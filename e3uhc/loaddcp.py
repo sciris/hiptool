@@ -1,5 +1,4 @@
-from e3uhc import e3uhcfolder
-from optima import makefilepath, odict
+from e3uhc import e3uhcpath, makefilepath, odict
 from xlrd import open_workbook
 
 
@@ -27,7 +26,7 @@ class Databook(object):
     
 
 # Define the default filename
-default_filename = e3uhcfolder('data')+'DCP3 V9_Table by Package for UHC Chapter_Working Version_8 30 17.xlsx' # Include the Optima folder
+default_filename = e3uhcpath('data')+'DCP3 V9_Table by Package for UHC Chapter_Working Version_8 30 17.xlsx' # Include the Optima folder
 default_sheetname = 'Deduplicated w Conflicts'
 
 
