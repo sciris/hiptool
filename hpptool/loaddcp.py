@@ -1,4 +1,4 @@
-from e3uhc import makefilepath, odict
+from hpptool import makefilepath, odict
 from xlrd import open_workbook
 
 
