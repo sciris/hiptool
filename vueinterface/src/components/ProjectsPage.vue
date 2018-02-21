@@ -81,6 +81,19 @@ Last update: 2/21/18 (gchadder3)
               <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
             </td>
           </tr>
+          <tr>
+            <td>
+              <button class="btn" @click="createNewProject">Create new project</button>
+            </td>
+            <td>
+              <select v-model="selectedCountry">
+                <option>Select country...</option>
+                <option v-for="choice in countryList">
+                  {{ choice }}
+                </option>
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -98,12 +111,6 @@ export default {
 
   data() {
     return {
-      // List of projects to choose from (by project name)
-      demoProjectList: [],
-
-      // Selected project (by name)
-      selectedDemoProject: '',
-
       // Placeholder text for table filter box
       filterPlaceholder: '\u{1f50e} Filter Projects',
 
@@ -145,17 +152,31 @@ export default {
             updateTime: '2017-Sep-21 08:44 AM',
             uid: 3,
             selected: false
+          },
+          {
+            projectName: 'Pakistan test 1',
+            country: 'Pakistan', 
+            creationTime: '2017-Sep-21 08:44 AM',
+            updateTime: '2017-Sep-21 08:44 AM',
+            uid: 4,
+            selected: false
           }
         ],
 
       // Active project
-      activeProject: {}
+      activeProject: {},
+
+      // Available countries
+      countryList: [],
+
+      // Country selected in the bottom select box
+      selectedCountry: 'Select country'
     }
   },
 
   computed: {
     sortedFilteredProjectSummaries() {
-      return this.applyFilter(this.applySorting(this.projectSummaries))
+      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
     } 
   }, 
 
@@ -167,11 +188,15 @@ export default {
 
     // Otherwise...
     else {
-      // Initialize the demoProjectList by picking out the project names.
-      this.demoProjectList = this.demoProjectSummaries.map(demoProj => demoProj.projectName)
+      // Initialize the countryList by picking out the (unique) country names.
+      // (First, a list is constructed pulling out the non-unique countries 
+      // for each project, then this array is stuffed into a new Set (which 
+      // will not duplicate array entries) and then the spread operator is 
+      // used to pull the set items out into an array.)
+      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
 
       // Initialize the selection of the demo project to the first element.
-      this.selectedDemoProject = this.demoProjectList[0]
+      this.selectedCountry = 'Select country...'
     }
   },
 
@@ -194,8 +219,8 @@ export default {
       }
     },
 
-    applyFilter(projects) {
-      console.log('applyFilter() called')
+    applyNameFilter(projects) {
+      console.log('applyNameFilter() called')
 
       return projects.filter(theProject => theProject.projectName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
@@ -220,6 +245,15 @@ export default {
           }
         }
       )
+    },
+
+    applyCountryFilter(projects) {
+      console.log('applyCountryFilter() called')
+
+      if (this.selectedCountry === 'Select country...')
+        return projects
+      else
+        return projects.filter(theProj => theProj.country === this.selectedCountry)
     },
 
     openProject(uid) {
@@ -251,6 +285,10 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
 
       console.log('deleteProject() called for ' + matchProject.projectName)
+    },
+
+    createNewProject() {
+      console.log('createNewProject() called')
     }
   }
 }
