@@ -55,6 +55,10 @@ Last update: 2/21/18 (gchadder3)
             </router-link>
           </div> -->
 
+          <div class="menu-item">
+            Help
+          </div>
+
           <div class="menu-item" @click="logout">
             Logout
           </div>
