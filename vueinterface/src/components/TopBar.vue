@@ -1,7 +1,7 @@
 <!-- 
 TopBar.vue -- TopBar Vue component
 
-Last update: 2/12/18 (gchadder3)
+Last update: 2/21/18 (gchadder3)
 -->
 
 <template>
@@ -13,23 +13,31 @@ Last update: 2/12/18 (gchadder3)
 
       <div style="display:table-cell; vertical-align: middle;" v-if="userloggedin()">
         <div class="menu">
-          <div class="menu-item" v-if="adminloggedin()">
+<!--          <div class="menu-item" v-if="adminloggedin()">
             <router-link to="/mainadmin" tag="span">
               Admin
             </router-link> 
-          </div>
+          </div> -->
 
           <div class="menu-item">
             <router-link to="/" tag="span" exact>
-              Projects
+              Manage projects
             </router-link> 
           </div>
 
           <div class="menu-item">
-            Plot view
+            Burden of disease
           </div>
 
           <div class="menu-item">
+            Interventions
+          </div>
+
+          <div class="menu-item">
+            Define health packages
+          </div>
+
+<!--          <div class="menu-item">
             <router-link to="/mypage" tag="span">
               Old main
             </router-link> 
@@ -45,7 +53,7 @@ Last update: 2/12/18 (gchadder3)
             <router-link to="/changepassword" tag="span">
               Change password
             </router-link>
-          </div>
+          </div> -->
 
           <div class="menu-item" @click="logout">
             Logout

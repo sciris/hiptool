@@ -1,7 +1,7 @@
 <!-- 
 LoginPage.vue -- LoginPage Vue component
 
-Last update: 2/14/18 (gchadder3)
+Last update: 2/21/18 (gchadder3)
 -->
 
 <template>
@@ -34,12 +34,12 @@ Last update: 2/14/18 (gchadder3)
 
         <button type="submit" class="section btn __l __block">Login</button>
 
-        <div class="section">
+<!--        <div class="section">
           New user?
           <router-link class="link __blue" to="/register">
             Register here
           </router-link> 
-        </div>
+        </div> -->
 
         <p>Login 1: Username = 'newguy', Password = 'mesogreen'</p>
         <p>Login 2: Username = 'admin', Password = 'mesoawesome'</p>
