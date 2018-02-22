@@ -1,12 +1,12 @@
 <!-- 
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 2/21/18 (gchadder3)
+Last update: 2/22/18 (gchadder3)
 -->
 
 <template>
   <div class="SitePage">
-    <h2>Disease Burden Page</h2>
+    <h2>Open Project: Afghanistan test 1</h2>
 
     <div class="PageSection">
       <input type="text" 
@@ -19,7 +19,7 @@ Last update: 2/21/18 (gchadder3)
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
-              Name
+              Burden project
               <span v-show="sortColumn == 'name' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
@@ -30,18 +30,7 @@ Last update: 2/21/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('country')" class="sortable">
-              Country
-              <span v-show="sortColumn == 'country' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-              <span v-show="sortColumn == 'country' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-              <span v-show="sortColumn != 'country'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-            </th>
+            <th>Country</th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -85,15 +74,7 @@ Last update: 2/21/18 (gchadder3)
           </tr>
           <tr>
             <td>
-              <button class="btn" @click="createNewProject">Create new project</button>
-            </td>
-            <td>
-              <select v-model="selectedCountry">
-                <option>Select country...</option>
-                <option v-for="choice in countryList">
-                  {{ choice }}
-                </option>
-              </select>
+              <button class="btn" @click="createNewProject">Create new</button>
             </td>
           </tr>
         </tbody>
@@ -109,12 +90,12 @@ import rpcservice from '../services/rpc-service'
 import router from '../router'
 
 export default {
-  name: 'ProjectsPage',
+  name: 'DiseaseBurdenPage',
 
   data() {
     return {
       // Placeholder text for table filter box
-      filterPlaceholder: '\u{1f50e} Filter Projects',
+      filterPlaceholder: '\u{1f50e} Filter Burden Projects',
 
       // Text in the table filter box
       filterText: '',
@@ -132,53 +113,31 @@ export default {
       projectSummaries: 
         [
           {
-            projectName: 'Afghanistan test 1',
+            projectName: 'Default GBD',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
+            creationTime: '2017-Jun-01 02:45 AM',
+            updateTime: '2017-Jun-02 05:41 AM',
             uid: 1,
             selected: false
           }, 
           {
-            projectName: 'Afghanistan HBP equity',
+            projectName: 'GBD with updated NCDs',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-22 08:44 AM',
-            updateTime: '',
+            creationTime: '2017-Jun-07 05:15 PM',
+            updateTime: '2017-Jun-08 05:14 PM',
             uid: 2,
-            selected: false
-          },
-          {
-            projectName: 'Final Afghanistan HBP', 
-            country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
-            uid: 3,
-            selected: false
-          },
-          {
-            projectName: 'Pakistan test 1',
-            country: 'Pakistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
-            uid: 4,
             selected: false
           }
         ],
 
       // Active project
-      activeProject: {},
-
-      // Available countries
-      countryList: [],
-
-      // Country selected in the bottom select box
-      selectedCountry: 'Select country'
+      activeProject: {}
     }
   },
 
   computed: {
     sortedFilteredProjectSummaries() {
-      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
+      return this.applyNameFilter(this.applySorting(this.projectSummaries))
     } 
   }, 
 
@@ -187,19 +146,6 @@ export default {
     if (this.$store.state.currentuser.displayname == undefined) {
       router.push('/login')
     } 
-
-    // Otherwise...
-    else {
-      // Initialize the countryList by picking out the (unique) country names.
-      // (First, a list is constructed pulling out the non-unique countries 
-      // for each project, then this array is stuffed into a new Set (which 
-      // will not duplicate array entries) and then the spread operator is 
-      // used to pull the set items out into an array.)
-      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
-
-      // Initialize the selection of the demo project to the first element.
-      this.selectedCountry = 'Select country...'
-    }
   },
 
   methods: {
@@ -247,15 +193,6 @@ export default {
           }
         }
       )
-    },
-
-    applyCountryFilter(projects) {
-      console.log('applyCountryFilter() called')
-
-      if (this.selectedCountry === 'Select country...')
-        return projects
-      else
-        return projects.filter(theProj => theProj.country === this.selectedCountry)
     },
 
     openProject(uid) {

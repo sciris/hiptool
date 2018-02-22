@@ -6,7 +6,7 @@ Last update: 2/21/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <h2>Interventions Page</h2>
+    <h2>Open Project: Afghanistan test 1</h2>
 
     <div class="PageSection">
       <input type="text" 
@@ -109,7 +109,7 @@ import rpcservice from '../services/rpc-service'
 import router from '../router'
 
 export default {
-  name: 'ProjectsPage',
+  name: 'InterventionsPage',
 
   data() {
     return {

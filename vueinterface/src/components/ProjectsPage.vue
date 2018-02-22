@@ -132,24 +132,24 @@ export default {
           {
             projectName: 'Afghanistan test 1',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
+            creationTime: '2017-Jun-01 02:45 AM',
+            updateTime: '2017-Jun-02 05:41 AM',
             uid: 1,
             selected: false
           }, 
           {
             projectName: 'Afghanistan HBP equity',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-22 08:44 AM',
-            updateTime: '',
+            creationTime: '2017-Jun-03 03:12 PM',
+            updateTime: '2017-Jun-05 03:38 PM',
             uid: 2,
             selected: false
           },
           {
             projectName: 'Final Afghanistan HBP', 
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
+            creationTime: '2017-Jun-06 08:15 PM',
+            updateTime: '2017-Jun-06 08:20 PM',
             uid: 3,
             selected: false
           },
