@@ -19,25 +19,25 @@ Last update: 2/21/18 (gchadder3)
             </router-link> 
           </div> -->
 
-          <div class="menu-item">
+          <div class="menu-item" :class="{'menu-active': $route.path === '/'}">
             <router-link to="/" tag="span" exact>
               Manage projects
             </router-link> 
           </div>
 
-          <div class="menu-item">
+          <div class="menu-item" :class="{'menu-active': $route.path === '/bod'}">
             <router-link to="/bod" tag="span">
               Burden of disease
             </router-link>
           </div>
 
-          <div class="menu-item">
+          <div class="menu-item" :class="{'menu-active': $route.path === '/interventions'}">
             <router-link to="/interventions" tag="span">
               Interventions
             </router-link>
           </div>
 
-          <div class="menu-item">
+          <div class="menu-item" :class="{'menu-active': $route.path === '/healthpackages'}">
             <router-link to="/healthpackages" tag="span">
               Define health packages
             </router-link>
@@ -81,6 +81,12 @@ import router from '../router'
 
 export default {
   name: 'TopBar', 
+
+  data() {
+    return {
+      activePage: 'manage projects'
+    }
+  },
 
   computed: {
     currentuser() {
