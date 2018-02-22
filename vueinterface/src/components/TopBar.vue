@@ -26,15 +26,21 @@ Last update: 2/21/18 (gchadder3)
           </div>
 
           <div class="menu-item">
-            Burden of disease
+            <router-link to="/bod" tag="span">
+              Burden of disease
+            </router-link>
           </div>
 
           <div class="menu-item">
-            Interventions
+            <router-link to="/interventions" tag="span">
+              Interventions
+            </router-link>
           </div>
 
           <div class="menu-item">
-            Define health packages
+            <router-link to="/healthpackages" tag="span">
+              Define health packages
+            </router-link>
           </div>
 
 <!--          <div class="menu-item">

@@ -1,10 +1,13 @@
 // index.js -- vue-router path configuration code
 //
-// Last update: 2/12/18 (gchadder3)
+// Last update: 2/21/18 (gchadder3)
 
 import Vue from 'vue'
 import Router from 'vue-router'
 import ProjectsPage from '@/components/ProjectsPage'
+import DiseaseBurdenPage from '@/components/DiseaseBurdenPage'
+import InterventionsPage from '@/components/InterventionsPage'
+import HealthPackagesPage from '@/components/HealthPackagesPage'
 import MyPage from '@/components/MyPage'
 import LoginPage from '@/components/LoginPage'
 import MainAdminPage from '@/components/MainAdminPage'
@@ -20,6 +23,21 @@ export default new Router({
       path: '/',
       name: 'ProjectsPage',
       component: ProjectsPage
+    },
+    {
+      path: '/bod',
+      name: 'DiseaseBurdenPage',
+      component: DiseaseBurdenPage
+    },
+    {
+      path: '/interventions',
+      name: 'InterventionsPage',
+      component: InterventionsPage
+    },
+    {
+      path: '/healthpackages',
+      name: 'HealthPackagesPage',
+      component: HealthPackagesPage
     },
     {
       path: '/mypage',
