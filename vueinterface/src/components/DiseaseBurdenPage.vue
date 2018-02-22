@@ -66,7 +66,7 @@ Last update: 2/22/18 (gchadder3)
             <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
+              <button class="btn __green" @click="openProject(projectSummary.uid)">View</button>
               <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
               <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
               <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
@@ -99,9 +99,6 @@ export default {
 
       // Text in the table filter box
       filterText: '',
-
-      // Are all of the projects selected?
-      allSelected: false, 
 
       // Column of table used for sorting the projects
       sortColumn: 'name',  // name, country, creationTime, updatedTime

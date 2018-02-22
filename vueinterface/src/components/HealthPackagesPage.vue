@@ -1,7 +1,7 @@
 <!-- 
 HealthPackagesPage.vue -- HealthPackagesPage Vue component
 
-Last update: 2/21/18 (gchadder3)
+Last update: 2/22/18 (gchadder3)
 -->
 
 <template>
@@ -132,35 +132,19 @@ export default {
       projectSummaries: 
         [
           {
-            projectName: 'Afghanistan test 1',
+            projectName: 'Package 1',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
+            creationTime: '2017-Jun-01 02:45 AM',
+            updateTime: '2017-Jun-02 05:41 AM',
             uid: 1,
             selected: false
           }, 
           {
-            projectName: 'Afghanistan HBP equity',
+            projectName: 'Final package',
             country: 'Afghanistan', 
-            creationTime: '2017-Sep-22 08:44 AM',
-            updateTime: '',
+            creationTime: '2017-Jun-07 05:15 PM',
+            updateTime: '2017-Jun-08 05:14 PM',
             uid: 2,
-            selected: false
-          },
-          {
-            projectName: 'Final Afghanistan HBP', 
-            country: 'Afghanistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
-            uid: 3,
-            selected: false
-          },
-          {
-            projectName: 'Pakistan test 1',
-            country: 'Pakistan', 
-            creationTime: '2017-Sep-21 08:44 AM',
-            updateTime: '2017-Sep-21 08:44 AM',
-            uid: 4,
             selected: false
           }
         ],
