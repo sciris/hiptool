@@ -66,7 +66,7 @@ Last update: 2/22/18 (gchadder3)
             <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.uid)">View</button>
+              <button class="btn __green" @click="viewProject(projectSummary.uid)">View</button>
               <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
               <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
               <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
@@ -114,16 +114,14 @@ export default {
             country: 'Afghanistan', 
             creationTime: '2017-Jun-01 02:45 AM',
             updateTime: '2017-Jun-02 05:41 AM',
-            uid: 1,
-            selected: false
+            uid: 1
           }, 
           {
             projectName: 'GBD with updated NCDs',
             country: 'Afghanistan', 
             creationTime: '2017-Jun-07 05:15 PM',
             updateTime: '2017-Jun-08 05:14 PM',
-            uid: 2,
-            selected: false
+            uid: 2
           }
         ],
 
@@ -192,11 +190,11 @@ export default {
       )
     },
 
-    openProject(uid) {
+    viewProject(uid) {
       // Find the project that matches the UID passed in.
       let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
 
-      console.log('openProject() called for ' + matchProject.projectName)
+      console.log('viewProject() called for ' + matchProject.projectName)
 
       // Set the active project to the matched project.
       this.activeProject = matchProject

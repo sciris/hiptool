@@ -18,8 +18,11 @@ Last update: 2/22/18 (gchadder3)
       <table class="table table-bordered table-hover table-striped" style="width: auto">
         <thead>
           <tr>
+            <th>
+              <input type="checkbox" @click="selectAll()" v-model="allSelected"/>
+            </th>
             <th @click="updateSorting('name')" class="sortable">
-              Name
+              Benefits package
               <span v-show="sortColumn == 'name' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
@@ -30,70 +33,44 @@ Last update: 2/22/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('country')" class="sortable">
-              Country
-              <span v-show="sortColumn == 'country' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-              <span v-show="sortColumn == 'country' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-              <span v-show="sortColumn != 'country'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-            </th>
-            <th @click="updateSorting('creationTime')" class="sortable">
-              Created on
-              <span v-show="sortColumn == 'creationTime' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-              <span v-show="sortColumn == 'creationTime' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-              <span v-show="sortColumn != 'creationTime'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-            </th>
-            <th @click="updateSorting('updatedTime')" class="sortable">
-              Last modified
-              <span v-show="sortColumn == 'updatedTime' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-              <span v-show="sortColumn == 'updatedTime' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-              <span v-show="sortColumn != 'updatedTime'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-            </th>
+            <th>Country</th>
+            <th>Burden project</th>
+            <th>Potential intervention set</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in sortedFilteredProjectSummaries" :class="{ highlighted: activeProject.uid === projectSummary.uid }">
-            <td>{{ projectSummary.projectName }}</td>
-            <td>{{ projectSummary.country }}</td>
-            <td>{{ projectSummary.creationTime }}</td>
-            <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
-              'No modification' }}</td>
-            <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
-              <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
-              <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
-              <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
-            </td>
-          </tr>
-          <tr>
+          <tr v-for="healthPackage in sortedFilteredHealthPackages" :class="{ highlighted: activePackage.uid === healthPackage.uid }">
             <td>
-              <button class="btn" @click="createNewProject">Create new project</button>
+              <input type="checkbox" @click="uncheckSelectAll()" v-model="healthPackage.selected"/>
             </td>
+            <td>{{ healthPackage.packageName }}</td>
+            <td>{{ healthPackage.country }}</td>
             <td>
-              <select v-model="selectedCountry">
-                <option>Select country...</option>
-                <option v-for="choice in countryList">
+              <select v-model="healthPackage.burdenProject">
+                <option v-for="choice in burdenProjects">
                   {{ choice }}
                 </option>
               </select>
+            </td>
+            <td>
+              <select v-model="healthPackage.intervSet">
+                <option v-for="choice in intervSets">
+                  {{ choice }}
+                </option>
+              </select>
+            </td>
+            <td style="white-space: nowrap">
+              <button class="btn __green" @click="viewPackage(healthPackage.uid)">View</button>
+              <button class="btn" @click="copyPackage(healthPackage.uid)">Copy</button>
+              <button class="btn" @click="renamePackage(healthPackage.uid)">Rename</button>
+              <button class="btn __red" @click="deletePackage(healthPackage.uid)">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <button class="btn" @click="createNewPackage">Create new</button>
             </td>
           </tr>
         </tbody>
@@ -114,55 +91,53 @@ export default {
   data() {
     return {
       // Placeholder text for table filter box
-      filterPlaceholder: '\u{1f50e} Filter Projects',
+      filterPlaceholder: '\u{1f50e} Filter Health Packages',
 
       // Text in the table filter box
       filterText: '',
 
-      // Are all of the projects selected?
+      // Are all of the health packages selected?
       allSelected: false, 
 
-      // Column of table used for sorting the projects
-      sortColumn: 'name',  // name, country, creationTime, updatedTime
+      // Column of table used for sorting the health packages
+      sortColumn: 'name',  // name
 
       // Sort in reverse order?
       sortReverse: false, 
 
-      // List of summary objects for projects the user has
-      projectSummaries: 
+      // List of objects for health packages the active project has
+      healthPackages: 
         [
           {
-            projectName: 'Package 1',
-            country: 'Afghanistan', 
-            creationTime: '2017-Jun-01 02:45 AM',
-            updateTime: '2017-Jun-02 05:41 AM',
+            packageName: 'Package 1',
+            country: 'Afghanistan',
+            burdenProject: 'Default GBD',
+            intervSet: 'Default LMIC from DCP',
             uid: 1,
             selected: false
           }, 
           {
-            projectName: 'Final package',
+            packageName: 'Final package',
             country: 'Afghanistan', 
-            creationTime: '2017-Jun-07 05:15 PM',
-            updateTime: '2017-Jun-08 05:14 PM',
+            burdenProject: 'GBD with updated NCDs',
+            intervSet: 'Default LMIC from DCP',
             uid: 2,
             selected: false
           }
         ],
 
-      // Active project
-      activeProject: {},
+      // Active health package
+      activePackage: {},
 
-      // Available countries
-      countryList: [],
+      burdenProjects: ['Default GBD', 'GBD with updated NCDs'],
 
-      // Country selected in the bottom select box
-      selectedCountry: 'Select country'
+      intervSets: ['Default LMIC from DCP', 'Country defined set']
     }
   },
 
   computed: {
-    sortedFilteredProjectSummaries() {
-      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
+    sortedFilteredHealthPackages() {
+      return this.applyNameFilter(this.applySorting(this.healthPackages))
     } 
   }, 
 
@@ -171,22 +146,25 @@ export default {
     if (this.$store.state.currentuser.displayname == undefined) {
       router.push('/login')
     } 
-
-    // Otherwise...
-    else {
-      // Initialize the countryList by picking out the (unique) country names.
-      // (First, a list is constructed pulling out the non-unique countries 
-      // for each project, then this array is stuffed into a new Set (which 
-      // will not duplicate array entries) and then the spread operator is 
-      // used to pull the set items out into an array.)
-      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
-
-      // Initialize the selection of the demo project to the first element.
-      this.selectedCountry = 'Select country...'
-    }
   },
 
   methods: {
+    selectAll() {
+      console.log('selectAll() called')
+
+      // For each of the packages, set the selection of the package to the 
+      // _opposite_ of the state of the all-select checkbox's state.
+      // NOTE: This function depends on it getting called before the 
+      // v-model state is updated.  If there are some cases of Vue 
+      // implementation where these happen in the opposite order, then 
+      // this will not give the desired result.
+      this.healthPackages.forEach(thePackage => thePackage.selected = !this.allSelected)
+    },
+
+    uncheckSelectAll() {
+      this.allSelected = false
+    },
+
     updateSorting(sortColumn) {
       console.log('updateSorting() called')
 
@@ -205,76 +183,58 @@ export default {
       }
     },
 
-    applyNameFilter(projects) {
+    applyNameFilter(packages) {
       console.log('applyNameFilter() called')
 
-      return projects.filter(theProject => theProject.projectName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
+      return packages.filter(thePackage => thePackage.packageName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
-    applySorting(projects) {
+    applySorting(packages) {
       console.log('applySorting() called')
 
-      return projects.sort((proj1, proj2) => 
+      return packages.sort((package1, package2) => 
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
-            return (proj1.projectName > proj2.projectName ? sortDir: -sortDir)
-          }
-          else if (this.sortColumn === 'country') {
-            return proj1.country > proj2.country ? sortDir: -sortDir
-          } 
-          else if (this.sortColumn === 'creationTime') {
-            return proj1.creationTime > proj2.creationTime ? sortDir: -sortDir
-          }
-          else if (this.sortColumn === 'updatedTime') {
-            return proj1.updateTime > proj2.updateTime ? sortDir: -sortDir
+            return (package1.packageName > package2.packageName ? sortDir: -sortDir)
           }
         }
       )
     },
 
-    applyCountryFilter(projects) {
-      console.log('applyCountryFilter() called')
+    viewPackage(uid) {
+      // Find the package that matches the UID passed in.
+      let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
-      if (this.selectedCountry === 'Select country...')
-        return projects
-      else
-        return projects.filter(theProj => theProj.country === this.selectedCountry)
+      console.log('viewPackage() called for ' + matchPackage.packageName)
+
+      // Set the active package to the matched package.
+      this.activePackage = matchPackage
     },
 
-    openProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    copyPackage(uid) {
+      // Find the package that matches the UID passed in.
+      let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
-      console.log('openProject() called for ' + matchProject.projectName)
-
-      // Set the active project to the matched project.
-      this.activeProject = matchProject
+      console.log('copyPackage() called for ' + matchPackage.packageName)
     },
 
-    copyProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    renamePackage(uid) {
+      // Find the package that matches the UID passed in.
+      let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
-      console.log('copyProject() called for ' + matchProject.projectName)
+      console.log('renamePackage() called for ' + matchPackage.packageName)
     },
 
-    renameProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    deletePackage(uid) {
+      // Find the package that matches the UID passed in.
+      let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
-      console.log('renameProject() called for ' + matchProject.projectName)
+      console.log('deletePackage() called for ' + matchPackage.packageName)
     },
 
-    deleteProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
-
-      console.log('deleteProject() called for ' + matchProject.projectName)
-    },
-
-    createNewProject() {
-      console.log('createNewProject() called')
+    createNewPackage() {
+      console.log('createNewPackage() called')
     }
   }
 }

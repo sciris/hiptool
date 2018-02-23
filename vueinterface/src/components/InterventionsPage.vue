@@ -37,7 +37,7 @@ Last update: 2/22/18 (gchadder3)
           <tr v-for="intervSet in sortedFilteredIntervSets" :class="{ highlighted: activeIntervSet.uid === intervSet.uid }">
             <td>{{ intervSet.setName }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openSet(intervSet.uid)">View</button>
+              <button class="btn __green" @click="viewSet(intervSet.uid)">View</button>
               <button class="btn" @click="copySet(intervSet.uid)">Copy</button>
               <button class="btn" @click="renameSet(intervSet.uid)">Rename</button>
               <button class="btn __red" @click="deleteSet(intervSet.uid)">Delete</button>
@@ -82,13 +82,11 @@ export default {
         [
           {
             setName: 'Default LMIC from DCP',
-            uid: 1,
-            selected: false
+            uid: 1
           }, 
           {
             setName: 'Country defined set',
-            uid: 2,
-            selected: false
+            uid: 2
           }
         ],
 
@@ -144,24 +142,15 @@ export default {
           if (this.sortColumn === 'name') {
             return (set1.setName > set2.setName ? sortDir: -sortDir)
           }
-          else if (this.sortColumn === 'country') {
-            return set1.country > set2.country ? sortDir: -sortDir
-          } 
-          else if (this.sortColumn === 'creationTime') {
-            return set1.creationTime > set2.creationTime ? sortDir: -sortDir
-          }
-          else if (this.sortColumn === 'updatedTime') {
-            return set1.updateTime > set2.updateTime ? sortDir: -sortDir
-          }
         }
       )
     },
 
-    openSet(uid) {
+    viewSet(uid) {
       // Find the intervention set that matches the UID passed in.
       let matchSet = this.interventionSets.find(theSet => theSet.uid === uid)
 
-      console.log('openSet() called for ' + matchSet.setName)
+      console.log('viewSet() called for ' + matchSet.setName)
 
       // Set the active intervention set to the matched intervention set.
       this.activeIntervSet = matchSet
