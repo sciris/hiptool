@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 2/22/18 (gchadder3)
+Last update: 2/23/18 (gchadder3)
 -->
 
 <template>
@@ -50,6 +50,12 @@ Last update: 2/22/18 (gchadder3)
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.setName != undefined">
+      <div class="PHText">
+        Page interface specific to {{ activeIntervSet.setName }} intervention set
+      </div>
     </div>
   </div>
 </template>
@@ -186,4 +192,14 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+  .UIPlaceholder {
+    height: 500px;
+    width: 100%;
+    border: 1px solid black;
+  }
+
+  .PHText {
+    color: green;
+    text-align: center;
+  }
 </style>
