@@ -85,6 +85,17 @@ Last update: 2/23/18 (gchadder3)
       <div class="PHText">
         Page interface specific to {{ activeProject.projectName }} project
       </div>
+      <div class="ThreePanels">
+        <div class="LeftPanel">
+          <span style="display: inline-block; vertical-align: middle; line-height: normal">left panel</span>
+        </div>
+        <div class="MidPanel">
+          middle panel
+        </div>
+        <div class="RightPanel">
+          right panel
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -245,5 +256,37 @@ export default {
   .PHText {
     color: green;
     text-align: center;
+    border: 1px solid black;
+  }
+
+  .ThreePanels {
+    display: flex;
+    height: 480px;
+    width: 100%;
+    border: 1px solid black;
+  }
+
+  .LeftPanel {
+    height: 100%;
+    width: 33%;
+    line-height: 480px;
+    text-align: center;
+    border: 1px solid black;
+  }
+
+  .MidPanel {
+    height: 100%;
+    width: 34%;
+    line-height: 480px;
+    text-align: center;
+    border: 1px solid black;
+  }
+
+  .RightPanel {
+    height: 100%;
+    width: 33%;
+    line-height: 480px;
+    text-align: center;
+    border: 1px solid black;
   }
 </style>
