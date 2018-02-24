@@ -87,13 +87,32 @@ Last update: 2/23/18 (gchadder3)
       </div>
       <div class="ThreePanels">
         <div class="LeftPanel">
-          <img src="../assets/images/bod_img1.png" width="350"/>
+          <div style="margin-top: 10px">
+            <img src="../assets/images/bod_img1.png" width="350"/>
+          </div>
+          <div style="margin-top: 10px">
+            <button class="btn">Edit</button>
+            <button class="btn">Download data</button>
+          </div>
+<!--          <img src="../assets/images/bod_img1.png" width="350"/> -->
         </div>
         <div class="MidPanel">
-          <img src="../assets/images/bod_img2.png" width="350"/>
+          <div style="margin-top: 10px">
+            <img src="../assets/images/bod_img2.png" width="350"/>
+          </div>
+          <div style="margin-top: 10px">
+            <button class="btn">Edit</button>
+            <button class="btn">Download data</button>
+          </div>
         </div>
         <div class="RightPanel">
-          <img src="../assets/images/bod_img3.png" width="350"/>
+          <div style="margin-top: 10px">
+            <img src="../assets/images/bod_img3.png" width="350"/>
+          </div>
+          <div style="margin-top: 10px">
+            <button class="btn">Edit</button>
+            <button class="btn">Download data</button>
+          </div>
         </div>
       </div>
     </div>
@@ -250,43 +269,40 @@ export default {
   .UIPlaceholder {
     height: 500px;
     width: 100%;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .PHText {
     color: green;
     text-align: center;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .ThreePanels {
     display: flex;
     height: 480px;
     width: 100%;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .LeftPanel {
     height: 100%;
     width: 33%;
-    line-height: 480px;
     text-align: center;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .MidPanel {
     height: 100%;
     width: 34%;
-    line-height: 480px;
     text-align: center;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .RightPanel {
     height: 100%;
     width: 33%;
-    line-height: 480px;
     text-align: center;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 </style>
