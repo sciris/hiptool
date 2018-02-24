@@ -87,13 +87,13 @@ Last update: 2/23/18 (gchadder3)
       </div>
       <div class="ThreePanels">
         <div class="LeftPanel">
-          <span style="display: inline-block; vertical-align: middle; line-height: normal">left panel</span>
+          <img src="../assets/images/bod_img1.png" width="350"/>
         </div>
         <div class="MidPanel">
-          middle panel
+          <img src="../assets/images/bod_img2.png" width="350"/>
         </div>
         <div class="RightPanel">
-          right panel
+          <img src="../assets/images/bod_img3.png" width="350"/>
         </div>
       </div>
     </div>
