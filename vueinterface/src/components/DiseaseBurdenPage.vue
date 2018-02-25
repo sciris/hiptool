@@ -1,7 +1,7 @@
 <!-- 
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 2/23/18 (gchadder3)
+Last update: 2/24/18 (gchadder3)
 -->
 
 <template>
@@ -267,7 +267,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
   .UIPlaceholder {
-    height: 500px;
+//    height: 500px;
     width: 100%;
 //    border: 1px solid black;
   }
@@ -280,7 +280,7 @@ export default {
 
   .ThreePanels {
     display: flex;
-    height: 480px;
+//    height: 480px;
     width: 100%;
 //    border: 1px solid black;
   }
