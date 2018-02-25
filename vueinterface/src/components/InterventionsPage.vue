@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 2/24/18 (gchadder3)
+Last update: 2/25/18 (gchadder3)
 -->
 
 <template>
@@ -58,6 +58,33 @@ Last update: 2/24/18 (gchadder3)
       </div>
 
       <div style="margin-top: 10px">
+        <table id="checkboxtable" class="table table-bordered" style="width: auto">
+          <tr>
+            <td>
+              Categories of intervention
+            </td>
+            <td>
+              <input type="checkbox" @click="intervAllCategoryClick" v-model="showAllIntervs"/> All
+            </td>
+            <td>
+              <input type="checkbox" v-model="showInfectiousIntervs"/> Infectious diseases
+            </td>
+          </tr>
+          <tr>
+            <td>
+              to show
+            </td>
+            <td>
+              <input type="checkbox" v-model="showCancerIntervs"/> Cancers
+            </td>
+            <td>
+              <input type="checkbox" v-model="showChildIntervs"/> Child care
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="margin-top: 10px">
         <table class="table table-bordered table-hover table-striped" style="width: auto">
           <thead>
             <tr>
@@ -71,7 +98,7 @@ Last update: 2/24/18 (gchadder3)
             </tr>
           </thead>
           <tbody>
-            <tr v-for="interv in interventionList">
+            <tr v-for="interv in filteredInterventions">
               <td style="text-align: center">
                 <input type="checkbox" v-model="interv.included"/>
               </td>
@@ -139,23 +166,56 @@ export default {
       // Active intervention set
       activeIntervSet: {},
 
+      // Show all of the intervention categories
+      showAllIntervs: true,
+
+      // Show cancer interventions
+      showCancerIntervs: false,
+
+      // Show infectious diseases interventions
+      showInfectiousIntervs: false,
+
+      // Show child care interventions
+      showChildIntervs: false,
+
       // Interventions to be shown in the table
       interventionList:
         [
           {
-            interventionName: 'Anti-retroviral therapy',
+            interventionName: 'Skin cancer removal',
             uid: 1,
-            included: true
+            included: true,
+            intervCategory: 'cancer'
           },
           {
-            interventionName: 'Family planning sessions',
+            interventionName: 'Brain tumor surgery',
             uid: 2,
-            included: true
+            included: false,
+            intervCategory: 'cancer'
           },
           {
-            interventionName: 'Vitamin A fortification',
+            interventionName: 'TB vaccination',
             uid: 3,
-            included: false
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Measles vaccination',
+            uid: 4,
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Polio vaccination',
+            uid: 5,
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Child checkup',
+            uid: 6,
+            included: false,
+            intervCategory: 'childcare'
           }
         ]
     }
@@ -164,7 +224,26 @@ export default {
   computed: {
     sortedFilteredIntervSets() {
       return this.applyNameFilter(this.applySorting(this.interventionSets))
-    } 
+    }, 
+
+    filteredInterventions() {
+      if (this.showAllIntervs) {
+        return this.interventionList
+      } else {
+        return this.interventionList.filter(interv => 
+          {
+            if (interv.intervCategory === 'cancer')
+              return this.showCancerIntervs
+            else if (interv.intervCategory === 'infectious')
+              return this.showInfectiousIntervs
+            else if (interv.intervCategory === 'childcare')
+              return this.showChildIntervs
+            else
+              return false
+          }
+        )  
+      }
+    }
   }, 
 
   created() {
@@ -245,6 +324,12 @@ export default {
 
     createNewSet() {
       console.log('createNewSet() called')
+    },
+
+    intervAllCategoryClick() {
+      this.showCancerIntervs = false
+      this.showInfectiousIntervs = false
+      this.showChildIntervs = false
     }
   }
 }
@@ -261,5 +346,9 @@ export default {
   .PHText {
     color: green;
     text-align: center;
+  }
+
+  #checkboxtable td {
+    padding: 0px 5px;
   }
 </style>
