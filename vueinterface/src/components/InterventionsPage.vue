@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 2/23/18 (gchadder3)
+Last update: 2/24/18 (gchadder3)
 -->
 
 <template>
@@ -56,6 +56,46 @@ Last update: 2/23/18 (gchadder3)
       <div class="PHText">
         Page interface specific to {{ activeIntervSet.setName }} intervention set
       </div>
+
+      <div style="margin-top: 10px">
+        <table class="table table-bordered table-hover table-striped" style="width: auto">
+          <thead>
+            <tr>
+              <th>Included in optimizations</th>
+              <th>Intervention name</th>
+              <th>Total cost</th>
+              <th>Est. DALY averted</th>
+              <th>Unit cost</th>
+              <th>Coverage %</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="interv in interventionList">
+              <td style="text-align: center">
+                <input type="checkbox" v-model="interv.included"/>
+              </td>
+              <td>{{ interv.interventionName }}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+                <i class="fas fa-edit"></i>
+                <i class="fas fa-copy"></i>
+                <i class="fas fa-download"></i>
+                <i class="fas fa-upload"></i>
+                <i class="fas fa-trash-alt"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button class="btn">Add new intervention</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -98,6 +138,26 @@ export default {
 
       // Active intervention set
       activeIntervSet: {},
+
+      // Interventions to be shown in the table
+      interventionList:
+        [
+          {
+            interventionName: 'Anti-retroviral therapy',
+            uid: 1,
+            included: true
+          },
+          {
+            interventionName: 'Family planning sessions',
+            uid: 2,
+            included: true
+          },
+          {
+            interventionName: 'Vitamin A fortification',
+            uid: 3,
+            included: false
+          }
+        ]
     }
   },
 
@@ -193,9 +253,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
   .UIPlaceholder {
-    height: 500px;
+//    height: 500px;
     width: 100%;
-    border: 1px solid black;
+//    border: 1px solid black;
   }
 
   .PHText {
