@@ -11,7 +11,7 @@ The HealthPrior tool, a.k.a. Health Packages Prioritization Tool, a.k.a. Health 
 
 To install, do
 
-`pip install -e .`
+`python setup.py develop`
 
 in the main folder.
 
