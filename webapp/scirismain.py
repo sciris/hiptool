@@ -22,6 +22,7 @@ import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import sciris.user as user
 import sciris.project as project
+from pylab import subplot
 
 #
 # Script code (Block 1)
@@ -524,13 +525,13 @@ def get_saved_scatterplotdata_graph(spdName):
         return {'error': 'Cannot find resource \'%s\'' % spdName}
     
     # Create a ScatterplotData object.
-    spd = model.ScatterplotData()
+    # spd = model.ScatterplotData()
 
-    # Load the data for this from the csv file.
-    spd.loadFromCsv(fullFileName)
+    # # Load the data for this from the csv file.
+    # spd.loadFromCsv(fullFileName)
     
     # Generate a matplotib graph for display.
-    graphData = spd.plot()
+    graphData = subplot(111) #spd.plot()
   
     # Return the dictionary representation of the matplotlib figure.
     return {'graph': mpld3.fig_to_dict(graphData)}
