@@ -1,6 +1,6 @@
-# HPP Tool
+# HealthPrior Tool
 
-The Health Packages Prioritization Tool, a.k.a. Health Services Prioritization Tool, a.k.a., E3UHC, is a tool for helping optimize health services.
+The HealthPrior tool, a.k.a. Health Packages Prioritization Tool, a.k.a. Health Services Prioritization Tool, a.k.a., E3UHC, is a tool for helping optimize health services.
 
 **WARNING, copied from Sciris**
 
@@ -9,7 +9,19 @@ The Health Packages Prioritization Tool, a.k.a. Health Services Prioritization T
 
 ### Installing on Linux Systems
 
-[needs to be written...]
+To install, do
+
+`pip install -e .`
+
+in the main folder.
+
+
+
+
+
+
+
+
 
 ### Installing on Windows Systems
 
