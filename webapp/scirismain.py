@@ -60,7 +60,7 @@ else:
     
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
-import model
+import hpptool
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
@@ -128,18 +128,18 @@ def init_filepaths(theApp):
         # Create an uploads subdirectory of this.
         os.mkdir(ds.uploadsPath)
         
-        # Create the fake data for scatterplots.
-        sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        fullFileName = '%s%sgraph1.csv' % (ds.fileSaveRootPath, os.sep)
-        sd.saveAsCsv(fullFileName)
+        # # Create the fake data for scatterplots.
+        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
+        # fullFileName = '%s%sgraph1.csv' % (ds.fileSaveRootPath, os.sep)
+        # sd.saveAsCsv(fullFileName)
         
-        sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        fullFileName = '%s%sgraph2.csv' % (ds.fileSaveRootPath, os.sep)
-        sd.saveAsCsv(fullFileName)
+        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
+        # fullFileName = '%s%sgraph2.csv' % (ds.fileSaveRootPath, os.sep)
+        # sd.saveAsCsv(fullFileName)
         
-        sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        fullFileName = '%s%sgraph3.csv' % (ds.fileSaveRootPath, os.sep)
-        sd.saveAsCsv(fullFileName) 
+        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
+        # fullFileName = '%s%sgraph3.csv' % (ds.fileSaveRootPath, os.sep)
+        # sd.saveAsCsv(fullFileName) 
         
 def init_datastore(theApp):
     # Create the DataStore object, setting up Redis.
