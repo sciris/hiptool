@@ -2,8 +2,8 @@ from hpptool import makefilepath, odict
 from xlrd import open_workbook
 
 
-def e3uhcpath(subdir=None, trailingsep=True):
-    ''' Returns the parent path of the E3UHC module. If subdir is not None, include it in the path '''
+def healthpriorpath(subdir=None, trailingsep=True):
+    ''' Returns the parent path of the HealthPrior module. If subdir is not None, include it in the path '''
     import os
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     if subdir is not None:
@@ -37,7 +37,7 @@ class Databook(object):
     
 
 # Define the default filename
-default_filename = e3uhcpath('data')+'DCP3 V9_Table by Package for UHC Chapter_Working Version_8 30 17.xlsx' # Include the Optima folder
+default_filename = healthpriorpath('data')+'DCP3 V9_Table by Package for UHC Chapter_Working Version_8 30 17.xlsx' # Include the Optima folder
 default_sheetname = 'Deduplicated w Conflicts'
 
 

@@ -1,11 +1,11 @@
-from optima import makefilepath, odict
-
 from .version import version, versiondate
 
-from .loaddcp import Databook, loaddcp, e3uhcpath
+from .utils import makefilepath, odict
+
+from .loaddcp import Databook, loaddcp, healthpriorpath
 
 # Print the license
-e3uhclicense = 'E3UHC %s (%s) -- (c) Optima Consortium' % (version, versiondate)
-print(e3uhclicense)
+healthpriorlicense = 'HealthPrior %s (%s)' % (version, versiondate)
+print(healthpriorlicense)
 
 
