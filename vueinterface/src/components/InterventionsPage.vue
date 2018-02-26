@@ -123,6 +123,16 @@ Last update: 2/25/18 (gchadder3)
           </tbody>
         </table>
       </div>
+
+      <div style="margin-top: 10px">
+        <span style="font-size: large">
+          <i class="fas fa-download"></i> Table of all
+        </span>
+        &nbsp; &nbsp;
+        <span style="font-size: large">
+          <i class="fas fa-download"></i> Selected
+        </span>
+      </div>
     </div>
   </div>
 </template>
