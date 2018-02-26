@@ -17,10 +17,11 @@ import sys
 import os
 import re
 import copy
-import sessionmanager.scirisobjects as sobj
-import sessionmanager.datastore as ds
-import sessionmanager.user as user
-import sessionmanager.project as project
+import sciris
+import sciris.scirisobjects as sobj
+import sciris.datastore as ds
+import sciris.user as user
+import sciris.project as project
 
 #
 # Script code (Block 1)
@@ -28,11 +29,12 @@ import sessionmanager.project as project
 
 # Get the full path for the loaded sciris repo.  (It in sys path at the 
 # beginning because the caller puts it there.)
-scirisRepoFullPath = sys.path[0]
+scirisRepoFullPath = os.path.dirname(sciris.__file__)
 
 # Execute the config.py file to get parameter values we need (directories).
-execfile('%s%s%s%s%s' % (scirisRepoFullPath, os.sep, 'sessionmanager', 
+execfile('%s%s%s' % (scirisRepoFullPath, 
     os.sep, 'config.py'))
+print('Warning fix path!')
 
 # If we have a full path for the model directory, load scirismain.py from that.
 if os.path.isabs(MODEL_DIR):
