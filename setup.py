@@ -4,9 +4,7 @@ from __future__ import unicode_literals
 
 from setuptools import setup, find_packages
 
-# NOTE: disease is intended to be replaced here at some point in the future with a build script that will 
-# dynamically create and move code into a subfolder within optima/ for a specific disease area. 
-with open("e3uhc/version.py", "r") as f:
+with open("model/version.py", "r") as f:
     version_file = {}
     exec(f.read(), version_file)
     version = version_file["version"]
@@ -31,12 +29,12 @@ CLASSIFIERS = [
 ]
 
 setup(
-    name='e3uhc',
+    name='hpptool',
     version=version,
     author='Cliff Kerr, George Chadderdon',
     author_email='info@optimamodel.com',
-    description='Software package for modeling UHC',
-    url='http://github.com/optimamodel/e3uhc',
+    description='Health Package Prioritization Tool',
+    url='http://github.com/optimamodel/hpptool',
     keywords=['optima','UHC'],
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
