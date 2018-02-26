@@ -1,2 +1,2 @@
-from hpptool import loaddcp
-dcp = loaddcp()
+from hpptool import Project
+P = Project(interventionsfile='../data/dcp-data.xlsx')

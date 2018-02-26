@@ -89,10 +89,8 @@ def loadspreadsheet(filename=None, folder=None, sheetname='Sheet1'):
     '''
     Load a spreadsheet
     '''
-    if filename is None:
-        default = HPpath('data')+'dcp-data.xlsx'
-        print('WARNING, fix')
-    fullpath = makefilepath(filename=filename, folder=folder, default=default)
+
+    fullpath = makefilepath(filename=filename, folder=folder)
     workbook = open_workbook(fullpath)
     sheet = workbook.sheet_by_name(sheetname)
     

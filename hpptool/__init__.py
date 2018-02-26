@@ -54,11 +54,6 @@ import utils as _utils; del utils
 from .colortools import alpinecolormap, bicolormap, gridcolors, vectocolor, shifthue
 import colortools as _colortools; del colortools
 
-# File imports
-from .fileio import loadobj, saveobj, loadstr, dumpstr, loadspreadsheet
-import fileio as _fileio; del fileio
-
-
 #####################################################################################################################
 ### Define debugging and exception functions/classes
 #####################################################################################################################
@@ -100,6 +95,11 @@ class HPException(Exception):
 ### Load HealthPrior functions and classes
 #####################################################################################################################
 
+# File imports
+from .fileio import loadobj, saveobj, loadstr, dumpstr, loadspreadsheet
+import fileio as _fileio; del fileio
+
+# Core functions
 from .burden import Burden
 from .interventions import Interventions
 from .project import Project

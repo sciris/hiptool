@@ -1,5 +1,7 @@
 from hpptool import odict, uuid, today, version, gitinfo, objrepr, getdate
-from hpptool import HPException, isnumber, printv, loadspreadsheet
+from hpptool import isnumber, printv
+from hpptool import HPException, Interventions
+
 
 #######################################################################################################
 ## Project class -- this contains everything else!
@@ -59,7 +61,9 @@ class Project(object):
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
-            self.loadinterventions(interventionsfile, verbose=verbose, **kwargs)
+            interventions = Interventions(project=self)
+            interventions.loaddata(filename=interventionsfile)
+            self.intersets['default'] = interventions
 
         return None
 
