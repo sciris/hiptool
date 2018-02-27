@@ -8,7 +8,7 @@ Last update: 2/21/18 (gchadder3)
   <div class="TopBar">
     <div class="elastic header">
       <div style="display:table-cell; width:160px">
-        <img src="../assets/images/optima-logo-sciris.png" height="50">
+        <img src="../assets/images/healthprior.png" height="60">
       </div>
 
       <div style="display:table-cell; vertical-align: middle;" v-if="userloggedin()">
