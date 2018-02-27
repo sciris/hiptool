@@ -150,8 +150,9 @@ def init_datastore(theApp):
     # Load the DataStore state from disk.
     ds.theDataStore.load()
     
-    ds.theDataStore.deleteAll()
-    print '>>>> This should really have deleted all users'
+    # Uncomment this line (for now) to reset the database, and then recomment
+    # before running for usage.
+#    ds.theDataStore.deleteAll()
     
 def init_users(theApp):
     # Look for an existing users dictionary.
