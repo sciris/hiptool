@@ -1,6 +1,6 @@
 from hpptool import odict, uuid, today, version, gitinfo, objrepr, getdate
 from hpptool import isnumber, printv
-from hpptool import HPException, Interventions
+from hpptool import HPException, Burden, Interventions
 
 
 #######################################################################################################
@@ -57,7 +57,9 @@ class Project(object):
 
         ## Load burden spreadsheet, if available
         if burdenfile:
-            self.loadburden(burdenfile, verbose=verbose, **kwargs)
+            burden = Burden(project=self)
+            burden.loaddata(filename=burdenfile)
+            self.burdensets['default'] = burden
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:

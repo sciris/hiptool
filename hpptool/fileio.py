@@ -85,14 +85,18 @@ def loadpickle(fileobj, verbose=False):
     return obj
 
 
-def loadspreadsheet(filename=None, folder=None, sheetname='Sheet1'):
+def loadspreadsheet(filename=None, folder=None, sheetname=None, sheetnum=None):
     '''
     Load a spreadsheet
     '''
 
     fullpath = makefilepath(filename=filename, folder=folder)
     workbook = open_workbook(fullpath)
-    sheet = workbook.sheet_by_name(sheetname)
+    if sheetname is not None: 
+        sheet = workbook.sheet_by_name(sheetname)
+    else:
+        if sheetnum is None: sheetnum = 0
+        sheet = workbook.sheet_by_index(sheetnum)
     
     rawdcp = []
     for rownum in range(sheet.nrows-1):
