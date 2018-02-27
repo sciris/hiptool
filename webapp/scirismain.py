@@ -61,7 +61,7 @@ else:
     
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
-import hpptool
+import hptool
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
