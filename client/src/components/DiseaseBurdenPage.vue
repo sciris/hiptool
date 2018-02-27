@@ -1,4 +1,4 @@
-<!-- 
+<!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
 Last update: 2/24/18 (gchadder3)
@@ -9,9 +9,9 @@ Last update: 2/24/18 (gchadder3)
     <h2>Open Project: Afghanistan test 1</h2>
 
     <div class="PageSection">
-      <input type="text" 
-             class="txbox" 
-             style="margin-bottom: 20px" 
+      <input type="text"
+             class="txbox"
+             style="margin-bottom: 20px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -63,7 +63,7 @@ Last update: 2/24/18 (gchadder3)
             <td>{{ projectSummary.projectName }}</td>
             <td>{{ projectSummary.country }}</td>
             <td>{{ projectSummary.creationTime }}</td>
-            <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
+            <td>{{ projectSummary.updateTime ? projectSummary.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
               <button class="btn __green" @click="viewProject(projectSummary.uid)">View</button>
@@ -85,6 +85,93 @@ Last update: 2/24/18 (gchadder3)
       <div class="PHText">
         Page interface specific to {{ activeProject.projectName }} project
       </div>
+
+      <div class="PageSection UIPlaceholder">
+        <div class="PHText">
+          Page interface specific to {{ activeIntervSet.setName }} burden set
+        </div>
+
+        <div style="margin-top: 10px">
+          <table id="checkboxtable" class="table table-bordered" style="width: auto">
+            <tr>
+              <td>
+                Categories of burden
+              </td>
+              <td>
+                <input type="checkbox" @click="intervAllCategoryClick" v-model="showAllIntervs"/> All
+              </td>
+              <td>
+                <input type="checkbox" v-model="showInfectiousIntervs"/> Infectious diseases
+              </td>
+            </tr>
+            <tr>
+              <td>
+                to show
+              </td>
+              <td>
+                <input type="checkbox" v-model="showCancerIntervs"/> Cancers
+              </td>
+              <td>
+                <input type="checkbox" v-model="showChildIntervs"/> Child care
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-top: 10px">
+          <table class="table table-bordered table-hover table-striped" style="width: auto">
+            <thead>
+            <tr>
+              <th>Include</th>
+              <th>Cause name</th>
+              <th>DALYs</th>
+              <th>Deaths</th>
+              <th>Prevalence</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="interv in filteredInterventions">
+              <td style="text-align: center">
+                <input type="checkbox" v-model="interv.included"/>
+              </td>
+              <td>{{ interv.interventionName }}</td>
+              <td>
+                <input type="text" />
+              </td>
+              <td></td>
+              <td></td>
+              <td>
+                <i class="fas fa-edit"></i>
+                <i class="fas fa-copy"></i>
+                <i class="fas fa-download"></i>
+                <i class="fas fa-upload"></i>
+                <i class="fas fa-trash-alt"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button class="btn">Add new cause</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 10px">
+        <span style="font-size: large">
+          <i class="fas fa-download"></i> Table of all
+        </span>
+          &nbsp; &nbsp;
+          <span style="font-size: large">
+          <i class="fas fa-download"></i> Selected
+        </span>
+        </div>
+      </div>
+
+
+
+
       <div class="ThreePanels">
         <div class="LeftPanel">
           <div style="margin-top: 10px">
@@ -140,21 +227,21 @@ export default {
       sortColumn: 'name',  // name, country, creationTime, updatedTime
 
       // Sort in reverse order?
-      sortReverse: false, 
+      sortReverse: false,
 
       // List of summary objects for projects the user has
-      projectSummaries: 
+      projectSummaries:
         [
           {
             projectName: 'Default GBD',
-            country: 'Afghanistan', 
+            country: 'Afghanistan',
             creationTime: '2017-Jun-01 02:45 AM',
             updateTime: '2017-Jun-02 05:41 AM',
             uid: 1
-          }, 
+          },
           {
             projectName: 'GBD with updated NCDs',
-            country: 'Afghanistan', 
+            country: 'Afghanistan',
             creationTime: '2017-Jun-07 05:15 PM',
             updateTime: '2017-Jun-08 05:14 PM',
             uid: 2
@@ -162,21 +249,90 @@ export default {
         ],
 
       // Active project
-      activeProject: {}
+      activeProject: {},
+
+      // List of objects for intervention sets the project has
+      interventionSets:
+        [
+          {
+            setName: 'Default LMIC from DCP',
+            uid: 1
+          },
+          {
+            setName: 'Country defined set',
+            uid: 2
+          }
+        ],
+
+      // Active intervention set
+      activeIntervSet: 1,
+
+      // Show all of the intervention categories
+      showAllIntervs: true,
+
+      // Show cancer interventions
+      showCancerIntervs: false,
+
+      // Show infectious diseases interventions
+      showInfectiousIntervs: false,
+
+      // Show child care interventions
+      showChildIntervs: false,
+
+      // Interventions to be shown in the table
+      interventionList:
+        [
+          {
+            interventionName: 'Skin cancer removal',
+            uid: 1,
+            included: true,
+            intervCategory: 'cancer'
+          },
+          {
+            interventionName: 'Brain tumor surgery',
+            uid: 2,
+            included: false,
+            intervCategory: 'cancer'
+          },
+          {
+            interventionName: 'TB vaccination',
+            uid: 3,
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Measles vaccination',
+            uid: 4,
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Polio vaccination',
+            uid: 5,
+            included: true,
+            intervCategory: 'infectious'
+          },
+          {
+            interventionName: 'Child checkup',
+            uid: 6,
+            included: false,
+            intervCategory: 'childcare'
+          }
+        ]
     }
   },
 
   computed: {
     sortedFilteredProjectSummaries() {
       return this.applyNameFilter(this.applySorting(this.projectSummaries))
-    } 
-  }, 
+    }
+  },
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
     if (this.$store.state.currentuser.displayname == undefined) {
       router.push('/login')
-    } 
+    }
   },
 
   methods: {
@@ -187,7 +343,7 @@ export default {
       if (this.sortColumn === sortColumn) {
           // Reverse the sort.
           this.sortReverse = !this.sortReverse
-      } 
+      }
       // Otherwise.
       else {
         // Select the new column for sorting.
@@ -207,7 +363,7 @@ export default {
     applySorting(projects) {
       console.log('applySorting() called')
 
-      return projects.sort((proj1, proj2) => 
+      return projects.sort((proj1, proj2) =>
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
@@ -215,7 +371,7 @@ export default {
           }
           else if (this.sortColumn === 'country') {
             return proj1.country > proj2.country ? sortDir: -sortDir
-          } 
+          }
           else if (this.sortColumn === 'creationTime') {
             return proj1.creationTime > proj2.creationTime ? sortDir: -sortDir
           }
