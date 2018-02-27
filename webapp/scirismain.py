@@ -166,12 +166,12 @@ def init_users(theApp):
         user.theUserDict.loadFromDataStore() 
     
     # Else (no match)...
-    else:
-        print '>> Creating a new UserDict.'   
-        user.theUserDict.addToDataStore()
-        user.theUserDict.add(user.testUser)
-        user.theUserDict.add(user.testUser2)
-        user.theUserDict.add(user.testUser3)
+    # else:
+    print '>> Creating a new UserDict.'   
+    user.theUserDict.addToDataStore()
+    user.theUserDict.add(user.testUser)
+    user.theUserDict.add(user.testUser2)
+    user.theUserDict.add(user.testUser3)
 
     # Show all of the handles in theDataStore.
     print '>> List of all DataStore handles...'
