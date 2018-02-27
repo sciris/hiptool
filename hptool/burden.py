@@ -2,7 +2,7 @@
 Version:
 """
 
-from hpptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet
+from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet
 
 class Burden(object):
     ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:

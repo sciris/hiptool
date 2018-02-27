@@ -1,6 +1,6 @@
-from hpptool import odict, uuid, today, version, gitinfo, objrepr, getdate
-from hpptool import isnumber, printv
-from hpptool import HPException, Burden, Interventions
+from hptool import odict, uuid, today, version, gitinfo, objrepr, getdate
+from hptool import isnumber, printv
+from hptool import HPException, Burden, Interventions
 
 
 #######################################################################################################

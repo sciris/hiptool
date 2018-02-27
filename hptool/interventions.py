@@ -2,7 +2,7 @@
 Version:
 """
 
-from hpptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet
+from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet
 
 
 class Interventions(object):

@@ -7,7 +7,7 @@ except: import pickle
 from gzip import GzipFile
 from cStringIO import StringIO
 from contextlib import closing
-from hpptool import makefilepath, odict, HPpath
+from hptool import makefilepath, odict, HPpath
 from xlrd import open_workbook
 
 

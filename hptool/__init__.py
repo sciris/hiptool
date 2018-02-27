@@ -2,11 +2,11 @@
 """
 This file performs all necessary imports, so HealthPrior (HP) can be used either as
 
-from hpptool import Project
+from hptool import Project
 or
-import hpptool as hp
+import hptool as hp
 or
-from hpptool import *
+from hptool import *
 
 Now, the legal part:
 
