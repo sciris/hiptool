@@ -41,9 +41,9 @@ Last update: 2/21/18 (gchadder3)
           </router-link> 
         </div> -->
 
-        <p>Login 1: Username = 'newguy', Password = 'mesogreen'</p>
+<!--        <p>Login 1: Username = 'newguy', Password = 'mesogreen'</p>
         <p>Login 2: Username = 'admin', Password = 'mesoawesome'</p>
-        <p>Login 3: Username = '_ScirisDemo', Password = '_ScirisDemo'</p>
+        <p>Login 3: Username = '_ScirisDemo', Password = '_ScirisDemo'</p> -->
 
       </div>
     </form>
