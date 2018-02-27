@@ -12,6 +12,8 @@ class Burden(object):
     4.	Number of people affected by year*
     5.	Total DALYs by year
     6.	Total mortality by year
+    
+    From http://ghdx.healthdata.org/gbd-results-tool
     '''
     
     def __init__(self, name='default', project=None):
