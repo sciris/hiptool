@@ -151,6 +151,7 @@ def init_datastore(theApp):
     ds.theDataStore.load()
     
     ds.theDataStore.deleteAll()
+    print '>>>> This should really have deleted all users'
     
 def init_users(theApp):
     # Look for an existing users dictionary.
