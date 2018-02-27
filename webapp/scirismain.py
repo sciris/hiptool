@@ -150,7 +150,7 @@ def init_datastore(theApp):
     # Load the DataStore state from disk.
     ds.theDataStore.load()
     
-   ds.theDataStore.deleteAll()
+    ds.theDataStore.deleteAll()
     
 def init_users(theApp):
     # Look for an existing users dictionary.
