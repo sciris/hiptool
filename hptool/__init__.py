@@ -91,9 +91,13 @@ class HPException(Exception):
         Exception.__init__(self, errormsg, *args, **kwargs)
 
 
+
 #####################################################################################################################
 ### Load HealthPrior functions and classes
 #####################################################################################################################
+
+# Configuration for webapp
+import config as _config
 
 # File imports
 from .fileio import loadobj, saveobj, loadstr, dumpstr, loadspreadsheet
