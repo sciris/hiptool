@@ -96,9 +96,6 @@ class HPException(Exception):
 ### Load HealthPrior functions and classes
 #####################################################################################################################
 
-# Configuration for webapp
-import config as _config
-
 # File imports
 from .fileio import loadobj, saveobj, loadstr, dumpstr, loadspreadsheet
 import fileio as _fileio; del fileio
