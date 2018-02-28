@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 # Load Sciris
-from sciris import _autoreload
-from sciris import _twisted_wsgi
+from sciris import server
 
 # Run the server
-_autoreload.main(_twisted_wsgi.run)
+server.start()
