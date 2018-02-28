@@ -1,7 +1,7 @@
 """
 scirismain.py -- main code for Sciris users to change to create their web apps
     
-Last update: 1/17/18 (gchadder3)
+Last update: 2/28/18 (gchadder3)
 """
 
 #
@@ -160,12 +160,12 @@ def init_users(theApp):
         user.theUserDict.loadFromDataStore() 
     
     # Else (no match)...
-    # else:
-    print '>> Creating a new UserDict.'   
-    user.theUserDict.addToDataStore()
-    user.theUserDict.add(user.testUser)
-    user.theUserDict.add(user.testUser2)
-    user.theUserDict.add(user.testUser3)
+    else:
+        print '>> Creating a new UserDict.'   
+        user.theUserDict.addToDataStore()
+        user.theUserDict.add(user.testUser)
+        user.theUserDict.add(user.testUser2)
+        user.theUserDict.add(user.testUser3)
 
     # Show all of the handles in theDataStore.
     print '>> List of all DataStore handles...'
