@@ -24,6 +24,7 @@ class Burden(object):
         self.modified = today() # Date modified
         self.data = None
         self.filename = None
+        self.popsize = None
     
     def __repr__(self):
         ''' Print out useful information when called'''

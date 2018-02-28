@@ -23,6 +23,7 @@ import sciris.datastore as ds
 import sciris.user as user
 import sciris.project as project
 from pylab import subplot
+import config
 
 #
 # Script code (Block 1)
@@ -32,28 +33,23 @@ from pylab import subplot
 # beginning because the caller puts it there.)
 scirisRepoFullPath = os.path.dirname(sciris.__file__)
 
-# Execute the config.py file to get parameter values we need (directories).
-execfile('%s%s%s' % (scirisRepoFullPath, 
-    os.sep, 'config.py'))
-print('Warning fix path!')
-
 # If we have a full path for the model directory, load scirismain.py from that.
-if os.path.isabs(MODEL_DIR):
-    modelDirTarget = MODEL_DIR
+if os.path.isabs(config.MODEL_DIR):
+    modelDirTarget = config.MODEL_DIR
     
 # Otherwise (we have a relative path), use it (correcting so it is with 
 # respect to the sciris repo directory).
 else:
-    modelDirTarget = '%s%s%s' % (os.pardir, os.sep, MODEL_DIR) 
+    modelDirTarget = '%s%s%s' % (os.pardir, os.sep, config.MODEL_DIR) 
     
 # If we have a full path for the webapp directory, load scirismain.py from that.
-if os.path.isabs(WEBAPP_DIR):
-    webappDirTarget = WEBAPP_DIR
+if os.path.isabs(config.WEBAPP_DIR):
+    webappDirTarget = config.WEBAPP_DIR
     
 # Otherwise (we have a relative path), use it (correcting so it is with 
 # respect to the sciris repo directory).
 else:
-    webappDirTarget = '%s%s%s' % (os.pardir, os.sep, WEBAPP_DIR) 
+    webappDirTarget = '%s%s%s' % (os.pardir, os.sep, config.WEBAPP_DIR) 
     
 #
 # Imports (Block 2, dependent on config file)
@@ -65,10 +61,6 @@ import hptool
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
-import imp
-imp.load_source('ourexceptions', '%s%sexceptions.py' % \
-   (webappDirTarget, os.sep))
-from ourexceptions import ProjectDoesNotExist, SpreadsheetDoesNotExist
 
 #
 # Classes
