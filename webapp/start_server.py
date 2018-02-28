@@ -5,4 +5,4 @@ from sciris import server
 from config import config
 
 # Run the server
-#server.start()
+server.start(config=config)
