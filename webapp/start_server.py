@@ -2,7 +2,7 @@
 
 # Load Sciris
 from sciris import server
-from ..webapp import config
+from config import config
 
 # Run the server
 #server.start()
