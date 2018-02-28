@@ -119,7 +119,6 @@ def loadspreadsheet(filename=None, folder=None, sheetname=None, sheetnum=None, a
             newrow = list(oldrow[:])
             reformatted.append(newrow)
         dfdata = dataframe(cols=cols, data=reformatted)
-        import traceback; traceback.print_exc(); import pdb; pdb.set_trace()
         return dfdata
     
     # Or leave in the original format
