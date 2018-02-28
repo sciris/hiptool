@@ -65,10 +65,6 @@ import hptool
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
-import imp
-imp.load_source('ourexceptions', '%s%sexceptions.py' % \
-   (webappDirTarget, os.sep))
-from ourexceptions import ProjectDoesNotExist, SpreadsheetDoesNotExist
 
 #
 # Classes
