@@ -7,7 +7,7 @@ except: import pickle
 from gzip import GzipFile
 from cStringIO import StringIO
 from contextlib import closing
-from hptool import makefilepath, odict, HPpath
+from hptool import makefilepath, odict, HPpath, dataframe
 from xlrd import open_workbook
 
 
@@ -85,7 +85,7 @@ def loadpickle(fileobj, verbose=False):
     return obj
 
 
-def loadspreadsheet(filename=None, folder=None, sheetname=None, sheetnum=None):
+def loadspreadsheet(filename=None, folder=None, sheetname=None, sheetnum=None, asdataframe=True):
     '''
     Load a spreadsheet
     '''
@@ -98,10 +98,30 @@ def loadspreadsheet(filename=None, folder=None, sheetname=None, sheetnum=None):
         if sheetnum is None: sheetnum = 0
         sheet = workbook.sheet_by_index(sheetnum)
     
-    rawdcp = []
+    # Load the raw data
+    rawdata = []
     for rownum in range(sheet.nrows-1):
-        rawdcp.append(odict())
+        rawdata.append(odict())
         for colnum in range(sheet.ncols):
             attr = sheet.cell_value(0,colnum)
-            rawdcp[rownum][attr] = sheet.cell_value(rownum+1,colnum) if sheet.cell_value(rownum+1,colnum)!='None' else None
-    return rawdcp
+            val = sheet.cell_value(rownum+1,colnum)
+            try:    val = float(val) # Convert it to a number if possible
+            except: 
+                try:    val = str(val)  # But give up easily and convert to a string (not Unicode)
+                except: pass # Still no dice? Fine, we tried
+            rawdata[rownum][attr] = val
+    
+    # Convert to dataframe
+    if asdataframe:
+        cols = rawdata[0].keys()
+        reformatted = []
+        for oldrow in rawdata:
+            newrow = list(oldrow[:])
+            reformatted.append(newrow)
+        dfdata = dataframe(cols=cols, data=reformatted)
+        import traceback; traceback.print_exc(); import pdb; pdb.set_trace()
+        return dfdata
+    
+    # Or leave in the original format
+    else:
+        return rawdata
