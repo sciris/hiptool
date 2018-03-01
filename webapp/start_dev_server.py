@@ -1,7 +1,6 @@
-#!/usr/bin/python
-
 # Load Sciris
-from sciris.api import app
+from sciris.api import makeapp
+import config
 
-# Run the server
-app.run()
+app = makeapp(config=config) # Create the app
+app.run() # Run the server
