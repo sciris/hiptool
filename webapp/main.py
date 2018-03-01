@@ -58,6 +58,7 @@ else:
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
 import hptool
+from hptool import Project, HPpath
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
@@ -479,6 +480,29 @@ def admin_delete_user(userName):
         
     # Return the callResult.    
     return callResult
+
+def read_ihme_table():
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Load the data path holding the Excel files.
+    dataPath = HPpath('data')
+    
+    # Load the project.
+    P = Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
+        interventionsfile=dataPath + 'dcp-data.xlsx')
+    
+    # The data of interest is in
+    # P.burdensets[0].data, which is a list of odicts.  Each odict contains
+    # the elements for that row of data.
+    
+    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]    
+    print diseaseData
+    
+    # Return success.
+    return { 'diseases': diseaseData }
     
 def list_saved_scatterplotdata_resources():
     # Check (for security purposes) that the function is being called by the 

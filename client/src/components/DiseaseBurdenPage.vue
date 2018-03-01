@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 2/24/18 (gchadder3)
+Last update: 2/28/18 (gchadder3)
 -->
 
 <template>
@@ -86,6 +86,9 @@ Last update: 2/24/18 (gchadder3)
         Page interface specific to {{ activeProject.projectName }} project
       </div>
 
+      <button @click="grabTableData">Push the pretty button</button>
+
+<!-- Cliff inserted this...
       <div class="PageSection UIPlaceholder">
         <div class="PHText">
           Page interface specific to {{ activeIntervSet.setName }} burden set
@@ -168,10 +171,10 @@ Last update: 2/24/18 (gchadder3)
         </span>
         </div>
       </div>
+end of Cliff insert -->
 
 
-
-
+<!-- old ThreePanels stuff
       <div class="ThreePanels">
         <div class="LeftPanel">
           <div style="margin-top: 10px">
@@ -181,7 +184,6 @@ Last update: 2/24/18 (gchadder3)
             <button class="btn">Edit</button>
             <button class="btn">Download data</button>
           </div>
-<!--          <img src="../assets/images/bod_img1.png" width="350"/> -->
         </div>
         <div class="MidPanel">
           <div style="margin-top: 10px">
@@ -201,7 +203,9 @@ Last update: 2/24/18 (gchadder3)
             <button class="btn">Download data</button>
           </div>
         </div>
-      </div>
+      </div> 
+end of ThreePanels stuff -->
+
     </div>
   </div>
 </template>
@@ -415,6 +419,11 @@ export default {
 
     createNewProject() {
       console.log('createNewProject() called')
+    },
+
+    grabTableData() {
+      console.log('grabTableData() called')
+      rpcservice.rpcCall('read_ihme_table')
     }
   }
 }
