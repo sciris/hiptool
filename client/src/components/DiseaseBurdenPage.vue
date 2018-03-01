@@ -86,92 +86,91 @@ Last update: 2/28/18 (gchadder3)
         Page interface specific to {{ activeProject.projectName }} project
       </div>
 
-      <button @click="grabTableData">Push the pretty button</button>
+      <h2 v-if="diseaseList.length > 0">We've loaded diseases for a table below.</h2>
 
-<!-- Cliff inserted this...
-      <div class="PageSection UIPlaceholder">
-        <div class="PHText">
-          Page interface specific to {{ activeIntervSet.setName }} burden set
-        </div>
-
-        <div style="margin-top: 10px">
-          <table id="checkboxtable" class="table table-bordered" style="width: auto">
-            <tr>
-              <td>
-                Categories of burden
-              </td>
-              <td>
-                <input type="checkbox" @click="intervAllCategoryClick" v-model="showAllIntervs"/> All
-              </td>
-              <td>
-                <input type="checkbox" v-model="showInfectiousIntervs"/> Infectious diseases
-              </td>
-            </tr>
-            <tr>
-              <td>
-                to show
-              </td>
-              <td>
-                <input type="checkbox" v-model="showCancerIntervs"/> Cancers
-              </td>
-              <td>
-                <input type="checkbox" v-model="showChildIntervs"/> Child care
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <div style="margin-top: 10px">
-          <table class="table table-bordered table-hover table-striped" style="width: auto">
-            <thead>
-            <tr>
-              <th>Include</th>
-              <th>Cause name</th>
-              <th>DALYs</th>
-              <th>Deaths</th>
-              <th>Prevalence</th>
-              <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="interv in filteredInterventions">
-              <td style="text-align: center">
-                <input type="checkbox" v-model="interv.included"/>
-              </td>
-              <td>{{ interv.interventionName }}</td>
-              <td>
-                <input type="text" />
-              </td>
-              <td></td>
-              <td></td>
-              <td>
-                <i class="fas fa-edit"></i>
-                <i class="fas fa-copy"></i>
-                <i class="fas fa-download"></i>
-                <i class="fas fa-upload"></i>
-                <i class="fas fa-trash-alt"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button class="btn">Add new cause</button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div style="margin-top: 10px">
-        <span style="font-size: large">
-          <i class="fas fa-download"></i> Table of all
-        </span>
-          &nbsp; &nbsp;
-          <span style="font-size: large">
-          <i class="fas fa-download"></i> Selected
-        </span>
-        </div>
-      </div>
-end of Cliff insert -->
+<!--      <table class="table table-bordered table-hover table-striped" style="width: auto">
+        <thead>
+          <tr>
+            <th @click="updateSorting('name')" class="sortable">
+              Cause name
+              <span v-show="sortColumn == 'name' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'name' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'name'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
+            <th @click="updateSorting('country')" class="sortable">
+              DALYs
+              <span v-show="sortColumn == 'country' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'country' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'country'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
+            <th @click="updateSorting('creationTime')" class="sortable">
+              Deaths
+              <span v-show="sortColumn == 'creationTime' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'creationTime' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'creationTime'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
+            <th @click="updateSorting('updatedTime')" class="sortable">
+              Prevalence
+              <span v-show="sortColumn == 'updatedTime' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'updatedTime' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'updatedTime'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="projectSummary in sortedFilteredProjectSummaries" :class="{ highlighted: activeProject.uid === projectSummary.uid }">
+            <td>{{ projectSummary.projectName }}</td>
+            <td>{{ projectSummary.country }}</td>
+            <td>{{ projectSummary.creationTime }}</td>
+            <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
+              'No modification' }}</td>
+            <td style="white-space: nowrap">
+              <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
+              <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
+              <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
+              <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button class="btn" @click="createNewProject">Create new project</button>
+            </td>
+            <td>
+              <select v-model="selectedCountry">
+                <option>Select country...</option>
+                <option v-for="choice in countryList">
+                  {{ choice }}
+                </option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table> -->
 
 
 <!-- old ThreePanels stuff
@@ -255,74 +254,9 @@ export default {
       // Active project
       activeProject: {},
 
-      // List of objects for intervention sets the project has
-      interventionSets:
-        [
-          {
-            setName: 'Default LMIC from DCP',
-            uid: 1
-          },
-          {
-            setName: 'Country defined set',
-            uid: 2
-          }
-        ],
-
-      // Active intervention set
-      activeIntervSet: 1,
-
-      // Show all of the intervention categories
-      showAllIntervs: true,
-
-      // Show cancer interventions
-      showCancerIntervs: false,
-
-      // Show infectious diseases interventions
-      showInfectiousIntervs: false,
-
-      // Show child care interventions
-      showChildIntervs: false,
-
-      // Interventions to be shown in the table
-      interventionList:
-        [
-          {
-            interventionName: 'Skin cancer removal',
-            uid: 1,
-            included: true,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'Brain tumor surgery',
-            uid: 2,
-            included: false,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'TB vaccination',
-            uid: 3,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Measles vaccination',
-            uid: 4,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Polio vaccination',
-            uid: 5,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Child checkup',
-            uid: 6,
-            included: false,
-            intervCategory: 'childcare'
-          }
-        ]
+      // List of diseases.  Each list element is a list of the ailment name
+      // and numbers associated with it.
+      diseaseList: []
     }
   },
 
@@ -394,6 +328,8 @@ export default {
 
       // Set the active project to the matched project.
       this.activeProject = matchProject
+
+      this.grabTableData()
     },
 
     copyProject(uid) {
@@ -424,6 +360,9 @@ export default {
     grabTableData() {
       console.log('grabTableData() called')
       rpcservice.rpcCall('read_ihme_table')
+        .then(response => {
+          this.diseaseList = response.data.diseases
+        })
     }
   }
 }
