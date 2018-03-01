@@ -41,4 +41,4 @@ python start_dev_server.py
 python start_dev_client.py
 ```
 
-This uses hot reloading, so any changes you make to the client code will be immediately live.
+This uses hot reloading, so any changes you make to the client code will be immediately live. Your site will be live at `localhost:8080`.
