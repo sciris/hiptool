@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 2/28/18 (gchadder3)
+Last update: 3/1/18 (gchadder3)
 -->
 
 <template>
@@ -86,56 +86,56 @@ Last update: 2/28/18 (gchadder3)
         Page interface specific to {{ activeProject.projectName }} project
       </div>
 
-      <h2 v-if="diseaseList.length > 0">We've loaded diseases for a table below.</h2>
+      <button class="btn" @click="grabTableData">Upload IHME data</button>
 
-<!--      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
           <tr>
-            <th @click="updateSorting('name')" class="sortable">
+            <th @click="updateSorting2('name')" class="sortable">
               Cause name
-              <span v-show="sortColumn == 'name' && !sortReverse">
+              <span v-show="sortColumn2 == 'name' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
               </span>
-              <span v-show="sortColumn == 'name' && sortReverse">
+              <span v-show="sortColumn2 == 'name' && sortReverse2">
                 <i class="fas fa-caret-up"></i>
               </span>
-              <span v-show="sortColumn != 'name'">
+              <span v-show="sortColumn2 != 'name'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('country')" class="sortable">
+            <th @click="updateSorting2('DALYs')" class="sortable">
               DALYs
-              <span v-show="sortColumn == 'country' && !sortReverse">
+              <span v-show="sortColumn2 == 'DALYs' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
               </span>
-              <span v-show="sortColumn == 'country' && sortReverse">
+              <span v-show="sortColumn2 == 'DALYs' && sortReverse2">
                 <i class="fas fa-caret-up"></i>
               </span>
-              <span v-show="sortColumn != 'country'">
+              <span v-show="sortColumn2 != 'DALYs'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('creationTime')" class="sortable">
+            <th @click="updateSorting2('deaths')" class="sortable">
               Deaths
-              <span v-show="sortColumn == 'creationTime' && !sortReverse">
+              <span v-show="sortColumn2 == 'deaths' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
               </span>
-              <span v-show="sortColumn == 'creationTime' && sortReverse">
+              <span v-show="sortColumn2 == 'deaths' && sortReverse2">
                 <i class="fas fa-caret-up"></i>
               </span>
-              <span v-show="sortColumn != 'creationTime'">
+              <span v-show="sortColumn2 != 'deaths'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('updatedTime')" class="sortable">
+            <th @click="updateSorting2('prevalence')" class="sortable">
               Prevalence
-              <span v-show="sortColumn == 'updatedTime' && !sortReverse">
+              <span v-show="sortColumn2 == 'prevalence' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
               </span>
-              <span v-show="sortColumn == 'updatedTime' && sortReverse">
+              <span v-show="sortColumn2 == 'prevalence' && sortReverse2">
                 <i class="fas fa-caret-up"></i>
               </span>
-              <span v-show="sortColumn != 'updatedTime'">
+              <span v-show="sortColumn2 != 'prevalence'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
@@ -143,34 +143,23 @@ Last update: 2/28/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in sortedFilteredProjectSummaries" :class="{ highlighted: activeProject.uid === projectSummary.uid }">
-            <td>{{ projectSummary.projectName }}</td>
-            <td>{{ projectSummary.country }}</td>
-            <td>{{ projectSummary.creationTime }}</td>
-            <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
-              'No modification' }}</td>
+          <tr v-for="disease in sortedDiseases">
+            <td>{{ disease[0] }}</td>
+            <td>{{ disease[1] }}</td>
+            <td>{{ disease[2] }}</td>
+            <td>{{ disease[3] }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
-              <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
-              <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
-              <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
+              <button class="btn">Rename</button>
+              <button class="btn __red">Delete</button>
             </td>
           </tr>
           <tr>
             <td>
-              <button class="btn" @click="createNewProject">Create new project</button>
-            </td>
-            <td>
-              <select v-model="selectedCountry">
-                <option>Select country...</option>
-                <option v-for="choice in countryList">
-                  {{ choice }}
-                </option>
-              </select>
+              <button class="btn">Create new</button>
             </td>
           </tr>
         </tbody>
-      </table> -->
+      </table>
 
 
 <!-- old ThreePanels stuff
@@ -256,13 +245,23 @@ export default {
 
       // List of diseases.  Each list element is a list of the ailment name
       // and numbers associated with it.
-      diseaseList: []
+      diseaseList: [],
+
+      // Column of table used for sorting the diseases
+      sortColumn2: 'name',  // name, country, creationTime, updatedTime
+
+      // Sort diseases in reverse order?
+      sortReverse2: false
     }
   },
 
   computed: {
     sortedFilteredProjectSummaries() {
       return this.applyNameFilter(this.applySorting(this.projectSummaries))
+    }, 
+
+    sortedDiseases() {
+      return this.applySorting2(this.diseaseList)
     }
   },
 
@@ -329,7 +328,10 @@ export default {
       // Set the active project to the matched project.
       this.activeProject = matchProject
 
-      this.grabTableData()
+      // Clear the disease list (for now) and reset the bottom table sorting state.
+      this.diseaseList = []
+      this.sortColumn2 = 'name'
+      this.sortReverse2 = false
     },
 
     copyProject(uid) {
@@ -363,7 +365,48 @@ export default {
         .then(response => {
           this.diseaseList = response.data.diseases
         })
+    },
+
+    updateSorting2(sortColumn) {
+      console.log('updateSorting2() called')
+
+      // If the active sorting column is clicked...
+      if (this.sortColumn2 === sortColumn) {
+          // Reverse the sort.
+          this.sortReverse2 = !this.sortReverse2
+      }
+      // Otherwise.
+      else {
+        // Select the new column for sorting.
+        this.sortColumn2 = sortColumn
+
+        // Set the sorting for non-reverse.
+        this.sortReverse2 = false
+      }
+    },
+
+    applySorting2(diseases) {
+      console.log('applySorting2() called')
+
+      return diseases.sort((disease1, disease2) =>
+        {
+          let sortDir = this.sortReverse2 ? -1: 1
+          if (this.sortColumn2 === 'name') {
+            return (disease1[0] > disease2[0] ? sortDir: -sortDir)
+          }
+          else if (this.sortColumn2 === 'DALYs') {
+            return disease1[1] > disease2[1] ? sortDir: -sortDir
+          }
+          else if (this.sortColumn2 === 'deaths') {
+            return disease1[2] > disease2[2] ? sortDir: -sortDir
+          }
+          else if (this.sortColumn2 === 'prevalence') {
+            return disease1[3] > disease2[3] ? sortDir: -sortDir
+          }
+        }
+      )
     }
+
   }
 }
 </script>
