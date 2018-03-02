@@ -1,7 +1,7 @@
 """
 scirismain.py -- main code for Sciris users to change to create their web apps
     
-Last update: 2/28/18 (gchadder3)
+Last update: 3/1/18 (gchadder3)
 """
 
 #
@@ -222,7 +222,7 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print '-- Version 2 of the app --'
+    print '-- Version 1 of the HealthPrior app --'
     
 #
 # Other functions
@@ -481,6 +481,8 @@ def admin_delete_user(userName):
     # Return the callResult.    
     return callResult
 
+# This is a temporary RPC, just a development placeholder.
+
 def read_ihme_table():
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -503,7 +505,12 @@ def read_ihme_table():
     
     # Return success.
     return { 'diseases': diseaseData }
-    
+
+#
+# The functions below will probably go bye-bye, but I'll keep them around until
+# I'm more certain there's nothing useful to cannibalize from them.
+#
+   
 def list_saved_scatterplotdata_resources():
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
