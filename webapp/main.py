@@ -58,7 +58,6 @@ else:
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
 import hptool
-from hptool import Project, HPpath
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
@@ -490,18 +489,18 @@ def read_ihme_table():
         return {'error': 'Unauthorized RPC'}
     
     # Load the data path holding the Excel files.
-    dataPath = HPpath('data')
+    dataPath = hptool.HPpath('data')
     
     # Load the project.
-    P = Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
+    P = hptool.Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
         interventionsfile=dataPath + 'dcp-data.xlsx')
     
     # The data of interest is in
     # P.burdensets[0].data, which is a list of odicts.  Each odict contains
     # the elements for that row of data.
-    
-    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]    
-    print diseaseData
+
+    # Gather the list for all of the diseases.
+    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]
     
     # Return success.
     return { 'diseases': diseaseData }
