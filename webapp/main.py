@@ -480,6 +480,37 @@ def admin_delete_user(userName):
     # Return the callResult.    
     return callResult
 
+# Temporary place for Projects stuff
+
+def get_scirisdemo_projects():
+    """
+    Return the projects associated with the Sciris Demo user.
+    """    
+
+    # Get the user UID for the _OptimaDemo user.
+    user_id = user.get_scirisdemo_user()
+    
+    # Get the Project entries matching the _OptimaLite user UID.
+    projectEntries = project.theProjCollection.getProjectEntriesByUser(user_id)
+    
+    # Get the projects for that user in a project list.
+    projectlist = map(load_project_summary_from_project_record, projectEntries)
+    
+    # Sort the projects by the project name.
+    sortedprojectlist = sorted(projectlist, key=lambda proj: proj['project']['name']) # Sorts by project name
+    
+    # Return a dictionary holding the projects.
+    output = {'projects': sortedprojectlist}
+    return output
+
+def load_project_summary_from_project_record(project_record):
+    """
+    Return the project summary, given the DataStore record.
+    """ 
+    
+    # Return the built project summary.
+    return project_record.getUserFrontEndRepr()
+
 # This is a temporary RPC, just a development placeholder.
 
 def read_ihme_table():

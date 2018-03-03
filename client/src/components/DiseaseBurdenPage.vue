@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/1/18 (gchadder3)
+Last update: 3/2/18 (gchadder3)
 -->
 
 <template>
@@ -362,9 +362,9 @@ export default {
     grabTableData() {
       console.log('grabTableData() called')
       rpcservice.rpcCall('read_ihme_table')
-        .then(response => {
-          this.diseaseList = response.data.diseases
-        })
+      .then(response => {
+        this.diseaseList = response.data.diseases
+      })
     },
 
     updateSorting2(sortColumn) {
