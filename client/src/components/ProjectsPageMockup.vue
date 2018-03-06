@@ -1,12 +1,14 @@
 <!-- 
-ProjectsPage.vue -- ProjectsPage Vue component
+ProjectsPageMockup.vue -- ProjectsPage Vue component
 
-Last update: 3/5/18 (gchadder3)
+Last update: 3/1/18 (gchadder3)
 -->
 
 <template>
   <div class="SitePage">
     <div class="PageSection">
+      <h2>Mockup Page</h2>
+
       <input type="text" 
              class="txbox" 
              style="margin-bottom: 20px" 
@@ -28,7 +30,7 @@ Last update: 3/5/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
- <!--           <th @click="updateSorting('country')" class="sortable">
+            <th @click="updateSorting('country')" class="sortable">
               Country
               <span v-show="sortColumn == 'country' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
@@ -39,7 +41,7 @@ Last update: 3/5/18 (gchadder3)
               <span v-show="sortColumn != 'country'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-            </th> -->
+            </th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -68,12 +70,11 @@ Last update: 3/5/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in bigProjectSummaries">
-<!--              :class="{ highlighted: activeProject.project.id === projectSummary.project.id }"> -->
-            <td>{{ projectSummary.project.name }}</td>
-<!--            <td>{{ projectSummary.country }}</td> -->
-            <td>{{ projectSummary.project.creationTime }}</td>
-            <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime: 
+          <tr v-for="projectSummary in sortedFilteredProjectSummaries" :class="{ highlighted: activeProject.uid === projectSummary.uid }">
+            <td>{{ projectSummary.projectName }}</td>
+            <td>{{ projectSummary.country }}</td>
+            <td>{{ projectSummary.creationTime }}</td>
+            <td>{{ projectSummary.updateTime ? projectSummary.updateTime: 
               'No modification' }}</td>
             <td style="white-space: nowrap">
               <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
@@ -126,8 +127,6 @@ export default {
 
       // Sort in reverse order?
       sortReverse: false, 
-
-      bigProjectSummaries: [],
 
       // List of summary objects for projects the user has
       projectSummaries: 
@@ -257,9 +256,9 @@ export default {
 
     openProject(uid) {
       // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
+      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
 
-      console.log('openProject() called for ' + matchProject.project.name)
+      console.log('openProject() called for ' + matchProject.projectName)
 
       // Set the active project to the matched project.
       this.activeProject = matchProject
@@ -288,10 +287,6 @@ export default {
 
     createNewProject() {
       console.log('createNewProject() called')
-      rpcservice.rpcProjectCall('get_scirisdemo_projects')
-      .then(response => {
-        this.bigProjectSummaries = response.data.projects
-      })
     }
   }
 }

@@ -1,7 +1,7 @@
 """
-scirismain.py -- main code for Sciris users to change to create their web apps
+main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 2/28/18 (gchadder3)
+Last update: 3/5/18 (gchadder3)
 """
 
 #
@@ -58,7 +58,6 @@ else:
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
 import hptool
-from hptool import Project, HPpath
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)
@@ -222,11 +221,13 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print '-- Version 2 of the app --'
+    print '-- Version 1 of the HealthPrior app --'
     
 #
 # Other functions
 #
+
+# Will want to delete this function, since it's specific to Scatterplotter.
 
 def get_saved_scatterplotdata_file_path(spdName):
     # Set the directory to the user's private directory.
@@ -272,14 +273,17 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
             args.insert(0, username)
         kwargs = reqdict.get('kwargs', {})
         
-    # Check to see if the function exists here in scirismain.py and get it 
-    # ready to call if it is.
+    # Check to see if the function exists here in main.py and get it 
+    # ready to call if it is.  Any versions of the functions in main.py 
+    # override those versions in user.py or project.py (or other places 
+    # where we have handlers).
     funcExists = hasattr(sys.modules[__name__], fn_name)
-    print('>> Checking RPC function "scirismain.%s" -> %s' % (fn_name, funcExists))
+    print('>> Checking RPC function "main.%s" -> %s' % (fn_name, funcExists))
     if funcExists:
         func = getattr(sys.modules[__name__], fn_name)
+        handlerLocation = 'main'
         
-    # Otherwise (it's not in scirismain.py), if the handlerLocation is 'user'...
+    # Otherwise (it's not in main.py), if the handlerLocation is 'user'...
     elif handlerLocation == 'user':
         # Check to see if there is a match.
         funcExists = hasattr(user, fn_name)
@@ -289,12 +293,17 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         if funcExists:
             func = getattr(user, fn_name)
             
-        # Otherwise, return an error.
-        else:
-            return jsonify({'error': 
-                'Attempted to call RPC function in non-existent handler location \'%s\'' \
-                    % handlerLocation})             
-    else:
+    # Otherwise (the function isn't in main.py and the handler is not 'user')...
+    elif handlerLocation == 'project':
+        # Check to see if there is a match.
+        funcExists = hasattr(project, fn_name)
+        print('>> Checking RPC function "project.%s" -> %s' % (fn_name, funcExists))
+        
+        # If there is a match, get the function ready.
+        if funcExists:
+            func = getattr(project, fn_name)   
+            
+    elif handlerLocation not in['scirismain', 'main', 'user', 'project']:
         return jsonify({'error': 
             'Attempted to call RPC function in non-existent handler location \'%s\'' \
                 % handlerLocation}) 
@@ -410,6 +419,9 @@ def json_sanitize_result(theResult):
 # RPC functions
 #
 
+# I probably don't need this function because it was just added to deal with 
+# the case of save paths, which we probaby won't be using for HSPT.
+
 def user_change_info(userName, password, displayname, email):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -453,6 +465,9 @@ def user_change_info(userName, password, displayname, email):
     # Return success.
     return 'success'
 
+# I probably don't need this function because it was just added to deal with 
+# the case of save paths, which we probaby won't be using for HSPT.
+
 def admin_delete_user(userName):
     # Get the result of doing the normal user.py call.
     callResult = user.admin_delete_user(userName)
@@ -481,6 +496,8 @@ def admin_delete_user(userName):
     # Return the callResult.    
     return callResult
 
+# This is a temporary RPC, just a development placeholder.
+
 def read_ihme_table():
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -488,22 +505,27 @@ def read_ihme_table():
         return {'error': 'Unauthorized RPC'}
     
     # Load the data path holding the Excel files.
-    dataPath = HPpath('data')
+    dataPath = hptool.HPpath('data')
     
     # Load the project.
-    P = Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
+    P = hptool.Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
         interventionsfile=dataPath + 'dcp-data.xlsx')
     
     # The data of interest is in
     # P.burdensets[0].data, which is a list of odicts.  Each odict contains
     # the elements for that row of data.
-    
-    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]    
-    print diseaseData
+
+    # Gather the list for all of the diseases.
+    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]
     
     # Return success.
     return { 'diseases': diseaseData }
-    
+
+#
+# The functions below will probably go bye-bye, but I'll keep them around until
+# I'm more certain there's nothing useful to cannibalize from them.
+#
+   
 def list_saved_scatterplotdata_resources():
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.

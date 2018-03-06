@@ -1,7 +1,7 @@
 <!-- 
 TopBar.vue -- TopBar Vue component
 
-Last update: 2/21/18 (gchadder3)
+Last update: 3/1/18 (gchadder3)
 -->
 
 <template>
@@ -13,25 +13,39 @@ Last update: 2/21/18 (gchadder3)
 
       <div style="display:table-cell; vertical-align: middle;" v-if="userloggedin()">
         <div class="menu">
-<!--          <div class="menu-item" v-if="adminloggedin()">
-            <router-link to="/mainadmin" tag="span">
-              Admin
-            </router-link> 
-          </div> -->
+          <router-link v-if="adminloggedin()" 
+                       tag="div" 
+                       to="/mainadmin" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/mainadmin'}">
+            Admin
+          </router-link>
 
-          <router-link tag="div" to="/" class="menu-item" :class="{'menu-active': $route.path === '/'}">
+          <router-link tag="div" 
+                       to="/" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/'}">
             Manage projects
           </router-link>
 
-          <router-link tag="div" to="/bod" class="menu-item" :class="{'menu-active': $route.path === '/bod'}">
+          <router-link tag="div" 
+                       to="/bod" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/bod'}">
             Burden of disease
           </router-link>
 
-          <router-link tag="div" to="/interventions" class="menu-item" :class="{'menu-active': $route.path === '/interventions'}">
+          <router-link tag="div" 
+                       to="/interventions" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/interventions'}">
             Interventions
           </router-link>
 
-          <router-link tag="div" to="/healthpackages" class="menu-item" :class="{'menu-active': $route.path === '/healthpackages'}">
+          <router-link tag="div" 
+                       to="/healthpackages" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/healthpackages'}">
             Define health packages
           </router-link>
 
@@ -39,19 +53,21 @@ Last update: 2/21/18 (gchadder3)
             <router-link to="/mypage" tag="span">
               Old main
             </router-link> 
-          </div>
-
-          <div class="menu-item">
-            <router-link to="/changeinfo" tag="span">
-              Edit account
-            </router-link>
-          </div>
-
-          <div class="menu-item">
-            <router-link to="/changepassword" tag="span">
-              Change password
-            </router-link>
           </div> -->
+
+          <router-link tag="div" 
+                       to="/changeinfo" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/changeinfo'}">
+            Edit account
+          </router-link>
+
+          <router-link tag="div" 
+                       to="/changepassword" 
+                       class="menu-item" 
+                       :class="{'menu-active': $route.path === '/changepassword'}">
+            Change password
+          </router-link>
 
           <div class="menu-item">
             Help
