@@ -1,6 +1,6 @@
 // rpc-service.js -- RPC functions for Vue to call
 //
-// Last update: 9/28/17 (gchadder3)
+// Last update: 3/5/18 (gchadder3)
 
 import axios from 'axios'
 var filesaver = require('file-saver')
@@ -53,6 +53,11 @@ function readJsonFromBlob (theBlob) {
 }
 
 export default {
+  //
+  // Regular RPCs (main.py)
+  //
+
+  // rpcCall() -- normalRPC() /api/procedure calls in api.py.
   rpcCall (funcname, args, kwargs) {
     // Log the RPC call.
     consoleLogCommand("normal", funcname, args, kwargs)
@@ -93,6 +98,7 @@ export default {
     })
   },
 
+  // rpcPublicCall() -- publicNormalRPC() /api/publicprocedure calls in api.py.
   rpcPublicCall (funcname, args, kwargs) {
     // Log the RPC call.
     consoleLogCommand("normal", funcname, args, kwargs)
@@ -133,6 +139,7 @@ export default {
     })
   },
 
+  // rpcDownloadCall() -- downloadRPC() /api/download calls in api.py.
   rpcDownloadCall (funcname, args, kwargs) {
     // Log the download RPC call.
     consoleLogCommand("download", funcname, args, kwargs)
@@ -203,6 +210,7 @@ export default {
     })
   },
 
+  // rpcUploadCall() -- uploadRPC() /api/upload calls in api.py.
   rpcUploadCall (funcname, args, kwargs, fileType) {
     // Log the upload RPC call.
     consoleLogCommand("upload", funcname, args, kwargs)
@@ -273,6 +281,11 @@ export default {
     })
   }, 
 
+  //
+  // User RPCs (user.py)
+  //
+
+  // rpcLoginCall() -- loginRPC() /api/user/login calls in api.py.
   rpcLoginCall (funcname, username, password) {
     // Get a hex version of a hashed password using the SHA224 algorithm.
     var hashPassword = CryptoApi.hash('sha224', password, {}).stringify('hex')
@@ -316,6 +329,7 @@ export default {
     })
   }, 
 
+  // rpcLogoutCall() -- logoutRPC() /api/user/logout calls in api.py.
   rpcLogoutCall (funcname) {
     // Log the RPC call.
     consoleLogCommand("logout", funcname, [], {})
@@ -356,6 +370,7 @@ export default {
     })
   },
 
+  // rpcGetCurrentUserInfo() -- currentUserRPC() /api/user/current calls in api.py.
   rpcGetCurrentUserInfo (funcname) {
     // Log the RPC call.
     consoleLogCommand("getuserinfo", funcname, [], {})
@@ -392,6 +407,44 @@ export default {
     })
   },
 
+  // rpcAllGetUsersInfo() -- userListRPC() /api/user/list calls in api.py.
+  rpcAllGetUsersInfo (funcname) {
+    // Log the RPC call.
+    consoleLogCommand("getallusersinfo", funcname, [], {})
+
+    // Do the RPC processing, returning results as a Promise.
+    return new Promise((resolve, reject) => {
+      // Send the GET request for the RPC call.
+      axios.get('/api/user/list?funcname=' + funcname)
+      .then(response => {
+        // If there is an error in the GET response.
+        if (typeof(response.data.error) != 'undefined') {
+          reject(Error(response.data.error))
+        }
+
+        // Signal success with the response.
+        resolve(response)
+      })
+      .catch(error => {
+        // If there was an actual response returned from the server...
+        if (error.response) {
+          // If we have exception information in the response (which indicates 
+          // an exception on the server side)...
+          if (typeof(error.response.data.exception) != 'undefined') {
+            // For now, reject with an error message matching the exception.
+            // In the future, we want to put the exception message in a 
+            // pop-up dialog.
+            reject(Error(error.response.data.exception))
+          }
+        }
+
+        // Reject with the error axios got.
+        reject(error)
+      })
+    })
+  },
+
+  // rpcRegisterCall() -- registrationRPC() /api/user/register calls in api.py.
   rpcRegisterCall (funcname, username, password, displayname, email) {
     // Get a hex version of a hashed password using the SHA224 algorithm.
     var hashPassword = CryptoApi.hash('sha224', password, {}).stringify('hex')
@@ -435,42 +488,7 @@ export default {
     })
   },
 
-  rpcAllGetUsersInfo (funcname) {
-    // Log the RPC call.
-    consoleLogCommand("getallusersinfo", funcname, [], {})
-
-    // Do the RPC processing, returning results as a Promise.
-    return new Promise((resolve, reject) => {
-      // Send the GET request for the RPC call.
-      axios.get('/api/user/list?funcname=' + funcname)
-      .then(response => {
-        // If there is an error in the GET response.
-        if (typeof(response.data.error) != 'undefined') {
-          reject(Error(response.data.error))
-        }
-
-        // Signal success with the response.
-        resolve(response)
-      })
-      .catch(error => {
-        // If there was an actual response returned from the server...
-        if (error.response) {
-          // If we have exception information in the response (which indicates 
-          // an exception on the server side)...
-          if (typeof(error.response.data.exception) != 'undefined') {
-            // For now, reject with an error message matching the exception.
-            // In the future, we want to put the exception message in a 
-            // pop-up dialog.
-            reject(Error(error.response.data.exception))
-          }
-        }
-
-        // Reject with the error axios got.
-        reject(error)
-      })
-    })
-  },
-
+  // rpcUserChangeInfoCall() -- changeUserInfoRPC() /api/user/changeinfo calls in api.py.
   rpcUserChangeInfoCall (funcname, username, password, displayname, email) {
     // Get a hex version of a hashed password using the SHA224 algorithm.
     var hashPassword = CryptoApi.hash('sha224', password, {}).stringify('hex')
@@ -514,6 +532,7 @@ export default {
     })
   },
 
+  // rpcChangePasswordCall() -- changePasswordRPC() /api/user/changepassword calls in api.py.
   rpcChangePasswordCall (funcname, oldpassword, newpassword) {
     // Get a hex version of the hashed passwords using the SHA224 algorithm.
     var hashOldPassword = CryptoApi.hash('sha224', oldpassword, {}).stringify('hex')
@@ -558,6 +577,8 @@ export default {
     })
   },
 
+  // rpcAdminGetUserInfo() -- specificUserRPC() /api/user/<username> GET calls 
+  // in api.py.
   rpcAdminGetUserInfo (funcname, username) {
     // Log the RPC call.
     consoleLogCommand("admingetuserinfo", funcname, [], {})
@@ -594,6 +615,8 @@ export default {
     })
   },
 
+  // rpcAdminUserCall() -- specificUserRPC() /api/user/<username> POST calls 
+  // in api.py.
   rpcAdminUserCall (funcname, username) {
     // Log the RPC call.
     consoleLogCommand("adminusercall", funcname, [], {})
@@ -631,6 +654,193 @@ export default {
         // Reject with the error axios got.
         reject(error)
       })
+    })
+  },
+
+  //
+  // Project RPCs (project.py)
+  //
+
+  // rpcProjectCall() -- normalProjectRPC() /api/project/procedure calls in api.py.
+  rpcProjectCall (funcname, args, kwargs) {
+    // Log the RPC call.
+    consoleLogCommand("projectnormal", funcname, args, kwargs)
+
+    // Do the RPC processing, returning results as a Promise.
+    return new Promise((resolve, reject) => {
+      // Send the POST request for the RPC call.
+      axios.post('/api/project/procedure', {
+        funcname: funcname, 
+        args: args, 
+        kwargs: kwargs
+      })
+      .then(response => {
+        // If there is an error in the POST response.
+        if (typeof(response.data.error) != 'undefined') {
+          reject(Error(response.data.error))
+        }
+
+        // Signal success with the response.
+        resolve(response)
+      })
+      .catch(error => {
+        // If there was an actual response returned from the server...
+        if (error.response) {
+          // If we have exception information in the response (which indicates 
+          // an exception on the server side)...
+          if (typeof(error.response.data.exception) != 'undefined') {
+            // For now, reject with an error message matching the exception.
+            // In the future, we want to put the exception message in a 
+            // pop-up dialog.
+            reject(Error(error.response.data.exception))
+          }
+        }
+
+        // Reject with the error axios got.
+        reject(error)
+      })
+    })
+  },
+
+  // rpcProjectDownloadCall() -- downloadProjectRPC() /api/project/download calls in api.py.
+  rpcProjectDownloadCall (funcname, args, kwargs) {
+    // Log the download RPC call.
+    consoleLogCommand("projectdownload", funcname, args, kwargs)
+
+    // Do the RPC processing, returning results as a Promise.
+    return new Promise((resolve, reject) => {
+      // Send the POST request for the RPC call.
+      axios.post('/api/project/download', {
+        funcname: funcname, 
+        args: args, 
+        kwargs: kwargs
+      }, 
+      {
+        responseType: 'blob'
+      })
+      .then(response => {
+        readJsonFromBlob(response.data)
+        .then(responsedata => {
+          // If we have error information in the response (which indicates 
+          // a logical error on the server side)...
+          if (typeof(responsedata.error) != 'undefined') {
+            // For now, reject with an error message matching the error.
+            reject(Error(responsedata.error))
+          }
+        })
+        .catch(error2 => {
+          // An error here indicates we do in fact have a file to download.
+
+          // Create a new blob object (containing the file data) from the
+          // response.data component.
+          var blob = new Blob([response.data])
+
+          // Grab the file name from response.headers.
+          var filename = response.headers.filename
+
+          // Bring up the browser dialog allowing the user to save the file 
+          // or cancel doing so.
+          filesaver.saveAs(blob, filename)
+
+          // Signal success with the response.
+          resolve(response)
+        })
+      })
+      .catch(error => {
+        // If there was an actual response returned from the server...
+        if (error.response) {
+          readJsonFromBlob(error.response.data)
+          .then(responsedata => {
+            // If we have exception information in the response (which indicates 
+            // an exception on the server side)...
+            if (typeof(responsedata.exception) != 'undefined') {
+              // For now, reject with an error message matching the exception.
+              // In the future, we want to put the exception message in a 
+              // pop-up dialog.
+              reject(Error(responsedata.exception))
+            }
+          })
+          .catch(error2 => {
+            // Reject with the error axios got.
+            reject(error)
+          })
+
+        // Otherwise (no response was delivered), reject with the error axios got.
+        } else {
+          reject(error)
+        }
+      })
+    })
+  },
+
+  // rpcProjectUploadCall() -- uploadProjectRPC() /api/project/upload calls in api.py.
+  rpcProjectUploadCall (funcname, args, kwargs, fileType) {
+    // Log the upload RPC call.
+    consoleLogCommand("projectupload", funcname, args, kwargs)
+
+    // Do the RPC processing, returning results as a Promise.
+    return new Promise((resolve, reject) => {
+      // Function for trapping the change event that has the user-selected 
+      // file.
+      var onFileChange = (e) => {
+        // Pull out the files (should only be 1) that were selected.
+        var files = e.target.files || e.dataTransfer.files
+
+        // If no files were selected, reject the promise.
+        if (!files.length)
+          reject(Error('No file selected'))
+
+        // Create a FormData object for holding the file.
+        const formData = new FormData()
+
+        // Put the selected file in the formData object with 'uploadfile' key.
+        formData.append('uploadfile', files[0])
+
+        // Add the RPC function name to the form data.
+        formData.append('funcname', funcname)
+
+        // Add args and kwargs to the form data.
+        formData.append('args', JSON.stringify(args))
+        formData.append('kwargs', JSON.stringify(kwargs))
+
+        // Use a POST request to pass along file to the server.
+        axios.post('/api/project/upload', formData)
+        .then(response => {
+          // If there is an error in the POST response.
+          if (typeof(response.data.error) != 'undefined') {
+            reject(Error(response.data.error))
+          }
+
+          // Signal success with the response.
+          resolve(response)
+        })
+        .catch(error => {
+          // If there was an actual response returned from the server...
+          if (error.response) {
+            // If we have exception information in the response (which indicates 
+            // an exception on the server side)...
+            if (typeof(error.response.data.exception) != 'undefined') {
+              // For now, reject with an error message matching the exception.
+              // In the future, we want to put the exception message in a 
+              // pop-up dialog.
+              reject(Error(error.response.data.exception))
+            }
+          }
+
+          // Reject with the error axios got.
+          reject(error)
+        })
+      }
+
+      // Create an invisible file input element and set its change callback to 
+      // our onFileChange function.
+      var inElem = document.createElement('input')
+      inElem.setAttribute('type', 'file')
+      inElem.setAttribute('accept', fileType)
+      inElem.addEventListener('change', onFileChange)
+
+      // Manually click the button to open the file dialog.
+      inElem.click()
     })
   }
 

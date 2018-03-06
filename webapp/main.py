@@ -1,7 +1,7 @@
 """
-scirismain.py -- main code for Sciris users to change to create their web apps
+main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/1/18 (gchadder3)
+Last update: 3/5/18 (gchadder3)
 """
 
 #
@@ -227,6 +227,8 @@ def init_main(theApp):
 # Other functions
 #
 
+# Will want to delete this function, since it's specific to Scatterplotter.
+
 def get_saved_scatterplotdata_file_path(spdName):
     # Set the directory to the user's private directory.
     userFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, 
@@ -271,14 +273,17 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
             args.insert(0, username)
         kwargs = reqdict.get('kwargs', {})
         
-    # Check to see if the function exists here in scirismain.py and get it 
-    # ready to call if it is.
+    # Check to see if the function exists here in main.py and get it 
+    # ready to call if it is.  Any versions of the functions in main.py 
+    # override those versions in user.py or project.py (or other places 
+    # where we have handlers).
     funcExists = hasattr(sys.modules[__name__], fn_name)
-    print('>> Checking RPC function "scirismain.%s" -> %s' % (fn_name, funcExists))
+    print('>> Checking RPC function "main.%s" -> %s' % (fn_name, funcExists))
     if funcExists:
         func = getattr(sys.modules[__name__], fn_name)
+        handlerLocation = 'main'
         
-    # Otherwise (it's not in scirismain.py), if the handlerLocation is 'user'...
+    # Otherwise (it's not in main.py), if the handlerLocation is 'user'...
     elif handlerLocation == 'user':
         # Check to see if there is a match.
         funcExists = hasattr(user, fn_name)
@@ -288,12 +293,17 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         if funcExists:
             func = getattr(user, fn_name)
             
-        # Otherwise, return an error.
-        else:
-            return jsonify({'error': 
-                'Attempted to call RPC function in non-existent handler location \'%s\'' \
-                    % handlerLocation})             
-    else:
+    # Otherwise (the function isn't in main.py and the handler is not 'user')...
+    elif handlerLocation == 'project':
+        # Check to see if there is a match.
+        funcExists = hasattr(project, fn_name)
+        print('>> Checking RPC function "project.%s" -> %s' % (fn_name, funcExists))
+        
+        # If there is a match, get the function ready.
+        if funcExists:
+            func = getattr(project, fn_name)   
+            
+    elif handlerLocation not in['scirismain', 'main', 'user', 'project']:
         return jsonify({'error': 
             'Attempted to call RPC function in non-existent handler location \'%s\'' \
                 % handlerLocation}) 
@@ -409,6 +419,9 @@ def json_sanitize_result(theResult):
 # RPC functions
 #
 
+# I probably don't need this function because it was just added to deal with 
+# the case of save paths, which we probaby won't be using for HSPT.
+
 def user_change_info(userName, password, displayname, email):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -452,6 +465,9 @@ def user_change_info(userName, password, displayname, email):
     # Return success.
     return 'success'
 
+# I probably don't need this function because it was just added to deal with 
+# the case of save paths, which we probaby won't be using for HSPT.
+
 def admin_delete_user(userName):
     # Get the result of doing the normal user.py call.
     callResult = user.admin_delete_user(userName)
@@ -479,37 +495,6 @@ def admin_delete_user(userName):
         
     # Return the callResult.    
     return callResult
-
-# Temporary place for Projects stuff
-
-def get_scirisdemo_projects():
-    """
-    Return the projects associated with the Sciris Demo user.
-    """    
-
-    # Get the user UID for the _OptimaDemo user.
-    user_id = user.get_scirisdemo_user()
-    
-    # Get the Project entries matching the _OptimaLite user UID.
-    projectEntries = project.theProjCollection.getProjectEntriesByUser(user_id)
-    
-    # Get the projects for that user in a project list.
-    projectlist = map(load_project_summary_from_project_record, projectEntries)
-    
-    # Sort the projects by the project name.
-    sortedprojectlist = sorted(projectlist, key=lambda proj: proj['project']['name']) # Sorts by project name
-    
-    # Return a dictionary holding the projects.
-    output = {'projects': sortedprojectlist}
-    return output
-
-def load_project_summary_from_project_record(project_record):
-    """
-    Return the project summary, given the DataStore record.
-    """ 
-    
-    # Return the built project summary.
-    return project_record.getUserFrontEndRepr()
 
 # This is a temporary RPC, just a development placeholder.
 

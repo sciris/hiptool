@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/2/18 (gchadder3)
+Last update: 3/5/18 (gchadder3)
 -->
 
 <template>
@@ -288,7 +288,7 @@ export default {
 
     createNewProject() {
       console.log('createNewProject() called')
-      rpcservice.rpcCall('get_scirisdemo_projects')
+      rpcservice.rpcProjectCall('get_scirisdemo_projects')
       .then(response => {
         this.bigProjectSummaries = response.data.projects
       })
