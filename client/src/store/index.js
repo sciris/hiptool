@@ -9,12 +9,20 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    currentUser: {}
+    // The currently logged in user
+    currentUser: {}, 
+
+    // The project currently chosen by the user
+    activeProject: {}
   },
 
   mutations: {
     newUser(state, user) {
       state.currentUser = user
+    }, 
+
+    newActiveProject(state, project) {
+      state.activeProject = project
     }
   }
 })

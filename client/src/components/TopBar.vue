@@ -127,6 +127,9 @@ export default {
         // Update the user info.
         this.getUserInfo()
 
+        // Clear out the active project.
+        this.$store.commit('newActiveProject', {})
+
         // Navigate to the login page automatically.
         router.push('/login')
       })

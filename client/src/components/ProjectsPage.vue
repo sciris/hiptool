@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/6/18 (gchadder3)
+Last update: 3/7/18 (gchadder3)
 -->
 
 <template>
@@ -164,9 +164,6 @@ export default {
       // List of summary objects for projects the user has
       projectSummaries: [],
 
-      // Active project
-      activeProject: {},
-
       // Available countries
       countryList: [],
 
@@ -218,13 +215,13 @@ export default {
 
     projectIsActive(uid) {
       // If the project is undefined, it is not active.
-      if (this.activeProject.project === undefined) {
+      if (this.$store.state.activeProject.project === undefined) {
         return false
       } 
    
       // Otherwise, the project is active if the UIDs match.
       else {
-        return (this.activeProject.project.id === uid)
+        return (this.$store.state.activeProject.project.id === uid)
       }
     },
 
@@ -293,7 +290,7 @@ export default {
       console.log('openProject() called for ' + matchProject.project.name)
 
       // Set the active project to the matched project.
-      this.activeProject = matchProject
+      this.$store.commit('newActiveProject', matchProject)
     },
 
     copyProject(uid) {
