@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/5/18 (gchadder3)
+Last update: 3/6/18 (gchadder3)
 -->
 
 <template>
@@ -68,32 +68,32 @@ Last update: 3/5/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in bigProjectSummaries">
-<!--              :class="{ highlighted: activeProject.project.id === projectSummary.project.id }"> -->
+          <tr v-for="projectSummary in sortedFilteredProjectSummaries" 
+              :class="{ highlighted: projectIsActive(projectSummary.project.id) }">
             <td>{{ projectSummary.project.name }}</td>
 <!--            <td>{{ projectSummary.country }}</td> -->
             <td>{{ projectSummary.project.creationTime }}</td>
             <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime: 
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.uid)">Open</button>
-              <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
-              <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
-              <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
+              <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
+              <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
+              <button class="btn" @click="renameProject(projectSummary.project.id)">Rename</button>
+              <button class="btn __red" @click="deleteProject(projectSummary.project.id)">Delete</button>
             </td>
           </tr>
           <tr>
             <td>
               <button class="btn" @click="createNewProject">Create new project</button>
             </td>
-            <td>
+<!-- comment out for now            <td>
               <select v-model="selectedCountry">
                 <option>Select country...</option>
                 <option v-for="choice in countryList">
                   {{ choice }}
                 </option>
               </select>
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -122,15 +122,14 @@ export default {
       allSelected: false, 
 
       // Column of table used for sorting the projects
-      sortColumn: 'name',  // name, country, creationTime, updatedTime
+      sortColumn: 'name',  // name, country, creationTime, updatedTime, dataUploadTime
 
       // Sort in reverse order?
       sortReverse: false, 
 
-      bigProjectSummaries: [],
-
-      // List of summary objects for projects the user has
-      projectSummaries: 
+/* old project summaries stuff to get rid of
+        // List of summary objects for projects the user has
+        projectSummaries: 
         [
           {
             projectName: 'Afghanistan test 1',
@@ -160,7 +159,10 @@ export default {
             updateTime: '2017-Sep-21 08:44 AM',
             uid: 4
           }
-        ],
+        ], */
+
+      // List of summary objects for projects the user has
+      projectSummaries: [],
 
       // Active project
       activeProject: {},
@@ -175,8 +177,9 @@ export default {
 
   computed: {
     sortedFilteredProjectSummaries() {
-      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
-    } 
+      return this.applyNameFilter(this.applySorting(this.projectSummaries))
+//      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
+    }
   }, 
 
   created() {
@@ -187,19 +190,44 @@ export default {
 
     // Otherwise...
     else {
+      // Load the project summaries of the current user.
+      this.updateProjectSummaries()
+
       // Initialize the countryList by picking out the (unique) country names.
       // (First, a list is constructed pulling out the non-unique countries 
       // for each project, then this array is stuffed into a new Set (which 
       // will not duplicate array entries) and then the spread operator is 
       // used to pull the set items out into an array.)
-      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
+//      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
 
       // Initialize the selection of the demo project to the first element.
-      this.selectedCountry = 'Select country...'
+//      this.selectedCountry = 'Select country...'
     }
   },
 
   methods: {
+    updateProjectSummaries() {
+      console.log('updateProjectSummaries() called')
+
+      // Get the current user's project summaries from the server.
+      rpcservice.rpcProjectCall('load_current_user_project_summaries')
+      .then(response => {
+        this.projectSummaries = response.data.projects
+      })
+    },
+
+    projectIsActive(uid) {
+      // If the project is undefined, it is not active.
+      if (this.activeProject.project === undefined) {
+        return false
+      } 
+   
+      // Otherwise, the project is active if the UIDs match.
+      else {
+        return (this.activeProject.project.id === uid)
+      }
+    },
+
     updateSorting(sortColumn) {
       console.log('updateSorting() called')
 
@@ -221,7 +249,7 @@ export default {
     applyNameFilter(projects) {
       console.log('applyNameFilter() called')
 
-      return projects.filter(theProject => theProject.projectName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
+      return projects.filter(theProject => theProject.project.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
     applySorting(projects) {
@@ -231,29 +259,32 @@ export default {
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
-            return (proj1.projectName > proj2.projectName ? sortDir: -sortDir)
+            return (proj1.project.name > proj2.project.name ? sortDir: -sortDir)
           }
-          else if (this.sortColumn === 'country') {
+/*          else if (this.sortColumn === 'country') {
             return proj1.country > proj2.country ? sortDir: -sortDir
-          } 
+          } */
           else if (this.sortColumn === 'creationTime') {
-            return proj1.creationTime > proj2.creationTime ? sortDir: -sortDir
+            return proj1.project.creationTime > proj2.project.creationTime ? sortDir: -sortDir
           }
           else if (this.sortColumn === 'updatedTime') {
-            return proj1.updateTime > proj2.updateTime ? sortDir: -sortDir
+            return proj1.project.updateTime > proj2.project.updateTime ? sortDir: -sortDir
           }
+          else if (this.sortColumn === 'dataUploadTime') {
+            return proj1.project.dataUploadTime > proj2.project.dataUploadTime ? sortDir: -sortDir
+          } 
         }
       )
     },
 
-    applyCountryFilter(projects) {
+/*    applyCountryFilter(projects) {
       console.log('applyCountryFilter() called')
 
       if (this.selectedCountry === 'Select country...')
         return projects
       else
         return projects.filter(theProj => theProj.country === this.selectedCountry)
-    },
+    }, */
 
     openProject(uid) {
       // Find the project that matches the UID passed in.
@@ -267,31 +298,27 @@ export default {
 
     copyProject(uid) {
       // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
-      console.log('copyProject() called for ' + matchProject.projectName)
+      console.log('copyProject() called for ' + matchProject.project.name)
     },
 
     renameProject(uid) {
       // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
-      console.log('renameProject() called for ' + matchProject.projectName)
+      console.log('renameProject() called for ' + matchProject.project.name)
     },
 
     deleteProject(uid) {
       // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('deleteProject() called for ' + matchProject.projectName)
     },
 
     createNewProject() {
       console.log('createNewProject() called')
-      rpcservice.rpcProjectCall('get_scirisdemo_projects')
-      .then(response => {
-        this.bigProjectSummaries = response.data.projects
-      })
     }
   }
 }

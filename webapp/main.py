@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/5/18 (gchadder3)
+Last update: 3/6/18 (gchadder3)
 """
 
 #
@@ -195,25 +195,26 @@ def init_projects(theApp):
         project.theProjCollection.addToDataStore()
         
         print '>> Starting a demo project.'
-        fullFileName = '%s%sgraph1.csv' % (ds.fileSaveRootPath, os.sep)
-        theProject = project.Project('Graph 1', user.get_scirisdemo_user(), 
-            spreadsheetPath=fullFileName)
+        theProject = project.Project('Afghanistan test 1', 
+            user.get_scirisdemo_user(), 
+            spreadsheetPath=None)
         project.theProjCollection.addObject(theProject)
         
         print '>> Starting a second demo project.'
-        fullFileName = '%s%sgraph2.csv' % (ds.fileSaveRootPath, os.sep)
-        theProject = project.Project('Graph 2', user.get_scirisdemo_user(), 
-            spreadsheetPath=fullFileName)
+        theProject = project.Project('Afghanistan HBP equity', 
+            user.get_scirisdemo_user(), 
+            spreadsheetPath=None)
         project.theProjCollection.addObject(theProject)
         
         print '>> Starting a third demo project.'
-        fullFileName = '%s%sgraph3.csv' % (ds.fileSaveRootPath, os.sep)
-        theProject = project.Project('Graph 3', user.get_scirisdemo_user(), 
-            spreadsheetPath=fullFileName)
+        theProject = project.Project('Final Afghanistan HBP', 
+            user.get_scirisdemo_user(), 
+            spreadsheetPath=None)
         project.theProjCollection.addObject(theProject)
         
         print '>> Starting a fourth demo project.'
-        theProject = project.Project('Empty graph', user.get_scirisdemo_user(), 
+        theProject = project.Project('Pakistan test 1', 
+            user.get_scirisdemo_user(), 
             spreadsheetPath=None)
         project.theProjCollection.addObject(theProject)
         
