@@ -6,7 +6,7 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <h2>Open Project: Afghanistan test 1</h2>
+    <h2>Open Project: {{ activeProjectName }}</h2>
 
     <div class="PageSection">
       <input type="text"
@@ -256,6 +256,14 @@ export default {
   },
 
   computed: {
+    activeProjectName() {
+      if (this.$store.state.activeProject.project === undefined) {
+        return '[nothing]'
+      } else {
+        return this.$store.state.activeProject.project.name
+      }
+    },
+
     sortedFilteredProjectSummaries() {
       return this.applyNameFilter(this.applySorting(this.projectSummaries))
     }, 
