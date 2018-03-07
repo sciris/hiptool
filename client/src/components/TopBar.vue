@@ -1,7 +1,7 @@
 <!-- 
 TopBar.vue -- TopBar Vue component
 
-Last update: 3/1/18 (gchadder3)
+Last update: 3/7/18 (gchadder3)
 -->
 
 <template>
@@ -97,8 +97,8 @@ export default {
   },
 
   computed: {
-    currentuser() {
-      return this.$store.state.currentuser
+    currentUser() {
+      return this.$store.state.currentUser
     }
   },
 
@@ -108,7 +108,7 @@ export default {
 
   methods: {
     userloggedin() {
-      if (this.currentuser.displayname == undefined) 
+      if (this.currentUser.displayname == undefined) 
         return false
       else
         return true
@@ -116,7 +116,7 @@ export default {
 
     adminloggedin() {
       if (this.userloggedin) {
-        return this.currentuser.admin
+        return this.currentUser.admin
       }
     },
 
@@ -136,12 +136,12 @@ export default {
       rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
       .then(response => {
         // Set the username to what the server indicates.
-        this.$store.commit('newuser', response.data.user)
+        this.$store.commit('newUser', response.data.user)
       })
       .catch(error => {
         // Set the username to {}.  An error probably means the 
         // user is not logged in.
-        this.$store.commit('newuser', {})
+        this.$store.commit('newUser', {})
       })
     }
   }

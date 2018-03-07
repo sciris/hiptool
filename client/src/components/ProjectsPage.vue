@@ -184,7 +184,7 @@ export default {
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
-    if (this.$store.state.currentuser.displayname == undefined) {
+    if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
     } 
 

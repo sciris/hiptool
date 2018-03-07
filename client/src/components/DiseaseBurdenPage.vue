@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/2/18 (gchadder3)
+Last update: 3/7/18 (gchadder3)
 -->
 
 <template>
@@ -267,7 +267,7 @@ export default {
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
-    if (this.$store.state.currentuser.displayname == undefined) {
+    if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
     }
   },

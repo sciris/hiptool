@@ -1,7 +1,7 @@
 <!-- 
 UserChangeInfoPage.vue -- Vue component for a page to change account info
 
-Last update: 1/29/18 (gchadder3)
+Last update: 3/7/18 (gchadder3)
 -->
 
 <template>
@@ -38,9 +38,9 @@ export default {
 
   data () {
     return {
-      changeUserName: this.$store.state.currentuser.username,
-      changeDisplayName: this.$store.state.currentuser.displayname,
-      changeEmail: this.$store.state.currentuser.email,
+      changeUserName: this.$store.state.currentUser.username,
+      changeDisplayName: this.$store.state.currentUser.displayname,
+      changeEmail: this.$store.state.currentUser.email,
       changePassword: '',
       changeResult: ''
     }
@@ -59,7 +59,7 @@ export default {
           rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
           .then(response2 => {
             // Set the username to what the server indicates.
-            this.$store.commit('newuser', response2.data.user)
+            this.$store.commit('newUser', response2.data.user)
 
             // Navigate automatically to the home page.
             router.push('/')
@@ -67,7 +67,7 @@ export default {
           .catch(error => {
             // Set the username to {}.  An error probably means the 
             // user is not logged in.
-            this.$store.commit('newuser', {})
+            this.$store.commit('newUser', {})
           })
         } else {
           // Set a failure result to show.
