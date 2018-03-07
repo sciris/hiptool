@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Load Sciris
 from sciris.api import makeapp
 import config

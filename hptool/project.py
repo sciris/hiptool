@@ -35,7 +35,7 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='default', burdenfile=None, interventionsfile=None, verbose=2, **kwargs):
+    def __init__(self, name='default', burdenfile=None, interventionsfile=None, country=None, verbose=2, **kwargs):
         ''' Initialize the project '''
 
         ## Define the structure sets
@@ -46,6 +46,7 @@ class Project(object):
 
         ## Define other quantities
         self.name = name
+        self.country = country
         self.uid = uuid()
         self.created = today()
         self.modified = today()
@@ -74,6 +75,7 @@ class Project(object):
         ''' Print out useful information when called '''
         output = objrepr(self)
         output += '      Project name: %s\n'    % self.name
+        output += '           Country: %s\n'    % self.country
         output += '\n'
         output += '       Burden sets: %i\n'    % len(self.burdensets)
         output += ' Intervention sets: %i\n'    % len(self.intersets)
