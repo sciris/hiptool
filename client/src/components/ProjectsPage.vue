@@ -7,6 +7,39 @@ Last update: 3/7/18 (gchadder3)
 <template>
   <div class="SitePage">
     <div class="PageSection">
+      <h2>Create projects</h2>
+
+      <div class="ControlsRowLabel">
+        Choose a demonstration project from our database:
+      </div>
+
+      <div class="ControlsRow">
+        <select v-model="selectedDemoProject">
+          <option v-for="choice in demoProjectList">
+            {{ choice }}
+          </option>
+        </select>
+        &nbsp; &nbsp;
+        <button class="btn" @click="addDemoProject">Add this project</button>
+      </div>
+
+      <div class="ControlsRowLabel">
+        Or create/upload a new project:
+      </div>
+
+      <div class="ControlsRow">
+        <button class="btn" @click="createNewProject">Create new project</button>
+        &nbsp; &nbsp;
+        <button class="btn" @click="uploadProjectFromFile">Upload project from file</button>
+        &nbsp; &nbsp;
+        <button class="btn" @click="uploadProjectFromSpreadsheet">Upload project from spreadsheet</button>
+      </div>
+    </div>
+
+    <div class="PageSection"
+         v-if="projectSummaries.length > 0">
+      <h2>Manage projects</h2>
+
       <input type="text" 
              class="txbox" 
              style="margin-bottom: 20px" 
@@ -16,6 +49,9 @@ Last update: 3/7/18 (gchadder3)
       <table class="table table-bordered table-hover table-striped" style="width: auto">
         <thead>
           <tr>
+            <th>
+              <input type="checkbox" @click="selectAll()" v-model="allSelected"/>
+            </th>
             <th @click="updateSorting('name')" class="sortable">
               Name
               <span v-show="sortColumn == 'name' && !sortReverse">
@@ -70,6 +106,10 @@ Last update: 3/7/18 (gchadder3)
         <tbody>
           <tr v-for="projectSummary in sortedFilteredProjectSummaries" 
               :class="{ highlighted: projectIsActive(projectSummary.project.id) }">
+            <td>
+              <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/>
+<!--              <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/> -->
+            </td>
             <td>{{ projectSummary.project.name }}</td>
 <!--            <td>{{ projectSummary.country }}</td> -->
             <td>{{ projectSummary.project.creationTime }}</td>
@@ -97,6 +137,12 @@ Last update: 3/7/18 (gchadder3)
           </tr>
         </tbody>
       </table>
+
+      <div class="ControlsRow">
+        <button class="btn" @click="deleteSelectedProjects">Delete selected</button>
+        &nbsp; &nbsp;
+        <button class="btn" @click="downloadSelectedProjects">Download selected</button>
+      </div>
     </div>
   </div>
 </template>
@@ -112,6 +158,15 @@ export default {
 
   data() {
     return {
+      // List of projects to choose from (by project name)
+      demoProjectList: [],
+
+      // Selected demo project (by name)
+      selectedDemoProject: '',
+
+      // List of demo project summaries
+      demoProjectSummaries: [],
+
       // Placeholder text for table filter box
       filterPlaceholder: '\u{1f50e} Filter Projects',
 
@@ -211,6 +266,49 @@ export default {
       .then(response => {
         this.projectSummaries = response.data.projects
       })
+
+      // Get the demo project summaries from the server.
+      rpcservice.rpcProjectCall('get_scirisdemo_projects')
+      .then(response => {
+        // Set the demo projects to what we received.
+        this.demoProjectSummaries = response.data.projects
+
+        // Initialize the demoProjectList by picking out the project names.
+        this.demoProjectList = this.demoProjectSummaries.map(demoProj => demoProj.project.name)
+
+        // Initialize the selection of the demo project to the first element.
+        this.selectedDemoProject = this.demoProjectList[0]
+      })
+    },
+
+    addDemoProject() {
+      console.log('addDemoProject() called')
+
+      // Find the object in the default project summaries that matches what's 
+      // selected in the select box.
+      let foundProject = this.demoProjectSummaries.find(demoProj => 
+        demoProj.project.name == this.selectedDemoProject)
+
+      // Make a deep copy of the found object by JSON-stringifying the old 
+      // object, and then parsing the result back into a new object.
+      let newProject = JSON.parse(JSON.stringify(foundProject));
+
+      // Push the deep copy to the projectSummaries list.
+//      this.projectSummaries.push(newProject)
+
+//      this.projectSummaries.push(this.demoProjectSummaries[0])
+    },
+
+    createNewProject() {
+      console.log('createNewProject() called')
+    },
+
+    uploadProjectFromFile() {
+      console.log('uploadProjectFromFile() called')
+    },
+
+    uploadProjectFromSpreadsheet() {
+      console.log('uploadProjectFromSpreadsheet() called')
     },
 
     projectIsActive(uid) {
@@ -223,6 +321,22 @@ export default {
       else {
         return (this.$store.state.activeProject.project.id === uid)
       }
+    },
+
+    selectAll() {
+      console.log('selectAll() called')
+
+      // For each of the projects, set the selection of the project to the 
+      // _opposite_ of the state of the all-select checkbox's state.
+      // NOTE: This function depends on it getting called before the 
+      // v-model state is updated.  If there are some cases of Vue 
+      // implementation where these happen in the opposite order, then 
+      // this will not give the desired result.
+      this.projectSummaries.forEach(theProject => theProject.selected = !this.allSelected)
+    },
+
+    uncheckSelectAll() {
+      this.allSelected = false
     },
 
     updateSorting(sortColumn) {
@@ -314,8 +428,20 @@ export default {
       console.log('deleteProject() called for ' + matchProject.projectName)
     },
 
-    createNewProject() {
-      console.log('createNewProject() called')
+    deleteSelectedProjects() {
+      // Pull out the names of the projects that are selected.
+      let selectProjects = this.projectSummaries.filter(theProj => 
+        theProj.selected).map(theProj => theProj.projectName)
+
+      console.log('deleteSelectedProjects() called for ', selectProjects)
+    },
+
+    downloadSelectedProjects() {
+      // Pull out the names of the projects that are selected.
+      let selectProjects = this.projectSummaries.filter(theProj => 
+        theProj.selected).map(theProj => theProj.projectName)
+
+      console.log('downloadSelectedProjects() called for ', selectProjects)
     }
   }
 }
