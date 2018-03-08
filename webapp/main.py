@@ -25,6 +25,10 @@ import sciris.project as project
 from pylab import subplot
 import config
 
+# imports to hopefully get rid of
+import uuid
+from copy import deepcopy as dcp
+
 #
 # Script code (Block 1)
 #
@@ -66,7 +70,271 @@ sys.path.append(webappDirTarget)
 # Classes
 #
 
-# ProjectSO goes here...
+class ProjectSO(sobj.ScirisObject):
+    """
+    A ScirisObject-wrapped hptool Project object.
+    
+    Methods:
+        __init__(theProject: Project, ownerUID: UUID, theUID: UUID [None]): 
+            void -- constructor
+        loadFromCopy(otherObject): void -- assuming otherObject is another 
+            object of our type, copy its contents to us (calls the 
+            ScirisObject superclass version of this method also)   
+        show(): void -- print the contents of the object
+        getUserFrontEndRepr(): dict -- get a JSON-friendly dictionary 
+            representation of the object state the front-end uses for non-
+            admin purposes  
+        saveAsFile(loadDir: str): str -- given a load dictionary, save the 
+            project in a file there and return the file name
+                    
+    Attributes:
+        theProject (Project) -- the actual Project object being wrapped
+        ownerUID (UUID) -- the UID of the User that owns the Project
+        
+    Usage:
+        >>> myProject = ProjectSO(theProject,uuid.UUID('12345678123456781234567812345678'))                      
+    """
+    
+    def  __init__(self, theProject, ownerUID, theUID=None):
+        # NOTE: theUID argument is ignored but kept here to not mess up
+        # inheritance.
+        
+        # Make sure the argument is a valid UUID, converting a hex text to a
+        # UUID object, if needed.        
+        validUID = sobj.getValidUUID(ownerUID)
+        
+        # If we have a valid UUID...
+        if validUID is not None:       
+            # Set superclass parameters (passing in the actual Project's UID).
+            super(ProjectSO, self).__init__(theProject.uid)
+                   
+            # Set the project to the Sciris Project that is passed in.
+            self.theProject = theProject
+            
+            # Set the owner (User) UID.
+            self.ownerUID = validUID
+        
+    def loadFromCopy(self, otherObject):
+        if type(otherObject) == type(self):
+            # Do the superclass copying.
+            super(ProjectSO, self).loadFromCopy(otherObject)
+            
+            # Copy the Project object itself.
+            self.theProject = dcp(otherObject.theProject)
+            
+            # Copy the owner UID.
+            self.ownerUID = otherObject.ownerUID
+              
+    def show(self):
+        # Show superclass attributes.
+        super(ProjectSO, self).show()  
+        
+        # Show the Optima defined display text for the project.
+        print '---------------------'
+        print 'Owner User UID: %s' % self.ownerUID.hex
+        print 'Project Name: %s' % self.theProject.name
+        print 'Creation Time: %s' % self.theProject.created
+        print 'Update Time: %s' % self.theProject.modified
+        print 'Data Upload Time: %s' % self.theProject.spreadsheetdate
+        
+    def getUserFrontEndRepr(self):
+        objInfo = {
+            'project': {
+                'id': self.uid,
+                'name': self.theProject.name,
+                'userId': self.ownerUID,
+                'creationTime': self.theProject.created,
+                'updatedTime': self.theProject.modified,
+                'dataUploadTime': self.theProject.spreadsheetdate
+            }
+        }
+        return objInfo
+    
+#    def saveAsFile(self, loadDir):
+#        # Save the project in the file.
+#        self.theProject.saveToPrjFile(loadDir, saveResults=True)
+#        
+#        # Return the filename (not the full one).
+#        return self.theProject.name + ".prj"
+    
+# newer (more complicated) version...
+#class ProjectSO(sobj.ScirisObject):
+#    """
+#    A Sciris project.
+#    
+#    Methods:
+#        __init__(name: str, ownerUID: UUID, theUID: UUID [None], 
+#            spreadsheetPath: str [None]): void -- constructor            
+#        updateName(newName: str): void -- change the project name to newName
+#        updateSpreadsheet(spreadsheetPath: str): void -- change the 
+#            spreadsheet the project is using
+#            
+#        saveToPrjFile(dirPath: str, saveResults: bool [False]) -- save the 
+#            project to a .prj file and return the full path
+#            
+#        loadFromCopy(otherObject): void -- assuming otherObject is another 
+#            object of our type, copy its contents to us (calls the 
+#            ScirisObject superclass version of this method also)             
+#        show(): void -- print the contents of the object
+#        getUserFrontEndRepr(): dict -- get a JSON-friendly dictionary 
+#            representation of the object state the front-end uses for non-
+#            admin purposes 
+#            
+#        saveAsFile(loadDir: str): str -- given a load dictionary, save the 
+#            project in a file there and return the file name
+#            
+#    Attributes:
+#        theProject (Project) -- the actual Project object being wrapped
+#        uid (UUID) -- the UID of the Project
+#        ownerUID (UUID) -- the UID of the User that owns the Project        
+#        name (str) -- the Project's name
+#        spreadsheetPath (str) -- the full path name for the Excel spreadsheet
+#        createdTime (datetime.datetime) -- the time that the Project was 
+#            created
+#        updatedTime (datetime.datetime) -- the time that the Project was last 
+#            updated
+#        dataUploadTime (datetime.datetime) -- the time that the Project's 
+#            spreadsheet was last updated
+#        
+#    Usage:
+#        >>> theProj = Project('myproject', uuid.UUID('12345678123456781234567812345672'), uuid.UUID('12345678123456781234567812345678'))                    
+#    """ 
+#    
+#    def  __init__(self, name, ownerUID, theUID=None, spreadsheetPath=None):
+#        # Make sure owner has a valid UUID, converting a hex text to a
+#        # UUID object, if needed.        
+#        validOwnerUID = sobj.getValidUUID(ownerUID)
+#        
+#        # If we have a valid UUID...
+#        if validOwnerUID is not None:  
+#            # Set the owner (User) UID.
+#            self.ownerUID = validOwnerUID
+#                       
+#            # If a UUID was passed in...
+#            if theUID is not None:
+#                # Make sure the argument is a valid UUID, converting a hex text to a
+#                # UUID object, if needed.        
+#                validUID = sobj.getValidUUID(theUID) 
+#                
+#                # If a validUID was found, use it.
+#                if validUID is not None:
+#                    self.uid = validUID
+#                # Otherwise, generate a new random UUID using uuid4().
+#                else:
+#                    self.uid = uuid.uuid4()
+#            # Otherwise, generate a new random UUID using uuid4().
+#            else:
+#                self.uid = uuid.uuid4()
+#                
+#            # Set the project name.
+#            self.name = name
+#            
+#            # Set the spreadsheetPath.
+#            self.spreadsheetPath = spreadsheetPath
+#                                
+#            # Set the creation time for now.
+#            self.createdTime = project.now_utc()
+#            
+#            # Set the updating time to None.
+#            self.updatedTime = None
+#            
+#            # Set the spreadsheet upload time to None.
+#            self.dataUploadTime = None
+#            
+#            # If we have passed in a spreadsheet path...
+#            if self.spreadsheetPath is not None:
+#                # Set the data spreadsheet upload time for now.
+#                self.dataUploadTime = project.now_utc()
+#                
+#            # Set the type prefix to 'user'.
+#            self.typePrefix = 'project'
+#            
+#            # Set the file suffix to '.usr'.
+#            self.fileSuffix = '.prj'
+#            
+#            # Set the instance label to the username.
+#            self.instanceLabel = name   
+#          
+#    def updateName(self, newName):
+#        # Set the project name.
+#        self.name = newName
+#        self.instanceLabel = newName
+#        
+#        # Set the updating time to now.
+#        self.updatedTime = project.now_utc()
+#        
+#    def updateSpreadsheet(self, spreadsheetPath):
+#        # Set the spreadsheetPath from what's passed in.
+#        self.spreadsheetPath = spreadsheetPath
+#        
+#        # Set the data spreadsheet upload time for now.
+#        self.dataUploadTime = project.now_utc()
+#        
+#        # Set the updating time to now.
+#        self.updatedTime = project.now_utc()
+#        
+##    def saveToPrjFile(self, dirPath, saveResults=False):
+##        # Create a filename containing the project name followed by a .prj 
+##        # suffix.
+##        fileName = '%s.prj' % self.name
+##        
+##        # Generate the full file name with path.
+##        fullFileName = '%s%s%s' % (dirPath, os.sep, fileName)
+##        
+##        # Write the object to a Gzip string pickle file.
+##        objectToGzipStringPickleFile(fullFileName, self)
+##        
+##        # Return the full file name.
+##        return fullFileName
+#
+#    def loadFromCopy(self, otherObject):
+#        if type(otherObject) == type(self):
+#            # Do the superclass copying.
+#            super(ProjectSO, self).loadFromCopy(otherObject)
+#            
+#            self.ownerUID = otherObject.ownerUID
+#            self.name = otherObject.name
+#            self.spreadsheetPath = otherObject.spreadsheetPath
+#            self.createdTime = otherObject.createdTime
+#            self.updatedTime = otherObject.updatedTime
+#            self.dataUploadTime = otherObject.dataUploadTime
+#            
+#            # Copy the owner UID.
+#            self.ownerUID = otherObject.ownerUID
+#            
+#    def show(self):
+#        # Show superclass attributes.
+#        super(ProjectSO, self).show()  
+#        
+#        print '---------------------'
+#
+#        print 'Owner User UID: %s' % self.ownerUID.hex
+#        print 'Project Name: %s' % self.name
+#        print 'Spreadsheet Path: %s' % self.spreadsheetPath
+#        print 'Creation Time: %s' % self.createdTime
+#        print 'Update Time: %s' % self.updatedTime
+#        print 'Data Upload Time: %s' % self.dataUploadTime
+#        
+#    def getUserFrontEndRepr(self):
+#        objInfo = {
+#            'project': {
+#                'id': self.uid,
+#                'name': self.name,
+#                'userId': self.ownerUID,
+#                'spreadsheetPath': self.spreadsheetPath,
+#                'creationTime': self.createdTime,
+#                'updatedTime': self.updatedTime,
+#                'dataUploadTime': self.dataUploadTime
+#            }
+#        }
+#        return objInfo
+#    
+##    def saveAsFile(self, loadDir):
+##        # Save the project in the file.
+##        self.theProject.saveToPrjFile(loadDir, saveResults=True)
+##        
+##        # Return the filename (not the full one).
+##        return self.theProject.name + ".prj" 
 
 #
 # Initialization functions 
@@ -182,32 +450,45 @@ def init_projects(theApp):
     
     # Else (no match)...
     else:
+        # Load the data path holding the Excel files.
+        dataPath = hptool.HPpath('data')
+    
         print '>> Creating a new ProjectCollection.'   
         project.theProjCollection.addToDataStore()
         
         print '>> Starting a demo project.'
-        theProject = project.Project('Afghanistan test 1', 
-            user.get_scirisdemo_user(), 
-            spreadsheetPath=None)
-        project.theProjCollection.addObject(theProject)
+        theProject = hptool.Project(name='Afghanistan test 1', 
+            burdenfile=dataPath + 'ihme-gbd.xlsx', 
+            interventionsfile=dataPath + 'dcp-data.xlsx')  
+        theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
+#        theProjectSO = ProjectSO('Afghanistan test 1', 
+#            user.get_scirisdemo_user(), 
+#            spreadsheetPath=None)
+        project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a second demo project.'
-        theProject = project.Project('Afghanistan HBP equity', 
-            user.get_scirisdemo_user(), 
-            spreadsheetPath=None)
-        project.theProjCollection.addObject(theProject)
+        theProject = hptool.Project(name='Afghanistan HBP equity')
+        theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
+#        theProjectSO = ProjectSO('Afghanistan HBP equity', 
+#            user.get_scirisdemo_user(), 
+#            spreadsheetPath=None)
+        project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a third demo project.'
-        theProject = project.Project('Final Afghanistan HBP', 
-            user.get_scirisdemo_user(), 
-            spreadsheetPath=None)
-        project.theProjCollection.addObject(theProject)
+        theProject = hptool.Project(name='Final Afghanistan HBP')
+        theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
+#        theProjectSO = ProjectSO('Final Afghanistan HBP', 
+#            user.get_scirisdemo_user(), 
+#            spreadsheetPath=None)
+        project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a fourth demo project.'
-        theProject = project.Project('Pakistan test 1', 
-            user.get_scirisdemo_user(), 
-            spreadsheetPath=None)
-        project.theProjCollection.addObject(theProject)
+        theProject = hptool.Project(name='Pakistan test 1')  
+        theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
+#        theProjectSO = ProjectSO('Pakistan test 1', 
+#            user.get_scirisdemo_user(), 
+#            spreadsheetPath=None)
+        project.theProjCollection.addObject(theProjectSO)
         
     # Show what's in the ProjectCollection.    
     project.theProjCollection.show()
