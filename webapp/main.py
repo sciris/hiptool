@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/6/18 (gchadder3)
+Last update: 3/8/18 (gchadder3)
 """
 
 #
@@ -64,18 +64,9 @@ sys.path.append(webappDirTarget)
 
 #
 # Classes
-# NOTE: These probably should end up in other files (if I keep them).
 #
 
-# Wraps a Matplotlib figure displayable in the GUI.
-class GraphFigure(object):
-    def __init__(self, theFigure):
-        self.theFigure = theFigure
-
-# Wraps a collection of data.
-class DataCollection(object):
-    def __init__(self, dataObj):
-        self.dataObj = dataObj
+# ProjectSO goes here...
 
 #
 # Initialization functions 
@@ -227,24 +218,6 @@ def init_main(theApp):
 #
 # Other functions
 #
-
-# Will want to delete this function, since it's specific to Scatterplotter.
-
-def get_saved_scatterplotdata_file_path(spdName):
-    # Set the directory to the user's private directory.
-    userFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, 
-        current_user.username)
-    
-    # Create a full file name for the file.
-    fullFileName = '%s%s%s.csv' % (userFileSavePath, os.sep, spdName)
-    
-    # If the file is there, return the path name; otherwise, return None.
-    if os.path.exists(fullFileName):
-        return fullFileName
-    else:
-        return None
-    
-
 
 # Do the meat of the RPC calls, passing args and kwargs to the appropriate 
 # function in the appropriate handler location.
@@ -420,82 +393,23 @@ def json_sanitize_result(theResult):
 # RPC functions
 #
 
-# I probably don't need this function because it was just added to deal with 
-# the case of save paths, which we probaby won't be using for HSPT.
+##
+## User RPCs
+##
 
-def user_change_info(userName, password, displayname, email):
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'changeUserInfoRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Make a copy of the current_user.
-    theUser = copy.copy(current_user)
-    
-    # If the password entered doesn't match the current user password, fail.
-    if password != theUser.password:
-        return 'failure'
-       
-    # If the username entered by the user is different from the current_user
-    # name (meaning they are trying to change the name)...
-    if userName != theUser.username:
-        # Get any matching user (if any) to the new username we're trying to 
-        # switch to.
-        matchingUser = user.theUserDict.getUserByUsername(userName)
-    
-        # If we have a match, fail because we don't want to rename the user to 
-        # another existing user.
-        if matchingUser is not None:
-            return 'failure'
-        
-        # If a directory exists at the old name, rename it to the new name.
-        userOldFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, theUser.username)
-        userNewFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, userName)
-        if os.path.exists(userOldFileSavePath):
-            os.rename(userOldFileSavePath, userNewFileSavePath)
-        
-    # Change the user name, display name, email, and instance label.
-    theUser.username = userName
-    theUser.displayname = displayname
-    theUser.email = email
-    theUser.instanceLabel = userName
-    
-    # Update the user in theUserDict.
-    user.theUserDict.update(theUser)
-    
-    # Return success.
-    return 'success'
+# We will have some overrides here because we want to handle account editing 
+# and password changing in a way different than the defaults.
 
-# I probably don't need this function because it was just added to deal with 
-# the case of save paths, which we probaby won't be using for HSPT.
+##
+## Project RPCs
+##
 
-def admin_delete_user(userName):
-    # Get the result of doing the normal user.py call.
-    callResult = user.admin_delete_user(userName)
-    
-    # If we had a successful result, do the additional processing.
-    if callResult == 'success':
-        # Set the directory to the user's private directory.
-        userFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, userName)
-        
-        # If the directory exists...
-        if os.path.exists(userFileSavePath):
-            # Get the total list of entries in the user's directory.
-            allEntries = os.listdir(userFileSavePath)
-            
-            # Remove each of the files.
-            for fileName in allEntries:
-                # Create a full file name for the file.
-                fullFileName = '%s%s%s' % (userFileSavePath, os.sep, fileName)
+# We will probably have some of these here, though I want to move as much as 
+# I can into sciris/project.py.
 
-                # Remove the file.                
-                os.remove(fullFileName)
-            
-            # Remove the directory itself.
-            os.rmdir(userFileSavePath)
-        
-    # Return the callResult.    
-    return callResult
+##
+## Temporary (development) RPCs
+##
 
 # This is a temporary RPC, just a development placeholder.
 
@@ -521,117 +435,3 @@ def read_ihme_table():
     
     # Return success.
     return { 'diseases': diseaseData }
-
-#
-# The functions below will probably go bye-bye, but I'll keep them around until
-# I'm more certain there's nothing useful to cannibalize from them.
-#
-   
-def list_saved_scatterplotdata_resources():
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'normalRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Set the directory to the user's private directory.
-    userFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, 
-        current_user.username)
-    
-    # If the directory doesn't exist, return an empty list.
-    if not os.path.exists(userFileSavePath):
-        return []
-    
-    # Get the total list of entries in the user's directory.
-    allEntries = os.listdir(userFileSavePath)
-    
-    # Extract just the entries that are .csv files.
-    fTypeEntries = [entry for entry in allEntries if re.match('.+\.csv$', entry)]
-    
-    # Truncate the .csv suffix from each entry.
-    truncEntries = [re.sub('\.csv$', '', entry) for entry in fTypeEntries]
-    
-    # Return the truncated entries.
-    return truncEntries
-
-def get_saved_scatterplotdata_graph(spdName):
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'normalRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Look for a match of the resource, and if we don't find it, return
-    # an error.
-    fullFileName = get_saved_scatterplotdata_file_path(spdName)
-    if fullFileName is None:
-        return {'error': 'Cannot find resource \'%s\'' % spdName}
-    
-    # Create a ScatterplotData object.
-    # spd = model.ScatterplotData()
-
-    # # Load the data for this from the csv file.
-    # spd.loadFromCsv(fullFileName)
-    
-    # Generate a matplotib graph for display.
-    graphData = subplot(111) #spd.plot()
-  
-    # Return the dictionary representation of the matplotlib figure.
-    return {'graph': mpld3.fig_to_dict(graphData)}
-
-def delete_saved_scatterplotdata_graph(spdName):
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'normalRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Look for a match of the resource, and if we don't find it, return
-    # an error.
-    fullFileName = get_saved_scatterplotdata_file_path(spdName)
-    if fullFileName is None:
-        return {'error': 'Cannot find resource \'%s\'' % spdName}
-    
-    # Delete the file.
-    os.remove(fullFileName)
-    
-    # Return success.
-    return 'success'
-    
-def download_saved_scatterplotdata(spdName):
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'downloadRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    return get_saved_scatterplotdata_file_path(spdName)
-
-def upload_scatterplotdata_from_csv(fullFileName, spdName):
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'uploadRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Set the directory to the user's private directory.
-    userFileSavePath = '%s%s%s' % (ds.fileSaveRootPath, os.sep, 
-        current_user.username)
-    
-    # If the directory doesn't exist yet, make it.
-    if not os.path.exists(userFileSavePath):
-        os.mkdir(userFileSavePath)
-    
-    # Pull out the directory and file names from the full file name.
-    dirName, fileName = os.path.split(fullFileName)
-    
-    # Create a new destination for the file in the datafiles directory.
-    newFullFileName = '%s%s%s' % (userFileSavePath, os.sep, fileName)
-    
-    # If the new file already exists, return a failure.
-    if os.path.exists(newFullFileName):
-        return {'error': 'Resource \'%s\' already on server' % spdName}        
-    
-    # Move the file into the datafiles directory.
-    os.rename(fullFileName, newFullFileName)
-    
-    # Return the new file name.
-    #return newFullFileName
-
-    # Return the resource we added (i.e. stripping off the full filename).
-    return re.sub('\.csv$', '', fileName)

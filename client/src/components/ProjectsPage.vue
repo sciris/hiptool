@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/7/18 (gchadder3)
+Last update: 3/8/18 (gchadder3)
 -->
 
 <template>
@@ -330,6 +330,8 @@ export default {
 
     createNewProject() {
       console.log('createNewProject() called')
+
+      rpcservice.rpcProjectCall('tester_func', [0])
     },
 
     uploadProjectFromFile() {
@@ -441,6 +443,9 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('copyProject() called for ' + matchProject.project.name)
+
+
+      rpcservice.rpcProjectCall('tester_func', [matchProject.project.id])
     },
 
     renameProject(uid) {
