@@ -64,6 +64,7 @@ Last update: 3/7/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
+            <th>Select</th>
  <!--           <th @click="updateSorting('country')" class="sortable">
               Country
               <span v-show="sortColumn == 'country' && !sortReverse">
@@ -100,7 +101,21 @@ Last update: 3/7/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
+            <th @click="updateSorting('dataUploadTime')" class="sortable">
+              Data uploaded on
+              <span v-show="sortColumn == 'dataUploadTime' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'dataUploadTime' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'dataUploadTime'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
             <th>Actions</th>
+            <th>Data spreadsheet</th>
+            <th>Project file</th>
           </tr>
         </thead>
         <tbody>
@@ -108,21 +123,31 @@ Last update: 3/7/18 (gchadder3)
               :class="{ highlighted: projectIsActive(projectSummary.project.id) }">
             <td>
               <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/>
-<!--              <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/> -->
             </td>
             <td>{{ projectSummary.project.name }}</td>
+            <td>
+              <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
+            </td>
 <!--            <td>{{ projectSummary.country }}</td> -->
             <td>{{ projectSummary.project.creationTime }}</td>
             <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime: 
               'No modification' }}</td>
+            <td>{{ projectSummary.project.dataUploadTime ?  projectSummary.project.dataUploadTime: 
+              'No data uploaded' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
               <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
               <button class="btn" @click="renameProject(projectSummary.project.id)">Rename</button>
-              <button class="btn __red" @click="deleteProject(projectSummary.project.id)">Delete</button>
+            </td>
+            <td style="white-space: nowrap">
+              <button class="btn" @click="uploadSpreadsheetToProject(projectSummary.project.id)">Upload</button>
+              <button class="btn" @click="downloadSpreadsheetFromProject(projectSummary.project.id)">Download</button>
+            </td>
+            <td style="white-space: nowrap">
+              <button class="btn" @click="downloadProjectFile(projectSummary.project.id)">Download</button>
+              <button class="btn" @click="downloadProjectFileWithResults(projectSummary.project.id)">Download with results</button>
             </td>
           </tr>
-          <tr>
+<!--          <tr>
             <td>
               <button class="btn" @click="createNewProject">Create new project</button>
             </td>
@@ -133,8 +158,8 @@ Last update: 3/7/18 (gchadder3)
                   {{ choice }}
                 </option>
               </select>
-            </td> -->
-          </tr>
+            </td> 
+          </tr> -->
         </tbody>
       </table>
 
@@ -264,7 +289,11 @@ export default {
       // Get the current user's project summaries from the server.
       rpcservice.rpcProjectCall('load_current_user_project_summaries')
       .then(response => {
+        // Set the projects to what we received.
         this.projectSummaries = response.data.projects
+
+        // Set select flags for false initially.
+        this.projectSummaries.forEach(theProj => { theProj.selected = false })
       })
 
       // Get the demo project summaries from the server.
@@ -421,17 +450,38 @@ export default {
       console.log('renameProject() called for ' + matchProject.project.name)
     },
 
-    deleteProject(uid) {
+    uploadSpreadsheetToProject(uid) {
       // Find the project that matches the UID passed in.
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
-      console.log('deleteProject() called for ' + matchProject.projectName)
+      console.log('uploadSpreadsheetToProject() called for ' + matchProject.project.name)
+    },
+
+    downloadSpreadsheetFromProject(uid) {
+      // Find the project that matches the UID passed in.
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
+
+      console.log('downloadSpreadsheetFromProject() called for ' + matchProject.project.name)
+    },
+
+    downloadProjectFile(uid) {
+      // Find the project that matches the UID passed in.
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
+
+      console.log('downloadProjectFile() called for ' + matchProject.project.name)
+    },
+
+    downloadProjectFileWithResults(uid) {
+      // Find the project that matches the UID passed in.
+      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
+
+      console.log('downloadProjectFileWithResults() called for ' + matchProject.project.name)
     },
 
     deleteSelectedProjects() {
       // Pull out the names of the projects that are selected.
       let selectProjects = this.projectSummaries.filter(theProj => 
-        theProj.selected).map(theProj => theProj.projectName)
+        theProj.selected).map(theProj => theProj.project.name)
 
       console.log('deleteSelectedProjects() called for ', selectProjects)
     },
@@ -439,7 +489,7 @@ export default {
     downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
       let selectProjects = this.projectSummaries.filter(theProj => 
-        theProj.selected).map(theProj => theProj.projectName)
+        theProj.selected).map(theProj => theProj.project.name)
 
       console.log('downloadSelectedProjects() called for ', selectProjects)
     }
