@@ -669,7 +669,191 @@ def json_sanitize_result(theResult):
 #        return str(theResult)
 
     return theResult
+
+##
+## Project helper functions
+##
+
+def save_project(theProj, skip_result=False):
+    """
+    Given a Project object, wrap it in a new ProjectSO object and put this 
+    in the project collection (either adding a new object, or updating an 
+    existing one)  skip_result lets you null out saved results in the Project.
+    """ 
+    
+    # Load the project record matching the UID of the project passed in.
+    project_record = project.load_project_record(theProj.uid)
+    
+    # Copy the project, only save what we want...
+    new_project = dcp(theProj)
+#    if skip_result:
+#        new_project.results = op.odict()
+         
+    # Create the new project entry and enter it into the ProjectCollection.
+    # Note: We don't need to pass in project.uid as a 3rd argument because 
+    # the constructor will automatically use the Project's UID.
+    theProjSO = ProjectSO(new_project, project_record.ownerUID)
+    project.theProjCollection.updateObject(theProjSO)
+    
+def update_project_with_fn(project_id, update_project_fn):
+    """
+    Do an update of a hptool Project, given the UID and a function that 
+    does the actual Project updating.
+    """ 
+    
+    # Load the project.
+    theProj = project.load_project(project_id)
+    
+    # Execute the passed-in function that modifies the project.
+    update_project_fn(theProj)
+    
+    # Set the updating time to now.
+    theProj.modified = project.now_utc()
+    
+    # Save the changed project.
+    save_project(theProj) 
+    
+#def create_project(user_id, project_summary):
+#    """
+#    Create a new hptool Project for a user from a passed in project 
+#    summary.
+#    """ 
+#    
+#    # Create a new Project object with the name passed in from the project 
+#    # summary.
+#    theProj = hptool.Project(name=project_summary['name'])
+#    
+#    # Display the call information.
+#    print(">> create_project %s" % (project.name))
+#    
+#    # Save the new project.
+#    save_project_as_new(theProj, user_id)
+#    
+#    # Return the new project UID.
+#    return {'projectId': str(theProj.uid)}
+
+def update_project_from_summary(project_summary, delete_data=False):
+    """
+    Given the passed in project summary, update the underlying project 
+    accordingly.
+    """ 
+    
+    # Load the project corresponding with this summary.
+    theProj = project.load_project(project_summary['id'])
+       
+    # If we want to delete the data, delete it in the summary. 
+    if delete_data:
+        pass
+        # parse.clear_project_data(project)
         
+    # Use the summary to set the actual project.
+    theProj.updateName(project_summary['name'])
+    #parse.set_project_summary_on_project(theProj, project_summary)
+    
+    # Save the changed project to the DataStore.
+    save_project(theProj)
+    
+def save_project_as_new(theProj, user_id):
+    """
+    Given a Project object and a user UID, wrap the Project in a new ProjectSO 
+    object and put this in the project collection, after getting a fresh UID
+    for this Project.  Then do the actual save.
+    """ 
+    
+    # Set a new project UID, so we aren't replicating the UID passed in.
+    theProj.uid = uuid.uuid4()
+    
+    # Create the new project entry and enter it into the ProjectCollection.
+    theProjSO = ProjectSO(theProj, user_id)
+    project.theProjCollection.addObject(theProjSO)  
+
+    # Display the call information.
+    print(">> save_project_as_new '%s'" % theProj.name)
+
+    # Save the changed Project object to the DataStore.
+    save_project(theProj)
+    
+    return None
+
+def copy_project(project_id, new_project_name):
+    """
+    Given a project UID and a new project name, creates a copy of the project 
+    with a new UID and returns that UID.
+    """
+    
+    # Display the call information.
+    print(">> copy_project args project_id %s" % project_id)
+    print(">> copy_project args new_project_name %s" % new_project_name)     
+    
+    # Get the Project object for the project to be copied.
+    project_record = project.load_project_record(project_id, raise_exception=True)
+    theProj = project_record.theProject
+    
+    # Make a copy of the project loaded in to work with.
+    new_project = dcp(theProj)
+    
+    # Just change the project name, and we have the new version of the 
+    # Project object to be saved as a copy.
+    new_project.name = new_project_name
+    
+    # Set the user UID for the new projects record to be the current user.
+    user_id = current_user.get_id() 
+    
+    # Save a DataStore projects record for the copy project.
+    save_project_as_new(new_project, user_id)
+    
+    # Remember the new project UID (created in save_project_as_new()).
+    copy_project_id = new_project.uid
+
+    # Return the UID for the new projects record.
+    return { 'projectId': copy_project_id }
+
+def create_project_from_prj_file(prj_filename, user_id, other_names):
+    """
+    Given a .prj file name, a user UID, and other other file names, 
+    create a new project from the file with a new UID and return the new UID.
+    """
+    
+    # Display the call information.
+    print(">> create_project_from_prj_file '%s'" % prj_filename)
+    
+    # Try to open the .prj file, and return an error message if this fails.
+    try:
+        theProj = hptool.loadProjectFromPrjFile(prj_filename)
+    except Exception:
+        return { 'projectId': 'BadFileFormatError' }
+    
+    # Reset the project name to a new project name that is unique.
+    theProj.name = project.get_unique_name(theProj.name, other_names)
+    
+    # Save the new project in the DataStore.
+    save_project_as_new(theProj, user_id)
+    
+    # Return the new project UID in the return message.
+    return { 'projectId': str(theProj.uid) }
+
+#def create_project_from_spreadsheet(xlsx_filename, user_id, other_names):
+#    """
+#    Given an Excel file name, a user UID, and other other file names, 
+#    create a new project from the file with a new UID and return the new UID.
+#    """
+#    
+#    # Display the call information.
+#    print(">> create_project_from_spreadsheet '%s'" % xlsx_filename)
+#    
+#    # Create a new Project with the passed in Excel file.
+#    theProj = hptool.Project(name='spreadsheetread', 
+#        spreadsheetPath=xlsx_filename)
+#    
+#    # Get a unique project name if one is lacking.
+#    theProj.name = project.get_unique_name(theProj.name, other_names)
+#    
+#    # Save the new project.
+#    save_project_as_new(theProj, user_id)
+#    
+#    # Return the UID for the new project.
+#    return { 'projectId': str(theProj.uid) }
+
 #
 # RPC functions
 #
@@ -688,9 +872,38 @@ def json_sanitize_result(theResult):
 # We will probably have some of these here, though I want to move as much as 
 # I can into sciris/project.py.
 
+def update_project_from_uploaded_spreadsheet(spreadsheet_fname, project_id):
+    """
+    Update the spreadsheet in the project pointed to by the project UID.
+    """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'uploadProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+    
+    # Display the call information.
+    print(">> update_project_from_uploaded_spreadsheet %s" % (spreadsheet_fname))
+    
+    # Function to pass into update_project_with_fn()
+    def modify(theProj):
+        theProj.updateSpreadsheet(spreadsheet_fname)
+        
+    # Update the project with the above function.    
+    update_project_with_fn(project_id, modify)
+        
+    # Return success.
+    return { 'success': True }
+
 ##
 ## Temporary (development) RPCs
 ##
+
+def tester_func_main(project_id):
+    theProjRecord = load_project_record(project_id)
+    print theProjRecord
+    
+    return 'success'
 
 # This is a temporary RPC, just a development placeholder.
 

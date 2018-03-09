@@ -331,7 +331,8 @@ export default {
     createNewProject() {
       console.log('createNewProject() called')
 
-      rpcservice.rpcProjectCall('tester_func', [0])
+      rpcservice.rpcProjectCall('tester_func_project', [0])
+//      rpcservice.rpcProjectCall('tester_func_main', [0])
     },
 
     uploadProjectFromFile() {
@@ -444,8 +445,10 @@ export default {
 
       console.log('copyProject() called for ' + matchProject.project.name)
 
-
-      rpcservice.rpcProjectCall('tester_func', [matchProject.project.id])
+//        rpcservice.rpcProjectCall('load_all_project_summaries', [matchProject.project.id])
+        rpcservice.rpcProjectCall('load_all_project_summaries')
+//      rpcservice.rpcProjectCall('tester_func_project', [matchProject.project.id])
+//      rpcservice.rpcProjectCall('tester_func_main', [matchProject.project.id])
     },
 
     renameProject(uid) {
