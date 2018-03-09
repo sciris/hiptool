@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/8/18 (gchadder3)
+Last update: 3/9/18 (gchadder3)
 -->
 
 <template>
@@ -9,7 +9,7 @@ Last update: 3/8/18 (gchadder3)
     <div class="PageSection">
       <h2>Create projects</h2>
 
-      <div class="ControlsRowLabel">
+<!--      <div class="ControlsRowLabel">
         Choose a demonstration project from our database:
       </div>
 
@@ -25,14 +25,13 @@ Last update: 3/8/18 (gchadder3)
 
       <div class="ControlsRowLabel">
         Or create/upload a new project:
-      </div>
+      </div> -->
 
       <div class="ControlsRow">
         <button class="btn" @click="createNewProject">Create new project</button>
         &nbsp; &nbsp;
         <button class="btn" @click="uploadProjectFromFile">Upload project from file</button>
         &nbsp; &nbsp;
-        <button class="btn" @click="uploadProjectFromSpreadsheet">Upload project from spreadsheet</button>
       </div>
     </div>
 
@@ -101,21 +100,7 @@ Last update: 3/8/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting('dataUploadTime')" class="sortable">
-              Data uploaded on
-              <span v-show="sortColumn == 'dataUploadTime' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-              <span v-show="sortColumn == 'dataUploadTime' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-              <span v-show="sortColumn != 'dataUploadTime'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-            </th>
             <th>Actions</th>
-            <th>Data spreadsheet</th>
-            <th>Project file</th>
           </tr>
         </thead>
         <tbody>
@@ -132,19 +117,10 @@ Last update: 3/8/18 (gchadder3)
             <td>{{ projectSummary.project.creationTime }}</td>
             <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime: 
               'No modification' }}</td>
-            <td>{{ projectSummary.project.dataUploadTime ?  projectSummary.project.dataUploadTime: 
-              'No data uploaded' }}</td>
             <td style="white-space: nowrap">
               <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
               <button class="btn" @click="renameProject(projectSummary.project.id)">Rename</button>
-            </td>
-            <td style="white-space: nowrap">
-              <button class="btn" @click="uploadSpreadsheetToProject(projectSummary.project.id)">Upload</button>
-              <button class="btn" @click="downloadSpreadsheetFromProject(projectSummary.project.id)">Download</button>
-            </td>
-            <td style="white-space: nowrap">
               <button class="btn" @click="downloadProjectFile(projectSummary.project.id)">Download</button>
-              <button class="btn" @click="downloadProjectFileWithResults(projectSummary.project.id)">Download with results</button>
             </td>
           </tr>
 <!--          <tr>
@@ -339,10 +315,6 @@ export default {
       console.log('uploadProjectFromFile() called')
     },
 
-    uploadProjectFromSpreadsheet() {
-      console.log('uploadProjectFromSpreadsheet() called')
-    },
-
     projectIsActive(uid) {
       // If the project is undefined, it is not active.
       if (this.$store.state.activeProject.project === undefined) {
@@ -458,32 +430,11 @@ export default {
       console.log('renameProject() called for ' + matchProject.project.name)
     },
 
-    uploadSpreadsheetToProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
-      console.log('uploadSpreadsheetToProject() called for ' + matchProject.project.name)
-    },
-
-    downloadSpreadsheetFromProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
-      console.log('downloadSpreadsheetFromProject() called for ' + matchProject.project.name)
-    },
-
     downloadProjectFile(uid) {
       // Find the project that matches the UID passed in.
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('downloadProjectFile() called for ' + matchProject.project.name)
-    },
-
-    downloadProjectFileWithResults(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
-      console.log('downloadProjectFileWithResults() called for ' + matchProject.project.name)
     },
 
     deleteSelectedProjects() {
