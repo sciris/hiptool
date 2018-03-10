@@ -307,8 +307,12 @@ export default {
     createNewProject() {
       console.log('createNewProject() called')
 
-      rpcservice.rpcProjectCall('tester_func_project', [0])
-//      rpcservice.rpcProjectCall('tester_func_main', [0])
+      // Have the server create a new project.
+      rpcservice.rpcProjectCall('create_new_project', [this.$store.state.currentUser.UID])
+      .then(response => {
+        // Update the project summaries so the new project shows up on the list.
+        this.updateProjectSummaries()
+      })
     },
 
     uploadProjectFromFile() {

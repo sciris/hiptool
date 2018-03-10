@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/8/18 (gchadder3)
+Last update: 3/9/18 (gchadder3)
 """
 
 #
@@ -713,25 +713,6 @@ def update_project_with_fn(project_id, update_project_fn):
     # Save the changed project.
     save_project(theProj) 
     
-#def create_project(user_id, project_summary):
-#    """
-#    Create a new hptool Project for a user from a passed in project 
-#    summary.
-#    """ 
-#    
-#    # Create a new Project object with the name passed in from the project 
-#    # summary.
-#    theProj = hptool.Project(name=project_summary['name'])
-#    
-#    # Display the call information.
-#    print(">> create_project %s" % (project.name))
-#    
-#    # Save the new project.
-#    save_project_as_new(theProj, user_id)
-#    
-#    # Return the new project UID.
-#    return {'projectId': str(theProj.uid)}
-
 def update_project_from_summary(project_summary, delete_data=False):
     """
     Given the passed in project summary, update the underlying project 
@@ -832,28 +813,6 @@ def create_project_from_prj_file(prj_filename, user_id, other_names):
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }
 
-#def create_project_from_spreadsheet(xlsx_filename, user_id, other_names):
-#    """
-#    Given an Excel file name, a user UID, and other other file names, 
-#    create a new project from the file with a new UID and return the new UID.
-#    """
-#    
-#    # Display the call information.
-#    print(">> create_project_from_spreadsheet '%s'" % xlsx_filename)
-#    
-#    # Create a new Project with the passed in Excel file.
-#    theProj = hptool.Project(name='spreadsheetread', 
-#        spreadsheetPath=xlsx_filename)
-#    
-#    # Get a unique project name if one is lacking.
-#    theProj.name = project.get_unique_name(theProj.name, other_names)
-#    
-#    # Save the new project.
-#    save_project_as_new(theProj, user_id)
-#    
-#    # Return the UID for the new project.
-#    return { 'projectId': str(theProj.uid) }
-
 #
 # RPC functions
 #
@@ -872,35 +831,64 @@ def create_project_from_prj_file(prj_filename, user_id, other_names):
 # We will probably have some of these here, though I want to move as much as 
 # I can into sciris/project.py.
 
-def update_project_from_uploaded_spreadsheet(spreadsheet_fname, project_id):
+#def create_project(user_id, project_summary):
+#    """
+#    Create a new hptool Project for a user from a passed in project 
+#    summary.
+#    """ 
+#    
+#    # Create a new Project object with the name passed in from the project 
+#    # summary.
+#    theProj = hptool.Project(name=project_summary['name'])
+#    
+#    # Display the call information.
+#    print(">> create_project %s" % (project.name))
+#    
+#    # Save the new project.
+#    save_project_as_new(theProj, user_id)
+#    
+#    # Return the new project UID.
+#    return {'projectId': str(theProj.uid) }
+
+def create_new_project(user_id):
     """
-    Update the spreadsheet in the project pointed to by the project UID.
+    Create a new HealthPrior project.
     """
     
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
-    if request.endpoint != 'uploadProjectRPC':
-        return {'error': 'Unauthorized RPC'} 
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Load the data path holding the Excel files.
+    dataPath = hptool.HPpath('data')
+    
+    # Get a unique name for the project to be added.
+    newProjName = project.get_unique_name('New project', other_names=None)
+    
+    # Create the project, loading in the desired spreadsheets.
+    theProj = hptool.Project(name=newProjName, 
+        burdenfile=dataPath + 'ihme-gbd.xlsx', 
+        interventionsfile=dataPath + 'dcp-data.xlsx')  
+    
+    # Set the burden population size.
+    theProj.burden().popsize = 36373.176 # From UN population division 
     
     # Display the call information.
-    print(">> update_project_from_uploaded_spreadsheet %s" % (spreadsheet_fname))
+    print(">> create_new_project %s" % (theProj.name))    
     
-    # Function to pass into update_project_with_fn()
-    def modify(theProj):
-        theProj.updateSpreadsheet(spreadsheet_fname)
-        
-    # Update the project with the above function.    
-    update_project_with_fn(project_id, modify)
-        
-    # Return success.
-    return { 'success': True }
+    # Save the new project in the DataStore.
+    save_project_as_new(theProj, user_id)
+    
+    # Return the new project UID in the return message.
+    return { 'projectId': str(theProj.uid) }  
 
 ##
 ## Temporary (development) RPCs
 ##
 
 def tester_func_main(project_id):
-    theProjRecord = load_project_record(project_id)
+    theProjRecord = project.load_project_record(project_id)
     print theProjRecord
     
     return 'success'
