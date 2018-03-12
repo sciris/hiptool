@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/9/18 (gchadder3)
+Last update: 3/12/18 (gchadder3)
 -->
 
 <template>
@@ -273,7 +273,7 @@ export default {
       })
 
       // Get the demo project summaries from the server.
-      rpcservice.rpcProjectCall('get_scirisdemo_projects')
+/*      rpcservice.rpcProjectCall('get_scirisdemo_projects')
       .then(response => {
         // Set the demo projects to what we received.
         this.demoProjectSummaries = response.data.projects
@@ -283,10 +283,10 @@ export default {
 
         // Initialize the selection of the demo project to the first element.
         this.selectedDemoProject = this.demoProjectList[0]
-      })
+      }) */
     },
 
-    addDemoProject() {
+/*    addDemoProject() {
       console.log('addDemoProject() called')
 
       // Find the object in the default project summaries that matches what's 
@@ -302,7 +302,7 @@ export default {
 //      this.projectSummaries.push(newProject)
 
 //      this.projectSummaries.push(this.demoProjectSummaries[0])
-    },
+    }, */
 
     createNewProject() {
       console.log('createNewProject() called')
@@ -366,14 +366,10 @@ export default {
     },
 
     applyNameFilter(projects) {
-      console.log('applyNameFilter() called')
-
       return projects.filter(theProject => theProject.project.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
     applySorting(projects) {
-      console.log('applySorting() called')
-
       return projects.sort((proj1, proj2) => 
         {
           let sortDir = this.sortReverse ? -1: 1
@@ -389,16 +385,11 @@ export default {
           else if (this.sortColumn === 'updatedTime') {
             return proj1.project.updateTime > proj2.project.updateTime ? sortDir: -sortDir
           }
-          else if (this.sortColumn === 'dataUploadTime') {
-            return proj1.project.dataUploadTime > proj2.project.dataUploadTime ? sortDir: -sortDir
-          } 
         }
       )
     },
 
 /*    applyCountryFilter(projects) {
-      console.log('applyCountryFilter() called')
-
       if (this.selectedCountry === 'Select country...')
         return projects
       else

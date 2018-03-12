@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/7/18 (gchadder3)
+Last update: 3/12/18 (gchadder3)
 -->
 
 <template>
@@ -19,7 +19,7 @@ Last update: 3/7/18 (gchadder3)
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
-              Burden project
+              Burden set
               <span v-show="sortColumn == 'name' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
@@ -30,7 +30,7 @@ Last update: 3/7/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th>Country</th>
+<!--            <th>Country</th> -->
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -59,31 +59,31 @@ Last update: 3/7/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in sortedFilteredProjectSummaries" :class="{ highlighted: activeProject.uid === projectSummary.uid }">
-            <td>{{ projectSummary.projectName }}</td>
-            <td>{{ projectSummary.country }}</td>
-            <td>{{ projectSummary.creationTime }}</td>
-            <td>{{ projectSummary.updateTime ? projectSummary.updateTime:
+          <tr v-for="burdenSet in sortedFilteredBurdenSets" :class="{ highlighted: activeBurdenSet.uid === burdenSet.uid }">
+            <td>{{ burdenSet.name }}</td>
+<!--            <td>{{ burdenSet.country }}</td> -->
+            <td>{{ burdenSet.creationTime }}</td>
+            <td>{{ burdenSet.updateTime ? burdenSet.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewProject(projectSummary.uid)">View</button>
-              <button class="btn" @click="copyProject(projectSummary.uid)">Copy</button>
-              <button class="btn" @click="renameProject(projectSummary.uid)">Rename</button>
-              <button class="btn __red" @click="deleteProject(projectSummary.uid)">Delete</button>
+              <button class="btn __green" @click="viewBurdenSet(burdenSet.uid)">View</button>
+              <button class="btn" @click="copyBurdenSet(burdenSet.uid)">Copy</button>
+              <button class="btn" @click="renameBurdenSet(burdenSet.uid)">Rename</button>
+              <button class="btn __red" @click="deleteBurdenSet(burdenSet.uid)">Delete</button>
             </td>
           </tr>
           <tr>
             <td>
-              <button class="btn" @click="createNewProject">Create new</button>
+              <button class="btn" @click="createNewBurdenSet">Create new</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="PageSection UIPlaceholder" v-if="activeProject.projectName != undefined">
+    <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.name != undefined">
       <div class="PHText">
-        Page interface specific to {{ activeProject.projectName }} project
+        Page interface specific to {{ activeBurdenSet.name }} project
       </div>
 
       <button class="btn" @click="grabTableData">Upload IHME data</button>
@@ -221,27 +221,31 @@ export default {
       // Sort in reverse order?
       sortReverse: false,
 
-      // List of summary objects for projects the user has
-      projectSummaries:
+/* old burden sets stuff to get rid of
+      // List of burden sets in the active project
+      burdenSets:
         [
           {
-            projectName: 'Default GBD',
-            country: 'Afghanistan',
+            name: 'Default GBD',
+//            country: 'Afghanistan',
             creationTime: '2017-Jun-01 02:45 AM',
             updateTime: '2017-Jun-02 05:41 AM',
             uid: 1
           },
           {
-            projectName: 'GBD with updated NCDs',
-            country: 'Afghanistan',
+            name: 'GBD with updated NCDs',
+//            country: 'Afghanistan',
             creationTime: '2017-Jun-07 05:15 PM',
             updateTime: '2017-Jun-08 05:14 PM',
             uid: 2
           }
-        ],
+        ], */
 
-      // Active project
-      activeProject: {},
+      // List of burden sets in the active project
+      burdenSets: [],
+
+      // Active burden set
+      activeBurdenSet: {},
 
       // List of diseases.  Each list element is a list of the ailment name
       // and numbers associated with it.
@@ -264,8 +268,8 @@ export default {
       }
     },
 
-    sortedFilteredProjectSummaries() {
-      return this.applyNameFilter(this.applySorting(this.projectSummaries))
+    sortedFilteredBurdenSets() {
+      return this.applyNameFilter(this.applySorting(this.burdenSets))
     }, 
 
     sortedDiseases() {
@@ -278,9 +282,29 @@ export default {
     if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
     }
+
+    // Otherwise...
+    else {
+      // Load the burden sets from the active project.
+      this.updateBurdenSets()
+    }
   },
 
   methods: {
+    updateBurdenSets() {
+      console.log('updateBurdenSets() called')
+
+      // Get the active project's burden sets.
+/*      rpcservice.rpcProjectCall('load_current_user_project_summaries')
+      .then(response => {
+        // Set the projects to what we received.
+        this.projectSummaries = response.data.projects
+
+        // Set select flags for false initially.
+        this.projectSummaries.forEach(theProj => { theProj.selected = false })
+      }) */
+    },
+
     updateSorting(sortColumn) {
       console.log('updateSorting() called')
 
@@ -299,42 +323,38 @@ export default {
       }
     },
 
-    applyNameFilter(projects) {
-      console.log('applyNameFilter() called')
-
-      return projects.filter(theProject => theProject.projectName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
+    applyNameFilter(sets) {
+      return sets.filter(theSet => theSet.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
-    applySorting(projects) {
-      console.log('applySorting() called')
-
-      return projects.sort((proj1, proj2) =>
+    applySorting(sets) {
+      return sets.sort((set1, set2) =>
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
-            return (proj1.projectName > proj2.projectName ? sortDir: -sortDir)
+            return (set1.projectName > set2.projectName ? sortDir: -sortDir)
           }
           else if (this.sortColumn === 'country') {
-            return proj1.country > proj2.country ? sortDir: -sortDir
+            return set1.country > set2.country ? sortDir: -sortDir
           }
           else if (this.sortColumn === 'creationTime') {
-            return proj1.creationTime > proj2.creationTime ? sortDir: -sortDir
+            return set1.creationTime > set2.creationTime ? sortDir: -sortDir
           }
           else if (this.sortColumn === 'updatedTime') {
-            return proj1.updateTime > proj2.updateTime ? sortDir: -sortDir
+            return set1.updateTime > set2.updateTime ? sortDir: -sortDir
           }
         }
       )
     },
 
-    viewProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    viewBurdenSet(uid) {
+      // Find the burden set that matches the UID passed in.
+      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('viewProject() called for ' + matchProject.projectName)
+      console.log('viewBurdenSet() called for ' + matchSet.name)
 
       // Set the active project to the matched project.
-      this.activeProject = matchProject
+      this.activeBurdenSet = matchSet
 
       // Clear the disease list (for now) and reset the bottom table sorting state.
       this.diseaseList = []
@@ -342,29 +362,29 @@ export default {
       this.sortReverse2 = false
     },
 
-    copyProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    copyBurdenSet(uid) {
+      // Find the burden set that matches the UID passed in.
+      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('copyProject() called for ' + matchProject.projectName)
+      console.log('copyBurdenSet() called for ' + matchSet.name)
     },
 
-    renameProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    renameBurdenSet(uid) {
+      // Find the burden set that matches the UID passed in.
+      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('renameProject() called for ' + matchProject.projectName)
+      console.log('renameBurdenSet() called for ' + matchSet.name)
     },
 
-    deleteProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.uid === uid)
+    deleteBurdenSet(uid) {
+      // Find the burden set that matches the UID passed in.
+      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('deleteProject() called for ' + matchProject.projectName)
+      console.log('deleteBurdenSet() called for ' + matchSet.name)
     },
 
-    createNewProject() {
-      console.log('createNewProject() called')
+    createNewBurdenSet() {
+      console.log('createNewBurdenSet() called')
     },
 
     grabTableData() {
@@ -394,8 +414,6 @@ export default {
     },
 
     applySorting2(diseases) {
-      console.log('applySorting2() called')
-
       return diseases.sort((disease1, disease2) =>
         {
           let sortDir = this.sortReverse2 ? -1: 1

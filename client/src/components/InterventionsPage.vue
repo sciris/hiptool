@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/7/18 (gchadder3)
+Last update: 3/12/18 (gchadder3)
 -->
 
 <template>
@@ -160,6 +160,7 @@ export default {
       // Sort in reverse order?
       sortReverse: false, 
 
+/* old burden sets stuff to get rid of
       // List of objects for intervention sets the project has
       interventionSets: 
         [
@@ -171,7 +172,10 @@ export default {
             setName: 'Country defined set',
             uid: 2
           }
-        ],
+        ], */
+
+      // List of objects for intervention sets the project has
+      interventionSets: [],
 
       // Active intervention set
       activeIntervSet: {},
@@ -269,9 +273,29 @@ export default {
     if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
     }
+
+    // Otherwise...
+    else {
+      // Load the burden sets from the active project.
+      this.updateIntervSets()
+    }
   },
 
   methods: {
+    updateIntervSets() {
+      console.log('updateIntervSets() called')
+
+      // Get the active project's intervention sets.
+/*      rpcservice.rpcProjectCall('load_current_user_project_summaries')
+      .then(response => {
+        // Set the projects to what we received.
+        this.projectSummaries = response.data.projects
+
+        // Set select flags for false initially.
+        this.projectSummaries.forEach(theProj => { theProj.selected = false })
+      }) */
+    },
+
     updateSorting(sortColumn) {
       console.log('updateSorting() called')
 
@@ -291,14 +315,10 @@ export default {
     },
 
     applyNameFilter(sets) {
-      console.log('applyNameFilter() called')
-
       return sets.filter(theSet => theSet.setName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
     applySorting(sets) {
-      console.log('applySorting() called')
-
       return sets.sort((set1, set2) => 
         {
           let sortDir = this.sortReverse ? -1: 1
