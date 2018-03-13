@@ -59,11 +59,12 @@ Last update: 3/12/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="burdenSet in sortedFilteredBurdenSets" :class="{ highlighted: activeBurdenSet.uid === burdenSet.uid }">
-            <td>{{ burdenSet.name }}</td>
+          <tr v-for="burdenSet in sortedFilteredBurdenSets" 
+              :class="{ highlighted: burdenSetIsSelected(burdenSet.burdenset.uid) }">
+            <td>{{ burdenSet.burdenset.name }}</td>
 <!--            <td>{{ burdenSet.country }}</td> -->
-            <td>{{ burdenSet.creationTime }}</td>
-            <td>{{ burdenSet.updateTime ? burdenSet.updateTime:
+            <td>{{ burdenSet.burdenset.creationTime }}</td>
+            <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
               <button class="btn __green" @click="viewBurdenSet(burdenSet.uid)">View</button>
@@ -81,9 +82,9 @@ Last update: 3/12/18 (gchadder3)
       </table>
     </div>
 
-    <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.name != undefined">
+    <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
       <div class="PHText">
-        Page interface specific to {{ activeBurdenSet.name }} project
+        Page interface specific to {{ activeBurdenSet.burdenset.name }} project
       </div>
 
       <button class="btn" @click="grabTableData">Upload IHME data</button>
@@ -294,15 +295,33 @@ export default {
     updateBurdenSets() {
       console.log('updateBurdenSets() called')
 
-      // Get the active project's burden sets.
-/*      rpcservice.rpcProjectCall('load_current_user_project_summaries')
-      .then(response => {
-        // Set the projects to what we received.
-        this.projectSummaries = response.data.projects
+      // If there is no active project, clear the burdenSets list.
+      if (this.$store.state.activeProject.project === undefined) {
+        this.burdenSets = []
+      }
 
-        // Set select flags for false initially.
-        this.projectSummaries.forEach(theProj => { theProj.selected = false })
-      }) */
+      // Otherwise...
+      else {
+        // Get the active project's burden sets.
+        rpcservice.rpcProjectCall('get_project_burden_sets', 
+          [this.$store.state.activeProject.project.id])
+        .then(response => {
+          // Set the burden set list to what we received.
+          this.burdenSets = response.data.burdensets
+        })
+      }
+    },
+
+    burdenSetIsSelected(uid) {
+      // If the active burden set is undefined, it is not active.
+      if (this.activeBurdenSet.burdenset === undefined) {
+        return false
+      } 
+   
+      // Otherwise, the project is active if the UIDs match.
+      else {
+        return (this.activeBurdenSet.burdenset.uid === uid)
+      }
     },
 
     updateSorting(sortColumn) {
@@ -324,7 +343,7 @@ export default {
     },
 
     applyNameFilter(sets) {
-      return sets.filter(theSet => theSet.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
+      return sets.filter(theSet => theSet.burdenset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
     applySorting(sets) {
@@ -332,16 +351,16 @@ export default {
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
-            return (set1.projectName > set2.projectName ? sortDir: -sortDir)
+            return (set1.burdenset.name > set2.burdenset.name ? sortDir: -sortDir)
           }
-          else if (this.sortColumn === 'country') {
-            return set1.country > set2.country ? sortDir: -sortDir
-          }
+/*          else if (this.sortColumn === 'country') {
+            return set1.burdenset.country > set2.burdenset.country ? sortDir: -sortDir
+          } */
           else if (this.sortColumn === 'creationTime') {
-            return set1.creationTime > set2.creationTime ? sortDir: -sortDir
+            return set1.burdenset.creationTime > set2.burdenset.creationTime ? sortDir: -sortDir
           }
           else if (this.sortColumn === 'updatedTime') {
-            return set1.updateTime > set2.updateTime ? sortDir: -sortDir
+            return set1.burdenset.updateTime > set2.burdenset.updateTime ? sortDir: -sortDir
           }
         }
       )
@@ -351,7 +370,7 @@ export default {
       // Find the burden set that matches the UID passed in.
       let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('viewBurdenSet() called for ' + matchSet.name)
+      console.log('viewBurdenSet() called for ' + matchSet.burdenset.name)
 
       // Set the active project to the matched project.
       this.activeBurdenSet = matchSet
@@ -366,21 +385,21 @@ export default {
       // Find the burden set that matches the UID passed in.
       let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('copyBurdenSet() called for ' + matchSet.name)
+      console.log('copyBurdenSet() called for ' + matchSet.burdenset.name)
     },
 
     renameBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
       let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('renameBurdenSet() called for ' + matchSet.name)
+      console.log('renameBurdenSet() called for ' + matchSet.burdenset.name)
     },
 
     deleteBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
       let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
 
-      console.log('deleteBurdenSet() called for ' + matchSet.name)
+      console.log('deleteBurdenSet() called for ' + matchSet.burdenset.name)
     },
 
     createNewBurdenSet() {

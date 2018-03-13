@@ -883,6 +883,41 @@ def create_new_project(user_id):
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }  
 
+    def getUserFrontEndRepr(self):
+        objInfo = {
+            'project': {
+                'id': self.uid,
+                'name': self.name,
+                'userId': self.ownerUID,
+                'spreadsheetPath': self.spreadsheetPath,
+                'creationTime': self.createdTime,
+                'updatedTime': self.updatedTime,
+                'dataUploadTime': self.dataUploadTime
+            }
+        }
+        return objInfo
+    
+def get_burden_set_fe_repr(theBurdenSet):
+    objInfo = {
+        'burdenset': {
+            'name': theBurdenSet.name,
+            'uid': theBurdenSet.uid,
+            'creationTime': theBurdenSet.created,
+            'updateTime': theBurdenSet.modified
+        }
+    }
+    return objInfo
+
+def get_project_burden_sets(project_id):
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get a list of the Burden objects.
+    burdenSets = [theProj.burdensets[ind] for ind in range(len(theProj.burdensets))] 
+    
+    # Return the JSON-friendly result.
+    return {'burdensets': map(get_burden_set_fe_repr, burdenSets)}
+
 ##
 ## Temporary (development) RPCs
 ##
