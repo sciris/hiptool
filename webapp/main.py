@@ -920,6 +920,24 @@ def get_project_burden_sets(project_id):
     # Return the JSON-friendly result.
     return {'burdensets': map(get_burden_set_fe_repr, burdenSets)}
 
+def get_project_burden_set_diseases(project_id, burdenset_id):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get the burden set that matches burdenset_id.
+    burdenSet = theProj.burden()  # TO DO: replace this with a call that handles ID
+    
+    # Gather the list for all of the diseases.
+    diseaseData = [list(theDisease) for theDisease in burdenSet.data]
+    
+    # Return success.
+    return { 'diseases': diseaseData }
+    
 def get_project_interv_sets(project_id):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -944,28 +962,3 @@ def tester_func_main(project_id):
     print theProjRecord
     
     return 'success'
-
-# This is a temporary RPC, just a development placeholder.
-
-def read_ihme_table():
-    # Check (for security purposes) that the function is being called by the 
-    # correct endpoint, and if not, fail.
-    if request.endpoint != 'normalRPC':
-        return {'error': 'Unauthorized RPC'}
-    
-    # Load the data path holding the Excel files.
-    dataPath = hptool.HPpath('data')
-    
-    # Load the project.
-    P = hptool.Project(burdenfile=dataPath + 'ihme-gbd.xlsx', 
-        interventionsfile=dataPath + 'dcp-data.xlsx')
-    
-    # The data of interest is in
-    # P.burdensets[0].data, which is a list of odicts.  Each odict contains
-    # the elements for that row of data.
-
-    # Gather the list for all of the diseases.
-    diseaseData = [list(theDisease) for theDisease in P.burdensets[0].data]
-    
-    # Return success.
-    return { 'diseases': diseaseData }

@@ -375,10 +375,17 @@ export default {
       // Set the active project to the matched project.
       this.activeBurdenSet = matchSet
 
-      // Clear the disease list (for now) and reset the bottom table sorting state.
-      this.diseaseList = []
-      this.sortColumn2 = 'name'
-      this.sortReverse2 = false
+      // Go to the server to get the diseases from the burden set.
+      rpcservice.rpcProjectCall('get_project_burden_set_diseases', 
+        [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
+      .then(response => {
+        // Set the disease list.
+        this.diseaseList = response.data.diseases
+
+        // Reset the bottom table sorting state.
+        this.sortColumn2 = 'name'
+        this.sortReverse2 = false
+      })
     },
 
     copyBurdenSet(uid) {
@@ -406,12 +413,13 @@ export default {
       console.log('createNewBurdenSet() called')
     },
 
-    grabTableData() {
+    grabTableData() {  
       console.log('grabTableData() called')
-      rpcservice.rpcCall('read_ihme_table')
+/*      rpcservice.rpcProjectCall('get_project_burden_set_diseases', 
+        [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
       .then(response => {
         this.diseaseList = response.data.diseases
-      })
+      }) */
     },
 
     updateSorting2(sortColumn) {
