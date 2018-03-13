@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/12/18 (gchadder3)
+Last update: 3/13/18 (gchadder3)
 -->
 
 <template>
@@ -67,10 +67,10 @@ Last update: 3/12/18 (gchadder3)
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewBurdenSet(burdenSet.uid)">View</button>
-              <button class="btn" @click="copyBurdenSet(burdenSet.uid)">Copy</button>
-              <button class="btn" @click="renameBurdenSet(burdenSet.uid)">Rename</button>
-              <button class="btn __red" @click="deleteBurdenSet(burdenSet.uid)">Delete</button>
+              <button class="btn __green" @click="viewBurdenSet(burdenSet.burdenset.uid)">View</button>
+              <button class="btn" @click="copyBurdenSet(burdenSet.burdenset.uid)">Copy</button>
+              <button class="btn" @click="renameBurdenSet(burdenSet.burdenset.uid)">Rename</button>
+              <button class="btn __red" @click="deleteBurdenSet(burdenSet.burdenset.uid)">Delete</button>
             </td>
           </tr>
           <tr>
@@ -318,7 +318,7 @@ export default {
         return false
       } 
    
-      // Otherwise, the project is active if the UIDs match.
+      // Otherwise, the burden set is selected if the UIDs match.
       else {
         return (this.activeBurdenSet.burdenset.uid === uid)
       }
@@ -368,7 +368,7 @@ export default {
 
     viewBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
-      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
 
       console.log('viewBurdenSet() called for ' + matchSet.burdenset.name)
 
@@ -383,21 +383,21 @@ export default {
 
     copyBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
-      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
 
       console.log('copyBurdenSet() called for ' + matchSet.burdenset.name)
     },
 
     renameBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
-      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
 
       console.log('renameBurdenSet() called for ' + matchSet.burdenset.name)
     },
 
     deleteBurdenSet(uid) {
       // Find the burden set that matches the UID passed in.
-      let matchSet = this.burdenSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
 
       console.log('deleteBurdenSet() called for ' + matchSet.burdenset.name)
     },

@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/9/18 (gchadder3)
+Last update: 3/13/18 (gchadder3)
 """
 
 #
@@ -813,6 +813,28 @@ def create_project_from_prj_file(prj_filename, user_id, other_names):
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }
 
+def get_burden_set_fe_repr(theBurdenSet):
+    objInfo = {
+        'burdenset': {
+            'name': theBurdenSet.name,
+            'uid': theBurdenSet.uid,
+            'creationTime': theBurdenSet.created,
+            'updateTime': theBurdenSet.modified
+        }
+    }
+    return objInfo
+
+def get_interv_set_fe_repr(theIntervSet):
+    objInfo = {
+        'intervset': {
+            'name': theIntervSet.name,
+            'uid': theIntervSet.uid,
+            'creationTime': theIntervSet.created,
+            'updateTime': theIntervSet.modified
+        }
+    }
+    return objInfo
+
 #
 # RPC functions
 #
@@ -882,33 +904,13 @@ def create_new_project(user_id):
     
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }  
-
-    def getUserFrontEndRepr(self):
-        objInfo = {
-            'project': {
-                'id': self.uid,
-                'name': self.name,
-                'userId': self.ownerUID,
-                'spreadsheetPath': self.spreadsheetPath,
-                'creationTime': self.createdTime,
-                'updatedTime': self.updatedTime,
-                'dataUploadTime': self.dataUploadTime
-            }
-        }
-        return objInfo
     
-def get_burden_set_fe_repr(theBurdenSet):
-    objInfo = {
-        'burdenset': {
-            'name': theBurdenSet.name,
-            'uid': theBurdenSet.uid,
-            'creationTime': theBurdenSet.created,
-            'updateTime': theBurdenSet.modified
-        }
-    }
-    return objInfo
-
 def get_project_burden_sets(project_id):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
     # Get the Project object.
     theProj = project.load_project(project_id)
     
@@ -917,6 +919,21 @@ def get_project_burden_sets(project_id):
     
     # Return the JSON-friendly result.
     return {'burdensets': map(get_burden_set_fe_repr, burdenSets)}
+
+def get_project_interv_sets(project_id):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get a list of the Interventions objects.
+    intervSets = [theProj.intersets[ind] for ind in range(len(theProj.intersets))] 
+    
+    # Return the JSON-friendly result.
+    return {'intervsets': map(get_interv_set_fe_repr, intervSets)}
 
 ##
 ## Temporary (development) RPCs

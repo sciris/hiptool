@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/12/18 (gchadder3)
+Last update: 3/13/18 (gchadder3)
 -->
 
 <template>
@@ -34,13 +34,14 @@ Last update: 3/12/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="intervSet in sortedFilteredIntervSets" :class="{ highlighted: activeIntervSet.uid === intervSet.uid }">
-            <td>{{ intervSet.setName }}</td>
+          <tr v-for="intervSet in sortedFilteredIntervSets" 
+              :class="{ highlighted: intervSetIsSelected(intervSet.intervset.uid) }">
+            <td>{{ intervSet.intervset.name }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewSet(intervSet.uid)">View</button>
-              <button class="btn" @click="copySet(intervSet.uid)">Copy</button>
-              <button class="btn" @click="renameSet(intervSet.uid)">Rename</button>
-              <button class="btn __red" @click="deleteSet(intervSet.uid)">Delete</button>
+              <button class="btn __green" @click="viewSet(intervSet.intervset.uid)">View</button>
+              <button class="btn" @click="copySet(intervSet.intervset.uid)">Copy</button>
+              <button class="btn" @click="renameSet(intervSet.intervset.uid)">Rename</button>
+              <button class="btn __red" @click="deleteSet(intervSet.intervset.uid)">Delete</button>
             </td>
           </tr>
           <tr>
@@ -52,9 +53,9 @@ Last update: 3/12/18 (gchadder3)
       </table>
     </div>
 
-    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.setName != undefined">
+    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
       <div class="PHText">
-        Page interface specific to {{ activeIntervSet.setName }} intervention set
+        Page interface specific to {{ activeIntervSet.intervset.name }} intervention set
       </div>
 
       <div style="margin-top: 10px">
@@ -160,7 +161,7 @@ export default {
       // Sort in reverse order?
       sortReverse: false, 
 
-/* old burden sets stuff to get rid of
+/* old intervention sets stuff to get rid of
       // List of objects for intervention sets the project has
       interventionSets: 
         [
@@ -276,7 +277,7 @@ export default {
 
     // Otherwise...
     else {
-      // Load the burden sets from the active project.
+      // Load the intervention sets from the active project.
       this.updateIntervSets()
     }
   },
@@ -285,15 +286,33 @@ export default {
     updateIntervSets() {
       console.log('updateIntervSets() called')
 
-      // Get the active project's intervention sets.
-/*      rpcservice.rpcProjectCall('load_current_user_project_summaries')
-      .then(response => {
-        // Set the projects to what we received.
-        this.projectSummaries = response.data.projects
+      // If there is no active project, clear the interventionSets list.
+      if (this.$store.state.activeProject.project === undefined) {
+        this.interventionSets = []
+      }
 
-        // Set select flags for false initially.
-        this.projectSummaries.forEach(theProj => { theProj.selected = false })
-      }) */
+      // Otherwise...
+      else {
+        // Get the active project's intervention sets.
+        rpcservice.rpcProjectCall('get_project_interv_sets', 
+          [this.$store.state.activeProject.project.id])
+        .then(response => {
+          // Set the intervention set list to what we received.
+          this.interventionSets = response.data.intervsets
+        })
+      }
+    },
+
+    intervSetIsSelected(uid) {
+      // If the active intervention set is undefined, it is not active.
+      if (this.activeIntervSet.intervset === undefined) {
+        return false
+      } 
+   
+      // Otherwise, the intervention is selected if the UIDs match.
+      else {
+        return (this.activeIntervSet.intervset.uid === uid)
+      }
     },
 
     updateSorting(sortColumn) {
@@ -315,7 +334,7 @@ export default {
     },
 
     applyNameFilter(sets) {
-      return sets.filter(theSet => theSet.setName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
+      return sets.filter(theSet => theSet.intervset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
     applySorting(sets) {
@@ -323,7 +342,7 @@ export default {
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
-            return (set1.setName > set2.setName ? sortDir: -sortDir)
+            return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)
           }
         }
       )
@@ -331,9 +350,9 @@ export default {
 
     viewSet(uid) {
       // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
 
-      console.log('viewSet() called for ' + matchSet.setName)
+      console.log('viewSet() called for ' + matchSet.intervset.name)
 
       // Set the active intervention set to the matched intervention set.
       this.activeIntervSet = matchSet
@@ -341,23 +360,23 @@ export default {
 
     copySet(uid) {
       // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
 
-      console.log('copySet() called for ' + matchSet.setName)
+      console.log('copySet() called for ' + matchSet.intervset.name)
     },
 
     renameSet(uid) {
       // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
 
-      console.log('renameSet() called for ' + matchSet.setName)
+      console.log('renameSet() called for ' + matchSet.intervset.name)
     },
 
     deleteSet(uid) {
       // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.uid === uid)
+      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
 
-      console.log('deleteSet() called for ' + matchSet.setName)
+      console.log('deleteSet() called for ' + matchSet.intervset.name)
     },
 
     createNewSet() {
