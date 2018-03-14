@@ -1,7 +1,7 @@
 <!-- 
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/12/18 (gchadder3)
+Last update: 3/14/18 (gchadder3)
 -->
 
 <template>
@@ -434,10 +434,17 @@ export default {
 
     deleteSelectedProjects() {
       // Pull out the names of the projects that are selected.
-      let selectProjects = this.projectSummaries.filter(theProj => 
-        theProj.selected).map(theProj => theProj.project.name)
+      let selectProjectsUIDs = this.projectSummaries.filter(theProj => 
+        theProj.selected).map(theProj => theProj.project.id)
 
-      console.log('deleteSelectedProjects() called for ', selectProjects)
+      console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
+
+      // Have the server delete the selected projects.
+      rpcservice.rpcProjectCall('delete_projects', [selectProjectsUIDs])
+      .then(response => {
+        // Update the project summaries so the deletions show up on the list.
+        this.updateProjectSummaries()
+      })
     },
 
     downloadSelectedProjects() {
