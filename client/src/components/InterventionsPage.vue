@@ -356,6 +356,18 @@ export default {
 
       // Set the active intervention set to the matched intervention set.
       this.activeIntervSet = matchSet
+
+      // Go to the server to get the interventions from the intervention set.
+      rpcservice.rpcProjectCall('get_project_interv_set_intervs', 
+        [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.uid])
+      .then(response => {
+        // Set the interventions table list.
+//        this.diseaseList = response.data.diseases
+
+        // Reset the bottom table sorting state.
+//        this.sortColumn2 = 'name'
+//        this.sortReverse2 = false
+      })
     },
 
     copySet(uid) {

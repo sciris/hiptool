@@ -660,8 +660,10 @@ def json_sanitize_result(theResult):
             return float(theResult)
 
     if isinstance(theResult, unicode):
-        return str(theResult)
-
+        return theResult
+#        return str(theResult)  # original line  (watch to make sure the 
+#                                                 new line doesn't break things)
+    
     if isinstance(theResult, set):
         return list(theResult)
 
@@ -952,6 +954,24 @@ def get_project_interv_sets(project_id):
     
     # Return the JSON-friendly result.
     return {'intervsets': map(get_interv_set_fe_repr, intervSets)}
+
+def get_project_interv_set_intervs(project_id, intervset_id):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get the intervention set that matches intervset_id.
+    intervSet = theProj.inter()  # TO DO: replace this with a call that handles ID
+    
+    # Gather the list for all of the interventions.
+    intervData = [list(theInterv) for theInterv in intervSet.data]
+    
+    # Return success.
+    return { 'interventions': intervData }
 
 ##
 ## Temporary (development) RPCs
