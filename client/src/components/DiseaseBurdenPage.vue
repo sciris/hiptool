@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/13/18 (gchadder3)
+Last update: 3/14/18 (gchadder3)
 -->
 
 <template>
@@ -83,9 +83,9 @@ Last update: 3/13/18 (gchadder3)
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
-      <div class="PHText">
+<!--      <div class="PHText">
         Page interface specific to {{ activeBurdenSet.burdenset.name }} project
-      </div>
+      </div> -->
 
       <button class="btn" @click="grabTableData">Upload IHME data</button>
 

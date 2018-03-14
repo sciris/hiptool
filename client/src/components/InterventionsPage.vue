@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/13/18 (gchadder3)
+Last update: 3/14/18 (gchadder3)
 -->
 
 <template>
@@ -54,10 +54,55 @@ Last update: 3/13/18 (gchadder3)
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
-      <div class="PHText">
+<!--      <div class="PHText">
         Page interface specific to {{ activeIntervSet.intervset.name }} intervention set
+      </div> -->
+
+      <div style="margin-top: 10px">
+        <table class="table table-bordered table-hover table-striped" style="width: auto">
+          <thead>
+            <tr>
+<!--              <th>Included in optimizations</th> -->
+              <th>Intervention name</th>
+              <th>Type</th>
+              <th>Delivery platform</th>
+              <th>icer</th>
+              <th>Unit cost</th>
+              <th>FRP</th>
+              <th>Equity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="interv in interventionList">
+<!--              <td style="text-align: center">
+                <input type="checkbox" v-model="interv.included"/>
+              </td> -->
+              <td>{{ interv[0] }}</td>
+              <td>{{ interv[3] }}</td>
+              <td>{{ interv[2] }}</td>
+              <td>{{ interv[4] }}</td>
+              <td>{{ interv[5] }}</td>
+              <td>{{ interv[6] }}</td>
+              <td>{{ interv[7] }}</td>
+              <td style="white-space: nowrap">
+                <i class="fas fa-edit"></i>
+                <i class="fas fa-copy"></i>
+                <i class="fas fa-download"></i>
+                <i class="fas fa-upload"></i>
+                <i class="fas fa-trash-alt"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <button class="btn">Add new intervention</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
+<!-- Old dummy table stuff
       <div style="margin-top: 10px">
         <table id="checkboxtable" class="table table-bordered" style="width: auto">
           <tr>
@@ -133,7 +178,8 @@ Last update: 3/13/18 (gchadder3)
         <span style="font-size: large">
           <i class="fas fa-download"></i> Selected
         </span>
-      </div>
+      </div> -->
+
     </div>
   </div>
 </template>
@@ -193,6 +239,7 @@ export default {
       // Show child care interventions
       showChildIntervs: false,
 
+/* old dummy interventions used in the demo table to get rid of
       // Interventions to be shown in the table
       interventionList:
         [
@@ -232,7 +279,9 @@ export default {
             included: false,
             intervCategory: 'childcare'
           }
-        ]
+        ] */
+
+      interventionList: []
     }
   },
 
@@ -362,7 +411,7 @@ export default {
         [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.uid])
       .then(response => {
         // Set the interventions table list.
-//        this.diseaseList = response.data.diseases
+        this.interventionList = response.data.interventions
 
         // Reset the bottom table sorting state.
 //        this.sortColumn2 = 'name'
