@@ -119,7 +119,7 @@ Last update: 3/14/18 (gchadder3)
               'No modification' }}</td>
             <td style="white-space: nowrap">
               <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
-              <button class="btn" @click="renameProject(projectSummary.project.id)">Rename</button>
+              <button class="btn" @click="renameProject(projectSummary)">Rename</button>
               <button class="btn" @click="downloadProjectFile(projectSummary.project.id)">Download</button>
             </td>
           </tr>
@@ -418,11 +418,24 @@ export default {
 //      rpcservice.rpcProjectCall('tester_func_main', [matchProject.project.id])
     },
 
-    renameProject(uid) {
-      // Find the project that matches the UID passed in.
-      let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
+    renameProject(projectSummary) {
+      console.log('renameProject() called for ' + projectSummary.project.name)
 
-      console.log('renameProject() called for ' + matchProject.project.name)
+      // Make a deep copy of the projectSummary object by JSON-stringifying the old 
+      // object, and then parsing the result back into a new object.
+      let newProjectSummary = JSON.parse(JSON.stringify(projectSummary));
+
+      // For now, just use this placeholder.
+      // Rename the project name in the client list.
+      newProjectSummary.project.name = 'Renamed project'
+
+      // Have the change the name of the project by passing in the new copy of the 
+      // summary.
+      rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
+      .then(response => {
+        // Update the project summaries so the rename shows up on the list.
+        this.updateProjectSummaries()
+      })
     },
 
     downloadProjectFile(uid) {

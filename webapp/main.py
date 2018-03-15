@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/13/18 (gchadder3)
+Last update: 3/14/18 (gchadder3)
 """
 
 #
@@ -676,7 +676,7 @@ def json_sanitize_result(theResult):
 ## Project helper functions
 ##
 
-def save_project(theProj, skip_result=False):
+def save_project(theProj):
     """
     Given a Project object, wrap it in a new ProjectSO object and put this 
     in the project collection (either adding a new object, or updating an 
@@ -688,8 +688,6 @@ def save_project(theProj, skip_result=False):
     
     # Copy the project, only save what we want...
     new_project = dcp(theProj)
-#    if skip_result:
-#        new_project.results = op.odict()
          
     # Create the new project entry and enter it into the ProjectCollection.
     # Note: We don't need to pass in project.uid as a 3rd argument because 
@@ -715,27 +713,6 @@ def update_project_with_fn(project_id, update_project_fn):
     # Save the changed project.
     save_project(theProj) 
     
-def update_project_from_summary(project_summary, delete_data=False):
-    """
-    Given the passed in project summary, update the underlying project 
-    accordingly.
-    """ 
-    
-    # Load the project corresponding with this summary.
-    theProj = project.load_project(project_summary['id'])
-       
-    # If we want to delete the data, delete it in the summary. 
-    if delete_data:
-        pass
-        # parse.clear_project_data(project)
-        
-    # Use the summary to set the actual project.
-    theProj.updateName(project_summary['name'])
-    #parse.set_project_summary_on_project(theProj, project_summary)
-    
-    # Save the changed project to the DataStore.
-    save_project(theProj)
-    
 def save_project_as_new(theProj, user_id):
     """
     Given a Project object and a user UID, wrap the Project in a new ProjectSO 
@@ -757,63 +734,6 @@ def save_project_as_new(theProj, user_id):
     save_project(theProj)
     
     return None
-
-def copy_project(project_id, new_project_name):
-    """
-    Given a project UID and a new project name, creates a copy of the project 
-    with a new UID and returns that UID.
-    """
-    
-    # Display the call information.
-    print(">> copy_project args project_id %s" % project_id)
-    print(">> copy_project args new_project_name %s" % new_project_name)     
-    
-    # Get the Project object for the project to be copied.
-    project_record = project.load_project_record(project_id, raise_exception=True)
-    theProj = project_record.theProject
-    
-    # Make a copy of the project loaded in to work with.
-    new_project = dcp(theProj)
-    
-    # Just change the project name, and we have the new version of the 
-    # Project object to be saved as a copy.
-    new_project.name = new_project_name
-    
-    # Set the user UID for the new projects record to be the current user.
-    user_id = current_user.get_id() 
-    
-    # Save a DataStore projects record for the copy project.
-    save_project_as_new(new_project, user_id)
-    
-    # Remember the new project UID (created in save_project_as_new()).
-    copy_project_id = new_project.uid
-
-    # Return the UID for the new projects record.
-    return { 'projectId': copy_project_id }
-
-def create_project_from_prj_file(prj_filename, user_id, other_names):
-    """
-    Given a .prj file name, a user UID, and other other file names, 
-    create a new project from the file with a new UID and return the new UID.
-    """
-    
-    # Display the call information.
-    print(">> create_project_from_prj_file '%s'" % prj_filename)
-    
-    # Try to open the .prj file, and return an error message if this fails.
-    try:
-        theProj = hptool.loadProjectFromPrjFile(prj_filename)
-    except Exception:
-        return { 'projectId': 'BadFileFormatError' }
-    
-    # Reset the project name to a new project name that is unique.
-    theProj.name = project.get_unique_name(theProj.name, other_names)
-    
-    # Save the new project in the DataStore.
-    save_project_as_new(theProj, user_id)
-    
-    # Return the new project UID in the return message.
-    return { 'projectId': str(theProj.uid) }
 
 def get_burden_set_fe_repr(theBurdenSet):
     objInfo = {
@@ -906,7 +826,94 @@ def create_new_project(user_id):
     
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }  
+  
+def update_project_from_summary(project_summary):
+    """
+    Given the passed in project summary, update the underlying project 
+    accordingly.
+    """ 
     
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Load the project corresponding with this summary.
+    theProj = project.load_project(project_summary['project']['id'])
+       
+    # Use the summary to set the actual project.
+    theProj.name = project_summary['project']['name']
+    
+    # Set the modified time to now.
+    theProj.modified = project.now_utc()
+
+    # Don't forget to have the modify time updated.
+    
+    # Save the changed project to the DataStore.
+    save_project(theProj)
+    
+def copy_project(project_id, new_project_name):
+    """
+    Given a project UID and a new project name, creates a copy of the project 
+    with a new UID and returns that UID.
+    """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Display the call information.
+    print(">> copy_project args project_id %s" % project_id)
+    print(">> copy_project args new_project_name %s" % new_project_name)     
+    
+    # Get the Project object for the project to be copied.
+    project_record = project.load_project_record(project_id, raise_exception=True)
+    theProj = project_record.theProject
+    
+    # Make a copy of the project loaded in to work with.
+    new_project = dcp(theProj)
+    
+    # Just change the project name, and we have the new version of the 
+    # Project object to be saved as a copy.
+    new_project.name = new_project_name
+    
+    # Set the user UID for the new projects record to be the current user.
+    user_id = current_user.get_id() 
+    
+    # Save a DataStore projects record for the copy project.
+    save_project_as_new(new_project, user_id)
+    
+    # Remember the new project UID (created in save_project_as_new()).
+    copy_project_id = new_project.uid
+
+    # Return the UID for the new projects record.
+    return { 'projectId': copy_project_id }
+
+def create_project_from_prj_file(prj_filename, user_id, other_names):
+    """
+    Given a .prj file name, a user UID, and other other file names, 
+    create a new project from the file with a new UID and return the new UID.
+    """
+    
+    # Display the call information.
+    print(">> create_project_from_prj_file '%s'" % prj_filename)
+    
+    # Try to open the .prj file, and return an error message if this fails.
+    try:
+        theProj = hptool.loadProjectFromPrjFile(prj_filename)
+    except Exception:
+        return { 'projectId': 'BadFileFormatError' }
+    
+    # Reset the project name to a new project name that is unique.
+    theProj.name = project.get_unique_name(theProj.name, other_names)
+    
+    # Save the new project in the DataStore.
+    save_project_as_new(theProj, user_id)
+    
+    # Return the new project UID in the return message.
+    return { 'projectId': str(theProj.uid) }
+     
 def get_project_burden_sets(project_id):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
