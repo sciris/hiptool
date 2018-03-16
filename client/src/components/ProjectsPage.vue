@@ -411,11 +411,13 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('copyProject() called for ' + matchProject.project.name)
-
-//        rpcservice.rpcProjectCall('load_all_project_summaries', [matchProject.project.id])
-        rpcservice.rpcProjectCall('load_all_project_summaries')
-//      rpcservice.rpcProjectCall('tester_func_project', [matchProject.project.id])
-//      rpcservice.rpcProjectCall('tester_func_main', [matchProject.project.id])
+	  
+	  // Have the server copy the project, giving it a new name.
+      rpcservice.rpcProjectCall('copy_project', [uid])
+      .then(response => {
+        // Update the project summaries so the copied program shows up on the list.
+        this.updateProjectSummaries()
+      })	  
     },
 
     renameProject(projectSummary) {

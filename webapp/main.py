@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/14/18 (gchadder3)
+Last update: 3/16/18 (gchadder3)
 """
 
 #
@@ -846,26 +846,20 @@ def update_project_from_summary(project_summary):
     
     # Set the modified time to now.
     theProj.modified = project.now_utc()
-
-    # Don't forget to have the modify time updated.
     
     # Save the changed project to the DataStore.
     save_project(theProj)
     
-def copy_project(project_id, new_project_name):
+def copy_project(project_id):
     """
-    Given a project UID and a new project name, creates a copy of the project 
-    with a new UID and returns that UID.
+    Given a project UID, creates a copy of the project with a new UID and 
+    returns that UID.
     """
     
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}   
-    
-    # Display the call information.
-    print(">> copy_project args project_id %s" % project_id)
-    print(">> copy_project args new_project_name %s" % new_project_name)     
     
     # Get the Project object for the project to be copied.
     project_record = project.load_project_record(project_id, raise_exception=True)
@@ -876,10 +870,13 @@ def copy_project(project_id, new_project_name):
     
     # Just change the project name, and we have the new version of the 
     # Project object to be saved as a copy.
-    new_project.name = new_project_name
+    new_project.name = project.get_unique_name(theProj.name, other_names=None)
     
     # Set the user UID for the new projects record to be the current user.
     user_id = current_user.get_id() 
+    
+    # Display the call information.
+    print(">> copy_project %s" % (new_project.name)) 
     
     # Save a DataStore projects record for the copy project.
     save_project_as_new(new_project, user_id)
