@@ -56,8 +56,8 @@ class Burden(object):
         if n     is None: n     = 10
         barw     = 0.8
         barcolor = (0.7,0,0.3)
-        axsize   = (0.55, 0.15, 0.4, 0.8)
-        figsize  = (12,5)
+        axsize   = (0.15, 0.15, 0.8, 0.8)
+        figsize  = (5,5)
         
         # Set labels
         titles = {'dalys':'Top ten causes of DALYs',

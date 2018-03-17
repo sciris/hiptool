@@ -91,9 +91,11 @@ Last update: 3/14/18 (gchadder3)
 
       <button class="btn" @click="makeGraph(activeBurdenSet.burdenset.uid)">Visualize</button>
 
-      <div id="fig01"></div>
-      <div id="fig02"></div>
-      <div id="fig03"></div>
+      <div>
+        <div id="fig01" style="float:left" ></div>
+        <div id="fig02" style="float:left" ></div>
+        <div id="fig03" style="float:left" ></div>
+      </div>
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
@@ -448,7 +450,6 @@ export default {
           mpld3.draw_figure('fig01', response.data.graph1)
           mpld3.draw_figure('fig02', response.data.graph2)
           mpld3.draw_figure('fig03', response.data.graph3)
-
         })
         .catch(error => {
           // Pull out the error message.
