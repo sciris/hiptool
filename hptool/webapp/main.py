@@ -20,7 +20,8 @@ import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import sciris.user as user
 import sciris.project as project
-import config
+import hptool
+from hptool.webapp import config
 
 # imports to hopefully get rid of
 import uuid
@@ -58,7 +59,7 @@ else:
     
 # Append the model directory to the path and import needed files.    
 sys.path.append(modelDirTarget)
-import hptool
+
 
 # Append the webapp directory to the path and import needed files.    
 sys.path.append(webappDirTarget)

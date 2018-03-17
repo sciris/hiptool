@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-import build_client
-import start_server
+execfile('build_client.py')
+execfile('start_server.py')
