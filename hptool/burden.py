@@ -2,7 +2,7 @@
 Version:
 """
 
-from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp
+from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp, HPException
 from hptool import SIticks, boxoff
 from pylab import figure, barh, arange
 
@@ -54,23 +54,42 @@ class Burden(object):
         # Handle options
         if which is None: which = 'dalys'
         if n     is None: n     = 10
+        barw     = 0.8
+        barcolor = (0.7,0,0.3)
+        axsize   = (0.55, 0.15, 0.4, 0.8)
+        figsize  = (12,5)
         
+        # Set labels
+        titles = {'dalys':'Top ten causes of DALYs',
+                  'deaths':'Top ten causes of mortality',
+                  'prevalence':'Top ten most prevalent conditions'}
+        xlabels = {'dalys':'DALYs',
+                  'deaths':'Deaths',
+                  'prevalence':'Prevalence'}
+        try:
+            thistitle = titles[which]
+            thisxlabel = xlabels[which]
+        except:
+            errormsg = '"%s" not found, "which" must be one of: %s' % (which, ', '.join(titles.keys()))
+            raise HPException(errormsg)
+        
+        # Pull out data
         burdendata = dcp(self.data)
         burdendata.sort(col=which, reverse=True)
         topdata = burdendata[:n]
         
+        # Create plot
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which].tolist()
-        barw = 0.8
-        barcolor = (0.7,0,0.3)
         yaxis = arange(len(barvals), 0, -1)
-        fig = figure(facecolor='w', figsize=(10,5))
-        ax = fig.add_axes((0.7, 0.1, 0.25, 0.85))
+        fig = figure(facecolor='w', figsize=figsize)
+        ax = fig.add_axes(axsize)
         barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
         ax.set_yticks(yaxis+barw/2.)
         ax.set_yticklabels(barlabels)
         SIticks(ax=ax,axis='x')
-        ax.set_xlabel('DALYs')
+        ax.set_xlabel(thisxlabel)
+        ax.set_title(thistitle)
         boxoff()
         return fig
         
