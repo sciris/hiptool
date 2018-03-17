@@ -6,11 +6,8 @@ Small script to reset the user database -- WARNING, deletes everything!!!
 Version: 2018mar17
 '''
 
-import os
-os.chdir('..'+os.sep+'webapp')
-
 import sciris.datastore as ds
-import config
+from hptool.webapp import config
 
 answer = raw_input('Are you sure you want to reset the database for "%s"? (y/[n]): ' % (config.ROOT_DIR))
 if answer == 'y':

@@ -2,7 +2,7 @@
 
 # Load Sciris
 from sciris import server
-import config
+from hptool.webapp import config
 
 # Run the server
 server.start(config=config)
