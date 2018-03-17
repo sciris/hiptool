@@ -1,4 +1,4 @@
-<!-- 
+<!--
 LoginPage.vue -- LoginPage Vue component
 
 Last update: 3/7/18 (gchadder3)
@@ -6,10 +6,11 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <form name="LogInForm" @submit.prevent="tryLogin" 
+    <form name="LogInForm" @submit.prevent="tryLogin"
           style="max-width: 500px; min-width: 200px; margin: 0 auto">
 
-      <h1>Log in</h1>
+      <h2>Login</h2>
+      <p><i>HealthPrior v0.2 (17 March 2018)</i></p>
 
       <div class="modal-body">
         <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
@@ -38,7 +39,7 @@ Last update: 3/7/18 (gchadder3)
           New user?
           <router-link class="link __blue" to="/register">
             Register here
-          </router-link> 
+          </router-link>
         </div>
 
 <!--        <p>Login 1: Username = 'newguy', Password = 'mesogreen'</p>
@@ -55,7 +56,7 @@ import rpcservice from '../services/rpc-service'
 import router from '../router'
 
 export default {
-  name: 'LoginPage', 
+  name: 'LoginPage',
 
   data () {
     return {
@@ -63,7 +64,7 @@ export default {
       loginPassword: '',
       loginResult: ''
     }
-  }, 
+  },
 
   methods: {
     tryLogin () {
@@ -83,7 +84,7 @@ export default {
             router.push('/')
           })
           .catch(error => {
-            // Set the username to {}.  An error probably means the 
+            // Set the username to {}.  An error probably means the
             // user is not logged in.
             this.$store.commit('newUser', {})
           })
