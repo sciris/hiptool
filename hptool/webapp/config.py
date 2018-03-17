@@ -25,7 +25,7 @@ MODEL_DIR = ROOT_DIR+'hptool'
 # Directory containing Python code specific to the web app.  sessionmanager 
 # (the directory this config file is in) contains general Python functionality 
 # that the web app directory code makes use of. 
-WEBAPP_DIR = ROOT_DIR+'webapp'
+WEBAPP_DIR = ROOT_DIR+'hptool/webapp'
 
 # Directory where uploaded files will be saved, as well as files saved to be 
 # downloadable to user machines.
