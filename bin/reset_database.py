@@ -6,6 +6,9 @@ Small script to reset the user database -- WARNING, deletes everything!!!
 Version: 2018mar17
 '''
 
+import os
+os.chdir('..'+os.sep+'webapp')
+
 import sciris.datastore as ds
 import config
 
