@@ -22,10 +22,8 @@ import sciris.user as user
 import sciris.project as project
 import hptool
 from hptool.webapp import config
+from hptool import uuid, dcp
 
-# imports to hopefully get rid of
-import uuid
-from copy import deepcopy as dcp
 
 #
 # Script code (Block 1)
