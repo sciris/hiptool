@@ -491,7 +491,8 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print '-- Version 1 of the HealthPrior app --'
+    print('-- Welcome to HealthPrior, version 0.2 --')
+    return None
     
 #
 # Other functions
@@ -941,8 +942,13 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
     # Return success.
     return { 'diseases': diseaseData }
     
+    
+   
 def get_project_burden_plot(project_id, burdenset_id):
     ''' Plot the disease burden '''
+    
+    print('IS CALLED!!!')
+    
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
     
@@ -956,6 +962,8 @@ def get_project_burden_plot(project_id, burdenset_id):
     
     # Gather the list for all of the diseases.
     graph = mpld3.fig_to_dict(fig)
+    
+    print('IS CALLED AND OK')
     
     # Return success.
     return { 'graph': graph }

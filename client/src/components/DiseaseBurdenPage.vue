@@ -89,9 +89,9 @@ Last update: 3/14/18 (gchadder3)
 
       <button class="btn" @click="grabTableData">Upload IHME data</button>
 
-      <button class="btn" @click="makeGraph">Visualize</button>
+      <button class="btn" @click="makeGraph(activeBurdenSet.burdenset.uid)">Visualize</button>
 
-      <div id="fig01"></div>
+      <div id="fig01">[Figure]</div>
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
@@ -426,9 +426,18 @@ export default {
       }) */
     },
 
-    makeGraph() {
-      // Call RPC get_saved_scatterplotdata_graph.
-      rpcservice.rpcCall('get_project_burden_plot', [this.selectedgraph])
+    makeGraph(uid) {
+      // Find the burden set that matches the UID passed in.
+      let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
+
+      console.log('makeGraph() called for ' + matchSet.burdenset.name)
+
+      // Set the active project to the matched project.
+      this.activeBurdenSet = matchSet
+
+      // Go to the server to get the diseases from the burden set.
+      rpcservice.rpcProjectCall('get_project_burden_plot',
+        [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
         .then(response => {
           // Pull out the response data.
           this.serverresponse = response.data
