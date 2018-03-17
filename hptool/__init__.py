@@ -42,12 +42,12 @@ from uuid import uuid4 as uuid
 from copy import deepcopy as dcp
 
 # Utilities -- import alphabetically
-from .utils import blank, boxoff, checkmem, checktype, colorize, compareversions, dataindex, dataframe, defaultrepr
+from .utils import blank, boxoff, checkmem, checktype, colorize, commaticks, compareversions, dataindex, dataframe, defaultrepr
 from .utils import findinds, findnearest, getdate, getfilelist, getvaliddata, getvalidinds, gitinfo, inclusiverange, indent, isnumber, isiterable
 from .utils import Link, LinkException, loadbalancer, makefilepath, objectid, objatt, objmeth, objrepr
 from .utils import odict, percentcomplete, perturb, printarr, printdata as pd, printdr, printv, printvars, printtologfile
-from .utils import promotetoarray, promotetolist, promotetoodict, quantile, runcommand, sanitize, scaleratio
-from .utils import sigfig, slacknotification, smoothinterp, tic, toc, today, vec2obj, sanitizefilename
+from .utils import promotetoarray, promotetolist, promotetoodict, quantile, runcommand, sanitize, scaleratio, setylim
+from .utils import sigfig, SItickformatter, SIticks, slacknotification, smoothinterp, tic, toc, today, vec2obj, sanitizefilename
 import utils as _utils; del utils
 
 # Color definitions

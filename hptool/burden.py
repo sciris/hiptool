@@ -2,7 +2,9 @@
 Version:
 """
 
-from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet
+from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp
+from hptool import SIticks, boxoff
+from pylab import figure, barh, arange
 
 class Burden(object):
     ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
@@ -53,5 +55,22 @@ class Burden(object):
         if which is None: which = 'dalys'
         if n     is None: n     = 10
         
-        return None
+        burdendata = dcp(self.data)
+        burdendata.sort(col=which, reverse=True)
+        topdata = burdendata[:n]
+        
+        barlabels = topdata['cause'].tolist()
+        barvals   = topdata[which].tolist()
+        barw = 0.8
+        barcolor = (0.7,0,0.3)
+        yaxis = arange(len(barvals), 0, -1)
+        fig = figure(facecolor='w', figsize=(10,5))
+        ax = fig.add_axes((0.7, 0.1, 0.25, 0.85))
+        barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
+        ax.set_yticks(yaxis+barw/2.)
+        ax.set_yticklabels(barlabels)
+        SIticks(ax=ax,axis='x')
+        ax.set_xlabel('DALYs')
+        boxoff()
+        return fig
         
