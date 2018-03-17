@@ -40,3 +40,18 @@ class Burden(object):
         ''' Load data from a spreadsheet '''
         self.data = loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
+        return None
+    
+    def plottopcauses(self, which=None, n=None):
+        '''
+        Create a bar plot of the top causes of burden. By default, plots the top
+        10 causes of DALYs.
+        
+        Version: 2018mar17        
+        '''
+        # Handle options
+        if which is None: which = 'dalys'
+        if n     is None: n     = 10
+        
+        return None
+        

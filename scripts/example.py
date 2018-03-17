@@ -14,3 +14,10 @@ P.burden().popsize = 36373.176 # From UN population division
 print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[37])
 
 print('\n\nExample interventions entry:\n\n%s' % P.intersets[0].data[37])
+
+z = P.burden().data
+z.sort(col='dalys', reverse=True)
+z[:10]
+
+
+#P.burden().plottopcauses()

@@ -2240,6 +2240,12 @@ class dataframe(object):
             colindex = self.cols.index(key[0])
             rowindex = int(key[1])
             output = self.data[rowindex,colindex]
+        elif isinstance(key, slice):
+            rowslice = key
+            slicedata = self.data[rowslice,:]
+            output = dataframe(cols=self.cols, data=slicedata)
+        else:
+            raise Exception('Unrecognized dataframe key "%s"' % key)
         return output
         
     def __setitem__(self, key, value):
