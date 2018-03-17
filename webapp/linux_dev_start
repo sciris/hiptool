@@ -1,0 +1,3 @@
+#!/bin/bash
+# gnome-terminal -x python start_dev_client.py
+gnome-terminal -x python start_dev_server.py
