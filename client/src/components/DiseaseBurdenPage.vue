@@ -59,7 +59,7 @@ Last update: 3/14/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="burdenSet in sortedFilteredBurdenSets" 
+          <tr v-for="burdenSet in sortedFilteredBurdenSets"
               :class="{ highlighted: burdenSetIsSelected(burdenSet.burdenset.uid) }">
             <td>{{ burdenSet.burdenset.name }}</td>
 <!--            <td>{{ burdenSet.country }}</td> -->
@@ -88,6 +88,10 @@ Last update: 3/14/18 (gchadder3)
       </div> -->
 
       <button class="btn" @click="grabTableData">Upload IHME data</button>
+
+      <button class="btn" @click="makeGraph">Visualize</button>
+
+      <div id="fig01"></div>
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
@@ -192,7 +196,7 @@ Last update: 3/14/18 (gchadder3)
             <button class="btn">Download data</button>
           </div>
         </div>
-      </div> 
+      </div>
 end of ThreePanels stuff -->
 
     </div>
@@ -271,7 +275,7 @@ export default {
 
     sortedFilteredBurdenSets() {
       return this.applyNameFilter(this.applySorting(this.burdenSets))
-    }, 
+    },
 
     sortedDiseases() {
       return this.applySorting2(this.diseaseList)
@@ -303,7 +307,7 @@ export default {
       // Otherwise...
       else {
         // Get the active project's burden sets.
-        rpcservice.rpcProjectCall('get_project_burden_sets', 
+        rpcservice.rpcProjectCall('get_project_burden_sets',
           [this.$store.state.activeProject.project.id])
         .then(response => {
           // Set the burden set list to what we received.
@@ -316,8 +320,8 @@ export default {
       // If the active burden set is undefined, it is not active.
       if (this.activeBurdenSet.burdenset === undefined) {
         return false
-      } 
-   
+      }
+
       // Otherwise, the burden set is selected if the UIDs match.
       else {
         return (this.activeBurdenSet.burdenset.uid === uid)
@@ -376,7 +380,7 @@ export default {
       this.activeBurdenSet = matchSet
 
       // Go to the server to get the diseases from the burden set.
-      rpcservice.rpcProjectCall('get_project_burden_set_diseases', 
+      rpcservice.rpcProjectCall('get_project_burden_set_diseases',
         [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
       .then(response => {
         // Set the disease list.
@@ -413,13 +417,33 @@ export default {
       console.log('createNewBurdenSet() called')
     },
 
-    grabTableData() {  
+    grabTableData() {
       console.log('grabTableData() called')
-/*      rpcservice.rpcProjectCall('get_project_burden_set_diseases', 
+/*      rpcservice.rpcProjectCall('get_project_burden_set_diseases',
         [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
       .then(response => {
         this.diseaseList = response.data.diseases
       }) */
+    },
+
+    makeGraph() {
+      // Call RPC get_saved_scatterplotdata_graph.
+      rpcservice.rpcCall('get_project_burden_plot', [this.selectedgraph])
+        .then(response => {
+          // Pull out the response data.
+          this.serverresponse = response.data
+
+          // Draw the figure in the 'fig01' div tag.
+          mpld3.draw_figure('fig01', response.data.graph)
+
+        })
+        .catch(error => {
+          // Pull out the error message.
+          this.serverresponse = 'There was an error: ' + error.message
+
+          // Set the server error.
+          this.servererror = error.message
+        })
     },
 
     updateSorting2(sortColumn) {

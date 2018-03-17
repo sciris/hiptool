@@ -15,14 +15,11 @@ import numpy as np
 import mpld3
 import sys
 import os
-import re
-import copy
 import sciris
 import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import sciris.user as user
 import sciris.project as project
-from pylab import subplot
 import config
 
 # imports to hopefully get rid of
@@ -943,6 +940,26 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
     
     # Return success.
     return { 'diseases': diseaseData }
+    
+def get_project_burden_plot(project_id, burdenset_id):
+    ''' Plot the disease burden '''
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get the burden set that matches burdenset_id.
+    burdenSet = theProj.burden()  # TO DO: replace this with a call that handles ID
+    
+    fig = burdenSet.plottopcauses() # Create the figure
+    
+    # Gather the list for all of the diseases.
+    graph = mpld3.fig_to_dict(fig)
+    
+    # Return success.
+    return { 'graph': graph }
+    
     
 def get_project_interv_sets(project_id):
     # Check (for security purposes) that the function is being called by the 
