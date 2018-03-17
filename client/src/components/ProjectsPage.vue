@@ -1,4 +1,4 @@
-<!-- 
+<!--
 ProjectsPage.vue -- ProjectsPage Vue component
 
 Last update: 3/14/18 (gchadder3)
@@ -7,7 +7,7 @@ Last update: 3/14/18 (gchadder3)
 <template>
   <div class="SitePage">
     <div class="PageSection">
-      <h2>Create projects</h2>
+      <!--<h2>Create projects</h2>-->
 
 <!--      <div class="ControlsRowLabel">
         Choose a demonstration project from our database:
@@ -37,11 +37,11 @@ Last update: 3/14/18 (gchadder3)
 
     <div class="PageSection"
          v-if="projectSummaries.length > 0">
-      <h2>Manage projects</h2>
+      <!--<h2>Manage projects</h2>-->
 
-      <input type="text" 
-             class="txbox" 
-             style="margin-bottom: 20px" 
+      <input type="text"
+             class="txbox"
+             style="margin-bottom: 20px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -104,7 +104,7 @@ Last update: 3/14/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="projectSummary in sortedFilteredProjectSummaries" 
+          <tr v-for="projectSummary in sortedFilteredProjectSummaries"
               :class="{ highlighted: projectIsActive(projectSummary.project.id) }">
             <td>
               <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/>
@@ -115,7 +115,7 @@ Last update: 3/14/18 (gchadder3)
             </td>
 <!--            <td>{{ projectSummary.country }}</td> -->
             <td>{{ projectSummary.project.creationTime }}</td>
-            <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime: 
+            <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
               <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
@@ -134,7 +134,7 @@ Last update: 3/14/18 (gchadder3)
                   {{ choice }}
                 </option>
               </select>
-            </td> 
+            </td>
           </tr> -->
         </tbody>
       </table>
@@ -175,42 +175,42 @@ export default {
       filterText: '',
 
       // Are all of the projects selected?
-      allSelected: false, 
+      allSelected: false,
 
       // Column of table used for sorting the projects
       sortColumn: 'name',  // name, country, creationTime, updatedTime, dataUploadTime
 
       // Sort in reverse order?
-      sortReverse: false, 
+      sortReverse: false,
 
 /* old project summaries stuff to get rid of
         // List of summary objects for projects the user has
-        projectSummaries: 
+        projectSummaries:
         [
           {
             projectName: 'Afghanistan test 1',
-            country: 'Afghanistan', 
+            country: 'Afghanistan',
             creationTime: '2017-Jun-01 02:45 AM',
             updateTime: '2017-Jun-02 05:41 AM',
             uid: 1
-          }, 
+          },
           {
             projectName: 'Afghanistan HBP equity',
-            country: 'Afghanistan', 
+            country: 'Afghanistan',
             creationTime: '2017-Jun-03 03:12 PM',
             updateTime: '2017-Jun-05 03:38 PM',
             uid: 2
           },
           {
-            projectName: 'Final Afghanistan HBP', 
-            country: 'Afghanistan', 
+            projectName: 'Final Afghanistan HBP',
+            country: 'Afghanistan',
             creationTime: '2017-Jun-06 08:15 PM',
             updateTime: '2017-Jun-06 08:20 PM',
             uid: 3
           },
           {
             projectName: 'Pakistan test 1',
-            country: 'Pakistan', 
+            country: 'Pakistan',
             creationTime: '2017-Sep-21 08:44 AM',
             updateTime: '2017-Sep-21 08:44 AM',
             uid: 4
@@ -233,13 +233,13 @@ export default {
       return this.applyNameFilter(this.applySorting(this.projectSummaries))
 //      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
     }
-  }, 
+  },
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
     if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
-    } 
+    }
 
     // Otherwise...
     else {
@@ -247,9 +247,9 @@ export default {
       this.updateProjectSummaries()
 
       // Initialize the countryList by picking out the (unique) country names.
-      // (First, a list is constructed pulling out the non-unique countries 
-      // for each project, then this array is stuffed into a new Set (which 
-      // will not duplicate array entries) and then the spread operator is 
+      // (First, a list is constructed pulling out the non-unique countries
+      // for each project, then this array is stuffed into a new Set (which
+      // will not duplicate array entries) and then the spread operator is
       // used to pull the set items out into an array.)
 //      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
 
@@ -289,12 +289,12 @@ export default {
 /*    addDemoProject() {
       console.log('addDemoProject() called')
 
-      // Find the object in the default project summaries that matches what's 
+      // Find the object in the default project summaries that matches what's
       // selected in the select box.
-      let foundProject = this.demoProjectSummaries.find(demoProj => 
+      let foundProject = this.demoProjectSummaries.find(demoProj =>
         demoProj.project.name == this.selectedDemoProject)
 
-      // Make a deep copy of the found object by JSON-stringifying the old 
+      // Make a deep copy of the found object by JSON-stringifying the old
       // object, and then parsing the result back into a new object.
       let newProject = JSON.parse(JSON.stringify(foundProject));
 
@@ -323,8 +323,8 @@ export default {
       // If the project is undefined, it is not active.
       if (this.$store.state.activeProject.project === undefined) {
         return false
-      } 
-   
+      }
+
       // Otherwise, the project is active if the UIDs match.
       else {
         return (this.$store.state.activeProject.project.id === uid)
@@ -334,11 +334,11 @@ export default {
     selectAll() {
       console.log('selectAll() called')
 
-      // For each of the projects, set the selection of the project to the 
+      // For each of the projects, set the selection of the project to the
       // _opposite_ of the state of the all-select checkbox's state.
-      // NOTE: This function depends on it getting called before the 
-      // v-model state is updated.  If there are some cases of Vue 
-      // implementation where these happen in the opposite order, then 
+      // NOTE: This function depends on it getting called before the
+      // v-model state is updated.  If there are some cases of Vue
+      // implementation where these happen in the opposite order, then
       // this will not give the desired result.
       this.projectSummaries.forEach(theProject => theProject.selected = !this.allSelected)
     },
@@ -354,7 +354,7 @@ export default {
       if (this.sortColumn === sortColumn) {
           // Reverse the sort.
           this.sortReverse = !this.sortReverse
-      } 
+      }
       // Otherwise.
       else {
         // Select the new column for sorting.
@@ -370,7 +370,7 @@ export default {
     },
 
     applySorting(projects) {
-      return projects.sort((proj1, proj2) => 
+      return projects.sort((proj1, proj2) =>
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
@@ -411,19 +411,19 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('copyProject() called for ' + matchProject.project.name)
-	  
+
 	  // Have the server copy the project, giving it a new name.
       rpcservice.rpcProjectCall('copy_project', [uid])
       .then(response => {
         // Update the project summaries so the copied program shows up on the list.
         this.updateProjectSummaries()
-      })	  
+      })
     },
 
     renameProject(projectSummary) {
       console.log('renameProject() called for ' + projectSummary.project.name)
 
-      // Make a deep copy of the projectSummary object by JSON-stringifying the old 
+      // Make a deep copy of the projectSummary object by JSON-stringifying the old
       // object, and then parsing the result back into a new object.
       let newProjectSummary = JSON.parse(JSON.stringify(projectSummary));
 
@@ -431,7 +431,7 @@ export default {
       // Rename the project name in the client list.
       newProjectSummary.project.name = 'Renamed project'
 
-      // Have the change the name of the project by passing in the new copy of the 
+      // Have the change the name of the project by passing in the new copy of the
       // summary.
       rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
       .then(response => {
@@ -449,7 +449,7 @@ export default {
 
     deleteSelectedProjects() {
       // Pull out the names of the projects that are selected.
-      let selectProjectsUIDs = this.projectSummaries.filter(theProj => 
+      let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
         theProj.selected).map(theProj => theProj.project.id)
 
       console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
@@ -464,7 +464,7 @@ export default {
 
     downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
-      let selectProjects = this.projectSummaries.filter(theProj => 
+      let selectProjects = this.projectSummaries.filter(theProj =>
         theProj.selected).map(theProj => theProj.project.name)
 
       console.log('downloadSelectedProjects() called for ', selectProjects)
