@@ -947,6 +947,77 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
 def get_project_burden_plots(project_id, burdenset_id):
     ''' Plot the disease burden '''
     
+    class FixTickLabels(mpld3.plugins.PluginBase):  # inherit from PluginBase
+        """Hello World plugin"""
+        
+        JAVASCRIPT = """
+        mpld3.register_plugin("fixticklabels", FixTickLabels);
+        FixTickLabels.prototype = Object.create(mpld3.Plugin.prototype);
+        FixTickLabels.prototype.constructor = FixTickLabels;
+        function FixTickLabels(fig, props){
+            mpld3.Plugin.call(this, fig, props);
+        };
+        
+        FixTickLabels.prototype.draw = function(){
+            // FIXME: this is a very brittle way to select the y-axis element
+            var ax = this.fig.axes[0].elements[__AXIS__];
+            
+            var ticklabels = __TICKFORMATS__;
+    
+            // see https://github.com/mbostock/d3/wiki/Formatting#d3_format
+            // for d3js formating documentation
+            ax.axis.tickFormat(function(d) { return ticklabels[d]; });
+    
+            // TODO: use a function for tick values that
+            // updates when values pan and zoom
+            ax.axis.tickValues(__TICKVALS__);
+    
+            // HACK: use reset to redraw figure
+            this.fig.reset(); 
+        }
+        """
+        def __init__(self, axis=None, ticklocations=None, ticklabels=None):
+            self.dict_ = {"type": "fixticklabels"}
+            js = self.JAVASCRIPT
+            js = js.replace('__AXIS__', '%s' % axis)
+            js = js.replace('__TICKVALS__', '%s' % ticklocations)
+            js = js.replace('__TICKFORMATS__', '%s' % ticklabels)
+            self.JAVASCRIPT = js
+            return None
+    
+    
+    class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
+        """Hello World plugin"""
+        
+        JAVASCRIPT = """
+        mpld3.register_plugin("helloworld", HelloWorld);
+        HelloWorld.prototype = Object.create(mpld3.Plugin.prototype);
+        HelloWorld.prototype.constructor = HelloWorld;
+        function HelloWorld(fig, props){
+            mpld3.Plugin.call(this, fig, props);
+        };
+        
+        HelloWorld.prototype.draw = function(){
+            // FIXME: this is a very brittle way to select the y-axis element
+            var ax = this.fig.axes[0].elements[1];
+    
+            // see https://github.com/mbostock/d3/wiki/Formatting#d3_format
+            // for d3js formating documentation
+            ax.axis.tickFormat(d3.format("d"));
+    
+            // TODO: use a function for tick values that
+            // updates when values pan and zoom
+            ax.axis.tickValues([1,100,1000]);
+    
+            // HACK: use reset to redraw figure
+            this.fig.reset(); 
+        }
+        """
+        def __init__(self):
+            self.dict_ = {"type": "helloworld"}
+    
+    
+    
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
     
@@ -964,8 +1035,18 @@ def get_project_burden_plots(project_id, burdenset_id):
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        graph = mpld3.fig_to_dict(fig)
-        graphs.append(graph)
+        print('WARNING, need to fix tick labels properly')
+        ylabels = [l.get_text() for l in fig.axes[0].get_yticklabels()]
+        ylocs = fig.axes[0].get_yticks().tolist()
+#        ax_fmt = FixTickLabels(ticklocations=ylocs, ticklabels=ylabels, axis='1')
+#        mpld3.plugins.connect(fig, ax_fmt)
+        ax_fmt = HelloWorld()
+        mpld3.plugins.connect(fig, ax_fmt)
+        graph_dict = mpld3.fig_to_dict(fig)
+        graphs.append(graph_dict)
+    
+    print('OKAY LOOK HERE')
+    print graphs[0]['plugins']
     
     # Return success.
     return {'graph1': graphs[0],

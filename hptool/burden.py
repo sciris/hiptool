@@ -77,10 +77,19 @@ class Burden(object):
         burdendata = dcp(self.data)
         burdendata.sort(col=which, reverse=True)
         topdata = burdendata[:n]
+        barlabels = topdata['cause'].tolist()
+        barvals   = topdata[which]
+        largestval = barvals[0]
+        if largestval>1e6:
+            barvals /= 1e6
+            unitstr = ' (millions)'
+        elif largestval>1e3:
+            barvals /= 1e3
+            unitstr = ' (thousands)'
+        else:
+            unitstr = ''
         
         # Create plot
-        barlabels = topdata['cause'].tolist()
-        barvals   = topdata[which].tolist()
         yaxis = arange(len(barvals), 0, -1)
         fig = figure(facecolor='w', figsize=figsize)
         ax = fig.add_axes(axsize)
@@ -88,7 +97,7 @@ class Burden(object):
         ax.set_yticks(yaxis+barw/2.)
         ax.set_yticklabels(barlabels)
         SIticks(ax=ax,axis='x')
-        ax.set_xlabel(thisxlabel)
+        ax.set_xlabel(thisxlabel+unitstr)
         ax.set_title(thistitle)
         boxoff()
         return fig
