@@ -944,10 +944,8 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
     
     
    
-def get_project_burden_plot(project_id, burdenset_id):
+def get_project_burden_plots(project_id, burdenset_id):
     ''' Plot the disease burden '''
-    
-    print('IS CALLED!!!')
     
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
@@ -958,15 +956,21 @@ def get_project_burden_plot(project_id, burdenset_id):
     # Get the burden set that matches burdenset_id.
     burdenSet = theProj.burden()  # TO DO: replace this with a call that handles ID
     
-    fig = burdenSet.plottopcauses() # Create the figure
-    
+    figs = []
+    for which in ['dalys','deaths','prevalence']:
+        fig = burdenSet.plottopcauses(which=which) # Create the figure
+        figs.append(fig)
+        
     # Gather the list for all of the diseases.
-    graph = mpld3.fig_to_dict(fig)
-    
-    print('IS CALLED AND OK')
+    graphs = []
+    for fig in figs:
+        graph = mpld3.fig_to_dict(fig)
+        graphs.append(graph)
     
     # Return success.
-    return { 'graph': graph }
+    return {'graph1': graphs[0],
+            'graph2': graphs[1],
+            'graph3': graphs[2],}
     
     
 def get_project_interv_sets(project_id):

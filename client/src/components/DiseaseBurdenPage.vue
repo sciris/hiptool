@@ -91,7 +91,9 @@ Last update: 3/14/18 (gchadder3)
 
       <button class="btn" @click="makeGraph(activeBurdenSet.burdenset.uid)">Visualize</button>
 
-      <div id="fig01">[Figure]</div>
+      <div id="fig01"></div>
+      <div id="fig02"></div>
+      <div id="fig03"></div>
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
@@ -436,14 +438,16 @@ export default {
       this.activeBurdenSet = matchSet
 
       // Go to the server to get the diseases from the burden set.
-      rpcservice.rpcProjectCall('get_project_burden_plot',
+      rpcservice.rpcProjectCall('get_project_burden_plots',
         [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
         .then(response => {
           // Pull out the response data.
           this.serverresponse = response.data
 
           // Draw the figure in the 'fig01' div tag.
-          mpld3.draw_figure('fig01', response.data.graph)
+          mpld3.draw_figure('fig01', response.data.graph1)
+          mpld3.draw_figure('fig02', response.data.graph2)
+          mpld3.draw_figure('fig03', response.data.graph3)
 
         })
         .catch(error => {
