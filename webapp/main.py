@@ -947,13 +947,13 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
 def get_project_burden_plots(project_id, burdenset_id):
     ''' Plot the disease burden '''
     
-    def fixgraph(graph, graph_dict):
-        print('Warning, need to incorporate into mpld3')
-        ylabels = [l.get_text() for l in graph.axes[0].get_yticklabels()]
-        graph_dict['ylabels'] = ylabels
-        xlabels = [l.get_text() for l in graph.axes[0].get_xticklabels()]
-        graph_dict['xlabels'] = xlabels
-        return graph_dict
+#    def fixgraph(graph, graph_dict):
+#        print('Warning, need to incorporate into mpld3')
+#        ylabels = [l.get_text() for l in graph.axes[0].get_yticklabels()]
+#        graph_dict['ylabels'] = ylabels
+#        xlabels = [l.get_text() for l in graph.axes[0].get_xticklabels()]
+#        graph_dict['xlabels'] = xlabels
+#        return graph_dict
     
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
@@ -973,7 +973,7 @@ def get_project_burden_plots(project_id, burdenset_id):
     graphs = []
     for fig in figs:
         graph_dict = mpld3.fig_to_dict(fig)
-        graph_dict = fixgraph(fig, graph_dict)
+#        graph_dict = fixgraph(fig, graph_dict)
         graphs.append(graph_dict)
     
     # Return success.

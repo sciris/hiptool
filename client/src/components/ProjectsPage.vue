@@ -7,7 +7,7 @@ Last update: 3/14/18 (gchadder3)
 <template>
   <div class="SitePage">
     <div class="PageSection">
-      <h1>Create projects</h1>
+      <!--<h2>Create projects</h2>-->
 
 <!--      <div class="ControlsRowLabel">
         Choose a demonstration project from our database:
