@@ -2,6 +2,8 @@
 
 The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
 
+## Install sciris
+
 
 ## Installing the Python tool
 
