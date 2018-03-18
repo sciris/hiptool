@@ -15,5 +15,5 @@ print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[37])
 
 print('\n\nExample interventions entry:\n\n%s' % P.intersets[0].data[37])
 
-P.burden().plottopcauses()
-P.burden().plottopcauses(which='prevalence', n=15)
+P.burden().plottopcauses(axsize=(0.55, 0.15, 0.4, 0.8), figsize=(15,5))
+#P.burden().plottopcauses(which='prevalence', n=15)
