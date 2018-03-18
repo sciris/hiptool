@@ -1,15 +1,38 @@
 # HealthPrior Tool
 
-The HealthPrior tool,a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
+The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
 
 
 ## Installing the Python tool
+
+If you are installing these packages for the first time, look at **First time install** below.
 
 To install, do
 
 `python setup.py develop`
 
-in the main folder.
+in the main folder. 
+
+### First time install
+If you are starting from a fresh Ubuntu install and have not used 
+You may need to install Python setuptools 
+
+`sudo apt-get install python-setuptools`
+
+`sudo apt-get install python-dev`
+
+Numpy requires cython:
+`easy_install --user cython`
+
+Matplot lib requires pkg-config, libfreetype6, and libpng12 
+
+`sudo apt-get install pkg-config`
+
+`sudo apt-get install libfreetype6-dev`
+
+`sudo apt-get install libpng12-dev` 
+
+EXCEPT: Ubuntu killed this library, so you need to get it here: https://packages.ubuntu.com/xenial/i386/libpng12-0/download
 
 ## Installing the client
 
