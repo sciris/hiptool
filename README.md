@@ -66,7 +66,11 @@ This will start on port `localhost:8091`.
 
 ## Development mode
 
-Instead of `npm run build` and `python start_server.py`, you can also run (in separate terminal windows):
+Instead of `npm run build` and `python start_server.py`, you can also run 
+
+`bash linux_dev_run`
+
+which runs (in separate terminal windows):
 
 ```
 python start_dev_server.py
