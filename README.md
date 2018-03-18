@@ -3,11 +3,17 @@
 The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
 
 ## Install sciris
-
+It is important that you install Sciris and Anaconda Python to get many of the dependencies needed for Numpy and Matplotlib.
 
 ## Installing the Python tool
 
 If you are installing these packages for the first time, look at **First time install** below.
+
+Before you install, check that you are using the correct python
+
+`which python`
+
+Should show that you are using Anaconda Python. 
 
 To install, do
 
@@ -16,17 +22,18 @@ To install, do
 in the main folder. 
 
 ### First time install
-If you are starting from a fresh Ubuntu install and have not used 
-You may need to install Python setuptools 
+If you are starting from a fresh Ubuntu install, you may need to install Python setuptools 
 
 `sudo apt-get install python-setuptools`
 
 `sudo apt-get install python-dev`
 
+`sudo apt install gcc`
+
 Numpy requires cython:
 `easy_install --user cython`
 
-Matplot lib requires pkg-config, libfreetype6, and libpng12 
+Matplotlib requires pkg-config, libfreetype6, and libpng12 
 
 `sudo apt-get install pkg-config`
 
