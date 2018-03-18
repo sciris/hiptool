@@ -217,10 +217,10 @@ class ProjectSO(sobj.ScirisObject):
 #                    self.uid = validUID
 #                # Otherwise, generate a new random UUID using uuid4().
 #                else:
-#                    self.uid = uuid.uuid4()
+#                    self.uid = uuid()
 #            # Otherwise, generate a new random UUID using uuid4().
 #            else:
-#                self.uid = uuid.uuid4()
+#                self.uid = uuid()
 #                
 #            # Set the project name.
 #            self.name = name
@@ -718,7 +718,7 @@ def save_project_as_new(theProj, user_id):
     """ 
     
     # Set a new project UID, so we aren't replicating the UID passed in.
-    theProj.uid = uuid.uuid4()
+    theProj.uid = uuid()
     
     # Create the new project entry and enter it into the ProjectCollection.
     theProjSO = ProjectSO(theProj, user_id)
