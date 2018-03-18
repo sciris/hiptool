@@ -44,7 +44,7 @@ class Burden(object):
         self.filename = filename
         return None
     
-    def plottopcauses(self, which=None, n=None):
+    def plottopcauses(self, which=None, n=None,axsize=None, figsize=None):
         '''
         Create a bar plot of the top causes of burden. By default, plots the top
         10 causes of DALYs.
@@ -54,10 +54,10 @@ class Burden(object):
         # Handle options
         if which is None: which = 'dalys'
         if n     is None: n     = 10
+        if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
+        if figsize is None: figsize  = (5,5)
         barw     = 0.8
         barcolor = (0.7,0,0.3)
-        axsize   = (0.15, 0.15, 0.8, 0.8)
-        figsize  = (5,5)
         
         # Set labels
         titles = {'dalys':'Top ten causes of DALYs',

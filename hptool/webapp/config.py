@@ -10,10 +10,13 @@
 
 # Last update: 12/21/17 (gchadder3)
 
+import hptool as hp
+import os
+
 # A secret key value used by Python Flask.
 SECRET_KEY = 'Pick something unique for your site here'
 
-ROOT_DIR = '/u/cliffk/unsw/hptool/'
+ROOT_DIR = hp.HPpath()+os.sep
 
 # Directory containing the client code.
 CLIENT_DIR = ROOT_DIR+'client'
