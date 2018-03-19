@@ -30,7 +30,6 @@ Last update: 3/14/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-<!--            <th>Country</th> -->
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -62,7 +61,6 @@ Last update: 3/14/18 (gchadder3)
           <tr v-for="burdenSet in sortedFilteredBurdenSets"
               :class="{ highlighted: burdenSetIsSelected(burdenSet.burdenset.uid) }">
             <td>{{ burdenSet.burdenset.name }}</td>
-<!--            <td>{{ burdenSet.country }}</td> -->
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
@@ -83,10 +81,6 @@ Last update: 3/14/18 (gchadder3)
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
-<!--      <div class="PHText">
-        Page interface specific to {{ activeBurdenSet.burdenset.name }} project
-      </div> -->
-
       <button class="btn" @click="grabTableData">Upload IHME data</button>
 
       <button class="btn" @click="makeGraph(activeBurdenSet.burdenset.uid)">Visualize</button>
@@ -177,39 +171,6 @@ Last update: 3/14/18 (gchadder3)
         </tbody>
       </table>
 
-
-<!-- old ThreePanels stuff
-      <div class="ThreePanels">
-        <div class="LeftPanel">
-          <div style="margin-top: 10px">
-            <img src="../assets/images/bod_img1.png" width="350"/>
-          </div>
-          <div style="margin-top: 10px">
-            <button class="btn">Edit</button>
-            <button class="btn">Download data</button>
-          </div>
-        </div>
-        <div class="MidPanel">
-          <div style="margin-top: 10px">
-            <img src="../assets/images/bod_img2.png" width="350"/>
-          </div>
-          <div style="margin-top: 10px">
-            <button class="btn">Edit</button>
-            <button class="btn">Download data</button>
-          </div>
-        </div>
-        <div class="RightPanel">
-          <div style="margin-top: 10px">
-            <img src="../assets/images/bod_img3.png" width="350"/>
-          </div>
-          <div style="margin-top: 10px">
-            <button class="btn">Edit</button>
-            <button class="btn">Download data</button>
-          </div>
-        </div>
-      </div>
-end of ThreePanels stuff -->
-
     </div>
   </div>
 </template>
@@ -247,28 +208,7 @@ export default {
         colHeaders: true
       },
       
-    
 
-
-/* old burden sets stuff to get rid of
-      // List of burden sets in the active project
-      burdenSets:
-        [
-          {
-            name: 'Default GBD',
-//            country: 'Afghanistan',
-            creationTime: '2017-Jun-01 02:45 AM',
-            updateTime: '2017-Jun-02 05:41 AM',
-            uid: 1
-          },
-          {
-            name: 'GBD with updated NCDs',
-//            country: 'Afghanistan',
-            creationTime: '2017-Jun-07 05:15 PM',
-            updateTime: '2017-Jun-08 05:14 PM',
-            uid: 2
-          }
-        ], */
 
       // List of burden sets in the active project
       burdenSets: [],
@@ -381,9 +321,6 @@ export default {
           if (this.sortColumn === 'name') {
             return (set1.burdenset.name > set2.burdenset.name ? sortDir: -sortDir)
           }
-/*          else if (this.sortColumn === 'country') {
-            return set1.burdenset.country > set2.burdenset.country ? sortDir: -sortDir
-          } */
           else if (this.sortColumn === 'creationTime') {
             return set1.burdenset.creationTime > set2.burdenset.creationTime ? sortDir: -sortDir
           }
@@ -443,11 +380,11 @@ export default {
 
     grabTableData() {
       console.log('grabTableData() called')
-/*      rpcservice.rpcProjectCall('get_project_burden_set_diseases',
-        [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
-      .then(response => {
-        this.diseaseList = response.data.diseases
-      }) */
+      // rpcservice.rpcProjectCall('get_project_burden_set_diseases',
+      //   [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
+      // .then(response => {
+      //   this.diseaseList = response.data.diseases
+      // }) 
     },
 
     makeGraph(uid) {
@@ -525,44 +462,37 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
   .UIPlaceholder {
-//    height: 500px;
     width: 100%;
-//    border: 1px solid black;
   }
 
   .PHText {
     color: green;
     text-align: center;
-//    border: 1px solid black;
   }
 
   .ThreePanels {
     display: flex;
-//    height: 480px;
     width: 100%;
-//    border: 1px solid black;
   }
 
   .LeftPanel {
     height: 100%;
     width: 33%;
     text-align: center;
-//    border: 1px solid black;
   }
 
   .MidPanel {
     height: 100%;
     width: 34%;
     text-align: center;
-//    border: 1px solid black;
   }
 
   .RightPanel {
     height: 100%;
     width: 33%;
     text-align: center;
-//    border: 1px solid black;
   }
+  
   #test-hot {
     width: 600px;
     height: 400px;
