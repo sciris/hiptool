@@ -13,7 +13,7 @@ Before you install, check that you are using the correct python
 
 `which python`
 
-Should show that you are using Anaconda Python. 
+Should show that you are using Anaconda Python. If it says you are using the built in Python, you need to close down the terminal and open it again. 
 
 To install, do
 
@@ -21,7 +21,10 @@ To install, do
 
 in the main folder. 
 
-### First time install
+### If Anaconda Python fails
+NOTE: The below steps were used when a failed Aacoda Python install occurred. 
+You may need some, all or none of the below. 
+
 If you are starting from a fresh Ubuntu install, you may need to install Python setuptools 
 
 `sudo apt-get install python-setuptools`
