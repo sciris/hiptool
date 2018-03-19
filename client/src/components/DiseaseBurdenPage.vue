@@ -97,6 +97,13 @@ Last update: 3/14/18 (gchadder3)
         <div id="fig03" style="float:left" ></div>
       </div>
 
+      <template>
+        <div id="hot-preview">
+          <HotTable :root="root" :settings="hotSettings"></HotTable>
+        </div>
+      </template>
+
+
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
           <tr>
@@ -212,10 +219,14 @@ import axios from 'axios'
 var filesaver = require('file-saver')
 import rpcservice from '../services/rpc-service'
 import router from '../router'
+import HotTable from 'vue-handsontable-official';
+
 
 export default {
   name: 'DiseaseBurdenPage',
-
+  components: {
+      HotTable
+  }, 
   data() {
     return {
       // Placeholder text for table filter box
@@ -229,6 +240,15 @@ export default {
 
       // Sort in reverse order?
       sortReverse: false,
+
+      root: 'test-hot',
+      hotSettings: {
+        data: [['sample', 'data']],
+        colHeaders: true
+      },
+      
+    
+
 
 /* old burden sets stuff to get rid of
       // List of burden sets in the active project
@@ -542,5 +562,10 @@ export default {
     width: 33%;
     text-align: center;
 //    border: 1px solid black;
+  }
+  #test-hot {
+    width: 600px;
+    height: 400px;
+    overflow: hidden;
   }
 </style>
