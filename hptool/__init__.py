@@ -23,7 +23,7 @@ Now, the legal part:
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Version: 2018feb26
+Version: 2018mar19
 """
 
 # Specify the version, for the purposes of figuring out which version was used to create a project
@@ -37,22 +37,10 @@ print(HPlicense)
 ### Load helper functions/modules
 #####################################################################################################################
 
-# General modules
-from uuid import uuid4 as uuid
-from copy import deepcopy as dcp
-
-# Utilities -- import alphabetically
-from .utils import blank, boxoff, checkmem, checktype, colorize, commaticks, compareversions, dataindex, dataframe, defaultrepr
-from .utils import findinds, findnearest, getdate, getfilelist, getvaliddata, getvalidinds, gitinfo, inclusiverange, indent, isnumber, isiterable
-from .utils import Link, LinkException, loadbalancer, makefilepath, objectid, objatt, objmeth, objrepr
-from .utils import odict, percentcomplete, perturb, printarr, printdata as pd, printdr, printv, printvars, printtologfile
-from .utils import promotetoarray, promotetolist, promotetoodict, quantile, runcommand, sanitize, scaleratio, setylim
-from .utils import sigfig, SItickformatter, SIticks, slacknotification, smoothinterp, tic, toc, today, vec2obj, sanitizefilename
-import utils as _utils; del utils
-
-# Color definitions
-from .colortools import alpinecolormap, bicolormap, gridcolors, vectocolor, shifthue
-import colortools as _colortools; del colortools
+# Utilities -- import all
+from sciris.utils import *
+from sciris.colortools import *
+from sciris.fileio import *
 
 #####################################################################################################################
 ### Define debugging and exception functions/classes
@@ -95,10 +83,6 @@ class HPException(Exception):
 #####################################################################################################################
 ### Load HealthPrior functions and classes
 #####################################################################################################################
-
-# File imports
-from .fileio import loadobj, saveobj, loadstr, dumpstr, loadspreadsheet
-import fileio as _fileio; del fileio
 
 # Core functions
 from .burden import Burden
