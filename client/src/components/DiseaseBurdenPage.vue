@@ -181,7 +181,7 @@ Last update: 3/14/18 (gchadder3)
   import rpcservice from '../services/rpc-service'
   import router from '../router'
   import HotTable from 'vue-handsontable-official';
-
+  import Vue from 'vue';
 
   export default {
     name: 'DiseaseBurdenPage',
@@ -242,7 +242,10 @@ Last update: 3/14/18 (gchadder3)
       },
 
       sortedDiseases() {
-        return this.applySorting2(this.diseaseList)
+        var sortedDiseaseList =  this.applySorting2(this.diseaseList);
+        Vue.set(this.hotSettings, 'data', [[1,2,3]]);
+        console.log(sortedDiseaseList);
+        return sortedDiseaseList;
       }
     },
 
