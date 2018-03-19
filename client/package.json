@@ -1,22 +1,34 @@
 {
-  "name": "HealthPrior",
-  "description": "HealthPrior",
-  "version": "1.0",
-  "author": "HealthPrior",
-  "license": "MIT License",
-  "private": true,
+  "name": "vue-devtools",
+  "version": "4.1.4",
+  "description": "devtools for Vue.js!",
+  "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "dev": "cd shells/dev && webpack-dev-server --inline --hot --no-info",
+    "dev:chrome": "cd shells/chrome && webpack --watch --hide-modules",
+    "lint": "eslint src --ext=js,vue && eslint shells/chrome/src && eslint shells/dev/src && eslint shells/electron/src",
+    "build": "cd shells/chrome && cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "run:firefox": "web-ext run -s shells/chrome -a dist -i src",
+    "zip": "npm run zip:chrome && npm run zip:firefox",
+    "zip:chrome": "cd shells && zip -r -FS ../dist/chrome.zip chrome -x *src/* -x *webpack.config.js",
+    "zip:firefox": "web-ext build -s shells/chrome -a dist -i src --overwrite-dest",
+    "release": "node release.js && npm run test && npm run build && npm run zip",
+    "test": "npm run lint && bash test/test.sh"
   },
-  "dependencies": {
-    "vue": "^2.5.11"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/vue-devtools.git"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
+  "keywords": [
+    "vue",
+    "devtools"
   ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuejs/vue-devtools/issues"
+  },
+  "homepage": "https://github.com/vuejs/vue-devtools#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
@@ -31,5 +43,11 @@
     "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.9.1"
+  }
+  "dependencies": {
+    "uglifyjs-webpack-plugin": "^1.1.4",
+    "vue": "^2.5.13",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   }
 }
