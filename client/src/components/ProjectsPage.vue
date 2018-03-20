@@ -1,7 +1,7 @@
 <!--
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/19/18 (gchadder3)
+Last update: 3/20/18 (gchadder3)
 -->
 
 <template>
@@ -474,10 +474,13 @@ export default {
 
     downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
-      let selectProjects = this.projectSummaries.filter(theProj =>
-        theProj.selected).map(theProj => theProj.project.name)
+      let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
+        theProj.selected).map(theProj => theProj.project.id)
 
-      console.log('downloadSelectedProjects() called for ', selectProjects)
+      console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
+	  
+      // Have the server download the selected projects.
+      rpcservice.rpcProjectDownloadCall('load_zip_of_prj_files', [selectProjectsUIDs])	  
     }
   }
 }

@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/19/18 (gchadder3)
+Last update: 3/20/18 (gchadder3)
 """
 
 #
@@ -146,12 +146,22 @@ class ProjectSO(sobj.ScirisObject):
         }
         return objInfo
     
-#    def saveAsFile(self, loadDir):
-#        # Save the project in the file.
-#        self.theProject.saveToPrjFile(loadDir, saveResults=True)
-#        
-#        # Return the filename (not the full one).
-#        return self.theProject.name + ".prj"
+    def saveAsFile(self, loadDir):
+        # Use the uploads directory to put the file in.
+        dirname = ds.uploadsPath
+    
+        # Create a filename containing the project name followed by a .prj 
+        # suffix.
+        fileName = '%s.prj' % self.theProject.name
+        
+        # Generate the full file name with path.
+        fullFileName = '%s%s%s' % (dirname, os.sep, fileName)   
+     
+        # Write the object to a Gzip string pickle file.
+        ds.objectToGzipStringPickleFile(fullFileName, self.theProject)
+        
+        # Return the filename (not the full one).
+        return self.theProject.name + ".prj"
     
 # newer (more complicated) version...
 #class ProjectSO(sobj.ScirisObject):
