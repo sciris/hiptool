@@ -141,8 +141,8 @@ Last update: 3/19/18 (gchadder3)
 
       <div class="ControlsRow">
         <button class="btn" @click="deleteSelectedProjects">Delete selected</button>
-<!--        &nbsp; &nbsp;
-        <button class="btn" @click="downloadSelectedProjects">Download selected</button> -->
+        &nbsp; &nbsp;
+        <button class="btn" @click="downloadSelectedProjects">Download selected</button>
       </div>
     </div>
   </div>
@@ -317,6 +317,13 @@ export default {
 
     uploadProjectFromFile() {
       console.log('uploadProjectFromFile() called')
+	  
+      // Have the server upload the project.
+      rpcservice.rpcProjectUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
+      .then(response => {
+        // Update the project summaries so the new project shows up on the list.
+        this.updateProjectSummaries()
+      })	  
     },
 
     projectIsActive(uid) {
@@ -463,15 +470,15 @@ export default {
         // Update the project summaries so the deletions show up on the list.
         this.updateProjectSummaries()
       })
-    }
+    },
 
-/*    downloadSelectedProjects() {
+    downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
       let selectProjects = this.projectSummaries.filter(theProj =>
         theProj.selected).map(theProj => theProj.project.name)
 
       console.log('downloadSelectedProjects() called for ', selectProjects)
-    } */
+    }
   }
 }
 </script>

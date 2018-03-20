@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/16/18 (gchadder3)
+Last update: 3/19/18 (gchadder3)
 """
 
 #
@@ -884,23 +884,28 @@ def copy_project(project_id):
     # Return the UID for the new projects record.
     return { 'projectId': copy_project_id }
 
-def create_project_from_prj_file(prj_filename, user_id, other_names):
+def create_project_from_prj_file(prj_filename, user_id):
     """
-    Given a .prj file name, a user UID, and other other file names, 
-    create a new project from the file with a new UID and return the new UID.
+    Given a .prj file name and a user UID, create a new project from the file 
+    with a new UID and return the new UID.
     """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'uploadProjectRPC':
+        return {'error': 'Unauthorized RPC'}  
     
     # Display the call information.
     print(">> create_project_from_prj_file '%s'" % prj_filename)
     
     # Try to open the .prj file, and return an error message if this fails.
     try:
-        theProj = hptool.loadProjectFromPrjFile(prj_filename)
+        theProj = ds.gzipStringPickleFileToObject(prj_filename)
     except Exception:
         return { 'projectId': 'BadFileFormatError' }
     
     # Reset the project name to a new project name that is unique.
-    theProj.name = project.get_unique_name(theProj.name, other_names)
+    theProj.name = project.get_unique_name(theProj.name, other_names=None)
     
     # Save the new project in the DataStore.
     save_project_as_new(theProj, user_id)
