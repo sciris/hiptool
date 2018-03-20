@@ -1,7 +1,7 @@
 <!--
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/14/18 (gchadder3)
+Last update: 3/19/18 (gchadder3)
 -->
 
 <template>
@@ -141,8 +141,8 @@ Last update: 3/14/18 (gchadder3)
 
       <div class="ControlsRow">
         <button class="btn" @click="deleteSelectedProjects">Delete selected</button>
-        &nbsp; &nbsp;
-        <button class="btn" @click="downloadSelectedProjects">Download selected</button>
+<!--        &nbsp; &nbsp;
+        <button class="btn" @click="downloadSelectedProjects">Download selected</button> -->
       </div>
     </div>
   </div>
@@ -445,6 +445,9 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('downloadProjectFile() called for ' + matchProject.project.name)
+	  
+	  // Make the server call to download the project to a .prj file.
+      rpcservice.rpcProjectDownloadCall('download_project', [uid])	  
     },
 
     deleteSelectedProjects() {
@@ -460,15 +463,15 @@ export default {
         // Update the project summaries so the deletions show up on the list.
         this.updateProjectSummaries()
       })
-    },
+    }
 
-    downloadSelectedProjects() {
+/*    downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
       let selectProjects = this.projectSummaries.filter(theProj =>
         theProj.selected).map(theProj => theProj.project.name)
 
       console.log('downloadSelectedProjects() called for ', selectProjects)
-    }
+    } */
   }
 }
 </script>
