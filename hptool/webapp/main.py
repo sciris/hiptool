@@ -779,27 +779,9 @@ def get_interv_set_fe_repr(theIntervSet):
 ## Project RPCs
 ##
 
-# We will probably have some of these here, though I want to move as much as 
-# I can into sciris/project.py.
-
-#def create_project(user_id, project_summary):
-#    """
-#    Create a new hptool Project for a user from a passed in project 
-#    summary.
-#    """ 
-#    
-#    # Create a new Project object with the name passed in from the project 
-#    # summary.
-#    theProj = hptool.Project(name=project_summary['name'])
-#    
-#    # Display the call information.
-#    print(">> create_project %s" % (project.name))
-#    
-#    # Save the new project.
-#    save_project_as_new(theProj, user_id)
-#    
-#    # Return the new project UID.
-#    return {'projectId': str(theProj.uid) }
+# I've tried to maximimize the number of these functions that I am able to 
+# move into sciris/project.py, but some that require dependency on the model 
+# Project class are defined here.
 
 def create_new_project(user_id):
     """
