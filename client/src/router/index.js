@@ -39,12 +39,17 @@ export default new Router({
       redirect: '/admin/overview'
     },
     {
+      path: '/login',
+      name: 'LoginPage',
+      component: LoginPage
+    },
+    {
       path: '/admin',
       component: DashboardLayout,
       redirect: '/admin/stats',
       children: [
         {
-          path: '/',
+          path: 'projects',
           name: 'ProjectsPage',
           component: ProjectsPage
         },
@@ -67,11 +72,6 @@ export default new Router({
           path: 'mypage',
           name: 'MyPage',
           component: MyPage
-        },
-        {
-          path: 'login',
-          name: 'LoginPage',
-          component: LoginPage
         },
         {
           path: 'mainadmin',
