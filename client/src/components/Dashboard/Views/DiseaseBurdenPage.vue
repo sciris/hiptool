@@ -179,7 +179,7 @@ Last update: 3/14/18 (gchadder3)
   import axios from 'axios'
   var filesaver = require('file-saver')
   import rpcservice from '../services/rpc-service'
-  import router from '../router'
+  import router from '@/router'
   import HotTable from 'vue-handsontable-official';
   import Vue from 'vue';
 

@@ -90,7 +90,7 @@
   </div>
 </template>
 <script>
-  import PaperNotification from 'src/components/UIComponents/NotificationPlugin/Notification.vue'
+  import PaperNotification from '@/components/UIComponents/NotificationPlugin/Notification.vue'
   export default {
     data () {
       return {

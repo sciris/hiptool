@@ -89,7 +89,7 @@ Last update: 3/7/18 (gchadder3)
 import axios from 'axios'
 var filesaver = require('file-saver')
 import rpcservice from '../services/rpc-service'
-import router from '../router'
+import router from '@/router'
 
 export default {
   name: 'HealthPackagesPage',

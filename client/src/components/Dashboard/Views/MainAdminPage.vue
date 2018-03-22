@@ -39,7 +39,7 @@ Last update: 1/29/18 (gchadder3)
 
 <script>
 import rpcservice from '../services/rpc-service'
-import router from '../router'
+import router from '@/router'
 
 export default {
   name: 'MainAdminPage', 

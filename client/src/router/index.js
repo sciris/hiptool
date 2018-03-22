@@ -4,30 +4,30 @@
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import DashboardLayout from '../components/Dashboard/Layout/DashboardLayout.vue'
+import DashboardLayout from '@/components/Dashboard/Layout/DashboardLayout.vue'
 // GeneralViews
-import NotFound from '../components/GeneralViews/NotFoundPage.vue'
+import NotFound from '@/components/GeneralViews/NotFoundPage.vue'
 
 // Admin pages
-import Overview from 'src/components/Dashboard/Views/Overview.vue'
-import UserProfile from 'src/components/Dashboard/Views/UserProfile.vue'
-import Notifications from 'src/components/Dashboard/Views/Notifications.vue'
-import Icons from 'src/components/Dashboard/Views/Icons.vue'
-import Maps from 'src/components/Dashboard/Views/Maps.vue'
-import Typography from 'src/components/Dashboard/Views/Typography.vue'
-import TableList from 'src/components/Dashboard/Views/TableList.vue'
-import ProjectsPage from 'src/components/Dashboard/Views/ProjectsPage'
+import Overview from '@/components/Dashboard/Views/Overview.vue'
+import UserProfile from '@/components/Dashboard/Views/UserProfile.vue'
+import Notifications from '@/components/Dashboard/Views/Notifications.vue'
+import Icons from '@/components/Dashboard/Views/Icons.vue'
+import Maps from '@/components/Dashboard/Views/Maps.vue'
+import Typography from '@/components/Dashboard/Views/Typography.vue'
+import TableList from '@/components/Dashboard/Views/TableList.vue'
+import ProjectsPage from '@/components/Dashboard/Views/ProjectsPage'
 
 // 
-import DiseaseBurdenPage from 'src/components/Dashboard/Views/DiseaseBurdenPage'
-import InterventionsPage from 'src/components/Dashboard/Views/InterventionsPage'
-import HealthPackagesPage from 'src/components/Dashboard/Views/HealthPackagesPage'
-import MyPage from 'src/components/Dashboard/Views/MyPage'
-import LoginPage from 'src/components/Dashboard/Views/LoginPage'
-import MainAdminPage from 'src/components/Dashboard/Views/MainAdminPage'
-import RegisterPage from 'src/components/Dashboard/Views/RegisterPage'
-import UserChangeInfoPage from 'src/components/Dashboard/Views/UserChangeInfoPage'
-import ChangePasswordPage from 'src/components/Dashboard/Views/ChangePasswordPage'
+import DiseaseBurdenPage from '@/components/Dashboard/Views/DiseaseBurdenPage'
+import InterventionsPage from '@/components/Dashboard/Views/InterventionsPage'
+import HealthPackagesPage from '@/components/Dashboard/Views/HealthPackagesPage'
+import MyPage from '@/components/Dashboard/Views/MyPage'
+import LoginPage from '@/components/Dashboard/Views/LoginPage'
+import MainAdminPage from '@/components/Dashboard/Views/MainAdminPage'
+import RegisterPage from '@/components/Dashboard/Views/RegisterPage'
+import UserChangeInfoPage from '@/components/Dashboard/Views/UserChangeInfoPage'
+import ChangePasswordPage from '@/components/Dashboard/Views/ChangePasswordPage'
 
 Vue.use(Router)
 
