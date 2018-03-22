@@ -47,15 +47,7 @@ Last update: 2/2/18 (gchadder3)
 
 <script>
 export default {}
-// import TopBar from '@/components/TopBar'
 
-// export default {
-//   name: 'app', 
-
-//   components: {
-//     TopBar
-//   }
-// }
 </script>
 
 <!-- Global SCSS/SASS settings go here. -->
