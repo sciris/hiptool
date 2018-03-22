@@ -33,25 +33,101 @@
               </p>
             </a>
           </li>
+          <li>
+            <a href="#" class="btn-rotate" @click="logout">
+              <i class="ti-close"></i>
+              <p>
+                Log out
+              </p>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
 </template>
 <script>
+  import rpcservice from '@/services/rpc-service'
+  import router from '@/router'
+
   export default {
+    name: 'TopBar', 
+
+    // Health prior function
+    data() {
+      return {
+        activePage: 'manage projects'
+      }
+    },
+
     computed: {
+      // Health prior function
+      currentUser() {
+        return this.$store.state.currentUser
+      },
+
+      // Theme function
       routeName () {
         const {name} = this.$route
         return this.capitalizeFirstLetter(name)
       }
     },
+
+    // Health prior function
+    created() {
+      this.getUserInfo()
+    },
+
+    // Theme function
     data () {
       return {
         activeNotifications: false
       }
     },
     methods: {
+      // Health prior functions
+      userloggedin() {
+        if (this.currentUser.displayname == undefined) 
+          return false
+        else
+          return true
+      }, 
+
+      adminloggedin() {
+        if (this.userloggedin) {
+          return this.currentUser.admin
+        }
+      },
+
+      logout() {
+        // Do the logout request.
+        rpcservice.rpcLogoutCall('user_logout')
+        .then(response => {
+          // Update the user info.
+          this.getUserInfo()
+
+          // Clear out the active project.
+          this.$store.commit('newActiveProject', {})
+
+          // Navigate to the login page automatically.
+          router.push('/login')
+        })
+      },
+
+      getUserInfo() {
+        rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
+        .then(response => {
+          // Set the username to what the server indicates.
+          this.$store.commit('newUser', response.data.user)
+        })
+        .catch(error => {
+          // Set the username to {}.  An error probably means the 
+          // user is not logged in.
+          this.$store.commit('newUser', {})
+        })
+      },
+
+      // Theme functions
       capitalizeFirstLetter (string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
       },
