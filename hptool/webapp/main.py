@@ -22,7 +22,7 @@ import sciris.user as user
 import sciris.project as project
 import hptool
 from hptool.webapp import config
-from hptool import uuid, dcp
+from hptool import uuid, dcp, Burden
 
 
 #
@@ -939,14 +939,51 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
     # Get the burden set that matches burdenset_numindex.
     burdenSet = theProj.burden(key=burdenset_numindex)
     
+    # Return an empty list if no data is present.
+    if burdenSet.data is None:
+        # Return success.
+        return { 'diseases': [] }
+
     # Gather the list for all of the diseases.
     diseaseData = [list(theDisease) for theDisease in burdenSet.data]
     
     # Return success.
     return { 'diseases': diseaseData }
     
+def create_burden_set(project_id, new_burden_set_name):
+
+    def update_project_fn(theProj):
+        # Create a new (empty) burden set.
+        newBurdenSet = Burden(project=theProj, name=new_burden_set_name)
+        
+        # Put the new burden set in the dictionary.
+        theProj.burdensets[new_burden_set_name] = newBurdenSet
+#        if new_burden_set_name in theProj.burdensets:
+#            raise ParsetAlreadyExists(project_id, new_burden_set_name)
+#        theProj.makeparset(new_burden_set_name, overwrite=False)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
     
+    update_project_with_fn(project_id, update_project_fn)
+
+    return get_project_burden_sets(project_id)
+
+def delete_burden_set(project_id, burdenset_numindex):
+
+    def update_project_fn(theProj):
+        theProj.burdensets.pop(burdenset_numindex)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    update_project_with_fn(project_id, update_project_fn)   
    
+    
 def get_project_burden_plots(project_id, burdenset_numindex):
     ''' Plot the disease burden '''
     

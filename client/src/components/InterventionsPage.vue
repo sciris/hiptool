@@ -435,6 +435,18 @@ export default {
 
     createNewSet() {
       console.log('createNewSet() called')
+      
+      // Go to the server to get the interventions from the intervention set.
+      rpcservice.rpcProjectCall('create_burden_set', 
+        [this.$store.state.activeProject.project.id, 'New burden set'])
+      .then(response => {
+        // Set the interventions table list.
+        this.interventionList = response.data.interventions
+
+        // Reset the bottom table sorting state.
+//        this.sortColumn2 = 'name'
+//        this.sortReverse2 = false
+      })      
     },
 
     intervAllCategoryClick() {

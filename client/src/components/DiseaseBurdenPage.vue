@@ -408,10 +408,26 @@ export default {
 
     deleteBurdenSet(burdenSet) {
       console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
+      
+      // Go to the server to delete the burden set.
+      rpcservice.rpcProjectCall('delete_burden_set', 
+        [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+      .then(response => {
+        // Update the burden sets so the new set shows up on the list.        
+        this.updateBurdenSets()
+      })       
     },
 
     createNewBurdenSet() {
       console.log('createNewBurdenSet() called')
+      
+      // Go to the server to create the new burden set.
+      rpcservice.rpcProjectCall('create_burden_set', 
+        [this.$store.state.activeProject.project.id, 'New burden set'])
+      .then(response => {
+        // Update the burden sets so the new set shows up on the list.        
+        this.updateBurdenSets()
+      })       
     },
 
     grabTableData() {
