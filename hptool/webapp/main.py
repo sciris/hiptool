@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/16/18 (gchadder3)
+Last update: 3/20/18 (gchadder3)
 """
 
 #
@@ -146,12 +146,22 @@ class ProjectSO(sobj.ScirisObject):
         }
         return objInfo
     
-#    def saveAsFile(self, loadDir):
-#        # Save the project in the file.
-#        self.theProject.saveToPrjFile(loadDir, saveResults=True)
-#        
-#        # Return the filename (not the full one).
-#        return self.theProject.name + ".prj"
+    def saveAsFile(self, loadDir):
+        # Use the uploads directory to put the file in.
+        dirname = ds.uploadsPath
+    
+        # Create a filename containing the project name followed by a .prj 
+        # suffix.
+        fileName = '%s.prj' % self.theProject.name
+        
+        # Generate the full file name with path.
+        fullFileName = '%s%s%s' % (dirname, os.sep, fileName)   
+     
+        # Write the object to a Gzip string pickle file.
+        ds.objectToGzipStringPickleFile(fullFileName, self.theProject)
+        
+        # Return the filename (not the full one).
+        return self.theProject.name + ".prj"
     
 # newer (more complicated) version...
 #class ProjectSO(sobj.ScirisObject):
@@ -769,27 +779,9 @@ def get_interv_set_fe_repr(theIntervSet):
 ## Project RPCs
 ##
 
-# We will probably have some of these here, though I want to move as much as 
-# I can into sciris/project.py.
-
-#def create_project(user_id, project_summary):
-#    """
-#    Create a new hptool Project for a user from a passed in project 
-#    summary.
-#    """ 
-#    
-#    # Create a new Project object with the name passed in from the project 
-#    # summary.
-#    theProj = hptool.Project(name=project_summary['name'])
-#    
-#    # Display the call information.
-#    print(">> create_project %s" % (project.name))
-#    
-#    # Save the new project.
-#    save_project_as_new(theProj, user_id)
-#    
-#    # Return the new project UID.
-#    return {'projectId': str(theProj.uid) }
+# I've tried to maximimize the number of these functions that I am able to 
+# move into sciris/project.py, but some that require dependency on the model 
+# Project class are defined here.
 
 def create_new_project(user_id):
     """
@@ -884,23 +876,28 @@ def copy_project(project_id):
     # Return the UID for the new projects record.
     return { 'projectId': copy_project_id }
 
-def create_project_from_prj_file(prj_filename, user_id, other_names):
+def create_project_from_prj_file(prj_filename, user_id):
     """
-    Given a .prj file name, a user UID, and other other file names, 
-    create a new project from the file with a new UID and return the new UID.
+    Given a .prj file name and a user UID, create a new project from the file 
+    with a new UID and return the new UID.
     """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'uploadProjectRPC':
+        return {'error': 'Unauthorized RPC'}  
     
     # Display the call information.
     print(">> create_project_from_prj_file '%s'" % prj_filename)
     
     # Try to open the .prj file, and return an error message if this fails.
     try:
-        theProj = hptool.loadProjectFromPrjFile(prj_filename)
+        theProj = ds.gzipStringPickleFileToObject(prj_filename)
     except Exception:
         return { 'projectId': 'BadFileFormatError' }
     
     # Reset the project name to a new project name that is unique.
-    theProj.name = project.get_unique_name(theProj.name, other_names)
+    theProj.name = project.get_unique_name(theProj.name, other_names=None)
     
     # Save the new project in the DataStore.
     save_project_as_new(theProj, user_id)

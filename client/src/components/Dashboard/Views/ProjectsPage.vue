@@ -1,7 +1,7 @@
 <!--
 ProjectsPage.vue -- ProjectsPage Vue component
 
-Last update: 3/14/18 (gchadder3)
+Last update: 3/20/18 (gchadder3)
 -->
 
 <template>
@@ -109,7 +109,15 @@ Last update: 3/14/18 (gchadder3)
             <td>
               <input type="checkbox" @click="uncheckSelectAll()" v-model="projectSummary.selected"/>
             </td>
-            <td>{{ projectSummary.project.name }}</td>
+            <td v-if="projectSummary.renaming !== ''">
+			  <input type="text"
+                     class="txbox"
+                     @keyup.enter="renameProject(projectSummary)"
+                     v-model="projectSummary.renaming"/>
+			</td>
+			<td v-else>
+			  {{ projectSummary.project.name }}
+			</td>
             <td>
               <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
             </td>
@@ -269,7 +277,10 @@ export default {
         this.projectSummaries = response.data.projects
 
         // Set select flags for false initially.
-        this.projectSummaries.forEach(theProj => { theProj.selected = false })
+        this.projectSummaries.forEach(theProj => { 
+		  theProj.selected = false 
+		  theProj.renaming = ''
+		})
       })
 
       // Get the demo project summaries from the server.
@@ -317,6 +328,13 @@ export default {
 
     uploadProjectFromFile() {
       console.log('uploadProjectFromFile() called')
+	  
+      // Have the server upload the project.
+      rpcservice.rpcProjectUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
+      .then(response => {
+        // Update the project summaries so the new project shows up on the list.
+        this.updateProjectSummaries()
+      })	  
     },
 
     projectIsActive(uid) {
@@ -422,22 +440,40 @@ export default {
 
     renameProject(projectSummary) {
       console.log('renameProject() called for ' + projectSummary.project.name)
-
-      // Make a deep copy of the projectSummary object by JSON-stringifying the old
-      // object, and then parsing the result back into a new object.
-      let newProjectSummary = JSON.parse(JSON.stringify(projectSummary));
-
-      // For now, just use this placeholder.
-      // Rename the project name in the client list.
-      newProjectSummary.project.name = 'Renamed project'
-
-      // Have the change the name of the project by passing in the new copy of the
-      // summary.
-      rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
-      .then(response => {
-        // Update the project summaries so the rename shows up on the list.
-        this.updateProjectSummaries()
-      })
+	  
+	  // If the project is not in a mode to be renamed, make it so.
+	  if (projectSummary.renaming === '') {
+		projectSummary.renaming = projectSummary.project.name
+      }
+	  
+	  // Otherwise (it is to be renamed)...
+	  else {
+        // Make a deep copy of the projectSummary object by JSON-stringifying the old
+        // object, and then parsing the result back into a new object.
+        let newProjectSummary = JSON.parse(JSON.stringify(projectSummary))
+		
+        // Rename the project name in the client list from what's in the textbox.
+        newProjectSummary.project.name = projectSummary.renaming
+	  
+        // Have the change the name of the project by passing in the new copy of the
+        // summary.
+        rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
+        .then(response => {
+          // Update the project summaries so the rename shows up on the list.
+          this.updateProjectSummaries()
+		  
+		  // Turn off the renaming mode.
+		  projectSummary.renaming = ''
+        })
+      }
+	  
+	  // This silly hack is done to make sure that the Vue component gets updated by this function call.
+	  // Something about resetting the project name informs the Vue component it needs to 
+	  // update, whereas the renaming attribute fails to update it.
+	  // We should find a better way to do this.	  
+      let theName = projectSummary.project.name
+      projectSummary.project.name = 'newname'
+      projectSummary.project.name = theName	 
     },
 
     downloadProjectFile(uid) {
@@ -445,6 +481,9 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('downloadProjectFile() called for ' + matchProject.project.name)
+	  
+	  // Make the server call to download the project to a .prj file.
+      rpcservice.rpcProjectDownloadCall('download_project', [uid])	  
     },
 
     deleteSelectedProjects() {
@@ -455,19 +494,25 @@ export default {
       console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
 
       // Have the server delete the selected projects.
-      rpcservice.rpcProjectCall('delete_projects', [selectProjectsUIDs])
-      .then(response => {
-        // Update the project summaries so the deletions show up on the list.
-        this.updateProjectSummaries()
-      })
+	  if (selectProjectsUIDs.length > 0) {
+        rpcservice.rpcProjectCall('delete_projects', [selectProjectsUIDs])
+        .then(response => {
+          // Update the project summaries so the deletions show up on the list.
+          this.updateProjectSummaries()
+        })
+	  }
     },
 
     downloadSelectedProjects() {
       // Pull out the names of the projects that are selected.
-      let selectProjects = this.projectSummaries.filter(theProj =>
-        theProj.selected).map(theProj => theProj.project.name)
+      let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
+        theProj.selected).map(theProj => theProj.project.id)
 
-      console.log('downloadSelectedProjects() called for ', selectProjects)
+      console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
+	  
+      // Have the server download the selected projects.
+	  if (selectProjectsUIDs.length > 0)
+        rpcservice.rpcProjectDownloadCall('load_zip_of_prj_files', [selectProjectsUIDs])	  
     }
   }
 }
