@@ -9,6 +9,31 @@ const SidebarStore = {
       path: '/admin/projects'
     },
     {
+      name: 'Burden of disease',
+      icon: 'ti-bar-chart',
+      path: '/admin/bod'
+    },
+    {
+      name: 'Interventions',
+      icon: 'ti-bolt',
+      path: '/admin/interventions'
+    },
+    {
+      name: 'Define health packages',
+      icon: 'ti-heart',
+      path: '/admin/healthpackages'
+    },
+    {
+      name: 'Edit account',
+      icon: 'ti-user',
+      path: '/admin/changeinfo'
+    },
+    {
+      name: 'Change password',
+      icon: 'ti-shield',
+      path: '/admin/changepassword'
+    },
+    {
       name: 'Dashboard',
       icon: 'ti-panel',
       path: '/admin/overview'

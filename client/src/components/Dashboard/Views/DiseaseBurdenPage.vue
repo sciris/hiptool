@@ -91,11 +91,7 @@ Last update: 3/14/18 (gchadder3)
         <div id="fig03" style="float:left" ></div>
       </div>
 
-      <template>
-        <div id="hot-preview">
-          <HotTable :root="root" :settings="hotSettings"></HotTable>
-        </div>
-      </template>
+      
 
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
@@ -170,6 +166,13 @@ Last update: 3/14/18 (gchadder3)
           </tr>
         </tbody>
       </table>
+
+      <template>
+        Testing handsontable
+        <div id="hot-preview">
+          <HotTable :root="root" :settings="hotSettings"></HotTable>
+        </div>
+      </template>
 
     </div>
   </div>
