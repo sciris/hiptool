@@ -51,7 +51,7 @@
   import router from '@/router'
 
   export default {
-    name: 'TopBar', 
+    name: 'TopNavbar', 
 
     // Health prior function
     data() {
