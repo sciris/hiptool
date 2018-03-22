@@ -22,7 +22,7 @@ Last update: 3/7/18 (gchadder3)
 </template>
 
 <script>
-import rpcservice from '../services/rpc-service'
+import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {

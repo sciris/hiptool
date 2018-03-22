@@ -105,7 +105,7 @@ Last update: 3/1/18 (gchadder3)
 <script>
 import axios from 'axios'
 var filesaver = require('file-saver')
-import rpcservice from '../services/rpc-service'
+import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {

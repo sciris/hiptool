@@ -15,7 +15,7 @@ Last update: 2/14/18 (gchadder3)
 // browsers.  Among other things it does the following:
 // * zeroes out margins for the body element (for all browsers)
 // * gets rid of ugly focus boxes for buttons in Firefox
-@import '../node_modules/normalize.css/normalize.css';
+@import '../../../node_modules/normalize.css/normalize.css';
 
 // Remove most spacing between table cells.
 // This code was in an earlier version of normalize.css, but was removed.
@@ -52,36 +52,36 @@ body {
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('./assets/fonts/proximanova-bold-webfont.eot');
-  src: url('./assets/fonts/proximanova-bold-webfont.eot?#iefix') format('embedded-opentype'),
-  url('./assets/fonts/proximanova-bold-webfont.woff2') format('woff2'),
-  url('./assets/fonts/proximanova-bold-webfont.woff') format('woff'),
-  url('./assets/fonts/proximanova-bold-webfont.ttf') format('truetype'),
-  url('./assets/fonts/proximanova-bold-webfont.svg#open_sansbold') format('svg');
+  src: url('../../assets/fonts/proximanova-bold-webfont.eot');
+  src: url('../../assets/fonts/proximanova-bold-webfont.eot?#iefix') format('embedded-opentype'),
+  url('../../assets/fonts/proximanova-bold-webfont.woff2') format('woff2'),
+  url('../../assets/fonts/proximanova-bold-webfont.woff') format('woff'),
+  url('../../assets/fonts/proximanova-bold-webfont.ttf') format('truetype'),
+  url('../../assets/fonts/proximanova-bold-webfont.svg#open_sansbold') format('svg');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('./assets/fonts/proximanova-light-webfont.eot');
-  src: url('./assets/fonts/proximanova-light-webfont.eot?#iefix') format('embedded-opentype'),
-  url('./assets/fonts/proximanova-light-webfont.woff2') format('woff2'),
-  url('./assets/fonts/proximanova-light-webfont.woff') format('woff'),
-  url('./assets/fonts/proximanova-light-webfont.ttf') format('truetype'),
-  url('./assets/fonts/proximanova-light-webfont.svg#open_sansregular') format('svg');
+  src: url('../../assets/fonts/proximanova-light-webfont.eot');
+  src: url('../../assets/fonts/proximanova-light-webfont.eot?#iefix') format('embedded-opentype'),
+  url('../../assets/fonts/proximanova-light-webfont.woff2') format('woff2'),
+  url('../../assets/fonts/proximanova-light-webfont.woff') format('woff'),
+  url('../../assets/fonts/proximanova-light-webfont.ttf') format('truetype'),
+  url('../../assets/fonts/proximanova-light-webfont.svg#open_sansregular') format('svg');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('./assets/fonts/proximanova-regular-webfont.eot');
-  src: url('./assets/fonts/proximanova-regular-webfont.eot?#iefix') format('embedded-opentype'),
-  url('./assets/fonts/proximanova-regular-webfont.woff2') format('woff2'),
-  url('./assets/fonts/proximanova-regular-webfont.woff') format('woff'),
+  src: url('../../assets/fonts/proximanova-regular-webfont.eot');
+  src: url('../../assets/fonts/proximanova-regular-webfont.eot?#iefix') format('embedded-opentype'),
+  url('../../assets/fonts/proximanova-regular-webfont.woff2') format('woff2'),
+  url('../../assets/fonts/proximanova-regular-webfont.woff') format('woff'),
   url('/assets/fonts/proximanova-regular-webfont.ttf') format('truetype'),
-  url('./assets/fonts/proximanova-regular-webfont.svg#open_sanssemibold') format('svg');
+  url('../../assets/fonts/proximanova-regular-webfont.svg#open_sanssemibold') format('svg');
   font-weight: 600;
   font-style: normal;
 }

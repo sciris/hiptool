@@ -60,7 +60,7 @@ export default {}
 
 <!-- Global SCSS/SASS settings go here. -->
 <style lang="scss">
-  @import './sass/main.scss';
+  // @import './sass/main.scss';
 
 /* #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
