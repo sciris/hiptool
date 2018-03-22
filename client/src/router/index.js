@@ -36,7 +36,7 @@ export default new Router({
     {
       path: '/',
       component: DashboardLayout,
-      redirect: '/admin/overview'
+      redirect: '/admin/projects'
     },
     {
       path: '/login',

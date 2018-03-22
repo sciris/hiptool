@@ -4,14 +4,14 @@ const SidebarStore = {
   showSidebar: false,
   sidebarLinks: [
     {
-      name: 'Dashboard',
-      icon: 'ti-panel',
-      path: '/admin/overview'
-    },
-    {
       name: 'Projects',
       icon: 'ti-view-grid',
       path: '/admin/projects'
+    },
+    {
+      name: 'Dashboard',
+      icon: 'ti-panel',
+      path: '/admin/overview'
     },
     {
       name: 'User Profile',
