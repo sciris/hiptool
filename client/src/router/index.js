@@ -16,16 +16,18 @@ import Icons from 'src/components/Dashboard/Views/Icons.vue'
 import Maps from 'src/components/Dashboard/Views/Maps.vue'
 import Typography from 'src/components/Dashboard/Views/Typography.vue'
 import TableList from 'src/components/Dashboard/Views/TableList.vue'
-import ProjectsPage from '@/components/ProjectsPage'
-import DiseaseBurdenPage from '@/components/DiseaseBurdenPage'
-import InterventionsPage from '@/components/InterventionsPage'
-import HealthPackagesPage from '@/components/HealthPackagesPage'
-import MyPage from '@/components/MyPage'
-import LoginPage from '@/components/LoginPage'
-import MainAdminPage from '@/components/MainAdminPage'
-import RegisterPage from '@/components/RegisterPage'
-import UserChangeInfoPage from '@/components/UserChangeInfoPage'
-import ChangePasswordPage from '@/components/ChangePasswordPage'
+import ProjectsPage from 'src/components/Dashboard/Views/ProjectsPage'
+
+// 
+import DiseaseBurdenPage from 'src/components/Dashboard/Views/DiseaseBurdenPage'
+import InterventionsPage from 'src/components/Dashboard/Views/InterventionsPage'
+import HealthPackagesPage from 'src/components/Dashboard/Views/HealthPackagesPage'
+import MyPage from 'src/components/Dashboard/Views/MyPage'
+import LoginPage from 'src/components/Dashboard/Views/LoginPage'
+import MainAdminPage from 'src/components/Dashboard/Views/MainAdminPage'
+import RegisterPage from 'src/components/Dashboard/Views/RegisterPage'
+import UserChangeInfoPage from 'src/components/Dashboard/Views/UserChangeInfoPage'
+import ChangePasswordPage from 'src/components/Dashboard/Views/ChangePasswordPage'
 
 Vue.use(Router)
 
@@ -47,47 +49,47 @@ export default new Router({
           component: ProjectsPage
         },
         {
-          path: '/bod',
+          path: 'bod',
           name: 'DiseaseBurdenPage',
           component: DiseaseBurdenPage
         },
         {
-          path: '/interventions',
+          path: 'interventions',
           name: 'InterventionsPage',
           component: InterventionsPage
         },
         {
-          path: '/healthpackages',
+          path: 'healthpackages',
           name: 'HealthPackagesPage',
           component: HealthPackagesPage
         },
         {
-          path: '/mypage',
+          path: 'mypage',
           name: 'MyPage',
           component: MyPage
         },
         {
-          path: '/login',
+          path: 'login',
           name: 'LoginPage',
           component: LoginPage
         },
         {
-          path: '/mainadmin',
+          path: 'mainadmin',
           name: 'MainAdminPage',
           component: MainAdminPage
         },
         {
-          path: '/register',
+          path: 'register',
           name: 'RegisterPage',
           component: RegisterPage
         },
         {
-          path: '/changeinfo',
+          path: 'changeinfo',
           name: 'UserChangeInfoPage',
           component: UserChangeInfoPage
         },
         {
-          path: '/changepassword',
+          path: 'changepassword',
           name: 'ChangePasswordPage',
           component: ChangePasswordPage
         },
