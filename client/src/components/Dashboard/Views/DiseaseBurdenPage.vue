@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/14/18 (gchadder3)
+Last update: 3/23/18 (gchadder3)
 -->
 
 <template>
@@ -59,16 +59,24 @@ Last update: 3/14/18 (gchadder3)
         </thead>
         <tbody>
           <tr v-for="burdenSet in sortedFilteredBurdenSets"
-              :class="{ highlighted: burdenSetIsSelected(burdenSet.burdenset.uid) }">
-            <td>{{ burdenSet.burdenset.name }}</td>
+              :class="{ highlighted: burdenSetIsSelected(burdenSet) }">
+            <td v-if="burdenSet.renaming !== ''">
+			        <input type="text"
+                     class="txbox"
+                     @keyup.enter="renameBurdenSet(burdenSet)"
+                     v-model="burdenSet.renaming"/>
+			      </td>
+			      <td v-else>
+			        {{ burdenSet.burdenset.name }}
+			      </td>           
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewBurdenSet(burdenSet.burdenset.uid)">View</button>
-              <button class="btn" @click="copyBurdenSet(burdenSet.burdenset.uid)">Copy</button>
-              <button class="btn" @click="renameBurdenSet(burdenSet.burdenset.uid)">Rename</button>
-              <button class="btn __red" @click="deleteBurdenSet(burdenSet.burdenset.uid)">Delete</button>
+              <button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button>
+              <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
+              <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
+              <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
           <tr>
@@ -81,9 +89,7 @@ Last update: 3/14/18 (gchadder3)
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
-      <button class="btn" @click="grabTableData">Upload IHME data</button>
-
-      <button class="btn" @click="makeGraph(activeBurdenSet.burdenset.uid)">Visualize</button>
+      <button class="btn" @click="makeGraph(activeBurdenSet)">Visualize</button>
 
       <div>
         <div id="fig01" style="float:left" ></div>
@@ -273,7 +279,7 @@ Last update: 3/14/18 (gchadder3)
         if (this.$store.state.activeProject.project === undefined) {
           this.burdenSets = []
         }
-
+        
         // Otherwise...
         else {
           // Get the active project's burden sets.
@@ -282,19 +288,29 @@ Last update: 3/14/18 (gchadder3)
           .then(response => {
             // Set the burden set list to what we received.
             this.burdenSets = response.data.burdensets
+		  
+            // Add numindex elements to the burden sets to keep track of 
+		        // which index to pull from the server.
+            for (let ind=0; ind < this.burdenSets.length; ind++)
+              this.burdenSets[ind].burdenset.numindex = ind
+            
+            // Set renaming values to blank initially.
+            this.burdenSets.forEach(theSet => { 
+		          theSet.renaming = ''
+		        })            
           })
         }
       },
 
-      burdenSetIsSelected(uid) {
+      burdenSetIsSelected(burdenSet) {
         // If the active burden set is undefined, it is not active.
         if (this.activeBurdenSet.burdenset === undefined) {
           return false
         }
-
-        // Otherwise, the burden set is selected if the UIDs match.
+        
+        // Otherwise, the burden set is selected if the numindexes match.
         else {
-          return (this.activeBurdenSet.burdenset.uid === uid)
+          return (this.activeBurdenSet.burdenset.numindex === burdenSet.burdenset.numindex)
         }
       },
 
@@ -336,19 +352,16 @@ Last update: 3/14/18 (gchadder3)
           }
         )
       },
+      
+      viewBurdenSet(burdenSet) {
+        console.log('viewBurdenSet() called for ' + burdenSet.burdenset.name)
 
-      viewBurdenSet(uid) {
-        // Find the burden set that matches the UID passed in.
-        let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
-
-        console.log('viewBurdenSet() called for ' + matchSet.burdenset.name)
-
-        // Set the active project to the matched project.
-        this.activeBurdenSet = matchSet
+        // Set the active project to the burdenSet passed in.
+        this.activeBurdenSet = burdenSet
 
         // Go to the server to get the diseases from the burden set.
         rpcservice.rpcProjectCall('get_project_burden_set_diseases',
-          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
+          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
         .then(response => {
           // Set the disease list.
           this.diseaseList = response.data.diseases
@@ -359,68 +372,99 @@ Last update: 3/14/18 (gchadder3)
         })
       },
 
-      copyBurdenSet(uid) {
-        // Find the burden set that matches the UID passed in.
-        let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
-
-        console.log('copyBurdenSet() called for ' + matchSet.burdenset.name)
+      copyBurdenSet(burdenSet) {
+        console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
+        
+	      // Have the server copy the burden set, giving it a new name.
+        rpcservice.rpcProjectCall('copy_burden_set', 
+          [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+        .then(response => {
+          // Update the burden sets so the new set shows up on the list.        
+          this.updateBurdenSets()
+        })        
       },
 
-      renameBurdenSet(uid) {
-        // Find the burden set that matches the UID passed in.
-        let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
-
-        console.log('renameBurdenSet() called for ' + matchSet.burdenset.name)
+      renameBurdenSet(burdenSet) {
+        console.log('renameBurdenSet() called for ' + burdenSet.burdenset.name)
+        
+	      // If the burden set is not in a mode to be renamed, make it so.
+	      if (burdenSet.renaming === '') {
+		      burdenSet.renaming = burdenSet.burdenset.name
+        }
+	  
+	      // Otherwise (it is to be renamed)...
+	      else {
+          // Have the server change the name of the burden set.
+          rpcservice.rpcProjectCall('rename_burden_set', 
+            [this.$store.state.activeProject.project.id, 
+            burdenSet.burdenset.numindex, burdenSet.renaming])      
+          .then(response => {
+            // Update the burden sets so the renamed one shows up on the list.
+            this.updateBurdenSets()
+		  
+		        // Turn off the renaming mode.
+		        burdenSet.renaming = ''
+          })
+        }
+	  
+	      // This silly hack is done to make sure that the Vue component gets updated by this function call.
+	      // Something about resetting the burden set name informs the Vue component it needs to 
+	      // update, whereas the renaming attribute fails to update it.
+	      // We should find a better way to do this.	  
+        let theName = burdenSet.burdenset.name
+        burdenSet.burdenset.name = 'newname'
+        burdenSet.burdenset.name = theName	         
       },
 
-      deleteBurdenSet(uid) {
-        // Find the burden set that matches the UID passed in.
-        let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
-
-        console.log('deleteBurdenSet() called for ' + matchSet.burdenset.name)
+      deleteBurdenSet(burdenSet) {
+        console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
+      
+        // Go to the server to delete the burden set.
+        rpcservice.rpcProjectCall('delete_burden_set', 
+          [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+        .then(response => {
+          // Update the burden sets so the new set shows up on the list.        
+          this.updateBurdenSets()
+        })       
       },
 
       createNewBurdenSet() {
         console.log('createNewBurdenSet() called')
+      
+        // Go to the server to create the new burden set.
+        rpcservice.rpcProjectCall('create_burden_set', 
+          [this.$store.state.activeProject.project.id, 'New burden set'])
+        .then(response => {
+          // Update the burden sets so the new set shows up on the list.        
+          this.updateBurdenSets()
+        })       
       },
-
-      grabTableData() {
-        console.log('grabTableData() called')
-        // rpcservice.rpcProjectCall('get_project_burden_set_diseases',
-        //   [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
-        // .then(response => {
-        //   this.diseaseList = response.data.diseases
-        // }) 
-      },
-
-      makeGraph(uid) {
-        // Find the burden set that matches the UID passed in.
-        let matchSet = this.burdenSets.find(theSet => theSet.burdenset.uid === uid)
-
-        console.log('makeGraph() called for ' + matchSet.burdenset.name)
+      
+      makeGraph(burdenSet) {
+        console.log('makeGraph() called for ' + burdenSet.burdenset.name)
 
         // Set the active project to the matched project.
-        this.activeBurdenSet = matchSet
+        this.activeBurdenSet = burdenSet
 
         // Go to the server to get the diseases from the burden set.
         rpcservice.rpcProjectCall('get_project_burden_plots',
-          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
-          .then(response => {
-            // Pull out the response data.
-            this.serverresponse = response.data
+          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
+        .then(response => {
+          // Pull out the response data.
+          this.serverresponse = response.data
 
-            // Draw the figure in the 'fig01' div tag.
-            mpld3.draw_figure('fig01', response.data.graph1)
-            mpld3.draw_figure('fig02', response.data.graph2)
-            mpld3.draw_figure('fig03', response.data.graph3)
-          })
-          .catch(error => {
-            // Pull out the error message.
-            this.serverresponse = 'There was an error: ' + error.message
+          // Draw the figure in the 'fig01' div tag.
+          mpld3.draw_figure('fig01', response.data.graph1)
+          mpld3.draw_figure('fig02', response.data.graph2)
+          mpld3.draw_figure('fig03', response.data.graph3)
+        })
+        .catch(error => {
+          // Pull out the error message.
+          this.serverresponse = 'There was an error: ' + error.message
 
-            // Set the server error.
-            this.servererror = error.message
-          })
+          // Set the server error.
+          this.servererror = error.message
+        })
       },
 
       updateSorting2(sortColumn) {
