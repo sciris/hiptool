@@ -32,6 +32,11 @@ export default new Router({
       redirect: '/admin/projects'
     },
     {
+      path: '/register',
+      name: 'RegisterPage',
+      component: RegisterPage
+    },
+    {
       path: '/login',
       name: 'LoginPage',
       component: LoginPage
@@ -70,11 +75,6 @@ export default new Router({
           path: 'mainadmin',
           name: 'MainAdminPage',
           component: MainAdminPage
-        },
-        {
-          path: 'register',
-          name: 'RegisterPage',
-          component: RegisterPage
         },
         {
           path: 'changeinfo',
