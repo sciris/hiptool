@@ -22,7 +22,7 @@ import sciris.user as user
 import sciris.project as project
 import hptool
 from hptool.webapp import config
-from hptool import uuid, dcp, Burden
+from hptool import uuid, dcp, Burden, Interventions
 
 
 #
@@ -968,7 +968,7 @@ def create_burden_set(project_id, new_burden_set_name):
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
 
-    # Return the new burden set.
+    # Return the new burden sets.
     return get_project_burden_sets(project_id)
 
 def delete_burden_set(project_id, burdenset_numindex):
@@ -984,19 +984,28 @@ def delete_burden_set(project_id, burdenset_numindex):
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
     
-#def copy_burden_set(project_id, burdenset_numindex, new_burden_set_name):
-#
-#    def update_project_fn(theProj):
-#        original_parset = parse.get_parset_from_project(theProj, burdenset_numindex)
-#        original_parset_name = original_burden_set.name
-#        theProj.copyparset(orig=original_parset_name, new=new_burden_set_name)
-#        theProj.parsets[new_burden_set_name].uid = op.uuid()
-#        
-#    # Do the project update using the internal function.  
-#    update_project_with_fn(project_id, update_project_fn)
-#    
-#    # Return the new burden set.
-#    return get_project_burden_sets(project_id) 
+def copy_burden_set(project_id, burdenset_numindex):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(theProj.burdensets[burdenset_numindex].name, 
+            other_names=list(theProj.burdensets))
+        
+        # Create a new burdenset which is a copy of the old one.
+        newBurdenSet = dcp(theProj.burdensets[burdenset_numindex])
+        
+        # Overwrite the old name with the new.
+        newBurdenSet.name = uniqueName
+       
+        # Put the new burden set in the dictionary.
+        theProj.burdensets[uniqueName] = newBurdenSet
+        
+    # Do the project update using the internal function.  
+    update_project_with_fn(project_id, update_project_fn)
+    
+    # Return the new burden sets.
+    return get_project_burden_sets(project_id) 
 
 #def rename_parset(project_id, burdenset_numindex, new_burden_set_name):
 #
@@ -1090,6 +1099,79 @@ def get_project_interv_set_intervs(project_id, intervset_numindex):
     # Return success.
     return { 'interventions': intervData }
 
+def create_interv_set(project_id, new_interv_set_name):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(new_interv_set_name, 
+            other_names=list(theProj.intersets))
+        
+        # Create a new (empty) intervention set.
+        newIntervSet = Interventions(project=theProj, name=uniqueName)
+        
+        # Put the new intervention set in the dictionary.
+        theProj.intersets[uniqueName] = newIntervSet
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.
+    update_project_with_fn(project_id, update_project_fn)
+
+    # Return the new intervention sets.
+    return get_project_interv_sets(project_id)
+
+def delete_interv_set(project_id, intervset_numindex):
+
+    def update_project_fn(theProj):
+        theProj.intersets.pop(intervset_numindex)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.    
+    update_project_with_fn(project_id, update_project_fn)   
+    
+def copy_interv_set(project_id, intervset_numindex):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(theProj.intersets[intervset_numindex].name, 
+            other_names=list(theProj.intersets))
+        
+        # Create a new intervention set which is a copy of the old one.
+        newIntervSet = dcp(theProj.intersets[intervset_numindex])
+        
+        # Overwrite the old name with the new.
+        newIntervSet.name = uniqueName
+       
+        # Put the new intervention set in the dictionary.
+        theProj.intersets[uniqueName] = newIntervSet
+        
+    # Do the project update using the internal function.  
+    update_project_with_fn(project_id, update_project_fn)
+    
+    # Return the new intervention sets.
+    return get_project_interv_sets(project_id)
+
+#def rename_parset(project_id, burdenset_numindex, new_burden_set_name):
+#
+#    def update_project_fn(theProj):
+#        parset = parse.get_parset_from_project(theProj, burdenset_numindex)
+#        old_parset_name = parset.name
+#        parset.name = new_parset_name
+#        del theProj.parsets[old_parset_name]
+#        theProj.parsets[new_parset_name] = parset
+#        
+#    # Do the project update using the internal function. 
+#    update_project_with_fn(project_id, update_project_fn)
+    
 ##
 ## Temporary (development) RPCs
 ##

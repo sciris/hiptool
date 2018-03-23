@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/21/18 (gchadder3)
+Last update: 3/23/18 (gchadder3)
 -->
 
 <template>
@@ -423,30 +423,43 @@ export default {
 
     copySet(intervSet) {
       console.log('copySet() called for ' + intervSet.intervset.name)
+      
+	    // Have the server copy the intervention set, giving it a new name.
+      rpcservice.rpcProjectCall('copy_interv_set', 
+        [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+      .then(response => {
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })        
     },
 
     renameSet(intervSet) {
       console.log('renameSet() called for ' + intervSet.intervset.name)
+      
     },
 
     deleteSet(intervSet) {
       console.log('deleteSet() called for ' + intervSet.intervset.name)
+      
+      // Go to the server to delete the intervention set.
+      rpcservice.rpcProjectCall('delete_interv_set', 
+        [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+      .then(response => {
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })       
     },
 
     createNewSet() {
       console.log('createNewSet() called')
-      
-      // Go to the server to get the interventions from the intervention set.
-      rpcservice.rpcProjectCall('create_burden_set', 
-        [this.$store.state.activeProject.project.id, 'New burden set'])
+   
+      // Go to the server to create the new intervention set.
+      rpcservice.rpcProjectCall('create_interv_set', 
+        [this.$store.state.activeProject.project.id, 'New intervention set'])
       .then(response => {
-        // Set the interventions table list.
-        this.interventionList = response.data.interventions
-
-        // Reset the bottom table sorting state.
-//        this.sortColumn2 = 'name'
-//        this.sortReverse2 = false
-      })      
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })     
     },
 
     intervAllCategoryClick() {

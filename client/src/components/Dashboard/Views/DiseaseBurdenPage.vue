@@ -363,6 +363,14 @@ Last update: 3/23/18 (gchadder3)
 
       copyBurdenSet(burdenSet) {
         console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
+        
+	      // Have the server copy the burden set, giving it a new name.
+        rpcservice.rpcProjectCall('copy_burden_set', 
+          [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+        .then(response => {
+          // Update the burden sets so the new set shows up on the list.        
+          this.updateBurdenSets()
+        })        
       },
 
       renameBurdenSet(burdenSet) {
