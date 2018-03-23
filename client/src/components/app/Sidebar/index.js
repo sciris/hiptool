@@ -37,11 +37,43 @@ const SidebarStore = {
       name: 'Help',
       icon: 'ti-help',
       path: '/admin/help'
+    },
+    {
+      name: 'Contact',
+      icon: 'ti-comment-alt',
+      path: '/admin/contact'
+    },
+    {
+      name: 'About',
+      icon: 'ti-face-smile',
+      path: '/admin/about'
+    },
+    {
+      name: 'Logout',
+      icon: 'ti-car',
+      path: '#',
+      click: this.logout,
     }
   ],
+
   displaySidebar (value) {
     this.showSidebar = value
-  }
+  },
+
+  logout() {
+    // Do the logout request.
+    rpcservice.rpcLogoutCall('user_logout')
+      .then(response => {
+        // Update the user info.
+        this.getUserInfo()
+
+        // Clear out the active project.
+        this.$store.commit('newActiveProject', {})
+
+        // Navigate to the login page automatically.
+        router.push('/login')
+      })
+  },
 }
 
 const SidebarPlugin = {

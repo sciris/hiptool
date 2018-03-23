@@ -19,6 +19,8 @@ import RegisterPage from '@/components/app/RegisterPage'
 import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
 import ChangePasswordPage from '@/components/app/ChangePasswordPage'
 import Help from '@/components/app/Help'
+import Contact from '@/components/app/Contact'
+import About from '@/components/app/About'
 
 
 Vue.use(Router);
@@ -84,6 +86,16 @@ export default new Router({
           path: 'help',
           name: 'Help',
           component: Help
+        },
+        {
+          path: 'contact',
+          name: 'Contact',
+          component: Contact
+        },
+        {
+          path: 'about',
+          name: 'About',
+          component: About
         },
     ]
   },

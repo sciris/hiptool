@@ -13,33 +13,26 @@
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
           <li class="open">
-            <a href="#" class="dropdown-toggle btn-magnify" data-toggle="dropdown">
-              <i class="ti-panel"></i>
-              <p>Stats</p>
-            </a>
-          </li>
-             <drop-down title="5 Notifications" icon="ti-bell">
-               <li><a href="#">Notification 1</a></li>
-               <li><a href="#">Notification 2</a></li>
-               <li><a href="#">Notification 3</a></li>
-               <li><a href="#">Notification 4</a></li>
-               <li><a href="#">Another notification</a></li>
-             </drop-down>
-          <li>
-            <a href="#" class="btn-rotate">
-              <i class="ti-settings"></i>
-              <p>
-                Settings
-              </p>
-            </a>
-          </li>
-          <li>
-            <a href="#" class="btn-rotate" @click="logout">
-              <i class="ti-close"></i>
-              <p>
-                Log out
-              </p>
-            </a>
+            <div style="display:table-cell; float:right; vertical-align: middle; padding-top:10px; padding-right:20px">
+              <div style="display:table">
+                <div style="display:table-row">
+                  <div style="display:table-cell; text-align:right; padding-right:10px">
+                    <b>User:</b>
+                  </div>
+                  <div style="display:table-cell">
+                    <span>{{ currentUser.username }}</span>
+                  </div>
+                </div>
+                <div style="display:table-row">
+                  <div style="display:table-cell; text-align:right; padding-right:10px">
+                    <b>Project:</b>
+                  </div>
+                  <div style="display:table-cell">
+                    <span>{{ activeProjectName }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
@@ -51,7 +44,7 @@
   import router from '@/router'
 
   export default {
-    name: 'TopNavbar', 
+    name: 'TopNavbar',
 
     // Health prior function
     data() {
@@ -64,6 +57,14 @@
       // Health prior function
       currentUser() {
         return this.$store.state.currentUser
+      },
+
+      activeProjectName() {
+        if (this.$store.state.activeProject.project === undefined) {
+          return 'none'
+        } else {
+          return this.$store.state.activeProject.project.name
+        }
       },
 
       // Theme function
@@ -87,31 +88,16 @@
     methods: {
       // Health prior functions
       userloggedin() {
-        if (this.currentUser.displayname == undefined) 
+        if (this.currentUser.displayname == undefined)
           return false
         else
           return true
-      }, 
+      },
 
       adminloggedin() {
         if (this.userloggedin) {
           return this.currentUser.admin
         }
-      },
-
-      logout() {
-        // Do the logout request.
-        rpcservice.rpcLogoutCall('user_logout')
-        .then(response => {
-          // Update the user info.
-          this.getUserInfo()
-
-          // Clear out the active project.
-          this.$store.commit('newActiveProject', {})
-
-          // Navigate to the login page automatically.
-          router.push('/login')
-        })
       },
 
       getUserInfo() {
@@ -121,7 +107,7 @@
           this.$store.commit('newUser', response.data.user)
         })
         .catch(error => {
-          // Set the username to {}.  An error probably means the 
+          // Set the username to {}.  An error probably means the
           // user is not logged in.
           this.$store.commit('newUser', {})
         })
