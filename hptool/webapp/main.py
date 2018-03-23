@@ -941,7 +941,6 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
     
     # Return an empty list if no data is present.
     if burdenSet.data is None:
-        # Return success.
         return { 'diseases': [] }
 
     # Gather the list for all of the diseases.
@@ -953,22 +952,26 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
 def create_burden_set(project_id, new_burden_set_name):
 
     def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(new_burden_set_name, 
+            other_names=list(theProj.burdensets))
+        
         # Create a new (empty) burden set.
-        newBurdenSet = Burden(project=theProj, name=new_burden_set_name)
+        newBurdenSet = Burden(project=theProj, name=uniqueName)
         
         # Put the new burden set in the dictionary.
-        theProj.burdensets[new_burden_set_name] = newBurdenSet
-#        if new_burden_set_name in theProj.burdensets:
-#            raise ParsetAlreadyExists(project_id, new_burden_set_name)
-#        theProj.makeparset(new_burden_set_name, overwrite=False)
+        theProj.burdensets[uniqueName] = newBurdenSet
         
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
     
+    # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
 
+    # Return the new burden set.
     return get_project_burden_sets(project_id)
 
 def delete_burden_set(project_id, burdenset_numindex):
@@ -981,8 +984,36 @@ def delete_burden_set(project_id, burdenset_numindex):
     if request.endpoint != 'normalProjectRPC':
         return {'error': 'Unauthorized RPC'}
     
+    # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
-   
+    
+#def copy_burden_set(project_id, burdenset_numindex, new_burden_set_name):
+#
+#    def update_project_fn(theProj):
+#        original_parset = parse.get_parset_from_project(theProj, burdenset_numindex)
+#        original_parset_name = original_burden_set.name
+#        theProj.copyparset(orig=original_parset_name, new=new_burden_set_name)
+#        theProj.parsets[new_burden_set_name].uid = op.uuid()
+#        
+#    # Do the project update using the internal function.  
+#    update_project_with_fn(project_id, update_project_fn)
+#    
+#    # Return the new burden set.
+#    return get_project_burden_sets(project_id) 
+
+#def rename_parset(project_id, burdenset_numindex, new_burden_set_name):
+#
+#    def update_project_fn(theProj):
+#        parset = parse.get_parset_from_project(theProj, burdenset_numindex)
+#        old_parset_name = parset.name
+#        parset.name = new_parset_name
+#        del theProj.parsets[old_parset_name]
+#        theProj.parsets[new_parset_name] = parset
+#        
+#    # Do the project update using the internal function. 
+#    update_project_with_fn(project_id, update_project_fn)
+    
+    
     
 def get_project_burden_plots(project_id, burdenset_numindex):
     ''' Plot the disease burden '''
@@ -1051,6 +1082,10 @@ def get_project_interv_set_intervs(project_id, intervset_numindex):
     
     # Get the intervention set that matches intervset_numindex.
     intervSet = theProj.inter(key=intervset_numindex)
+    
+    # Return an empty list if no data is present.
+    if intervSet.data is None:
+        return { 'interventions': [] } 
     
     # Gather the list for all of the interventions.
     intervData = [list(theInterv) for theInterv in intervSet.data]

@@ -89,7 +89,7 @@ class Project(object):
         output += '       Git version: %s\n'    % self.gitversion
         output += '               UID: %s\n'    % self.uid
         output += '============================================================\n'
-        output += self.getwarnings(doprint=False) # Don't print since print later
+#        output += self.getwarnings(doprint=False) # Don't print since print later
         return output
     
     
