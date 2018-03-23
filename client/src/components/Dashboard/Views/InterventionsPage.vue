@@ -36,7 +36,15 @@ Last update: 3/23/18 (gchadder3)
         <tbody>
           <tr v-for="intervSet in sortedFilteredIntervSets" 
               :class="{ highlighted: intervSetIsSelected(intervSet) }">
-            <td>{{ intervSet.intervset.name }}</td>
+            <td v-if="intervSet.renaming !== ''">
+			        <input type="text"
+                     class="txbox"
+                     @keyup.enter="renameSet(intervSet)"
+                     v-model="intervSet.renaming"/>
+			      </td>
+			      <td v-else>
+			        {{ intervSet.intervset.name }}
+			      </td> 
             <td style="white-space: nowrap">
               <button class="btn __green" @click="viewSet(intervSet)">View</button>
               <button class="btn" @click="copySet(intervSet)">Copy</button>
@@ -352,7 +360,12 @@ export default {
           // Add numindex elements to the intervention sets to keep track of 
 		      // which index to pull from the server.
           for (let ind=0; ind < this.interventionSets.length; ind++)
-            this.interventionSets[ind].intervset.numindex = ind          
+            this.interventionSets[ind].intervset.numindex = ind   
+
+          // Set renaming values to blank initially.
+          this.interventionSets.forEach(theSet => { 
+		        theSet.renaming = ''
+		      })           
         })
       }
     },
@@ -436,6 +449,33 @@ export default {
     renameSet(intervSet) {
       console.log('renameSet() called for ' + intervSet.intervset.name)
       
+	    // If the intervention set is not in a mode to be renamed, make it so.
+	    if (intervSet.renaming === '') {
+		    intervSet.renaming = intervSet.intervset.name
+      }
+	  
+	    // Otherwise (it is to be renamed)...
+	    else {
+        // Have the server change the name of the intervention set.
+        rpcservice.rpcProjectCall('rename_interv_set', 
+          [this.$store.state.activeProject.project.id, 
+          intervSet.intervset.numindex, intervSet.renaming])      
+        .then(response => {
+          // Update the intervention sets so the renamed one shows up on the list.
+          this.updateIntervSets()
+		  
+	        // Turn off the renaming mode.
+	        intervSet.renaming = ''
+        })
+      }
+	  
+	    // This silly hack is done to make sure that the Vue component gets updated by this function call.
+	    // Something about resetting the intervention set name informs the Vue component it needs to 
+	    // update, whereas the renaming attribute fails to update it.
+	    // We should find a better way to do this.	  
+      let theName = intervSet.intervset.name
+      intervSet.intervset.name = 'newname'
+      intervSet.intervset.name = theName      
     },
 
     deleteSet(intervSet) {

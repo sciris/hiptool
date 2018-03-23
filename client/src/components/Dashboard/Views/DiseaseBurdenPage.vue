@@ -60,7 +60,15 @@ Last update: 3/23/18 (gchadder3)
         <tbody>
           <tr v-for="burdenSet in sortedFilteredBurdenSets"
               :class="{ highlighted: burdenSetIsSelected(burdenSet) }">
-            <td>{{ burdenSet.burdenset.name }}</td>
+            <td v-if="burdenSet.renaming !== ''">
+			        <input type="text"
+                     class="txbox"
+                     @keyup.enter="renameBurdenSet(burdenSet)"
+                     v-model="burdenSet.renaming"/>
+			      </td>
+			      <td v-else>
+			        {{ burdenSet.burdenset.name }}
+			      </td>           
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
@@ -287,6 +295,11 @@ Last update: 3/23/18 (gchadder3)
 		        // which index to pull from the server.
             for (let ind=0; ind < this.burdenSets.length; ind++)
               this.burdenSets[ind].burdenset.numindex = ind
+            
+            // Set renaming values to blank initially.
+            this.burdenSets.forEach(theSet => { 
+		          theSet.renaming = ''
+		        })            
           })
         }
       },
@@ -375,6 +388,34 @@ Last update: 3/23/18 (gchadder3)
 
       renameBurdenSet(burdenSet) {
         console.log('renameBurdenSet() called for ' + burdenSet.burdenset.name)
+        
+	      // If the burden set is not in a mode to be renamed, make it so.
+	      if (burdenSet.renaming === '') {
+		      burdenSet.renaming = burdenSet.burdenset.name
+        }
+	  
+	      // Otherwise (it is to be renamed)...
+	      else {
+          // Have the server change the name of the burden set.
+          rpcservice.rpcProjectCall('rename_burden_set', 
+            [this.$store.state.activeProject.project.id, 
+            burdenSet.burdenset.numindex, burdenSet.renaming])      
+          .then(response => {
+            // Update the burden sets so the renamed one shows up on the list.
+            this.updateBurdenSets()
+		  
+		        // Turn off the renaming mode.
+		        burdenSet.renaming = ''
+          })
+        }
+	  
+	      // This silly hack is done to make sure that the Vue component gets updated by this function call.
+	      // Something about resetting the burden set name informs the Vue component it needs to 
+	      // update, whereas the renaming attribute fails to update it.
+	      // We should find a better way to do this.	  
+        let theName = burdenSet.burdenset.name
+        burdenSet.burdenset.name = 'newname'
+        burdenSet.burdenset.name = theName	         
       },
 
       deleteBurdenSet(burdenSet) {

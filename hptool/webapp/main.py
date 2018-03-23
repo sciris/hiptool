@@ -1007,19 +1007,14 @@ def copy_burden_set(project_id, burdenset_numindex):
     # Return the new burden sets.
     return get_project_burden_sets(project_id) 
 
-#def rename_parset(project_id, burdenset_numindex, new_burden_set_name):
-#
-#    def update_project_fn(theProj):
-#        parset = parse.get_parset_from_project(theProj, burdenset_numindex)
-#        old_parset_name = parset.name
-#        parset.name = new_parset_name
-#        del theProj.parsets[old_parset_name]
-#        theProj.parsets[new_parset_name] = parset
-#        
-#    # Do the project update using the internal function. 
-#    update_project_with_fn(project_id, update_project_fn)
-    
-    
+def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
+
+    def update_project_fn(theProj):
+        # Overwrite the old name with the new.
+        theProj.burdensets[burdenset_numindex].name = new_burden_set_name
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
     
 def get_project_burden_plots(project_id, burdenset_numindex):
     ''' Plot the disease burden '''
@@ -1160,17 +1155,14 @@ def copy_interv_set(project_id, intervset_numindex):
     # Return the new intervention sets.
     return get_project_interv_sets(project_id)
 
-#def rename_parset(project_id, burdenset_numindex, new_burden_set_name):
-#
-#    def update_project_fn(theProj):
-#        parset = parse.get_parset_from_project(theProj, burdenset_numindex)
-#        old_parset_name = parset.name
-#        parset.name = new_parset_name
-#        del theProj.parsets[old_parset_name]
-#        theProj.parsets[new_parset_name] = parset
-#        
-#    # Do the project update using the internal function. 
-#    update_project_with_fn(project_id, update_project_fn)
+def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
+
+    def update_project_fn(theProj):
+        # Overwrite the old name with the new.
+        theProj.intersets[intervset_numindex].name = new_interv_set_name
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
     
 ##
 ## Temporary (development) RPCs

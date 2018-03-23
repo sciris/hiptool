@@ -455,7 +455,7 @@ export default {
         // Rename the project name in the client list from what's in the textbox.
         newProjectSummary.project.name = projectSummary.renaming
 	  
-        // Have the change the name of the project by passing in the new copy of the
+        // Have the server change the name of the project by passing in the new copy of the
         // summary.
         rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
         .then(response => {
