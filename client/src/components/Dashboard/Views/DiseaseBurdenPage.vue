@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/14/18 (gchadder3)
+Last update: 3/23/18 (gchadder3)
 -->
 
 <template>
@@ -59,7 +59,7 @@ Last update: 3/14/18 (gchadder3)
         </thead>
         <tbody>
           <tr v-for="burdenSet in sortedFilteredBurdenSets"
-              :class="{ highlighted: burdenSetIsSelected(burdenSet.burdenset.uid) }">
+              :class="{ highlighted: burdenSetIsSelected(burdenSet) }">
             <td>{{ burdenSet.burdenset.name }}</td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
@@ -291,7 +291,7 @@ Last update: 3/14/18 (gchadder3)
         }
       },
 
-      burdenSetIsSelected(uid) {
+      burdenSetIsSelected(burdenSet) {
         // If the active burden set is undefined, it is not active.
         if (this.activeBurdenSet.burdenset === undefined) {
           return false
