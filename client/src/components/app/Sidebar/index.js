@@ -19,7 +19,7 @@ const SidebarStore = {
       path: '/admin/interventions'
     },
     {
-      name: 'Define health packages',
+      name: 'Health packages',
       icon: 'ti-heart',
       path: '/admin/healthpackages'
     },
