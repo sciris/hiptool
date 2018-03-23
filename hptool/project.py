@@ -98,8 +98,8 @@ class Project(object):
         info = odict()
         for attr in ['name', 'version', 'created', 'modified', 'gitbranch', 'gitversion', 'uid']:
             info[attr] = getattr(self, attr) # Populate the dictionary
-        info['parsetkeys'] = self.parsets.keys()
-        info['progsetkeys'] = self.parsets.keys()
+#        info['parsetkeys'] = self.parsets.keys()
+#        info['progsetkeys'] = self.parsets.keys()
         return info
     
     
