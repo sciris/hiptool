@@ -4,30 +4,22 @@
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import DashboardLayout from '@/components/Dashboard/Layout/DashboardLayout.vue'
+import DashboardLayout from '@/components/app/DashboardLayout.vue'
 // GeneralViews
-import NotFound from '@/components/GeneralViews/NotFoundPage.vue'
+import NotFound from '@/components/generic/NotFoundPage.vue'
 
 // Admin pages
-import Overview from '@/components/Dashboard/Views/Overview.vue'
-import UserProfile from '@/components/Dashboard/Views/UserProfile.vue'
-import Notifications from '@/components/Dashboard/Views/Notifications.vue'
-import Icons from '@/components/Dashboard/Views/Icons.vue'
-import Maps from '@/components/Dashboard/Views/Maps.vue'
-import Typography from '@/components/Dashboard/Views/Typography.vue'
-import TableList from '@/components/Dashboard/Views/TableList.vue'
-import ProjectsPage from '@/components/Dashboard/Views/ProjectsPage'
-
-// 
-import DiseaseBurdenPage from '@/components/Dashboard/Views/DiseaseBurdenPage'
-import InterventionsPage from '@/components/Dashboard/Views/InterventionsPage'
-import HealthPackagesPage from '@/components/Dashboard/Views/HealthPackagesPage'
-import MyPage from '@/components/Dashboard/Views/MyPage'
-import LoginPage from '@/components/Dashboard/Views/LoginPage'
-import MainAdminPage from '@/components/Dashboard/Views/MainAdminPage'
-import RegisterPage from '@/components/Dashboard/Views/RegisterPage'
-import UserChangeInfoPage from '@/components/Dashboard/Views/UserChangeInfoPage'
-import ChangePasswordPage from '@/components/Dashboard/Views/ChangePasswordPage'
+import Overview from '@/components/app/Overview.vue'
+import Notifications from '@/components/app/Notifications.vue'
+import ProjectsPage from '@/components/app/ProjectsPage'
+import DiseaseBurdenPage from '@/components/app/DiseaseBurdenPage'
+import InterventionsPage from '@/components/app/InterventionsPage'
+import HealthPackagesPage from '@/components/app/HealthPackagesPage'
+import LoginPage from '@/components/app/LoginPage'
+import MainAdminPage from '@/components/app/MainAdminPage'
+import RegisterPage from '@/components/app/RegisterPage'
+import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
+import ChangePasswordPage from '@/components/app/ChangePasswordPage'
 
 Vue.use(Router)
 
@@ -93,41 +85,6 @@ export default new Router({
           name: 'ChangePasswordPage',
           component: ChangePasswordPage
         },
-        {
-          path: 'overview',
-          name: 'overview',
-          component: Overview
-        },
-        {
-          path: 'stats',
-          name: 'stats',
-          component: UserProfile
-        },
-        {
-          path: 'notifications',
-          name: 'notifications',
-          component: Notifications
-        },
-        {
-          path: 'icons',
-          name: 'icons',
-          component: Icons
-        },
-        {
-          path: 'maps',
-          name: 'maps',
-          component: Maps
-        },
-        {
-          path: 'typography',
-          name: 'typography',
-          component: Typography
-        },
-        {
-          path: 'table-list',
-          name: 'table-list',
-          component: TableList
-        }
     ]
   },
     { path: '*', component: NotFound }
@@ -139,7 +96,7 @@ export default new Router({
  * The specified component must be inside the Views folder
  * @param  {string} name  the filename (basename) of the view to load.
 function view(name) {
-   var res= require('../components/Dashboard/Views/' + name + '.vue');
+   var res= require('../components/app/' + name + '.vue');
    return res;
 };**/
 
