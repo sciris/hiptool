@@ -2,15 +2,13 @@
 //
 // Last update: 2/21/18 (gchadder3)
 
+// Import main things
 import Vue from 'vue'
 import Router from 'vue-router'
 import DashboardLayout from '@/components/app/DashboardLayout.vue'
-// GeneralViews
-import NotFound from '@/components/generic/NotFoundPage.vue'
 
-// Admin pages
-import Overview from '@/components/app/Overview.vue'
-import Notifications from '@/components/app/Notifications.vue'
+// App views
+import NotFound from '@/components/generic/NotFoundPage.vue'
 import ProjectsPage from '@/components/app/ProjectsPage'
 import DiseaseBurdenPage from '@/components/app/DiseaseBurdenPage'
 import InterventionsPage from '@/components/app/InterventionsPage'
@@ -20,8 +18,10 @@ import MainAdminPage from '@/components/app/MainAdminPage'
 import RegisterPage from '@/components/app/RegisterPage'
 import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
 import ChangePasswordPage from '@/components/app/ChangePasswordPage'
+import Help from '@/components/app/Help'
 
-Vue.use(Router)
+
+Vue.use(Router);
 
 export default new Router({
   routes: [
@@ -79,6 +79,11 @@ export default new Router({
           path: 'changepassword',
           name: 'Change password',
           component: ChangePasswordPage
+        },
+        {
+          path: 'help',
+          name: 'Help',
+          component: Help
         },
     ]
   },

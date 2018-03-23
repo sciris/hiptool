@@ -32,6 +32,11 @@ const SidebarStore = {
       name: 'Change password',
       icon: 'ti-shield',
       path: '/admin/changepassword'
+    },
+    {
+      name: 'Help',
+      icon: 'ti-help',
+      path: '/admin/help'
     }
   ],
   displaySidebar (value) {
