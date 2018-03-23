@@ -4,12 +4,12 @@
       <nav class="pull-left">
         <ul>
           <li>
-            <router-link :to="{path:'/admin'}">Dashboard</router-link>
+            <!-- HealthPrior | Health Services Prioritization Tool -->
           </li>
         </ul>
       </nav>
-      <div class="copyright pull-right">
-        Health Prior - Health services prioritization tool
+      <div class="copyright pull-center">
+        Copyright &copy; 2018 by the Health Services Prioritization Working Group
       </div>
     </div>
   </footer>
