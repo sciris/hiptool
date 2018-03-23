@@ -1,7 +1,7 @@
 <!-- 
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/14/18 (gchadder3)
+Last update: 3/23/18 (gchadder3)
 -->
 
 <template>
@@ -35,13 +35,21 @@ Last update: 3/14/18 (gchadder3)
         </thead>
         <tbody>
           <tr v-for="intervSet in sortedFilteredIntervSets" 
-              :class="{ highlighted: intervSetIsSelected(intervSet.intervset.uid) }">
-            <td>{{ intervSet.intervset.name }}</td>
+              :class="{ highlighted: intervSetIsSelected(intervSet) }">
+            <td v-if="intervSet.renaming !== ''">
+			        <input type="text"
+                     class="txbox"
+                     @keyup.enter="renameSet(intervSet)"
+                     v-model="intervSet.renaming"/>
+			      </td>
+			      <td v-else>
+			        {{ intervSet.intervset.name }}
+			      </td> 
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewSet(intervSet.intervset.uid)">View</button>
-              <button class="btn" @click="copySet(intervSet.intervset.uid)">Copy</button>
-              <button class="btn" @click="renameSet(intervSet.intervset.uid)">Rename</button>
-              <button class="btn __red" @click="deleteSet(intervSet.intervset.uid)">Delete</button>
+              <button class="btn __green" @click="viewSet(intervSet)">View</button>
+              <button class="btn" @click="copySet(intervSet)">Copy</button>
+              <button class="btn" @click="renameSet(intervSet)">Rename</button>
+              <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
             </td>
           </tr>
           <tr>
@@ -348,19 +356,29 @@ export default {
         .then(response => {
           // Set the intervention set list to what we received.
           this.interventionSets = response.data.intervsets
+          
+          // Add numindex elements to the intervention sets to keep track of 
+		      // which index to pull from the server.
+          for (let ind=0; ind < this.interventionSets.length; ind++)
+            this.interventionSets[ind].intervset.numindex = ind   
+
+          // Set renaming values to blank initially.
+          this.interventionSets.forEach(theSet => { 
+		        theSet.renaming = ''
+		      })           
         })
       }
     },
 
-    intervSetIsSelected(uid) {
+    intervSetIsSelected(intervSet) {
       // If the active intervention set is undefined, it is not active.
       if (this.activeIntervSet.intervset === undefined) {
         return false
       } 
    
-      // Otherwise, the intervention is selected if the UIDs match.
+      // Otherwise, the intervention is selected if the numindexes match.
       else {
-        return (this.activeIntervSet.intervset.uid === uid)
+        return (this.activeIntervSet.intervset.numindex === intervSet.intervset.numindex)
       }
     },
 
@@ -397,18 +415,15 @@ export default {
       )
     },
 
-    viewSet(uid) {
-      // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
-
-      console.log('viewSet() called for ' + matchSet.intervset.name)
+    viewSet(intervSet) {
+      console.log('viewSet() called for ' + intervSet.intervset.name)
 
       // Set the active intervention set to the matched intervention set.
-      this.activeIntervSet = matchSet
+      this.activeIntervSet = intervSet
 
       // Go to the server to get the interventions from the intervention set.
       rpcservice.rpcProjectCall('get_project_interv_set_intervs', 
-        [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.uid])
+        [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
       .then(response => {
         // Set the interventions table list.
         this.interventionList = response.data.interventions
@@ -419,29 +434,72 @@ export default {
       })
     },
 
-    copySet(uid) {
-      // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
-
-      console.log('copySet() called for ' + matchSet.intervset.name)
+    copySet(intervSet) {
+      console.log('copySet() called for ' + intervSet.intervset.name)
+      
+	    // Have the server copy the intervention set, giving it a new name.
+      rpcservice.rpcProjectCall('copy_interv_set', 
+        [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+      .then(response => {
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })        
     },
 
-    renameSet(uid) {
-      // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
-
-      console.log('renameSet() called for ' + matchSet.intervset.name)
+    renameSet(intervSet) {
+      console.log('renameSet() called for ' + intervSet.intervset.name)
+      
+	    // If the intervention set is not in a mode to be renamed, make it so.
+	    if (intervSet.renaming === '') {
+		    intervSet.renaming = intervSet.intervset.name
+      }
+	  
+	    // Otherwise (it is to be renamed)...
+	    else {
+        // Have the server change the name of the intervention set.
+        rpcservice.rpcProjectCall('rename_interv_set', 
+          [this.$store.state.activeProject.project.id, 
+          intervSet.intervset.numindex, intervSet.renaming])      
+        .then(response => {
+          // Update the intervention sets so the renamed one shows up on the list.
+          this.updateIntervSets()
+		  
+	        // Turn off the renaming mode.
+	        intervSet.renaming = ''
+        })
+      }
+	  
+	    // This silly hack is done to make sure that the Vue component gets updated by this function call.
+	    // Something about resetting the intervention set name informs the Vue component it needs to 
+	    // update, whereas the renaming attribute fails to update it.
+	    // We should find a better way to do this.	  
+      let theName = intervSet.intervset.name
+      intervSet.intervset.name = 'newname'
+      intervSet.intervset.name = theName      
     },
 
-    deleteSet(uid) {
-      // Find the intervention set that matches the UID passed in.
-      let matchSet = this.interventionSets.find(theSet => theSet.intervset.uid === uid)
-
-      console.log('deleteSet() called for ' + matchSet.intervset.name)
+    deleteSet(intervSet) {
+      console.log('deleteSet() called for ' + intervSet.intervset.name)
+      
+      // Go to the server to delete the intervention set.
+      rpcservice.rpcProjectCall('delete_interv_set', 
+        [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+      .then(response => {
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })       
     },
 
     createNewSet() {
       console.log('createNewSet() called')
+   
+      // Go to the server to create the new intervention set.
+      rpcservice.rpcProjectCall('create_interv_set', 
+        [this.$store.state.activeProject.project.id, 'New intervention set'])
+      .then(response => {
+        // Update the intervention sets so the new set shows up on the list.        
+        this.updateIntervSets()
+      })     
     },
 
     intervAllCategoryClick() {
