@@ -16,7 +16,6 @@ import DiseaseBurdenPage from '@/components/app/DiseaseBurdenPage'
 import InterventionsPage from '@/components/app/InterventionsPage'
 import HealthPackagesPage from '@/components/app/HealthPackagesPage'
 import LoginPage from '@/components/app/LoginPage'
-import MyPage from '@/components/app/MyPage'
 import MainAdminPage from '@/components/app/MainAdminPage'
 import RegisterPage from '@/components/app/RegisterPage'
 import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
@@ -65,11 +64,6 @@ export default new Router({
           path: 'healthpackages',
           name: 'HealthPackagesPage',
           component: HealthPackagesPage
-        },
-        {
-          path: 'mypage',
-          name: 'MyPage',
-          component: MyPage
         },
         {
           path: 'mainadmin',
