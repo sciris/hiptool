@@ -89,8 +89,6 @@ Last update: 3/23/18 (gchadder3)
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
-      <button class="btn" @click="grabTableData">Upload IHME data</button>
-
       <button class="btn" @click="makeGraph(activeBurdenSet)">Visualize</button>
 
       <div>
@@ -440,15 +438,6 @@ Last update: 3/23/18 (gchadder3)
           // Update the burden sets so the new set shows up on the list.        
           this.updateBurdenSets()
         })       
-      },
-    
-      grabTableData() {
-        console.log('grabTableData() called')
-        // rpcservice.rpcProjectCall('get_project_burden_set_diseases',
-        //   [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.uid])
-        // .then(response => {
-        //   this.diseaseList = response.data.diseases
-        // }) 
       },
       
       makeGraph(burdenSet) {
