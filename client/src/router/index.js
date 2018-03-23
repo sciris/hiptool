@@ -47,37 +47,37 @@ export default new Router({
       children: [
         {
           path: 'projects',
-          name: 'ProjectsPage',
+          name: 'Manage projects',
           component: ProjectsPage
         },
         {
           path: 'bod',
-          name: 'DiseaseBurdenPage',
+          name: 'Disease burden',
           component: DiseaseBurdenPage
         },
         {
           path: 'interventions',
-          name: 'InterventionsPage',
+          name: 'Interventions',
           component: InterventionsPage
         },
         {
           path: 'healthpackages',
-          name: 'HealthPackagesPage',
+          name: 'Define health packages',
           component: HealthPackagesPage
         },
         {
           path: 'mainadmin',
-          name: 'MainAdminPage',
+          name: 'Admin',
           component: MainAdminPage
         },
         {
           path: 'changeinfo',
-          name: 'UserChangeInfoPage',
+          name: 'Edit account',
           component: UserChangeInfoPage
         },
         {
           path: 'changepassword',
-          name: 'ChangePasswordPage',
+          name: 'Change password',
           component: ChangePasswordPage
         },
     ]

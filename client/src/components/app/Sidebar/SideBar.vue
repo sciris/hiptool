@@ -11,9 +11,9 @@
       <div class="logo">
         <a href="#" class="simple-text">
             <div class="logo-img">
-                <img src="static/img/healthpriorlogo.png" alt="">
+                <img src="static/favicon-96x96.png" alt="">
             </div>
-          Health Prior
+          <font size="4">HealthPrior</font>
         </a>
       </div>
       <slot>
