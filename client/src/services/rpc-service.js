@@ -302,6 +302,8 @@ export default {
         kwargs: {}
       })
       .then(response => {
+        console.log('There was a response')
+        console.log(response)
         // If there is an error in the POST response.
         if (typeof(response.data.error) != 'undefined') {
           reject(Error(response.data.error))
@@ -311,6 +313,8 @@ export default {
         resolve(response)
       })
       .catch(error => {
+        console.log('error')
+        console.log(error)
         // If there was an actual response returned from the server...
         if (error.response) {
           // If we have exception information in the response (which indicates 
