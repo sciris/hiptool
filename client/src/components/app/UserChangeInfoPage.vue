@@ -86,7 +86,7 @@ export default {
           this.$notifications.notify({
             message: 'Failed to update user info',
             icon: 'ti-face-sad',
-            type: 'success',
+            type: 'danger',
             verticalAlign: 'top',
             horizontalAlign: 'center',
           });
