@@ -6,7 +6,7 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    
+
     <div class="divTable">
       <div class="divTableBody">
         <div class="divTableRow">
