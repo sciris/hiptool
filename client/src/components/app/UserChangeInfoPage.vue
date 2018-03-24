@@ -1,4 +1,4 @@
-<!-- 
+<!--
 UserChangeInfoPage.vue -- Vue component for a page to change account info
 
 Last update: 3/7/18 (gchadder3)
@@ -6,23 +6,29 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <label>Username:</label>
-    <input v-model='changeUserName'/>
-    <br/>
 
-    <label>Display Name:</label>
-    <input v-model='changeDisplayName'/>
-    <br/>
+    <div class="divTable">
+      <div class="divTableBody">
+        <div class="divTableRow">
+          <div class="divRowLabel">Username: </div>
+          <div class="divRowContent"><input v-model='changeUserName'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Display name: </div>
+          <div class="divRowContent"><input v-model='changeDisplayName'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Email: </div>
+          <div class="divRowContent"><input v-model='changeEmail'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Reenter password:</div>
+          <div class="divRowContent"><input v-model='changePassword'/></div>
+        </div>
+      </div>
+    </div>
 
-    <label>Email:</label>
-    <input v-model='changeEmail'/>
-    <br/>
-
-    <label>Reenter Password (to validate):</label>
-    <input v-model='changePassword'/>
-    <br/>
-
-    <button @click="tryChangeInfo">Update</button>
+    <button class="btn __green" @click="tryChangeInfo">Update</button>
     <br/>
 
     <p v-if="changeResult != ''">{{ changeResult }}</p>
@@ -34,7 +40,7 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {
-  name: 'UserChangeInfoPage', 
+  name: 'UserChangeInfoPage',
 
   data () {
     return {
@@ -44,16 +50,22 @@ export default {
       changePassword: '',
       changeResult: ''
     }
-  }, 
+  },
 
   methods: {
     tryChangeInfo () {
-      rpcservice.rpcUserChangeInfoCall('user_change_info', this.changeUserName, 
+      rpcservice.rpcUserChangeInfoCall('user_change_info', this.changeUserName,
         this.changePassword, this.changeDisplayName, this.changeEmail)
       .then(response => {
         if (response.data == 'success') {
           // Set a success result to show.
-          this.changeResult = 'Success!'
+          this.$notifications.notify({
+            message: 'User info updated',
+            icon: 'ti-check',
+            type: 'success',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          });
 
           // Read in the full current user information.
           rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
@@ -65,13 +77,19 @@ export default {
             router.push('/')
           })
           .catch(error => {
-            // Set the username to {}.  An error probably means the 
+            // Set the username to {}.  An error probably means the
             // user is not logged in.
             this.$store.commit('newUser', {})
           })
         } else {
           // Set a failure result to show.
-          this.changeResult = 'Change of account info failed.'
+          this.$notifications.notify({
+            message: 'Failed to update user info',
+            icon: 'ti-face-sad',
+            type: 'danger',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          });
         }
       })
       .catch(error => {

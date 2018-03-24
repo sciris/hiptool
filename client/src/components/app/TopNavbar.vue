@@ -17,11 +17,11 @@
             <a href="#" class="btn-rotate">
               <i class="ti-view-grid"></i>
               <p>
-                <b>Project: </b><span>{{ activeProjectName }}</span>
+                Project: <span>{{ activeProjectName }}</span>
               </p>
             </a>
           </li>
-          <drop-down v-bind:title="currentUser.username" icon="ti-user">
+          <drop-down v-bind:title="activeUserName" icon="ti-user">
             <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
             <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
             <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
@@ -58,6 +58,10 @@
         } else {
           return this.$store.state.activeProject.project.name
         }
+      },
+
+      activeUserName() {
+        return 'User: '+userService.currentUser().username
       },
 
       // Theme function

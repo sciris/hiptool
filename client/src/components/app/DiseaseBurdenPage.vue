@@ -6,7 +6,6 @@ Last update: 3/23/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <!--<h2>Open Project: {{ activeProjectName }}</h2>-->
 
     <div class="PageSection">
       <input type="text"
@@ -29,6 +28,9 @@ Last update: 3/23/18 (gchadder3)
               <span v-show="sortColumn != 'name'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
+            </th>
+            <th>
+              Select
             </th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
@@ -68,24 +70,20 @@ Last update: 3/23/18 (gchadder3)
 			      </td>
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
-			      </td>           
+			      </td>
+            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button>
               <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
-          <tr>
-            <td>
-              <button class="btn" @click="createNewBurdenSet">Create new</button>
-            </td>
-          </tr>
         </tbody>
       </table>
+      <button class="btn" @click="createNewBurdenSet">Create new</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -161,6 +159,7 @@ Last update: 3/23/18 (gchadder3)
             <td>{{ disease[2] }}</td>
             <td>{{ disease[3] }}</td>
             <td style="white-space: nowrap">
+              <button class="btn">Copy</button>
               <button class="btn">Rename</button>
               <button class="btn __red">Delete</button>
             </td>
@@ -173,12 +172,12 @@ Last update: 3/23/18 (gchadder3)
         </tbody>
       </table>
 
-      <template>
-        Testing handsontable
-        <div id="hot-preview">
-          <HotTable :root="root" :settings="hotSettings"></HotTable>
-        </div>
-      </template>
+      <!--<template>-->
+        <!--Testing handsontable-->
+        <!--<div id="hot-preview">-->
+          <!--<HotTable :root="root" :settings="hotSettings"></HotTable>-->
+        <!--</div>-->
+      <!--</template>-->
 
     </div>
   </div>
@@ -279,7 +278,7 @@ Last update: 3/23/18 (gchadder3)
         if (this.$store.state.activeProject.project === undefined) {
           this.burdenSets = []
         }
-        
+
         // Otherwise...
         else {
           // Get the active project's burden sets.
@@ -288,16 +287,16 @@ Last update: 3/23/18 (gchadder3)
           .then(response => {
             // Set the burden set list to what we received.
             this.burdenSets = response.data.burdensets
-		  
-            // Add numindex elements to the burden sets to keep track of 
+
+            // Add numindex elements to the burden sets to keep track of
 		        // which index to pull from the server.
             for (let ind=0; ind < this.burdenSets.length; ind++)
               this.burdenSets[ind].burdenset.numindex = ind
-            
+
             // Set renaming values to blank initially.
-            this.burdenSets.forEach(theSet => { 
+            this.burdenSets.forEach(theSet => {
 		          theSet.renaming = ''
-		        })            
+		        })
           })
         }
       },
@@ -307,7 +306,7 @@ Last update: 3/23/18 (gchadder3)
         if (this.activeBurdenSet.burdenset === undefined) {
           return false
         }
-        
+
         // Otherwise, the burden set is selected if the numindexes match.
         else {
           return (this.activeBurdenSet.burdenset.numindex === burdenSet.burdenset.numindex)
@@ -352,7 +351,7 @@ Last update: 3/23/18 (gchadder3)
           }
         )
       },
-      
+
       viewBurdenSet(burdenSet) {
         console.log('viewBurdenSet() called for ' + burdenSet.burdenset.name)
 
@@ -374,72 +373,72 @@ Last update: 3/23/18 (gchadder3)
 
       copyBurdenSet(burdenSet) {
         console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
-        
+
 	      // Have the server copy the burden set, giving it a new name.
-        rpcservice.rpcProjectCall('copy_burden_set', 
+        rpcservice.rpcProjectCall('copy_burden_set',
           [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.        
+          // Update the burden sets so the new set shows up on the list.
           this.updateBurdenSets()
-        })        
+        })
       },
 
       renameBurdenSet(burdenSet) {
         console.log('renameBurdenSet() called for ' + burdenSet.burdenset.name)
-        
+
 	      // If the burden set is not in a mode to be renamed, make it so.
 	      if (burdenSet.renaming === '') {
 		      burdenSet.renaming = burdenSet.burdenset.name
         }
-	  
+
 	      // Otherwise (it is to be renamed)...
 	      else {
           // Have the server change the name of the burden set.
-          rpcservice.rpcProjectCall('rename_burden_set', 
-            [this.$store.state.activeProject.project.id, 
-            burdenSet.burdenset.numindex, burdenSet.renaming])      
+          rpcservice.rpcProjectCall('rename_burden_set',
+            [this.$store.state.activeProject.project.id,
+            burdenSet.burdenset.numindex, burdenSet.renaming])
           .then(response => {
             // Update the burden sets so the renamed one shows up on the list.
             this.updateBurdenSets()
-		  
+
 		        // Turn off the renaming mode.
 		        burdenSet.renaming = ''
           })
         }
-	  
+
 	      // This silly hack is done to make sure that the Vue component gets updated by this function call.
-	      // Something about resetting the burden set name informs the Vue component it needs to 
+	      // Something about resetting the burden set name informs the Vue component it needs to
 	      // update, whereas the renaming attribute fails to update it.
-	      // We should find a better way to do this.	  
+	      // We should find a better way to do this.
         let theName = burdenSet.burdenset.name
         burdenSet.burdenset.name = 'newname'
-        burdenSet.burdenset.name = theName	         
+        burdenSet.burdenset.name = theName
       },
 
       deleteBurdenSet(burdenSet) {
         console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
-      
+
         // Go to the server to delete the burden set.
-        rpcservice.rpcProjectCall('delete_burden_set', 
+        rpcservice.rpcProjectCall('delete_burden_set',
           [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.        
+          // Update the burden sets so the new set shows up on the list.
           this.updateBurdenSets()
-        })       
+        })
       },
 
       createNewBurdenSet() {
         console.log('createNewBurdenSet() called')
-      
+
         // Go to the server to create the new burden set.
-        rpcservice.rpcProjectCall('create_burden_set', 
+        rpcservice.rpcProjectCall('create_burden_set',
           [this.$store.state.activeProject.project.id, 'New burden set'])
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.        
+          // Update the burden sets so the new set shows up on the list.
           this.updateBurdenSets()
-        })       
+        })
       },
-      
+
       makeGraph(burdenSet) {
         console.log('makeGraph() called for ' + burdenSet.burdenset.name)
 

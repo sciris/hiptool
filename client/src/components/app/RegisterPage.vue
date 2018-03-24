@@ -5,24 +5,30 @@ Last update: 2/13/18 (gchadder3)
 -->
 
 <template>
-  <div class="SitePage" style="width: 500px">
-    <span class="text_bold_medium" style="width: 25%">Username</span>
-    <input v-model='registerUserName' style="width: 100%" class="txbox __l"/>
-    <br/>
+  <div class="SitePage" style="width: 500px; margin:auto">
 
-    <span class="text_bold_medium" style="width: 25%">Password:</span>
-    <input v-model='registerPassword' style="width: 100%" class="txbox __l"/>
-    <br/>
+    <div class="divTable">
+      <div class="divTableBody">
+        <div class="divTableRow">
+          <div class="divRowLabel">Username: </div>
+          <div class="divRowContent"><input v-model='registerUserName'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Password:</div>
+          <div class="divRowContent"><input v-model='registerPassword'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Display name: </div>
+          <div class="divRowContent"><input v-model='registerDisplayName'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Email: </div>
+          <div class="divRowContent"><input v-model='registerEmail'/></div>
+        </div>
+      </div>
+    </div>
 
-    <span class="text_bold_medium" style="width: 25%">Display name:</span>
-    <input v-model='registerDisplayName' style="width: 100%" class="txbox __l"/>
-    <br/>
-
-    <span class="text_bold_medium" style="width: 25%">Email:</span>
-    <input v-model='registerEmail' style="width: 100%" class="txbox __l"/>
-    <br/>
-
-    <button @click="tryRegister" class="section btn __l __block">Register</button>
+    <button class="btn __green" @click="tryRegister">Register</button>
     <br/>
 
     <p v-if="registerResult != ''">{{ registerResult }}</p>
@@ -57,14 +63,29 @@ export default {
         this.registerPassword, this.registerDisplayName, this.registerEmail)
       .then(response => {
         if (response.data == 'success') {
+          this.registerResult = 'Success';
           // Set a success result to show.
-          this.registerResult = 'Success!'
+          // CK: Can't show these since don't appear here
+//          this.$notifications.notify({
+//            message: 'Registered!',
+//            icon: 'ti-check',
+//            type: 'success',
+//            verticalAlign: 'top',
+//            horizontalAlign: 'center',
+//          });
 
           // Navigate automatically to the login page.
           router.push('/login')
         } else {
           // Set a failure result to show.
-          this.registerResult = 'Registration failed.  Try again, possibly with a different username.'
+          this.registerResult = 'Failure';
+//          this.$notifications.notify({
+//            message: 'Failed to register',
+//            icon: 'ti-face-sad',
+//            type: 'danger',
+//            verticalAlign: 'top',
+//            horizontalAlign: 'center',
+//          });
         }
       })
       .catch(error => {

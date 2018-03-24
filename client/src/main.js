@@ -18,10 +18,10 @@ import './assets/sass/paper-dashboard.scss'
 import 'es6-promise/auto'
 
 // plugin setup
-Vue.use(GlobalComponents)
-Vue.use(GlobalDirectives)
-Vue.use(Notifications)
-Vue.use(SideBar)
+Vue.use(GlobalComponents);
+Vue.use(GlobalDirectives);
+Vue.use(Notifications); // WARNING, not used?
+Vue.use(SideBar);
 
 // global library setup
 Object.defineProperty(Vue.prototype, '$Chartist', {

@@ -1,4 +1,4 @@
-<!-- 
+<!--
 HealthPackagesPage.vue -- HealthPackagesPage Vue component
 
 Last update: 3/7/18 (gchadder3)
@@ -6,12 +6,11 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <h2>Open Project: {{ activeProjectName }}</h2>
 
     <div class="PageSection">
-      <input type="text" 
-             class="txbox" 
-             style="margin-bottom: 20px" 
+      <input type="text"
+             class="txbox"
+             style="margin-bottom: 20px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -103,16 +102,16 @@ export default {
       filterText: '',
 
       // Are all of the health packages selected?
-      allSelected: false, 
+      allSelected: false,
 
       // Column of table used for sorting the health packages
       sortColumn: 'name',  // name
 
       // Sort in reverse order?
-      sortReverse: false, 
+      sortReverse: false,
 
       // List of objects for health packages the active project has
-      healthPackages: 
+      healthPackages:
         [
           {
             packageName: 'Package 1',
@@ -121,10 +120,10 @@ export default {
             intervSet: 'Default LMIC from DCP',
             uid: 1,
             selected: false
-          }, 
+          },
           {
             packageName: 'Final package',
-            country: 'Afghanistan', 
+            country: 'Afghanistan',
             burdenProject: 'GBD with updated NCDs',
             intervSet: 'Default LMIC from DCP',
             uid: 2,
@@ -152,25 +151,25 @@ export default {
 
     sortedFilteredHealthPackages() {
       return this.applyNameFilter(this.applySorting(this.healthPackages))
-    } 
-  }, 
+    }
+  },
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
     if (this.$store.state.currentUser.displayname == undefined) {
       router.push('/login')
-    } 
+    }
   },
 
   methods: {
     selectAll() {
       console.log('selectAll() called')
 
-      // For each of the packages, set the selection of the package to the 
+      // For each of the packages, set the selection of the package to the
       // _opposite_ of the state of the all-select checkbox's state.
-      // NOTE: This function depends on it getting called before the 
-      // v-model state is updated.  If there are some cases of Vue 
-      // implementation where these happen in the opposite order, then 
+      // NOTE: This function depends on it getting called before the
+      // v-model state is updated.  If there are some cases of Vue
+      // implementation where these happen in the opposite order, then
       // this will not give the desired result.
       this.healthPackages.forEach(thePackage => thePackage.selected = !this.allSelected)
     },
@@ -186,7 +185,7 @@ export default {
       if (this.sortColumn === sortColumn) {
           // Reverse the sort.
           this.sortReverse = !this.sortReverse
-      } 
+      }
       // Otherwise.
       else {
         // Select the new column for sorting.
@@ -206,7 +205,7 @@ export default {
     applySorting(packages) {
       console.log('applySorting() called')
 
-      return packages.sort((package1, package2) => 
+      return packages.sort((package1, package2) =>
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {

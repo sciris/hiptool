@@ -13,8 +13,11 @@
       data-notify="dismiss"
       @click="close">×
     </button>
-    <span data-notify="icon" :class="icon" class="alert-icon"></span>
-    <span data-notify="message" v-html="message"></span>
+    <div>
+      <span data-notify="message" :class="icon" class="alert-icon" style="font-size:20px"></span>
+      <span data-notify="message" v-html="message"></span>
+    </div>
+
   </div>
 </template>
 <script>
@@ -22,7 +25,10 @@
     name: 'notification',
     props: {
       message: String,
-      icon: String,
+      icon: {
+        type: String,
+        default: 'ti-info-alt'
+      },
       verticalAlign: {
         type: String,
         default: 'top'
@@ -52,7 +58,7 @@
       },
       customPosition () {
         let initialMargin = 20
-        let alertHeight = 90
+        let alertHeight = 100
         let sameAlertsCount = this.$notifications.state.filter((alert) => {
           return alert.horizontalAlign === this.horizontalAlign && alert.verticalAlign === this.verticalAlign
         }).length
@@ -99,7 +105,7 @@
     border: 0;
     border-radius: 0;
     color: #FFFFFF;
-    padding: 10px 15px;
+    padding: 20px 15px;
     font-size: 14px;
     z-index: 100;
     display: inline-block;
@@ -145,12 +151,12 @@
 
     &[data-notify="container"] {
       width: 350px;
-      padding: 10px 10px 10px 20px;
+      padding: 20px 10px 10px 20px; // CK: This actually affects the padding!
       border-radius: $border-radius-base;
     }
 
     &.alert-with-icon {
-      padding-left: 65px;
+      padding-left: 15px; // CK: actual left padding
     }
   }
 

@@ -1,4 +1,4 @@
-<!-- 
+<!--
 ChangePasswordPage.vue -- Vue component for a page to change password
 
 Last update: 3/7/18 (gchadder3)
@@ -6,15 +6,21 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <label>New Password:</label>
-    <input v-model='newPassword'/>
-    <br/>
 
-    <label>Reenter Old Password (to validate):</label>
-    <input v-model='oldPassword'/>
-    <br/>
+    <div class="divTable">
+      <div class="divTableBody">
+        <div class="divTableRow">
+          <div class="divRowLabel">Reenter old password:</div>
+          <div class="divRowContent"><input v-model='oldPassword'/></div>
+        </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Enter new password: </div>
+          <div class="divRowContent"><input v-model='newPassword'/></div>
+        </div>
+      </div>
+    </div>
 
-    <button @click="tryChangePassword">Update</button>
+    <button class="btn __green" @click="tryChangePassword">Update</button>
     <br/>
 
     <p v-if="changeResult != ''">{{ changeResult }}</p>
@@ -26,7 +32,7 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {
-  name: 'ChangePasswordPage', 
+  name: 'ChangePasswordPage',
 
   data () {
     return {
@@ -34,16 +40,22 @@ export default {
       newPassword: '',
       changeResult: ''
     }
-  }, 
+  },
 
   methods: {
     tryChangePassword () {
-      rpcservice.rpcChangePasswordCall('user_change_password', this.oldPassword, 
+      rpcservice.rpcChangePasswordCall('user_change_password', this.oldPassword,
         this.newPassword)
       .then(response => {
         if (response.data == 'success') {
           // Set a success result to show.
-          this.changeResult = 'Success!'
+          this.$notifications.notify({
+            message: 'Password updated',
+            icon: 'ti-check',
+            type: 'success',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          });
 
           // Read in the full current user information.
           rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
@@ -55,13 +67,19 @@ export default {
             router.push('/')
           })
           .catch(error => {
-            // Set the username to {}.  An error probably means the 
+            // Set the username to {}.  An error probably means the
             // user is not logged in.
             this.$store.commit('newUser', {})
           })
         } else {
           // Set a failure result to show.
-          this.changeResult = 'Change of password failed.'
+          this.$notifications.notify({
+            message: 'Password update failed',
+            icon: 'ti-face-sad',
+            type: 'danger',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          });
         }
       })
       .catch(error => {
