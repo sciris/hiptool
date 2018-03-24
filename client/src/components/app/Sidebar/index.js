@@ -43,21 +43,6 @@ const SidebarStore = {
   displaySidebar (value) {
     this.showSidebar = value
   },
-
-  logout() {
-    // Do the logout request.
-    rpcservice.rpcLogoutCall('user_logout')
-      .then(response => {
-        // Update the user info.
-        this.getUserInfo()
-
-        // Clear out the active project.
-        this.$store.commit('newActiveProject', {})
-
-        // Navigate to the login page automatically.
-        router.push('/login')
-      })
-  },
 }
 
 const SidebarPlugin = {
