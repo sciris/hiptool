@@ -679,6 +679,19 @@ def json_sanitize_result(theResult):
 
     return theResult
 
+
+def get_version_info():
+	''' Return the informatino about the project. '''
+	gitinfo = sciris.utils.gitinfo(__file__)
+	version_info = {
+		'version': hptool.version,
+		'date': hptool.versiondate,
+		'gitbranch': gitinfo['branch'],
+		'githash': gitinfo['hash'],
+	}
+	return version_info
+
+
 ##
 ## Project helper functions
 ##

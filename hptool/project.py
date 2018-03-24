@@ -52,7 +52,7 @@ class Project(object):
         self.modified = today()
         self.spreadsheetdate = 'Spreadsheet never loaded'
         self.version = version
-        self.gitbranch, self.gitversion = gitinfo()
+        self.gitinfo = gitinfo(__file__)
         self.filename = None # File path, only present if self.save() is used
         self.warnings = None # Place to store information about warnings (mostly used during migrations)
 
@@ -85,8 +85,8 @@ class Project(object):
         output += '        HP version: %s\n'    % self.version
         output += '      Date created: %s\n'    % getdate(self.created)
         output += '     Date modified: %s\n'    % getdate(self.modified)
-        output += '        Git branch: %s\n'    % self.gitbranch
-        output += '       Git version: %s\n'    % self.gitversion
+        output += '        Git branch: %s\n'    % self.gitinfo['branch']
+        output += '          Git hash: %s\n'    % self.gitinfo['hash']
         output += '               UID: %s\n'    % self.uid
         output += '============================================================\n'
 #        output += self.getwarnings(doprint=False) # Don't print since print later
