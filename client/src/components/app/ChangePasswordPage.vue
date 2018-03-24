@@ -1,4 +1,4 @@
-<!-- 
+<!--
 ChangePasswordPage.vue -- Vue component for a page to change password
 
 Last update: 3/7/18 (gchadder3)
@@ -6,13 +6,11 @@ Last update: 3/7/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <label>New Password:</label>
-    <input v-model='newPassword'/>
-    <br/>
-
-    <label>Reenter Old Password (to validate):</label>
+    <label>Reenter old password (to validate):</label>
     <input v-model='oldPassword'/>
     <br/>
+    <label>New password:</label>
+    <input v-model='newPassword'/>
 
     <button @click="tryChangePassword">Update</button>
     <br/>
@@ -26,7 +24,7 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {
-  name: 'ChangePasswordPage', 
+  name: 'ChangePasswordPage',
 
   data () {
     return {
@@ -34,11 +32,11 @@ export default {
       newPassword: '',
       changeResult: ''
     }
-  }, 
+  },
 
   methods: {
     tryChangePassword () {
-      rpcservice.rpcChangePasswordCall('user_change_password', this.oldPassword, 
+      rpcservice.rpcChangePasswordCall('user_change_password', this.oldPassword,
         this.newPassword)
       .then(response => {
         if (response.data == 'success') {
@@ -55,7 +53,7 @@ export default {
             router.push('/')
           })
           .catch(error => {
-            // Set the username to {}.  An error probably means the 
+            // Set the username to {}.  An error probably means the
             // user is not logged in.
             this.$store.commit('newUser', {})
           })
