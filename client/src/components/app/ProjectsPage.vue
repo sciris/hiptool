@@ -427,10 +427,10 @@ export default {
 
       this.$notifications.notify({
         message: 'Project "'+matchProject.project.name+'" loaded',
-        icon: 'ti-gift',
-        horizontalAlign: 'center',
+        icon: 'ti-check',
+        type: 'success',
         verticalAlign: 'top',
-        type: 'success'
+        horizontalAlign: 'center',
       });
     },
 
