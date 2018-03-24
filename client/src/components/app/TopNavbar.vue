@@ -17,7 +17,7 @@
               <div style="display:table">
                 <div style="display:table-row">
                   <div style="display:table-cell; text-align:right; padding-right:10px">
-                    <b>User:</b>
+                    <b>Users:</b>
                   </div>
                   <div style="display:table-cell">
                     <span>{{ currentUser.username }}</span>
@@ -34,6 +34,11 @@
               </div>
             </div>
           </li>
+            <drop-down v-bind:title="currentUser.username" icon="ti-user">
+              <li><a href="#">Edit account</a></li>
+              <li><a href="#/admin/changeinfo">Change password</a></li>
+              <li><a href="#">Log out</a></li>
+            </drop-down>
         </ul>
       </div>
     </div>
