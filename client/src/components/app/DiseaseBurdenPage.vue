@@ -101,6 +101,9 @@ Last update: 3/23/18 (gchadder3)
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
           <tr>
+            <th>
+              Active
+            </th>
             <th @click="updateSorting2('name')" class="sortable">
               Cause name
               <span v-show="sortColumn2 == 'name' && !sortReverse2">
@@ -158,6 +161,7 @@ Last update: 3/23/18 (gchadder3)
             <td>{{ disease[1] }}</td>
             <td>{{ disease[2] }}</td>
             <td>{{ disease[3] }}</td>
+            <td>{{ disease[4] }}</td>
             <td style="white-space: nowrap">
               <button class="btn">Copy</button>
               <button class="btn">Rename</button>
