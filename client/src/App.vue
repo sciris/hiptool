@@ -20,8 +20,8 @@ Last update: 2/2/18 (gchadder3)
           </a>
         </li>
         <drop-down v-bind:title="currentUser.username" icon="ti-user">
-          <li><a href="#/admin/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-          <li><a href="#/admin/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+          <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
+          <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
           <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
         </drop-down>
         <li class="divider"></li>

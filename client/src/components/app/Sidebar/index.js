@@ -6,37 +6,37 @@ const SidebarStore = {
     {
       name: 'Projects',
       icon: 'ti-view-grid',
-      path: '/admin/projects'
+      path: '/projects'
     },
     {
       name: 'Burden of disease',
       icon: 'ti-bar-chart',
-      path: '/admin/bod'
+      path: '/bod'
     },
     {
       name: 'Interventions',
       icon: 'ti-bolt',
-      path: '/admin/interventions'
+      path: '/interventions'
     },
     {
       name: 'Health packages',
       icon: 'ti-heart',
-      path: '/admin/healthpackages'
+      path: '/healthpackages'
     },
     {
       name: 'Help',
       icon: 'ti-help',
-      path: '/admin/help'
+      path: '/help'
     },
     {
       name: 'Contact',
       icon: 'ti-comment-alt',
-      path: '/admin/contact'
+      path: '/contact'
     },
     {
       name: 'About',
       icon: 'ti-face-smile',
-      path: '/admin/about'
+      path: '/about'
     },
   ],
 
