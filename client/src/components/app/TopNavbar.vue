@@ -11,34 +11,21 @@
         <a class="navbar-brand">{{routeName}}</a>
       </div>
       <div class="collapse navbar-collapse">
+        <!-- If you edit this section, make sure to fix the section in App.vue -->
         <ul class="nav navbar-nav navbar-right">
-          <li class="open">
-            <div style="display:table-cell; float:right; vertical-align: middle; padding-top:10px; padding-right:20px">
-              <div style="display:table">
-                <div style="display:table-row">
-                  <div style="display:table-cell; text-align:right; padding-right:10px">
-                    <b>Users:</b>
-                  </div>
-                  <div style="display:table-cell">
-                    <span>{{ currentUser.username }}</span>
-                  </div>
-                </div>
-                <div style="display:table-row">
-                  <div style="display:table-cell; text-align:right; padding-right:10px">
-                    <b>Project:</b>
-                  </div>
-                  <div style="display:table-cell">
-                    <span>{{ activeProjectName }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <li>
+            <a href="#" class="btn-rotate">
+              <i class="ti-view-grid"></i>
+              <p>
+                <b>Project: </b><span>{{ activeProjectName }}</span>
+              </p>
+            </a>
           </li>
-            <drop-down v-bind:title="currentUser.username" icon="ti-user">
-              <li><a href="#/admin/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-              <li><a href="#/admin/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
-              <li><a href="#"><i class="ti-car"></i>&nbsp;Log out</a></li>
-            </drop-down>
+          <drop-down v-bind:title="currentUser.username" icon="ti-user">
+            <li><a href="#/admin/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
+            <li><a href="#/admin/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+            <li><a href="#"><i class="ti-car"></i>&nbsp;Log out</a></li>
+          </drop-down>
         </ul>
       </div>
     </div>
