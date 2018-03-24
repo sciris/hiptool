@@ -28,11 +28,6 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
-      path: '/',
-      component: DashboardLayout,
-      redirect: '/admin/projects'
-    },
-    {
       path: '/register',
       name: 'RegisterPage',
       component: RegisterPage
@@ -43,10 +38,15 @@ export default new Router({
       component: LoginPage
     },
     {
-      path: '/admin',
+      path: '/',
       component: DashboardLayout,
-      redirect: '/admin/stats',
+      redirect: '/projects',
       children: [
+        {
+          path: 'projects',
+          name: 'Manage projects',
+          component: ProjectsPage
+        },
         {
           path: 'projects',
           name: 'Manage projects',
@@ -97,8 +97,8 @@ export default new Router({
           name: 'About',
           component: About
         },
-    ]
-  },
+      ]
+    },
     { path: '*', component: NotFound }
   ]
 })

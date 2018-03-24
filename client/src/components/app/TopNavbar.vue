@@ -22,9 +22,9 @@
             </a>
           </li>
           <drop-down v-bind:title="currentUser.username" icon="ti-user">
-            <li><a href="#/admin/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-            <li><a href="#/admin/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
-            <li><a href="#"><i class="ti-car"></i>&nbsp;Log out</a></li>
+            <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
+            <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+            <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
           </drop-down>
         </ul>
       </div>
@@ -33,6 +33,7 @@
 </template>
 <script>
   import rpcservice from '@/services/rpc-service'
+  import userService from '@/services/user-service'
   import router from '@/router'
 
   export default {
@@ -47,8 +48,8 @@
 
     computed: {
       // Health prior function
-      currentUser() {
-        return this.$store.state.currentUser
+      currentUser(){
+        return userService.currentUser()
       },
 
       activeProjectName() {
@@ -63,12 +64,12 @@
       routeName () {
         const {name} = this.$route
         return this.capitalizeFirstLetter(name)
-      }
+      },
     },
 
     // Health prior function
     created() {
-      this.getUserInfo()
+      userService.getUserInfo()
     },
 
     // Theme function
@@ -79,30 +80,16 @@
     },
     methods: {
       // Health prior functions
-      userloggedin() {
-        if (this.currentUser.displayname == undefined)
-          return false
-        else
-          return true
+      checkLoggedIn() {
+        userService.checkLoggedIn
       },
 
-      adminloggedin() {
-        if (this.userloggedin) {
-          return this.currentUser.admin
-        }
+      checkAdminLoggedIn() {
+        userService.checkAdminLoggedIn
       },
 
-      getUserInfo() {
-        rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
-        .then(response => {
-          // Set the username to what the server indicates.
-          this.$store.commit('newUser', response.data.user)
-        })
-        .catch(error => {
-          // Set the username to {}.  An error probably means the
-          // user is not logged in.
-          this.$store.commit('newUser', {})
-        })
+      logOut() {
+        userService.logOut()
       },
 
       // Theme functions
