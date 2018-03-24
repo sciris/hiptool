@@ -425,7 +425,13 @@ export default {
       // Set the active project to the matched project.
       this.$store.commit('newActiveProject', matchProject)
 
-      this.notify('Copied project');
+      this.$notifications.notify({
+        message: 'Project "'+matchProject.project.name+'" loaded',
+        icon: 'ti-gift',
+        horizontalAlign: 'center',
+        verticalAlign: 'top',
+        type: 'success'
+      });
     },
 
     copyProject(uid) {

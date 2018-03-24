@@ -25,8 +25,7 @@
     "vue-clickaway": "^2.1.0",
     "vue-handsontable-official": "^1.1.0",
     "vue-router": "^2.6.0",
-    "vuex": "^2.4.0",
-    "vue-toastr":"^2.0.12"
+    "vuex": "^2.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
