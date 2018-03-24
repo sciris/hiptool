@@ -34,13 +34,6 @@ Last update: 2/2/18 (gchadder3)
         <li class="divider"></li>
       </ul>
     </side-bar>
-    <!-- <div id="app">
-      The top bar, including app title and menu
-      <top-bar></top-bar>
-
-      Switchable view
-      <router-view></router-view>
-    </div> -->
   </div>
   
 </template>
