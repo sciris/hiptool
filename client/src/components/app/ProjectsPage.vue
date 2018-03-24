@@ -446,6 +446,14 @@ export default {
         // Update the project summaries so the copied program shows up on the list.
         this.updateProjectSummaries()
       })
+
+      this.$notifications.notify({
+        message: 'Project "'+matchProject.project.name+'" copied',
+        icon: 'ti-check',
+        type: 'success',
+        verticalAlign: 'top',
+        horizontalAlign: 'center',
+      });
     },
 
     renameProject(projectSummary) {
