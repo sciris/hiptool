@@ -1,7 +1,7 @@
 <!--
 InterventionsPage.vue -- InterventionsPage Vue component
 
-Last update: 3/23/18 (gchadder3)
+Last update: 3/24/18 (gchadder3)
 -->
 
 <template>
@@ -29,6 +29,33 @@ Last update: 3/23/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
+            <th>
+              Select
+            </th>            
+            <th @click="updateSorting('creationTime')" class="sortable">
+              Created on
+              <span v-show="sortColumn == 'creationTime' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'creationTime' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'creationTime'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
+            <th @click="updateSorting('updatedTime')" class="sortable">
+              Last modified
+              <span v-show="sortColumn == 'updatedTime' && !sortReverse">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn == 'updatedTime' && sortReverse">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn != 'updatedTime'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>        
             <th>Actions</th>
           </tr>
         </thead>
@@ -44,8 +71,13 @@ Last update: 3/23/18 (gchadder3)
 			      <td v-else>
 			        {{ intervSet.intervset.name }}
 			      </td>
-            <td style="white-space: nowrap">
+            <td>
               <button class="btn __green" @click="viewSet(intervSet)">View</button>
+            </td>
+            <td>{{ intervSet.intervset.creationTime }}</td>
+            <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
+              'No modification' }}</td>            
+            <td style="white-space: nowrap">         
               <button class="btn" @click="copySet(intervSet)">Copy</button>
               <button class="btn" @click="renameSet(intervSet)">Rename</button>
               <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
@@ -65,7 +97,7 @@ Last update: 3/23/18 (gchadder3)
         <table class="table table-bordered table-hover table-striped" style="width: auto">
           <thead>
             <tr>
-<!--              <th>Included in optimizations</th> -->
+              <th>Active</th>
               <th>Intervention name</th>
               <th>Type</th>
               <th>Delivery platform</th>
@@ -82,12 +114,13 @@ Last update: 3/23/18 (gchadder3)
                 <input type="checkbox" v-model="interv.included"/>
               </td> -->
               <td>{{ interv[0] }}</td>
-              <td>{{ interv[3] }}</td>
-              <td>{{ interv[2] }}</td>
+              <td>{{ interv[1] }}</td>
               <td>{{ interv[4] }}</td>
+              <td>{{ interv[3] }}</td>
               <td>{{ interv[5] }}</td>
               <td>{{ interv[6] }}</td>
               <td>{{ interv[7] }}</td>
+              <td>{{ interv[8] }}</td>
               <td style="white-space: nowrap">
                 <i class="fas fa-edit"></i>
                 <i class="fas fa-copy"></i>
@@ -406,6 +439,12 @@ export default {
           if (this.sortColumn === 'name') {
             return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)
           }
+          else if (this.sortColumn === 'creationTime') {
+            return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir
+          }
+          else if (this.sortColumn === 'updatedTime') {
+            return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir
+          }          
         }
       )
     },

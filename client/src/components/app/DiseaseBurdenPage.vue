@@ -1,7 +1,7 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/23/18 (gchadder3)
+Last update: 3/24/18 (gchadder3)
 -->
 
 <template>
