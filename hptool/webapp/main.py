@@ -941,7 +941,7 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
         return { 'diseases': [] }
 
     # Gather the list for all of the diseases.
-    diseaseData = [list(theDisease) for theDisease in burdenSet.data]
+    diseaseData = burdenSet.export(cols=['cause','dalys','deaths','prevalence'])
     
     # Return success.
     return { 'diseases': diseaseData }
