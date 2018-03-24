@@ -51,13 +51,9 @@ Last update: 3/23/18 (gchadder3)
               <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
             </td>
           </tr>
-          <tr>
-            <td>
-              <button class="btn" @click="createNewSet">Create new</button>
-            </td>
-          </tr>
         </tbody>
       </table>
+      <button class="btn" @click="createNewSet">Create new</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">

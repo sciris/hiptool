@@ -29,6 +29,9 @@ Last update: 3/23/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
+            <th>
+              Select
+            </th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -68,23 +71,19 @@ Last update: 3/23/18 (gchadder3)
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
 			      </td>
+            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button>
               <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
-          <tr>
-            <td>
-              <button class="btn" @click="createNewBurdenSet">Create new</button>
-            </td>
-          </tr>
         </tbody>
       </table>
+      <button class="btn" @click="createNewBurdenSet">Create new</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -160,6 +159,7 @@ Last update: 3/23/18 (gchadder3)
             <td>{{ disease[2] }}</td>
             <td>{{ disease[3] }}</td>
             <td style="white-space: nowrap">
+              <button class="btn">Copy</button>
               <button class="btn">Rename</button>
               <button class="btn __red">Delete</button>
             </td>
@@ -172,12 +172,12 @@ Last update: 3/23/18 (gchadder3)
         </tbody>
       </table>
 
-      <template>
-        Testing handsontable
-        <div id="hot-preview">
-          <HotTable :root="root" :settings="hotSettings"></HotTable>
-        </div>
-      </template>
+      <!--<template>-->
+        <!--Testing handsontable-->
+        <!--<div id="hot-preview">-->
+          <!--<HotTable :root="root" :settings="hotSettings"></HotTable>-->
+        <!--</div>-->
+      <!--</template>-->
 
     </div>
   </div>
