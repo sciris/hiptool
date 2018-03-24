@@ -264,3 +264,28 @@ th.sortable:hover {
   background: #bedff4;
   cursor: pointer;
 }
+
+
+// CK: Define a div table
+.divTable{
+  display: table;
+}
+.divTableRow {
+  display: table-row;
+}
+.divRowLabel {
+  border: 0;
+  display: table-cell;
+  padding: 3px 10px;
+  text-align: left;
+  font-weight: bold;
+}
+.divRowContent {
+  border: 0;
+  display: table-cell;
+  padding: 3px 10px;
+  text-align: left;
+}
+.divTableBody {
+  display: table-row-group;
+}

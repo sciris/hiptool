@@ -85,26 +85,4 @@ Last update: 3/7/18 (gchadder3)
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .divTable{
-    display: table;
-  }
-  .divTableRow {
-    display: table-row;
-  }
-  .divRowContent {
-    border: 0;
-    display: table-cell;
-    padding: 3px 10px;
-    text-align: left;
-  }
-  .divRowLabel {
-    border: 0;
-    display: table-cell;
-    padding: 3px 10px;
-    text-align: left;
-    font-weight: bold;
-  }
-  .divTableBody {
-    display: table-row-group;
-  }
 </style>
