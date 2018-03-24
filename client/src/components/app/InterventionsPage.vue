@@ -238,7 +238,7 @@ export default {
       filterText: '',
 
       // Column of table used for sorting the intervention sets
-      sortColumn: 'name',  // name
+      sortColumn: 'updatedTime',  // name, creationTime, updatedTime
 
       // Sort in reverse order?
       sortReverse: false,
@@ -362,13 +362,14 @@ export default {
 
     // Otherwise...
     else {
-      // Load the intervention sets from the active project.
-      this.updateIntervSets()
+      // Load the intervention sets from the active project, telling the function
+      // to also set the active intervention set to the last item.
+      this.updateIntervSets(true)
     }
   },
 
   methods: {
-    updateIntervSets() {
+    updateIntervSets(setLastEntryActive=false) {
       console.log('updateIntervSets() called')
 
       // If there is no active project, clear the interventionSets list.
@@ -394,6 +395,11 @@ export default {
           this.interventionSets.forEach(theSet => {
 		        theSet.renaming = ''
 		      })
+          
+          // If we want to set the last entry active and we have any 
+          // entries, do the setting.
+          if ((setLastEntryActive) && (this.interventionSets.length > 0))
+            this.activeIntervSet = this.interventionSets[this.interventionSets.length - 1]          
         })
       }
     },

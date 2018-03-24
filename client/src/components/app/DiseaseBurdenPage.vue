@@ -208,8 +208,8 @@ Last update: 3/24/18 (gchadder3)
         // Text in the table filter box
         filterText: '',
 
-        // Column of table used for sorting the projects
-        sortColumn: 'name',  // name, country, creationTime, updatedTime
+        // Column of table used for sorting the burden sets
+        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
 
         // Sort in reverse order?
         sortReverse: false,
@@ -269,13 +269,14 @@ Last update: 3/24/18 (gchadder3)
 
       // Otherwise...
       else {
-        // Load the burden sets from the active project.
-        this.updateBurdenSets()
+        // Load the burden sets from the active project, telling the function
+        // to also set the active burden set to the last item.
+        this.updateBurdenSets(true)
       }
     },
 
     methods: {
-      updateBurdenSets() {
+      updateBurdenSets(setLastEntryActive=false) {
         console.log('updateBurdenSets() called')
 
         // If there is no active project, clear the burdenSets list.
@@ -301,6 +302,11 @@ Last update: 3/24/18 (gchadder3)
             this.burdenSets.forEach(theSet => {
 		          theSet.renaming = ''
 		        })
+            
+            // If we want to set the last entry active and we have any 
+            // entries, do the setting.
+            if ((setLastEntryActive) && (this.burdenSets.length > 0))
+              this.activeBurdenSet = this.burdenSets[this.burdenSets.length - 1]
           })
         }
       },
