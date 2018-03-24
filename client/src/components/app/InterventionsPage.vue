@@ -1,4 +1,4 @@
-<!-- 
+<!--
 InterventionsPage.vue -- InterventionsPage Vue component
 
 Last update: 3/23/18 (gchadder3)
@@ -6,12 +6,11 @@ Last update: 3/23/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <h2>Open Project: {{ activeProjectName }}</h2>
 
     <div class="PageSection">
-      <input type="text" 
-             class="txbox" 
-             style="margin-bottom: 20px" 
+      <input type="text"
+             class="txbox"
+             style="margin-bottom: 20px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -34,7 +33,7 @@ Last update: 3/23/18 (gchadder3)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="intervSet in sortedFilteredIntervSets" 
+          <tr v-for="intervSet in sortedFilteredIntervSets"
               :class="{ highlighted: intervSetIsSelected(intervSet) }">
             <td v-if="intervSet.renaming !== ''">
 			        <input type="text"
@@ -44,7 +43,7 @@ Last update: 3/23/18 (gchadder3)
 			      </td>
 			      <td v-else>
 			        {{ intervSet.intervset.name }}
-			      </td> 
+			      </td>
             <td style="white-space: nowrap">
               <button class="btn __green" @click="viewSet(intervSet)">View</button>
               <button class="btn" @click="copySet(intervSet)">Copy</button>
@@ -213,16 +212,16 @@ export default {
       sortColumn: 'name',  // name
 
       // Sort in reverse order?
-      sortReverse: false, 
+      sortReverse: false,
 
 /* old intervention sets stuff to get rid of
       // List of objects for intervention sets the project has
-      interventionSets: 
+      interventionSets:
         [
           {
             setName: 'Default LMIC from DCP',
             uid: 1
-          }, 
+          },
           {
             setName: 'Country defined set',
             uid: 2
@@ -304,13 +303,13 @@ export default {
 
     sortedFilteredIntervSets() {
       return this.applyNameFilter(this.applySorting(this.interventionSets))
-    }, 
+    },
 
     filteredInterventions() {
       if (this.showAllIntervs) {
         return this.interventionList
       } else {
-        return this.interventionList.filter(interv => 
+        return this.interventionList.filter(interv =>
           {
             if (interv.intervCategory === 'cancer')
               return this.showCancerIntervs
@@ -321,10 +320,10 @@ export default {
             else
               return false
           }
-        )  
+        )
       }
     }
-  }, 
+  },
 
   created() {
     // If we have no user logged in, automatically redirect to the login page.
@@ -351,21 +350,21 @@ export default {
       // Otherwise...
       else {
         // Get the active project's intervention sets.
-        rpcservice.rpcProjectCall('get_project_interv_sets', 
+        rpcservice.rpcProjectCall('get_project_interv_sets',
           [this.$store.state.activeProject.project.id])
         .then(response => {
           // Set the intervention set list to what we received.
           this.interventionSets = response.data.intervsets
-          
-          // Add numindex elements to the intervention sets to keep track of 
+
+          // Add numindex elements to the intervention sets to keep track of
 		      // which index to pull from the server.
           for (let ind=0; ind < this.interventionSets.length; ind++)
-            this.interventionSets[ind].intervset.numindex = ind   
+            this.interventionSets[ind].intervset.numindex = ind
 
           // Set renaming values to blank initially.
-          this.interventionSets.forEach(theSet => { 
+          this.interventionSets.forEach(theSet => {
 		        theSet.renaming = ''
-		      })           
+		      })
         })
       }
     },
@@ -374,8 +373,8 @@ export default {
       // If the active intervention set is undefined, it is not active.
       if (this.activeIntervSet.intervset === undefined) {
         return false
-      } 
-   
+      }
+
       // Otherwise, the intervention is selected if the numindexes match.
       else {
         return (this.activeIntervSet.intervset.numindex === intervSet.intervset.numindex)
@@ -389,7 +388,7 @@ export default {
       if (this.sortColumn === sortColumn) {
           // Reverse the sort.
           this.sortReverse = !this.sortReverse
-      } 
+      }
       // Otherwise.
       else {
         // Select the new column for sorting.
@@ -405,7 +404,7 @@ export default {
     },
 
     applySorting(sets) {
-      return sets.sort((set1, set2) => 
+      return sets.sort((set1, set2) =>
         {
           let sortDir = this.sortReverse ? -1: 1
           if (this.sortColumn === 'name') {
@@ -422,7 +421,7 @@ export default {
       this.activeIntervSet = intervSet
 
       // Go to the server to get the interventions from the intervention set.
-      rpcservice.rpcProjectCall('get_project_interv_set_intervs', 
+      rpcservice.rpcProjectCall('get_project_interv_set_intervs',
         [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
       .then(response => {
         // Set the interventions table list.
@@ -436,70 +435,70 @@ export default {
 
     copySet(intervSet) {
       console.log('copySet() called for ' + intervSet.intervset.name)
-      
+
 	    // Have the server copy the intervention set, giving it a new name.
-      rpcservice.rpcProjectCall('copy_interv_set', 
+      rpcservice.rpcProjectCall('copy_interv_set',
         [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
       .then(response => {
-        // Update the intervention sets so the new set shows up on the list.        
+        // Update the intervention sets so the new set shows up on the list.
         this.updateIntervSets()
-      })        
+      })
     },
 
     renameSet(intervSet) {
       console.log('renameSet() called for ' + intervSet.intervset.name)
-      
+
 	    // If the intervention set is not in a mode to be renamed, make it so.
 	    if (intervSet.renaming === '') {
 		    intervSet.renaming = intervSet.intervset.name
       }
-	  
+
 	    // Otherwise (it is to be renamed)...
 	    else {
         // Have the server change the name of the intervention set.
-        rpcservice.rpcProjectCall('rename_interv_set', 
-          [this.$store.state.activeProject.project.id, 
-          intervSet.intervset.numindex, intervSet.renaming])      
+        rpcservice.rpcProjectCall('rename_interv_set',
+          [this.$store.state.activeProject.project.id,
+          intervSet.intervset.numindex, intervSet.renaming])
         .then(response => {
           // Update the intervention sets so the renamed one shows up on the list.
           this.updateIntervSets()
-		  
+
 	        // Turn off the renaming mode.
 	        intervSet.renaming = ''
         })
       }
-	  
+
 	    // This silly hack is done to make sure that the Vue component gets updated by this function call.
-	    // Something about resetting the intervention set name informs the Vue component it needs to 
+	    // Something about resetting the intervention set name informs the Vue component it needs to
 	    // update, whereas the renaming attribute fails to update it.
-	    // We should find a better way to do this.	  
+	    // We should find a better way to do this.
       let theName = intervSet.intervset.name
       intervSet.intervset.name = 'newname'
-      intervSet.intervset.name = theName      
+      intervSet.intervset.name = theName
     },
 
     deleteSet(intervSet) {
       console.log('deleteSet() called for ' + intervSet.intervset.name)
-      
+
       // Go to the server to delete the intervention set.
-      rpcservice.rpcProjectCall('delete_interv_set', 
+      rpcservice.rpcProjectCall('delete_interv_set',
         [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
       .then(response => {
-        // Update the intervention sets so the new set shows up on the list.        
+        // Update the intervention sets so the new set shows up on the list.
         this.updateIntervSets()
-      })       
+      })
     },
 
     createNewSet() {
       console.log('createNewSet() called')
-   
+
       // Go to the server to create the new intervention set.
-      rpcservice.rpcProjectCall('create_interv_set', 
+      rpcservice.rpcProjectCall('create_interv_set',
         [this.$store.state.activeProject.project.id, 'New intervention set'])
       .then(response => {
-        // Update the intervention sets so the new set shows up on the list.        
+        // Update the intervention sets so the new set shows up on the list.
         this.updateIntervSets()
-      })     
+      })
     },
 
     intervAllCategoryClick() {

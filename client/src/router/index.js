@@ -29,12 +29,12 @@ export default new Router({
   routes: [
     {
       path: '/register',
-      name: 'RegisterPage',
+      name: 'Registration',
       component: RegisterPage
     },
     {
       path: '/login',
-      name: 'LoginPage',
+      name: 'Login',
       component: LoginPage
     },
     {
@@ -48,18 +48,13 @@ export default new Router({
           component: ProjectsPage
         },
         {
-          path: 'projects',
-          name: 'Manage projects',
-          component: ProjectsPage
-        },
-        {
           path: 'bod',
-          name: 'Disease burden',
+          name: 'Define burden of disease',
           component: DiseaseBurdenPage
         },
         {
           path: 'interventions',
-          name: 'Interventions',
+          name: 'Define interventions',
           component: InterventionsPage
         },
         {
