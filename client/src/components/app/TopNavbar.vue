@@ -33,6 +33,7 @@
 </template>
 <script>
   import rpcservice from '@/services/rpc-service'
+  import userService from '@/services/user-service'
   import router from '@/router'
 
   export default {
@@ -47,8 +48,8 @@
 
     computed: {
       // Health prior function
-      currentUser() {
-        return this.$store.state.currentUser
+      currentUser: () => {
+        return userService.currentUser()
       },
 
       activeProjectName() {
@@ -68,7 +69,7 @@
 
     // Health prior function
     created() {
-      this.getUserInfo()
+      userService.getUserInfo()
     },
 
     // Theme function
@@ -79,31 +80,9 @@
     },
     methods: {
       // Health prior functions
-      userloggedin() {
-        if (this.currentUser.displayname == undefined)
-          return false
-        else
-          return true
-      },
+      checkLoggedIn: userService.checkLoggedIn,
 
-      adminloggedin() {
-        if (this.userloggedin) {
-          return this.currentUser.admin
-        }
-      },
-
-      getUserInfo() {
-        rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
-        .then(response => {
-          // Set the username to what the server indicates.
-          this.$store.commit('newUser', response.data.user)
-        })
-        .catch(error => {
-          // Set the username to {}.  An error probably means the
-          // user is not logged in.
-          this.$store.commit('newUser', {})
-        })
-      },
+      checkAdminLoggedIn: userService.checkAdminLoggedIn,
 
       // Theme functions
       capitalizeFirstLetter (string) {
