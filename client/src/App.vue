@@ -10,14 +10,20 @@ Last update: 2/2/18 (gchadder3)
     <!--This sidebar appears only for screens smaller than 992px-->
     <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">
       <ul class="nav navbar-nav">
-        <drop-down title="5 Notifications" icon="ti-user">
-          <li><a><i class="ti-bell"></i>Notification 1</a></li>
-          <li><a>Notification 2</a></li>
-          <li><a>Notification 3</a></li>
-          <li><a>Notification 4</a></li>
-          <li><a>Another notification</a></li>
-
-        </drop-down>
+        <!-- Below requires a userService -->
+        <!-- <li>
+          <a href="#" class="btn-rotate">
+            <i class="ti-view-grid"></i>
+            <p>
+              <b>Project: </b><span>{{ activeProjectName }}</span>
+            </p>
+          </a>
+        </li> -->
+        <!-- <drop-down v-bind:title="currentUser.username" icon="ti-user">
+          <li><a href="#/admin/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
+          <li><a href="#/admin/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+          <li><a href="#"><i class="ti-car"></i>&nbsp;Log out</a></li>
+        </drop-down> -->
         <li class="divider"></li>
       </ul>
     </side-bar>
