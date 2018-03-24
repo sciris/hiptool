@@ -493,16 +493,16 @@ Last update: 3/23/18 (gchadder3)
           {
             let sortDir = this.sortReverse2 ? -1: 1
             if (this.sortColumn2 === 'name') {
-              return (disease1[0] > disease2[0] ? sortDir: -sortDir)
+              return (disease1[1] > disease2[1] ? sortDir: -sortDir)
             }
             else if (this.sortColumn2 === 'DALYs') {
-              return disease1[1] > disease2[1] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'deaths') {
               return disease1[2] > disease2[2] ? sortDir: -sortDir
             }
-            else if (this.sortColumn2 === 'prevalence') {
+            else if (this.sortColumn2 === 'deaths') {
               return disease1[3] > disease2[3] ? sortDir: -sortDir
+            }
+            else if (this.sortColumn2 === 'prevalence') {
+              return disease1[4] > disease2[4] ? sortDir: -sortDir
             }
           }
         )
