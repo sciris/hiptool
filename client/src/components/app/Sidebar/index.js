@@ -24,16 +24,6 @@ const SidebarStore = {
       path: '/admin/healthpackages'
     },
     {
-      name: 'Edit account',
-      icon: 'ti-user',
-      path: '/admin/changeinfo'
-    },
-    {
-      name: 'Change password',
-      icon: 'ti-shield',
-      path: '/admin/changepassword'
-    },
-    {
       name: 'Help',
       icon: 'ti-help',
       path: '/admin/help'
@@ -48,12 +38,6 @@ const SidebarStore = {
       icon: 'ti-face-smile',
       path: '/admin/about'
     },
-    {
-      name: 'Logout',
-      icon: 'ti-car',
-      path: '#',
-      click: this.logout,
-    }
   ],
 
   displaySidebar (value) {
