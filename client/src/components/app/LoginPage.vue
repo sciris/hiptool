@@ -10,7 +10,7 @@ Last update: 3/7/18 (gchadder3)
           style="max-width: 500px; min-width: 200px; margin: 0 auto">
 
       <h2>Login</h2>
-      <p><i>HealthPrior v0.2 (17 March 2018)</i></p>
+      <p><i>HealthPrior v0.3 (23 March 2018)</i></p>
 
       <div class="modal-body">
         <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>

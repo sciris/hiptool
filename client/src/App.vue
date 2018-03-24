@@ -10,43 +10,52 @@ Last update: 2/2/18 (gchadder3)
     <!--This sidebar appears only for screens smaller than 992px-->
     <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">
       <ul class="nav navbar-nav">
+        <!-- Below requires a userService -->
         <li>
-          <a class="dropdown-toggle" data-toggle="dropdown">
-            <i class="ti-panel"></i>
-            <p>Stats</p>
+          <a href="#" class="btn-rotate">
+            <i class="ti-view-grid"></i>
+            <p>
+              <b>Project: </b><span>{{ activeProjectName }}</span>
+            </p>
           </a>
         </li>
-        <drop-down title="5 Notifications" icon="ti-bell">
-
-          <li><a>Notification 1</a></li>
-          <li><a>Notification 2</a></li>
-          <li><a>Notification 3</a></li>
-          <li><a>Notification 4</a></li>
-          <li><a>Another notification</a></li>
-
+        <drop-down v-bind:title="currentUser.username" icon="ti-user">
+          <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
+          <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+          <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
         </drop-down>
-        <li>
-          <a>
-            <i class="ti-settings"></i>
-            <p>Settings</p>
-          </a>
-        </li>
         <li class="divider"></li>
       </ul>
     </side-bar>
-    <!-- <div id="app">
-      The top bar, including app title and menu
-      <top-bar></top-bar>
-
-      Switchable view
-      <router-view></router-view>
-    </div> -->
   </div>
   
 </template>
 
 <script>
-export default {}
+import userService from '@/services/user-service'
+
+export default {
+  computed: {
+    // Health prior function
+    currentUser: () => {
+      return userService.currentUser()
+    },
+
+    activeProjectName() {
+      if (this.$store.state.activeProject.project === undefined) {
+        return 'none'
+      } else {
+        return this.$store.state.activeProject.project.name
+      }
+    },
+  }, 
+  methods: {
+    logOut() {
+      userService.logOut()
+    },
+  }
+
+}
 
 </script>
 

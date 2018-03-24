@@ -6,7 +6,7 @@ Last update: 3/23/18 (gchadder3)
 
 <template>
   <div class="SitePage">
-    <h2>Open Project: {{ activeProjectName }}</h2>
+    <!--<h2>Open Project: {{ activeProjectName }}</h2>-->
 
     <div class="PageSection">
       <input type="text"
@@ -97,7 +97,7 @@ Last update: 3/23/18 (gchadder3)
         <div id="fig03" style="float:left" ></div>
       </div>
 
-      
+
 
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
@@ -196,7 +196,7 @@ Last update: 3/23/18 (gchadder3)
     name: 'DiseaseBurdenPage',
     components: {
         HotTable
-    }, 
+    },
     data() {
       return {
         // Placeholder text for table filter box
@@ -216,7 +216,7 @@ Last update: 3/23/18 (gchadder3)
           data: [['sample', 'data']],
           colHeaders: true
         },
-        
+
 
 
         // List of burden sets in the active project

@@ -44,6 +44,21 @@ class Burden(object):
         self.filename = filename
         return None
     
+    
+    def export(self, cols=None):
+        ''' Export to a JSON-friendly representation '''
+        if cols is None: cols = self.data.cols
+        output = []
+        for r in range(self.data.nrows()):
+            thisrow = []
+            for col in cols:
+                datum = self.data[col,r]
+                thisrow.append(datum)
+            output.append(thisrow)
+        
+        return output
+        
+    
     def plottopcauses(self, which=None, n=None,axsize=None, figsize=None):
         '''
         Create a bar plot of the top causes of burden. By default, plots the top
