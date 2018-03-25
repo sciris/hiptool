@@ -500,7 +500,7 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print('-- Welcome to HealthPrior, version 0.2 --')
+    print('-- Welcome to the HealthPrior webapp, version %s (%s) --' % (hptool.version, hptool.versiondate))
     return None
     
 #
@@ -954,7 +954,7 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
         return { 'diseases': [] }
 
     # Gather the list for all of the diseases.
-    diseaseData = burdenSet.export(cols=['active','cause','dalys','deaths','prevalence'])
+    diseaseData = burdenSet.export(cols=['active','cause','dalys','deaths','prevalence'], header=False)
     
     # Return success.
     return { 'diseases': diseaseData }

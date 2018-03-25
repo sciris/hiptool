@@ -45,9 +45,9 @@ class Burden(object):
         return None
     
     
-    def export(self, cols=None, rows=None):
+    def export(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
-        output = self.data.jsonify(cols=cols, rows=rows)
+        output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
         
     
