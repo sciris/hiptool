@@ -8,7 +8,7 @@ Last update: 2018mar25
   <div class="SitePage">
     <div style="max-width:800px; margin:auto" v-model="getVersionInfo">
       <div style="text-align:center;">
-        <img src="static/img/healthpriorlogo.png" width="250px">
+        <img src="static/img/healthpriorlogo-gray.png" width="250px">
       </div>
       <br/><br/>
       <p>The Health Services Prioritization Tool is currently under development. Development is supported through a partnership

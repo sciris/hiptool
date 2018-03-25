@@ -12,7 +12,9 @@ Last update: 2018mar25
           <div class="logo-img" style="height:40px; width:40px; line-height:40px; border-radius:40px; background-color:#fff; text-align:center; display:inline-block">
             <img src="static/favicon-96x96.png" width="21px" vertical-align="middle" alt>
           </div>
-        <span style="margin-left:10px">HealthPrior</span>
+          <span style="padding-left:10px">
+            <img src="static/img/healthpriorlogo-inverse.png" width="130px" vertical-align="middle" alt>
+          </span>
           <br/><br/>
           <div style="font-size:14px; font-weight:normal">
             Beta version {{ version }} ({{ date }})
@@ -61,65 +63,65 @@ Last update: 2018mar25
 </template>
 
 <script>
-import rpcservice from '@/services/rpc-service'
-import router from '@/router'
+  import rpcservice from '@/services/rpc-service'
+  import router from '@/router'
 
-export default {
-  name: 'LoginPage',
+  export default {
+    name: 'LoginPage',
 
-  data () {
-    return {
-      loginUserName: '',
-      loginPassword: '',
-      loginResult: '',
-      version: '',
-      date: '',
-    }
-  },
-
-  computed: {
-    getVersionInfo() {
-      rpcservice.rpcPublicCall('get_version_info')
-        .then(response => {
-          this.version = response.data['version'];
-          this.date = response.data['date'];
-        })
+    data () {
+      return {
+        loginUserName: '',
+        loginPassword: '',
+        loginResult: '',
+        version: '',
+        date: '',
+      }
     },
-  },
 
-  methods: {
-    tryLogin () {
-      rpcservice.rpcLoginCall('user_login', this.loginUserName, this.loginPassword)
-      .then(response => {
-        if (response.data == 'success') {
-          // Set a success result to show.
-          this.loginResult = 'Logging in...'
+    computed: {
+      getVersionInfo() {
+        rpcservice.rpcPublicCall('get_version_info')
+          .then(response => {
+            this.version = response.data['version'];
+            this.date = response.data['date'];
+          })
+      },
+    },
 
-          // Read in the full current user information.
-          rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
-          .then(response2 => {
-            // Set the username to what the server indicates.
-            this.$store.commit('newUser', response2.data.user)
+    methods: {
+      tryLogin () {
+        rpcservice.rpcLoginCall('user_login', this.loginUserName, this.loginPassword)
+          .then(response => {
+            if (response.data == 'success') {
+              // Set a success result to show.
+              this.loginResult = 'Logging in...'
 
-            // Navigate automatically to the home page.
-            router.push('/')
+              // Read in the full current user information.
+              rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
+                .then(response2 => {
+                  // Set the username to what the server indicates.
+                  this.$store.commit('newUser', response2.data.user)
+
+                  // Navigate automatically to the home page.
+                  router.push('/')
+                })
+                .catch(error => {
+                  // Set the username to {}.  An error probably means the
+                  // user is not logged in.
+                  this.$store.commit('newUser', {})
+                })
+            } else {
+              // Set a failure result to show.
+              this.loginResult = 'Login failed: username or password incorrect or account not activated.'
+            }
           })
           .catch(error => {
-            // Set the username to {}.  An error probably means the
-            // user is not logged in.
-            this.$store.commit('newUser', {})
+            this.loginResult = 'Server error.  Please try again later.'
           })
-        } else {
-          // Set a failure result to show.
-          this.loginResult = 'Login failed: username or password incorrect or account not activated.'
-        }
-      })
-      .catch(error => {
-        this.loginResult = 'Server error.  Please try again later.'
-      })
+      }
     }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
