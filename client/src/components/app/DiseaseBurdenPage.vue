@@ -1,13 +1,17 @@
 <!--
 DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
 
-Last update: 3/23/18 (gchadder3)
+Last update: 3/24/18 (gchadder3)
 -->
 
 <template>
   <div class="SitePage">
 
+
     <div class="PageSection">
+
+      <p><button class="btn" @click="createNewBurdenSet">Create new burden set</button></p>
+
       <input type="text"
              class="txbox"
              style="margin-bottom: 20px"
@@ -83,7 +87,6 @@ Last update: 3/23/18 (gchadder3)
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="createNewBurdenSet">Create new</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -101,6 +104,9 @@ Last update: 3/23/18 (gchadder3)
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
           <tr>
+            <th>
+              Active
+            </th>
             <th @click="updateSorting2('name')" class="sortable">
               Cause name
               <span v-show="sortColumn2 == 'name' && !sortReverse2">
@@ -154,10 +160,13 @@ Last update: 3/23/18 (gchadder3)
         </thead>
         <tbody>
           <tr v-for="disease in sortedDiseases">
-            <td>{{ disease[0] }}</td>
+            <td style="text-align: center">
+              <input type="checkbox" v-model="disease.active"/>
+            </td>
             <td>{{ disease[1] }}</td>
             <td>{{ disease[2] }}</td>
             <td>{{ disease[3] }}</td>
+            <td>{{ disease[4] }}</td>
             <td style="white-space: nowrap">
               <button class="btn">Copy</button>
               <button class="btn">Rename</button>
@@ -199,13 +208,13 @@ Last update: 3/23/18 (gchadder3)
     data() {
       return {
         // Placeholder text for table filter box
-        filterPlaceholder: '\u{1f50e} Filter Burden Projects',
+        filterPlaceholder: '\u{1f50e} Filter burden sets',
 
         // Text in the table filter box
         filterText: '',
 
-        // Column of table used for sorting the projects
-        sortColumn: 'name',  // name, country, creationTime, updatedTime
+        // Column of table used for sorting the burden sets
+        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
 
         // Sort in reverse order?
         sortReverse: false,
@@ -265,13 +274,14 @@ Last update: 3/23/18 (gchadder3)
 
       // Otherwise...
       else {
-        // Load the burden sets from the active project.
-        this.updateBurdenSets()
+        // Load the burden sets from the active project, telling the function
+        // to also set the active burden set to the last item.
+        this.updateBurdenSets(true)
       }
     },
 
     methods: {
-      updateBurdenSets() {
+      updateBurdenSets(setLastEntryActive=false) {
         console.log('updateBurdenSets() called')
 
         // If there is no active project, clear the burdenSets list.
@@ -297,6 +307,11 @@ Last update: 3/23/18 (gchadder3)
             this.burdenSets.forEach(theSet => {
 		          theSet.renaming = ''
 		        })
+
+            // If we want to set the last entry active and we have any
+            // entries, do the setting.
+            if ((setLastEntryActive) && (this.burdenSets.length > 0))
+              this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])
           })
         }
       },
@@ -364,6 +379,11 @@ Last update: 3/23/18 (gchadder3)
         .then(response => {
           // Set the disease list.
           this.diseaseList = response.data.diseases
+
+          // Set the active values from the loaded in data.
+          this.diseaseList.forEach(theDisease => {
+		        theDisease.active = theDisease[0]
+		      })
 
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
@@ -489,16 +509,16 @@ Last update: 3/23/18 (gchadder3)
           {
             let sortDir = this.sortReverse2 ? -1: 1
             if (this.sortColumn2 === 'name') {
-              return (disease1[0] > disease2[0] ? sortDir: -sortDir)
+              return (disease1[1] > disease2[1] ? sortDir: -sortDir)
             }
             else if (this.sortColumn2 === 'DALYs') {
-              return disease1[1] > disease2[1] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'deaths') {
               return disease1[2] > disease2[2] ? sortDir: -sortDir
             }
-            else if (this.sortColumn2 === 'prevalence') {
+            else if (this.sortColumn2 === 'deaths') {
               return disease1[3] > disease2[3] ? sortDir: -sortDir
+            }
+            else if (this.sortColumn2 === 'prevalence') {
+              return disease1[4] > disease2[4] ? sortDir: -sortDir
             }
           }
         )

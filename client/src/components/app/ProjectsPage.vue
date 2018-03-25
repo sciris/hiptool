@@ -325,6 +325,14 @@ export default {
       .then(response => {
         // Update the project summaries so the new project shows up on the list.
         this.updateProjectSummaries()
+
+        this.$notifications.notify({
+          message: 'New project created',
+          icon: 'ti-check',
+          type: 'success',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        });
       })
     },
 
