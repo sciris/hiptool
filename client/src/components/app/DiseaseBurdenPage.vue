@@ -10,15 +10,15 @@ Last update: 2018mar25
 
     <div class="PageSection">
 
-      <p><button class="btn" @click="createNewBurdenSet">Create new burden set</button></p>
+      <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
 
       <input type="text"
              class="txbox"
-             style="margin-bottom: 20px"
+             style="margin-left:20px; margin-bottom:20px; display:inline-block; max-width:400px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%">
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
@@ -75,7 +75,7 @@ Last update: 2018mar25
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
 			      </td>
-            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button></td>
+            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">Open</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
@@ -101,7 +101,7 @@ Last update: 2018mar25
 
 
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
         <thead>
           <tr>
             <th>
@@ -204,7 +204,7 @@ Last update: 2018mar25
     data() {
       return {
         // Placeholder text for table filter box
-        filterPlaceholder: '\u{1f50e} Filter burden sets',
+        filterPlaceholder: 'Type here to filter burden sets',
 
         // Text in the table filter box
         filterText: '',

@@ -8,13 +8,16 @@ Last update: 2018mar25
   <div class="SitePage">
 
     <div class="PageSection">
+
+      <button class="btn" @click="createNewSet">Create new intervention set</button>
+
       <input type="text"
              class="txbox"
-             style="margin-bottom: 20px"
+             style="margin-left:20px; margin-bottom:20px; display:inline-block; max-width:400px"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%">
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
@@ -72,7 +75,7 @@ Last update: 2018mar25
 			        {{ intervSet.intervset.name }}
 			      </td>
             <td>
-              <button class="btn __green" @click="viewSet(intervSet)">View</button>
+              <button class="btn __green" @click="viewSet(intervSet)">Open</button>
             </td>
             <td>{{ intervSet.intervset.creationTime }}</td>
             <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
@@ -85,7 +88,6 @@ Last update: 2018mar25
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="createNewSet">Create new</button>
     </div>
 
 
@@ -141,7 +143,7 @@ export default {
 
   data() {
     return {
-      filterPlaceholder: '\u{1f50e} Filter Intervention Set', // Placeholder text for table filter box
+      filterPlaceholder: 'Type here to filter intervention sets', // Placeholder text for table filter box
       filterText: '', // Text in the table filter box
       sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
       sortReverse: false, // Sort in reverse order?
