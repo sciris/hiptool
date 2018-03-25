@@ -9,7 +9,7 @@ const SidebarStore = {
       path: '/projects'
     },
     {
-      name: 'Burden of disease',
+      name: 'Disease burden',
       icon: 'ti-bar-chart',
       path: '/bod'
     },

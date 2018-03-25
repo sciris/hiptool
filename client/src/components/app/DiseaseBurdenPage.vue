@@ -80,8 +80,8 @@ Last update: 2018mar25
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
+              <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
@@ -168,18 +168,14 @@ Last update: 2018mar25
             <td>{{ disease[3] }}</td>
             <td>{{ disease[4] }}</td>
             <td style="white-space: nowrap">
-              <button class="btn">Copy</button>
-              <button class="btn">Rename</button>
-              <button class="btn __red">Delete</button>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <button class="btn">Create new</button>
+              <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
+              <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
+              <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
             </td>
           </tr>
         </tbody>
       </table>
+      <button class="btn">Add new burden type</button>
 
       <!--<template>-->
         <!--Testing handsontable-->
@@ -281,6 +277,17 @@ Last update: 2018mar25
     },
 
     methods: {
+
+      notImplemented(message) {
+        this.$notifications.notify({
+          message: 'Function "' + message + '" not yet implemented',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        });
+      },
+
       updateBurdenSets(setLastEntryActive=false) {
         console.log('updateBurdenSets() called')
 
