@@ -98,13 +98,13 @@ Last update: 2018mar25
           <thead>
             <tr>
               <th>Active</th>
-              <th>Intervention name</th>
+              <th>Intervention&nbsp;name</th>
               <th>Type</th>
-              <th>Delivery platform</th>
-              <th>icer</th>
-              <th>Unit cost</th>
-              <th>FRP</th>
+              <th>Delivery&nbsp;platform</th>
+              <th>ICER</th>
+              <th>Unit&nbsp;cost</th>
               <th>Equity</th>
+              <th>FRP</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -117,15 +117,13 @@ Last update: 2018mar25
               <td>{{ interv[4] }}</td>
               <td>{{ interv[3] }}</td>
               <td>{{ interv[5] }}</td>
-              <td>{{ interv[6] }}</td>
               <td>{{ interv[7] }}</td>
+              <td>{{ interv[6] }}</td>
               <td>{{ interv[8] }}</td>
               <td style="white-space: nowrap">
-                <i class="fas fa-edit"></i>
-                <i class="fas fa-copy"></i>
-                <i class="fas fa-download"></i>
-                <i class="fas fa-upload"></i>
-                <i class="fas fa-trash-alt"></i>
+                <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
+                <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
+                <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
               </td>
             </tr>
             <tr>
@@ -136,85 +134,6 @@ Last update: 2018mar25
           </tbody>
         </table>
       </div>
-
-<!-- Old dummy table stuff
-      <div style="margin-top: 10px">
-        <table id="checkboxtable" class="table table-bordered" style="width: auto">
-          <tr>
-            <td>
-              Categories of intervention
-            </td>
-            <td>
-              <input type="checkbox" @click="intervAllCategoryClick" v-model="showAllIntervs"/> All
-            </td>
-            <td>
-              <input type="checkbox" v-model="showInfectiousIntervs"/> Infectious diseases
-            </td>
-          </tr>
-          <tr>
-            <td>
-              to show
-            </td>
-            <td>
-              <input type="checkbox" v-model="showCancerIntervs"/> Cancers
-            </td>
-            <td>
-              <input type="checkbox" v-model="showChildIntervs"/> Child care
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div style="margin-top: 10px">
-        <table class="table table-bordered table-hover table-striped" style="width: auto">
-          <thead>
-            <tr>
-              <th>Included in optimizations</th>
-              <th>Intervention name</th>
-              <th>Total cost</th>
-              <th>Est. DALY averted</th>
-              <th>Unit cost</th>
-              <th>Coverage %</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="interv in filteredInterventions">
-              <td style="text-align: center">
-                <input type="checkbox" v-model="interv.included"/>
-              </td>
-              <td>{{ interv.interventionName }}</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>
-                <i class="fas fa-edit"></i>
-                <i class="fas fa-copy"></i>
-                <i class="fas fa-download"></i>
-                <i class="fas fa-upload"></i>
-                <i class="fas fa-trash-alt"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button class="btn">Add new intervention</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top: 10px">
-        <span style="font-size: large">
-          <i class="fas fa-download"></i> Table of all
-        </span>
-        &nbsp; &nbsp;
-        <span style="font-size: large">
-          <i class="fas fa-download"></i> Selected
-        </span>
-      </div> -->
-
     </div>
   </div>
 </template>
@@ -230,92 +149,16 @@ export default {
 
   data() {
     return {
-      // Placeholder text for table filter box
-      filterPlaceholder: '\u{1f50e} Filter Intervention Set',
-
-      // Text in the table filter box
-      filterText: '',
-
-      // Column of table used for sorting the intervention sets
-      sortColumn: 'updatedTime',  // name, creationTime, updatedTime
-
-      // Sort in reverse order?
-      sortReverse: false,
-
-/* old intervention sets stuff to get rid of
-      // List of objects for intervention sets the project has
-      interventionSets:
-        [
-          {
-            setName: 'Default LMIC from DCP',
-            uid: 1
-          },
-          {
-            setName: 'Country defined set',
-            uid: 2
-          }
-        ], */
-
-      // List of objects for intervention sets the project has
-      interventionSets: [],
-
-      // Active intervention set
-      activeIntervSet: {},
-
-      // Show all of the intervention categories
-      showAllIntervs: true,
-
-      // Show cancer interventions
-      showCancerIntervs: false,
-
-      // Show infectious diseases interventions
-      showInfectiousIntervs: false,
-
-      // Show child care interventions
-      showChildIntervs: false,
-
-/* old dummy interventions used in the demo table to get rid of
-      // Interventions to be shown in the table
-      interventionList:
-        [
-          {
-            interventionName: 'Skin cancer removal',
-            uid: 1,
-            included: true,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'Brain tumor surgery',
-            uid: 2,
-            included: false,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'TB vaccination',
-            uid: 3,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Measles vaccination',
-            uid: 4,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Polio vaccination',
-            uid: 5,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Child checkup',
-            uid: 6,
-            included: false,
-            intervCategory: 'childcare'
-          }
-        ] */
-
+      filterPlaceholder: '\u{1f50e} Filter Intervention Set', // Placeholder text for table filter box
+      filterText: '', // Text in the table filter box
+      sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
+      sortReverse: false, // Sort in reverse order?
+      interventionSets: [], // List of objects for intervention sets the project has
+      activeIntervSet: {}, // Active intervention set
+      showAllIntervs: true, // Show all of the intervention categories
+      showCancerIntervs: false, // Show cancer interventions
+      showInfectiousIntervs: false, // Show infectious diseases interventions
+      showChildIntervs: false, // Show child care interventions
       interventionList: []
     }
   },
@@ -368,6 +211,17 @@ export default {
   },
 
   methods: {
+
+    notImplemented(message) {
+      this.$notifications.notify({
+        message: 'Function "' + message + '" not yet implemented',
+        icon: 'ti-face-sad',
+        type: 'warning',
+        verticalAlign: 'top',
+        horizontalAlign: 'center',
+      });
+    },
+
     updateIntervSets(setLastEntryActive=false) {
       console.log('updateIntervSets() called')
 
