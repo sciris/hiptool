@@ -20,41 +20,43 @@ Last update: 2018mar25
         </div>
       </div>
     </div>
-    <form name="LogInForm" @submit.prevent="tryLogin" style="max-width: 500px; min-width: 200px; margin: 0 auto">
+    <div style="margin-right:-260px">
+      <form name="LogInForm" @submit.prevent="tryLogin" style="max-width: 500px; min-width: 100px; margin: 0 auto">
 
-      <div class="modal-body">
-        <h2>Login</h2>
+        <div class="modal-body">
+          <h2>Login</h2>
 
-        <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
+          <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
 
-        <div class="section form-input-validate">
-          <input class="txbox __l"
-                 type="text"
-                 name="username"
-                 placeholder="User name"
-                 required="required"
-                 v-model='loginUserName'/>
+          <div class="section form-input-validate">
+            <input class="txbox __l"
+                   type="text"
+                   name="username"
+                   placeholder="User name"
+                   required="required"
+                   v-model='loginUserName'/>
+          </div>
+
+          <div class="section form-input-validate">
+            <input class="txbox __l"
+                   type="password"
+                   name="password"
+                   placeholder="Password"
+                   required="required"
+                   v-model='loginPassword'/>
+          </div>
+
+          <button type="submit" class="section btn __l __block">Login</button>
+
+          <div class="section">
+            New user?
+            <router-link class="link __blue" to="/register">
+              Register here
+            </router-link>
+          </div>
         </div>
-
-        <div class="section form-input-validate">
-          <input class="txbox __l"
-                 type="password"
-                 name="password"
-                 placeholder="Password"
-                 required="required"
-                 v-model='loginPassword'/>
-        </div>
-
-        <button type="submit" class="section btn __l __block">Login</button>
-
-        <div class="section">
-          New user?
-          <router-link class="link __blue" to="/register">
-            Register here
-          </router-link>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </template>
 
