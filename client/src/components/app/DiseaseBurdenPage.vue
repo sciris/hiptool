@@ -175,7 +175,7 @@ Last update: 2018mar25
           </tr>
         </tbody>
       </table>
-      <button class="btn">Add new burden type</button>
+      <button class="btn" @click="notImplemented('Add new burden type')">Add new burden type</button>
 
       <!--<template>-->
         <!--Testing handsontable-->

@@ -127,7 +127,7 @@ Last update: 2018mar25
             </tr>
           </tbody>
         </table>
-      <button class="btn">Add new intervention</button>
+      <button class="btn" @click="notImplemented('Add new intervention')">Add new intervention</button>
     </div>
   </div>
 </template>
