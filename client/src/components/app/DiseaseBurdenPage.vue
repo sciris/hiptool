@@ -7,8 +7,13 @@ Last update: 2018mar25
 <template>
   <div class="SitePage">
 
+    <div v-if="activeProjectName === ''">
+      <div style="font-style:italic">
+        <p>Did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
+      </div>
+    </div>
 
-    <div class="PageSection">
+    <div class="PageSection" v-if="activeProjectName !== ''">
 
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
 
@@ -244,7 +249,7 @@ Last update: 2018mar25
     computed: {
       activeProjectName() {
         if (this.$store.state.activeProject.project === undefined) {
-          return '[nothing]'
+          return ''
         } else {
           return this.$store.state.activeProject.project.name
         }

@@ -7,7 +7,13 @@ Last update: 2018mar25
 <template>
   <div class="SitePage">
 
-    <div class="PageSection">
+    <div v-if="activeProjectName === ''">
+      <div style="font-style:italic">
+        <p>Did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
+      </div>
+    </div>
+
+    <div class="PageSection" v-if="activeProjectName !== ''">
 
       <button class="btn" @click="createNewSet">Create new intervention set</button>
 
@@ -160,7 +166,7 @@ export default {
   computed: {
     activeProjectName() {
       if (this.$store.state.activeProject.project === undefined) {
-        return '[nothing]'
+        return ''
       } else {
         return this.$store.state.activeProject.project.name
       }
