@@ -684,10 +684,11 @@ def get_version_info():
 	''' Return the informatino about the project. '''
 	gitinfo = sciris.utils.gitinfo(__file__)
 	version_info = {
-		'version': hptool.version,
-		'date': hptool.versiondate,
-		'gitbranch': gitinfo['branch'],
-		'githash': gitinfo['hash'],
+        'version': hptool.version,
+        'date': hptool.versiondate,
+        'gitbranch': gitinfo['branch'],
+        'githash': gitinfo['hash'],
+        'gitdate': gitinfo['date'],
 	}
 	return version_info
 

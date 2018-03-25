@@ -37,6 +37,10 @@ Last update: 2018mar25
           <div class="divRowLabel">Hash: </div>
           <div class="divRowContent">{{ githash }}</div>
         </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Timestamp: </div>
+          <div class="divRowContent">{{ gitdate }}</div>
+        </div>
       </div>
     </div>
       <!--<button @click="getVersionInfo">Updakte</button>-->
@@ -72,7 +76,8 @@ Last update: 2018mar25
         version: '',
         date: '',
         gitbranch: '',
-        githash: ''
+        githash: '',
+        gitdate: '',
       }
     },
 
@@ -84,6 +89,7 @@ Last update: 2018mar25
             this.date = response.data['date'];
             this.gitbranch = response.data['gitbranch'];
             this.githash = response.data['githash'];
+            this.gitdate = response.data['gitdate'];
           })
       },
     },
