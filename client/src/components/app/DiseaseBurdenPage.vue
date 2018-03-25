@@ -396,6 +396,14 @@ Last update: 2018mar25
           this.sortColumn2 = 'name'
           this.sortReverse2 = false
         })
+
+        this.$notifications.notify({
+          message: 'Burden set "' + burdenSet.burdenset.name + '" now active',
+          icon: 'ti-check',
+          type: 'success',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        });
       },
 
       copyBurdenSet(burdenSet) {

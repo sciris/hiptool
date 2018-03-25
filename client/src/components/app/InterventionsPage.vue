@@ -324,6 +324,14 @@ export default {
 //        this.sortColumn2 = 'name'
 //        this.sortReverse2 = false
       })
+
+      this.$notifications.notify({
+        message: 'Intervention set "' + intervSet.intervset.name + '" now active',
+        icon: 'ti-check',
+        type: 'success',
+        verticalAlign: 'top',
+        horizontalAlign: 'center',
+      });
     },
 
     copySet(intervSet) {
