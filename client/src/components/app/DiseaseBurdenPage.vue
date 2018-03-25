@@ -306,7 +306,7 @@ Last update: 3/24/18 (gchadder3)
             // If we want to set the last entry active and we have any 
             // entries, do the setting.
             if ((setLastEntryActive) && (this.burdenSets.length > 0))
-              this.activeBurdenSet = this.burdenSets[this.burdenSets.length - 1]
+              this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])           
           })
         }
       },

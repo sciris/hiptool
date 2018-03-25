@@ -110,9 +110,9 @@ Last update: 3/24/18 (gchadder3)
           </thead>
           <tbody>
             <tr v-for="interv in interventionList">
-<!--              <td style="text-align: center">
-                <input type="checkbox" v-model="interv.included"/>
-              </td> -->
+<!--               <td style="text-align: center">
+                <input type="checkbox" v-model="interv.active"/>
+              </td>  -->
               <td>{{ interv[0] }}</td>
               <td>{{ interv[1] }}</td>
               <td>{{ interv[4] }}</td>
@@ -399,7 +399,7 @@ export default {
           // If we want to set the last entry active and we have any 
           // entries, do the setting.
           if ((setLastEntryActive) && (this.interventionSets.length > 0))
-            this.activeIntervSet = this.interventionSets[this.interventionSets.length - 1]          
+            this.viewSet(this.interventionSets[this.interventionSets.length - 1])      
         })
       }
     },
