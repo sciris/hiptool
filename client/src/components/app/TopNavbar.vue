@@ -67,7 +67,16 @@ Last update: 2018mar25
       },
 
       activeUserName() {
-        return 'User: '+userService.currentUser().username
+        // Get the active user name -- the display name if defined; else the user name
+        var username = userService.currentUser().username;
+        var dispname = userService.currentUser().displayname;
+        var userlabel = '';
+        if (dispname === undefined || dispname === '') {
+          userlabel = username;
+        } else {
+          userlabel = dispname;
+        }
+        return 'User: '+userlabel
       },
 
       // Theme function

@@ -50,7 +50,16 @@ export default {
     },
 
     activeUserName() {
-      return 'User: '+userService.currentUser().username
+      // Get the active user name -- the display name if defined; else the user name -- WARNING, duplicates TopNavbar.vue
+      var username = userService.currentUser().username;
+      var dispname = userService.currentUser().displayname;
+      var userlabel = '';
+      if (dispname === undefined || dispname === '') {
+        userlabel = username;
+      } else {
+        userlabel = dispname;
+      }
+      return 'User: '+userlabel
     },
   },
   methods: {

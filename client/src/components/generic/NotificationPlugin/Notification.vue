@@ -43,7 +43,7 @@
       },
       timeout: {
         type: Number,
-        default: 1500
+        default: 2000
       }
     },
     data () {
