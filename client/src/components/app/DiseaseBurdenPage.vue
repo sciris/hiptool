@@ -7,7 +7,11 @@ Last update: 3/24/18 (gchadder3)
 <template>
   <div class="SitePage">
 
+
     <div class="PageSection">
+
+      <p><button class="btn" @click="createNewBurdenSet">Create new burden set</button></p>
+
       <input type="text"
              class="txbox"
              style="margin-bottom: 20px"
@@ -83,7 +87,6 @@ Last update: 3/24/18 (gchadder3)
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="createNewBurdenSet">Create new</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -205,7 +208,7 @@ Last update: 3/24/18 (gchadder3)
     data() {
       return {
         // Placeholder text for table filter box
-        filterPlaceholder: '\u{1f50e} Filter Burden Projects',
+        filterPlaceholder: '\u{1f50e} Filter burden sets',
 
         // Text in the table filter box
         filterText: '',
@@ -304,11 +307,11 @@ Last update: 3/24/18 (gchadder3)
             this.burdenSets.forEach(theSet => {
 		          theSet.renaming = ''
 		        })
-            
-            // If we want to set the last entry active and we have any 
+
+            // If we want to set the last entry active and we have any
             // entries, do the setting.
             if ((setLastEntryActive) && (this.burdenSets.length > 0))
-              this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])           
+              this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])
           })
         }
       },
@@ -376,12 +379,12 @@ Last update: 3/24/18 (gchadder3)
         .then(response => {
           // Set the disease list.
           this.diseaseList = response.data.diseases
-          
+
           // Set the active values from the loaded in data.
           this.diseaseList.forEach(theDisease => {
 		        theDisease.active = theDisease[0]
 		      })
-        
+
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
           this.sortReverse2 = false
