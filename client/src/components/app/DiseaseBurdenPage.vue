@@ -157,7 +157,9 @@ Last update: 3/24/18 (gchadder3)
         </thead>
         <tbody>
           <tr v-for="disease in sortedDiseases">
-            <td>{{ disease[0] }}</td>
+            <td style="text-align: center">
+              <input type="checkbox" v-model="disease.active"/>
+            </td>
             <td>{{ disease[1] }}</td>
             <td>{{ disease[2] }}</td>
             <td>{{ disease[3] }}</td>
@@ -374,7 +376,12 @@ Last update: 3/24/18 (gchadder3)
         .then(response => {
           // Set the disease list.
           this.diseaseList = response.data.diseases
-
+          
+          // Set the active values from the loaded in data.
+          this.diseaseList.forEach(theDisease => {
+		        theDisease.active = theDisease[0]
+		      })
+        
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
           this.sortReverse2 = false

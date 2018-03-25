@@ -110,10 +110,9 @@ Last update: 3/24/18 (gchadder3)
           </thead>
           <tbody>
             <tr v-for="interv in interventionList">
-<!--               <td style="text-align: center">
+              <td style="text-align: center">
                 <input type="checkbox" v-model="interv.active"/>
-              </td>  -->
-              <td>{{ interv[0] }}</td>
+              </td> 
               <td>{{ interv[1] }}</td>
               <td>{{ interv[4] }}</td>
               <td>{{ interv[3] }}</td>
@@ -467,7 +466,12 @@ export default {
       .then(response => {
         // Set the interventions table list.
         this.interventionList = response.data.interventions
-
+        
+        // Set the active values from the loaded in data.
+        this.interventionList.forEach(theInterv => {
+		      theInterv.active = theInterv[0]
+		    })
+          
         // Reset the bottom table sorting state.
 //        this.sortColumn2 = 'name'
 //        this.sortReverse2 = false
