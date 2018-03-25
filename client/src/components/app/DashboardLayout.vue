@@ -1,3 +1,9 @@
+<!--
+Definition of the dashboard itself
+
+Last update: 2018mar25
+-->
+
 <template>
   <div class="wrapper">
     <side-bar type="sidebar" :sidebar-links="$sidebar.sidebarLinks">

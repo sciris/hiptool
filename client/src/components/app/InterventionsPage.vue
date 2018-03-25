@@ -1,7 +1,7 @@
 <!--
-InterventionsPage.vue -- InterventionsPage Vue component
+Define interventions
 
-Last update: 3/24/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>
@@ -31,7 +31,7 @@ Last update: 3/24/18 (gchadder3)
             </th>
             <th>
               Select
-            </th>            
+            </th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -55,7 +55,7 @@ Last update: 3/24/18 (gchadder3)
               <span v-show="sortColumn != 'updatedTime'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-            </th>        
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -76,8 +76,8 @@ Last update: 3/24/18 (gchadder3)
             </td>
             <td>{{ intervSet.intervset.creationTime }}</td>
             <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
-              'No modification' }}</td>            
-            <td style="white-space: nowrap">         
+              'No modification' }}</td>
+            <td style="white-space: nowrap">
               <button class="btn" @click="copySet(intervSet)">Copy</button>
               <button class="btn" @click="renameSet(intervSet)">Rename</button>
               <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
@@ -112,7 +112,7 @@ Last update: 3/24/18 (gchadder3)
             <tr v-for="interv in interventionList">
               <td style="text-align: center">
                 <input type="checkbox" v-model="interv.active"/>
-              </td> 
+              </td>
               <td>{{ interv[1] }}</td>
               <td>{{ interv[4] }}</td>
               <td>{{ interv[3] }}</td>
@@ -394,11 +394,11 @@ export default {
           this.interventionSets.forEach(theSet => {
 		        theSet.renaming = ''
 		      })
-          
-          // If we want to set the last entry active and we have any 
+
+          // If we want to set the last entry active and we have any
           // entries, do the setting.
           if ((setLastEntryActive) && (this.interventionSets.length > 0))
-            this.viewSet(this.interventionSets[this.interventionSets.length - 1])      
+            this.viewSet(this.interventionSets[this.interventionSets.length - 1])
         })
       }
     },
@@ -449,7 +449,7 @@ export default {
           }
           else if (this.sortColumn === 'updatedTime') {
             return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir
-          }          
+          }
         }
       )
     },
@@ -466,12 +466,12 @@ export default {
       .then(response => {
         // Set the interventions table list.
         this.interventionList = response.data.interventions
-        
+
         // Set the active values from the loaded in data.
         this.interventionList.forEach(theInterv => {
 		      theInterv.active = theInterv[0]
 		    })
-          
+
         // Reset the bottom table sorting state.
 //        this.sortColumn2 = 'name'
 //        this.sortReverse2 = false

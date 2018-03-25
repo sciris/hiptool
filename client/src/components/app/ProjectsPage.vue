@@ -1,7 +1,7 @@
 <!--
-ProjectsPage.vue -- ProjectsPage Vue component
+Manage projects page
 
-Last update: 3/23/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>

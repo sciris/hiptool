@@ -1,7 +1,7 @@
-<!-- 
-MainAdminPage.vue -- Vue component for the main admin page
+<!--
+Admin page
 
-Last update: 1/29/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>
@@ -42,7 +42,7 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {
-  name: 'MainAdminPage', 
+  name: 'MainAdminPage',
 
   data () {
     return {

@@ -1,3 +1,9 @@
+<!--
+Definition of top navigation bar
+
+Last update: 2018mar25
+-->
+
 <template>
   <nav class="navbar navbar-default">
     <div class="container-fluid">

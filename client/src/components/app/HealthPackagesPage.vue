@@ -1,7 +1,7 @@
 <!--
-HealthPackagesPage.vue -- HealthPackagesPage Vue component
+Define health packages
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>

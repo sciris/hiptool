@@ -1,7 +1,7 @@
 <!--
-ChangePasswordPage.vue -- Vue component for a page to change password
+About page
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>

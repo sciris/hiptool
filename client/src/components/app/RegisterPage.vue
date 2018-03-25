@@ -1,7 +1,7 @@
 <!--
-RegisterPage.vue -- RegisterPage Vue component
+User registration page
 
-Last update: 2/13/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>

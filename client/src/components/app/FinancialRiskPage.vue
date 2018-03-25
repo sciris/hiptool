@@ -1,12 +1,12 @@
 <!--
-Contact page
+Financial risk protection
 
 Last update: 2018mar25
 -->
 
 <template>
   <div class="SitePage">
-  	<p>You can reach us at <a href="mailto:info@hptool.org">info@hptool.org</a>.</p>
+    <p><i>Module currently under development.</i></p>
   </div>
 </template>
 

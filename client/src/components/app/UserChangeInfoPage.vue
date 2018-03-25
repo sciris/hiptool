@@ -1,7 +1,7 @@
 <!--
-UserChangeInfoPage.vue -- Vue component for a page to change account info
+Change account info
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>
