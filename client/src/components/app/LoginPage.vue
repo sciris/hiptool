@@ -5,12 +5,22 @@ Last update: 2018mar25
 -->
 
 <template>
-  <div class="SitePage">
-    <form name="LogInForm" @submit.prevent="tryLogin"
-          style="max-width: 500px; min-width: 200px; margin: 0 auto">
+  <div class="SitePage" style="background-color:#f8f8f4; position:fixed; min-height:100%; min-width:100%; padding:0 0 0 0"> <!-- Should match _variables.scss:$bg-nude -->
+    <div style="background-color:#212120; position:absolute; height:100%; width:260px">
+      <div class="logo">
+        <div class="simple-text" style="font-size:20px; color:#fff; font-weight:bold; padding:20px">
+          <div class="logo-img" style="height:40px; width:40px; line-height:40px; border-radius:40px; background-color:#fff; text-align:center; display:inline-block">
+            <img src="static/favicon-96x96.png" width="21px" vertical-align="middle" alt>
+          </div>
+        <span style="margin-left:10px">HealthPrior</span>
+          <br/><br/>
+          <div style="font-size:14px">Beta version foo</div>
+        </div>
+      </div>
+    </div>
+    <form name="LogInForm" @submit.prevent="tryLogin" style="max-width: 500px; min-width: 200px; margin: 0 auto">
 
       <h2>Login</h2>
-      <p><i>HealthPrior v0.3 (23 March 2018)</i></p>
 
       <div class="modal-body">
         <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
@@ -41,11 +51,6 @@ Last update: 2018mar25
             Register here
           </router-link>
         </div>
-
-<!--        <p>Login 1: Username = 'newguy', Password = 'mesogreen'</p>
-        <p>Login 2: Username = 'admin', Password = 'mesoawesome'</p>
-        <p>Login 3: Username = '_ScirisDemo', Password = '_ScirisDemo'</p> -->
-
       </div>
     </form>
   </div>
