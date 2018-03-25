@@ -7,7 +7,7 @@ Last update: 3/7/18 (gchadder3)
 <template>
   <div class="SitePage">
     <div style="max-width:800px; margin:auto" v-model="getVersionInfo">
-      <div style="text-align:center;"">
+      <div style="text-align:center;">
         <img src="static/img/healthpriorlogo.png" width="250px">
       </div>
       <br/><br/>
@@ -39,14 +39,21 @@ Last update: 3/7/18 (gchadder3)
         </div>
       </div>
     </div>
-    <!--<button @click="getVersionInfo">Updakte</button>-->
+      <!--<button @click="getVersionInfo">Updakte</button>-->
       <br/>
-      <div style="display:flex; justify-content:space-between;">
-        <img src="static/img/ucl-logo-transparent.png" height="50px">
-        <img src="static/img/burnet-logo-transparent.png" height="50px">
-        <img src="static/img/gatesfoundation-logo.png" height="50px">
+      <br/>
+      <div class="divTable" style="width:100%">
+        <div class="divTableBody">
+          <div class="divTableRow">
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/ucl-logo-transparent.png" height="60px"></div>
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/burnet-logo-transparent.png" height="60px"></div>
+          </div>
+          <div class="divTableRow">
+            <div class="divRowContent" style="text-align:center"><img src="static/img/world-bank-logo.png" height="60px"></div>
+            <div class="divRowContent" style="text-align:center"><img src="static/img/gatesfoundation-logo.png" height="60px"></div>
+          </div>
+        </div>
       </div>
-
     </div>
   </div>
 </template>

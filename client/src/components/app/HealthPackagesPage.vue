@@ -7,6 +7,10 @@ Last update: 3/7/18 (gchadder3)
 <template>
   <div class="SitePage">
 
+    <div style="color:#ff5555; font-weight: normal; font-style:italic">
+      <p>Note: this page is under development</p>
+    </div>
+
     <div class="PageSection">
       <input type="text"
              class="txbox"
