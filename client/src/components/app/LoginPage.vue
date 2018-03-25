@@ -5,7 +5,7 @@ Last update: 2018mar25
 -->
 
 <template>
-  <div class="SitePage" style="background-color:#f8f8f4; position:fixed; min-height:100%; min-width:100%; padding:0 0 0 0"> <!-- Should match _variables.scss:$bg-nude -->
+  <div class="SitePage" style="background-color:#f8f8f4; position:fixed; min-height:100%; min-width:100%; padding:0 0 0 0" v-model="getVersionInfo"> <!-- Should match _variables.scss:$bg-nude -->
     <div style="background-color:#212120; position:absolute; height:100%; width:260px">
       <div class="logo">
         <div class="simple-text" style="font-size:20px; color:#fff; font-weight:bold; padding:20px">
@@ -14,15 +14,17 @@ Last update: 2018mar25
           </div>
         <span style="margin-left:10px">HealthPrior</span>
           <br/><br/>
-          <div style="font-size:14px">Beta version foo</div>
+          <div style="font-size:14px; font-weight:normal">
+            Beta version {{ version }} ({{ date }})
+          </div>
         </div>
       </div>
     </div>
     <form name="LogInForm" @submit.prevent="tryLogin" style="max-width: 500px; min-width: 200px; margin: 0 auto">
 
-      <h2>Login</h2>
-
       <div class="modal-body">
+        <h2>Login</h2>
+
         <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
 
         <div class="section form-input-validate">
@@ -67,8 +69,20 @@ export default {
     return {
       loginUserName: '',
       loginPassword: '',
-      loginResult: ''
+      loginResult: '',
+      version: '',
+      date: '',
     }
+  },
+
+  computed: {
+    getVersionInfo() {
+      rpcservice.rpcPublicCall('get_version_info')
+        .then(response => {
+          this.version = response.data['version'];
+          this.date = response.data['date'];
+        })
+    },
   },
 
   methods: {
