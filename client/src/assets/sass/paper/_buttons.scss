@@ -2,8 +2,8 @@
 .navbar .navbar-nav > li > a.btn {
   border-radius: $border-radius-btn-base;
   box-sizing: border-box;
-  border-width: $border-thin;
-  background-color: $button-bg;
+  border-width: 0; // $border-thin; // CK: border width
+  background-color: $button-bg; // CK: button color
   font-size: $font-size-base;
   font-weight: $font-weight-semi;
 

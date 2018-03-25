@@ -969,6 +969,8 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Create a new (empty) burden set.
         newBurdenSet = Burden(project=theProj, name=uniqueName)
+        dataPath = hptool.HPpath('data')
+        newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
         
         # Put the new burden set in the dictionary.
         theProj.burdensets[uniqueName] = newBurdenSet

@@ -88,13 +88,10 @@ Last update: 2018mar25
       <button class="btn" @click="createNewSet">Create new</button>
     </div>
 
-    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
-<!--      <div class="PHText">
-        Page interface specific to {{ activeIntervSet.intervset.name }} intervention set
-      </div> -->
 
-      <div style="margin-top: 10px">
-        <table class="table table-bordered table-hover table-striped" style="width: auto">
+    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
+
+        <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
           <thead>
             <tr>
               <th>Active</th>
@@ -117,8 +114,8 @@ Last update: 2018mar25
               <td>{{ interv[4] }}</td>
               <td>{{ interv[3] }}</td>
               <td>{{ interv[5] }}</td>
-              <td>{{ interv[7] }}</td>
               <td>{{ interv[6] }}</td>
+              <td>{{ interv[7] }}</td>
               <td>{{ interv[8] }}</td>
               <td style="white-space: nowrap">
                 <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
@@ -126,14 +123,9 @@ Last update: 2018mar25
                 <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
               </td>
             </tr>
-            <tr>
-              <td>
-                <button class="btn">Add new intervention</button>
-              </td>
-            </tr>
           </tbody>
         </table>
-      </div>
+      <button class="btn">Add new intervention</button>
     </div>
   </div>
 </template>
