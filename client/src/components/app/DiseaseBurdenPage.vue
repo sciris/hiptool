@@ -109,7 +109,7 @@ Last update: 2018-03-25
       <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
         <thead>
           <tr>
-            <th>
+            <th style="text-align:center">
               Active
             </th>
             <th @click="updateSorting2('name')" class="sortable">
@@ -160,7 +160,7 @@ Last update: 2018-03-25
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th>Actions</th>
+            <th style="text-align:center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -168,12 +168,31 @@ Last update: 2018-03-25
             <td style="text-align: center">
               <input type="checkbox" v-model="disease.active"/>
             </td>
-            <td>{{ disease[1] }}</td>
-            <td>{{ disease[2] }}</td>
-            <td>{{ disease[3] }}</td>
-            <td>{{ disease[4] }}</td>
-            <td style="white-space: nowrap">
-              <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Rename cause')"
+                     v-model="disease.cause"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit DALYs')"
+                     v-model="disease.dalys"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit deaths')"
+                     v-model="disease.deaths"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit prevalence')"
+                     v-model="disease.prevalence"/>
+            </td>
+            <td style="white-space: nowrap; text-align:center">
               <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
               <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
             </td>
@@ -394,7 +413,11 @@ Last update: 2018-03-25
 
           // Set the active values from the loaded in data.
           this.diseaseList.forEach(theDisease => {
-		        theDisease.active = theDisease[0]
+		        theDisease.active = theDisease[0];
+            theDisease.cause = theDisease[1];
+            theDisease.dalys = Number(theDisease[2]).toLocaleString();
+            theDisease.deaths = Number(theDisease[3]).toLocaleString();
+            theDisease.prevalence = Number(theDisease[4]).toLocaleString();
 		      })
 
           // Reset the bottom table sorting state.

@@ -45,7 +45,7 @@ const SidebarStore = {
     },
     {
       name: 'About',
-      icon: 'ti-face-smile',
+      icon: 'ti-shine',
       path: '/about'
     },
   ],
