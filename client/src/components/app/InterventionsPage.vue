@@ -9,7 +9,7 @@ Last update: 2018mar25
 
     <div v-if="activeProjectName === ''">
       <div style="font-style:italic">
-        <p>Did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
+        <p>Hmm, I can't find any interventions...did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
       </div>
     </div>
 
