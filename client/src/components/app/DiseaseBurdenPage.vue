@@ -117,7 +117,7 @@ Last update: 2018-03-25
       <div>
         <div id="fig01" style="float:left" ></div>
         <div id="fig02" style="float:left" ></div>
-        <div id="fig03" style="float:left" ></div>
+        <!--<div id="fig03" style="float:left" ></div>-->
       </div>
 
 
@@ -283,7 +283,9 @@ Last update: 2018-03-25
         countryList: [
           'Afghanistan',
           'Other',
-        ]
+        ],
+
+        serverresponse: 'no response',
       }
     },
 
@@ -305,7 +307,8 @@ Last update: 2018-03-25
         Vue.set(this.hotSettings, 'data', [[1,2,3]]);
         console.log(sortedDiseaseList);
         return sortedDiseaseList;
-      }
+      },
+
     },
 
     created() {
@@ -538,9 +541,19 @@ Last update: 2018-03-25
           this.serverresponse = response.data
 
           // Draw the figure in the 'fig01' div tag.
-          mpld3.draw_figure('fig01', response.data.graph1)
-          mpld3.draw_figure('fig02', response.data.graph2)
-          mpld3.draw_figure('fig03', response.data.graph3)
+          console.log('About to replace');
+          document.getElementById("fig01").innerHTML = response.data.graph1.div;
+          console.log('About to eval');
+          console.log(response.data.graph1.script);
+          eval(response.data.graph1.script);
+
+//          mpld3.draw_figure('fig01', response.data.graph1)
+//          mpld3.draw_figure('fig02', response.data.graph2)
+//          mpld3.draw_figure('fig03', response.data.graph3)
+
+          console.log('TEMP complete')
+          document.getElementById("fig02").innerHTML = response.data.graph2.div;
+          eval(response.data.graph2.script);
         })
         .catch(error => {
           // Pull out the error message.
