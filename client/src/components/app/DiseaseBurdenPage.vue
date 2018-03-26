@@ -115,9 +115,9 @@ Last update: 2018-03-25
       <button class="btn" @click="makeGraph(activeBurdenSet)">Visualize</button>
 
       <div>
-        <div id="fig01" style="float:left" >Fig. 1</div>
+        <div id="fig01" style="float:left" ></div>
         <div id="fig02" style="float:left" ></div>
-        <div id="fig03" style="float:left" ></div>
+        <!--<div id="fig03" style="float:left" ></div>-->
       </div>
 
 
@@ -546,11 +546,14 @@ Last update: 2018-03-25
           console.log('About to eval');
           console.log(response.data.graph1.script);
           eval(response.data.graph1.script);
+
 //          mpld3.draw_figure('fig01', response.data.graph1)
 //          mpld3.draw_figure('fig02', response.data.graph2)
 //          mpld3.draw_figure('fig03', response.data.graph3)
 
           console.log('TEMP complete')
+          document.getElementById("fig02").innerHTML = response.data.graph2.div;
+          eval(response.data.graph2.script);
         })
         .catch(error => {
           // Pull out the error message.

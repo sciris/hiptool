@@ -4,8 +4,9 @@ Version:
 
 from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp, HPException
 from hptool import SIticks, boxoff
-from pylab import figure, barh, arange
-import bokeh as bk
+from pylab import figure, barh, arange, array
+from bokeh.plotting import figure as bkfigure
+from bokeh.embed import components as bkcomponents
 
 class Burden(object):
     ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
@@ -83,11 +84,13 @@ class Burden(object):
             raise HPException(errormsg)
         
         # Pull out data
+        
         burdendata = dcp(self.data)
         burdendata.sort(col=which, reverse=True)
         topdata = burdendata[:n]
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which]
+        
         largestval = barvals[0]
         if largestval>1e6:
             barvals /= 1e6
@@ -99,10 +102,11 @@ class Burden(object):
             unitstr = ''
         
         # Create plot
+        
         if engine=='matplotlib':
-            yaxis = arange(len(barvals), 0, -1)
             fig = figure(facecolor='w', figsize=figsize)
             ax = fig.add_axes(axsize)
+            yaxis = arange(len(barvals), 0, -1)
             barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
             ax.set_yticks(yaxis+barw/2.)
             ax.set_yticklabels(barlabels)
@@ -112,13 +116,15 @@ class Burden(object):
             boxoff()
             return fig
         elif engine=='bokeh':
-            from bokeh.plotting import figure
-            from bokeh.embed import components
+            barlabelsr = barlabels[::-1]
+            barvalsr = barvals[::-1]
+            yaxis = arange(len(barvals))
+            p = bkfigure(y_range=barlabelsr)
+            p.hbar(y=yaxis+0.5, height=0.5, left=0, right=barvalsr, color="navy")
+            p.xaxis[0].axis_label = thisxlabel+unitstr
+            p.title.text = thistitle
             
-            plot = figure()
-            plot.circle([1,2], [3,4])
-            
-            script, div = components(plot)
+            script, div = bkcomponents(p)
             output = {'script':script, 'div':div}
             return output
         else:
