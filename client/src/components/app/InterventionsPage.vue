@@ -120,9 +120,9 @@ Last update: 2018-03-25
           <thead>
             <tr>
               <th>Active</th>
-              <th>Intervention&nbsp;name</th>
+              <th style="min-width:30%">Intervention&nbsp;name</th>
+              <th style="min-width:20%">Delivery&nbsp;platform</th>
               <th>Type</th>
-              <th>Delivery&nbsp;platform</th>
               <th>ICER</th>
               <th>Unit&nbsp;cost</th>
               <th>Equity</th>
@@ -135,13 +135,48 @@ Last update: 2018-03-25
               <td style="text-align: center">
                 <input type="checkbox" v-model="interv.active"/>
               </td>
-              <td>{{ interv[1] }}</td>
-              <td>{{ interv[4] }}</td>
-              <td>{{ interv[3] }}</td>
-              <td>{{ interv[5] }}</td>
-              <td>{{ interv[6] }}</td>
-              <td>{{ interv[7] }}</td>
-              <td>{{ interv[8] }}</td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit name')"
+                       v-model="interv.name"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit platform')"
+                       v-model="interv.platform"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit type')"
+                       v-model="interv.type"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit ICER')"
+                       v-model="interv.icer"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit unit cost')"
+                       v-model="interv.unitcost"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit equity')"
+                       v-model="interv.equity"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit financial risk protection')"
+                       v-model="interv.frp"/>
+              </td>
               <td style="white-space: nowrap">
                 <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
                 <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
@@ -347,12 +382,16 @@ export default {
 
         // Set the active values from the loaded in data.
         this.interventionList.forEach(theInterv => {
-		      theInterv.active = theInterv[0]
+		      theInterv.active = theInterv[0];
+          theInterv.name = theInterv[1];
+          theInterv.platform = theInterv[3];
+          theInterv.type = theInterv[4];
+          theInterv.icer = Number(theInterv[5]).toLocaleString();
+          theInterv.unitcost = Number(theInterv[6]).toLocaleString();
+          theInterv.equity = theInterv[7];
+          theInterv.frp = theInterv[8];
 		    })
 
-        // Reset the bottom table sorting state.
-//        this.sortColumn2 = 'name'
-//        this.sortReverse2 = false
       })
 
       this.$notifications.notify({
