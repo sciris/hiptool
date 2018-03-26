@@ -1,18 +1,18 @@
-<!-- 
-MainAdminPage.vue -- Vue component for the main admin page
+<!--
+Admin page
 
-Last update: 1/29/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
-    <h2>Scatterplotter Users</h2>
+    <h2>HealthPrior Users</h2>
     <table v-if="usersList[0] != undefined">
       <tr>
         <th>Username</th>
-        <th>Display Name</th>
+        <th>Display name</th>
         <th>Email</th>
-        <th>Account Active?</th>
+        <th>Account active?</th>
         <th>Admin?</th>
         <th>Actions</th>
       </tr>
@@ -42,7 +42,7 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 
 export default {
-  name: 'MainAdminPage', 
+  name: 'MainAdminPage',
 
   data () {
     return {

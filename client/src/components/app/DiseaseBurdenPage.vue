@@ -1,24 +1,46 @@
 <!--
-DiseaseBurdenPage.vue -- DiseaseBurdenPage Vue component
+Define disease burden
 
-Last update: 3/24/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
 
+    <div v-if="activeProjectName === ''">
+      <div style="font-style:italic">
+        <p>Hmm, I can't find any disease burdens...did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
+      </div>
+    </div>
 
-    <div class="PageSection">
+    <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <p><button class="btn" @click="createNewBurdenSet">Create new burden set</button></p>
+      <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
+
+      <span>&nbsp;based on&nbsp;</span>
+
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option
+          v-for = "country in countryList"
+          :value="country"
+        >
+          {{country}}
+        </option>
+      </select>
+
+      <br/><br/>
 
       <input type="text"
              class="txbox"
-             style="margin-bottom: 20px"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%">
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
@@ -75,13 +97,13 @@ Last update: 3/24/18 (gchadder3)
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
 			      </td>
-            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">View</button></td>
+            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">Open</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
             <td style="white-space: nowrap">
-              <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
+              <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
@@ -101,10 +123,10 @@ Last update: 3/24/18 (gchadder3)
 
 
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
         <thead>
           <tr>
-            <th>
+            <th style="text-align:center">
               Active
             </th>
             <th @click="updateSorting2('name')" class="sortable">
@@ -155,7 +177,7 @@ Last update: 3/24/18 (gchadder3)
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th>Actions</th>
+            <th style="text-align:center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -163,23 +185,38 @@ Last update: 3/24/18 (gchadder3)
             <td style="text-align: center">
               <input type="checkbox" v-model="disease.active"/>
             </td>
-            <td>{{ disease[1] }}</td>
-            <td>{{ disease[2] }}</td>
-            <td>{{ disease[3] }}</td>
-            <td>{{ disease[4] }}</td>
-            <td style="white-space: nowrap">
-              <button class="btn">Copy</button>
-              <button class="btn">Rename</button>
-              <button class="btn __red">Delete</button>
-            </td>
-          </tr>
-          <tr>
             <td>
-              <button class="btn">Create new</button>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Rename cause')"
+                     v-model="disease.cause"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit DALYs')"
+                     v-model="disease.dalys"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit deaths')"
+                     v-model="disease.deaths"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="notImplemented('Edit prevalence')"
+                     v-model="disease.prevalence"/>
+            </td>
+            <td style="white-space: nowrap; text-align:center">
+              <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
+              <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
             </td>
           </tr>
         </tbody>
       </table>
+      <button class="btn" @click="notImplemented('Add new burden type')">Add new burden type</button>
 
       <!--<template>-->
         <!--Testing handsontable-->
@@ -208,7 +245,7 @@ Last update: 3/24/18 (gchadder3)
     data() {
       return {
         // Placeholder text for table filter box
-        filterPlaceholder: '\u{1f50e} Filter burden sets',
+        filterPlaceholder: 'Type here to filter burden sets',
 
         // Text in the table filter box
         filterText: '',
@@ -225,8 +262,6 @@ Last update: 3/24/18 (gchadder3)
           colHeaders: true
         },
 
-
-
         // List of burden sets in the active project
         burdenSets: [],
 
@@ -241,14 +276,21 @@ Last update: 3/24/18 (gchadder3)
         sortColumn2: 'name',  // name, country, creationTime, updatedTime
 
         // Sort diseases in reverse order?
-        sortReverse2: false
+        sortReverse2: false,
+
+        // CK: WARNING TEMP, should come from backend
+        country: 'Afghanistan',
+        countryList: [
+          'Afghanistan',
+          'Other',
+        ]
       }
     },
 
     computed: {
       activeProjectName() {
         if (this.$store.state.activeProject.project === undefined) {
-          return '[nothing]'
+          return ''
         } else {
           return this.$store.state.activeProject.project.name
         }
@@ -281,6 +323,17 @@ Last update: 3/24/18 (gchadder3)
     },
 
     methods: {
+
+      notImplemented(message) {
+        this.$notifications.notify({
+          message: 'Function "' + message + '" not yet implemented',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        });
+      },
+
       updateBurdenSets(setLastEntryActive=false) {
         console.log('updateBurdenSets() called')
 
@@ -382,13 +435,25 @@ Last update: 3/24/18 (gchadder3)
 
           // Set the active values from the loaded in data.
           this.diseaseList.forEach(theDisease => {
-		        theDisease.active = theDisease[0]
+		        theDisease.active = theDisease[0];
+            theDisease.cause = theDisease[1];
+            theDisease.dalys = Number(theDisease[2]).toLocaleString();
+            theDisease.deaths = Number(theDisease[3]).toLocaleString();
+            theDisease.prevalence = Number(theDisease[4]).toLocaleString();
 		      })
 
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
           this.sortReverse2 = false
         })
+
+        this.$notifications.notify({
+          message: 'Burden set "' + burdenSet.burdenset.name + '" now active',
+          icon: 'ti-check',
+          type: 'success',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        });
       },
 
       copyBurdenSet(burdenSet) {

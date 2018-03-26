@@ -1,3 +1,9 @@
+<!--
+Template for content -- used to wrap dashboard content
+
+Last update: 2018-03-25
+-->
+
 <template>
   <div class="content">
     <div class="container-fluid">

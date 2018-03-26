@@ -43,7 +43,7 @@
       },
       timeout: {
         type: Number,
-        default: 5000
+        default: 2000
       }
     },
     data () {
@@ -58,7 +58,7 @@
       },
       customPosition () {
         let initialMargin = 20
-        let alertHeight = 100
+        let alertHeight = 60
         let sameAlertsCount = this.$notifications.state.filter((alert) => {
           return alert.horizontalAlign === this.horizontalAlign && alert.verticalAlign === this.verticalAlign
         }).length

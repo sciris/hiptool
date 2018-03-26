@@ -1,7 +1,7 @@
-<!-- 
-ChangePasswordPage.vue -- Vue component for a page to change password
+<!--
+Help page -- ideally will have mostly in-app help a la HIV
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>

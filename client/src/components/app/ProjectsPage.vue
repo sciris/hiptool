@@ -1,31 +1,12 @@
 <!--
-ProjectsPage.vue -- ProjectsPage Vue component
+Manage projects page
 
-Last update: 3/23/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
     <div class="PageSection">
-      <!--<h2>Create projects</h2>-->
-
-<!--      <div class="ControlsRowLabel">
-        Choose a demonstration project from our database:
-      </div>
-
-      <div class="ControlsRow">
-        <select v-model="selectedDemoProject">
-          <option v-for="choice in demoProjectList">
-            {{ choice }}
-          </option>
-        </select>
-        &nbsp; &nbsp;
-        <button class="btn" @click="addDemoProject">Add this project</button>
-      </div>
-
-      <div class="ControlsRowLabel">
-        Or create/upload a new project:
-      </div> -->
 
       <div class="ControlsRow">
         <button class="btn" @click="createNewProject">Create new project</button>
@@ -45,7 +26,7 @@ Last update: 3/23/18 (gchadder3)
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%">
         <thead>
           <tr>
             <th>
@@ -179,7 +160,7 @@ export default {
       demoProjectSummaries: [],
 
       // Placeholder text for table filter box
-      filterPlaceholder: '\u{1f50e} Filter Projects',
+      filterPlaceholder: 'Type here to filter projects',
 
       // Text in the table filter box
       filterText: '',

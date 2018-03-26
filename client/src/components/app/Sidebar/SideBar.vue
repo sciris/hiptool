@@ -13,7 +13,7 @@
             <div class="logo-img">
                 <img src="static/favicon-96x96.png" alt="">
             </div>
-          <font size="4">HealthPrior</font>
+            <img src="static/img/healthpriorlogo-inverse.png" width="130px" vertical-align="middle" alt>
         </a>
       </div>
       <slot>

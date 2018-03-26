@@ -1,29 +1,38 @@
 <!--
-ChangePasswordPage.vue -- Vue component for a page to change password
+Change the user's password
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
 
-    <div class="divTable">
-      <div class="divTableBody">
-        <div class="divTableRow">
-          <div class="divRowLabel">Reenter old password:</div>
-          <div class="divRowContent"><input v-model='oldPassword'/></div>
-        </div>
-        <div class="divTableRow">
-          <div class="divRowLabel">Enter new password: </div>
-          <div class="divRowContent"><input v-model='newPassword'/></div>
-        </div>
+    <form name="ChangePasswordForm" @submit.prevent="tryChangePassword" style="max-width: 300px; min-width: 100px; margin: 0 0">
+
+      <div class="section form-input-validate">
+        <input class="txbox __l"
+               type="password"
+               name="oldpassword"
+               placeholder="Reenter old password"
+               required="required"
+               v-model='oldPassword'/>
       </div>
-    </div>
 
-    <button class="btn __green" @click="tryChangePassword">Update</button>
-    <br/>
+      <div class="section form-input-validate">
+        <input class="txbox __l"
+               type="password"
+               name="password"
+               placeholder="Enter new password"
+               required="required"
+               v-model='newPassword'/>
+      </div>
 
-    <p v-if="changeResult != ''">{{ changeResult }}</p>
+      <button type="submit" class="section btn __l __block">Update</button>
+
+      <br/>
+
+      <p v-if="changeResult != ''">{{ changeResult }}</p>
+    </form>
   </div>
 </template>
 

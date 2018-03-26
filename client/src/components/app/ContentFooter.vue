@@ -1,3 +1,9 @@
+<!--
+Footer for content pages
+
+Last update: 2018-03-25
+-->
+
 <template>
   <footer class="footer">
     <div class="container-fluid">

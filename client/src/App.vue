@@ -1,4 +1,4 @@
-<!-- 
+<!--
 App.vue -- App component, the main page
 
 Last update: 2/2/18 (gchadder3)
@@ -7,7 +7,7 @@ Last update: 2/2/18 (gchadder3)
 <template>
   <div :class="{'nav-open': $sidebar.showSidebar}">
     <router-view></router-view>
-    <!--This sidebar appears only for screens smaller than 992px-->
+    <!--This sidebar appears only for screens smaller than 992px -- otherwise, it is rendered in TopNavbar.vue-->
     <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">
       <ul class="nav navbar-nav">
         <!-- Below requires a userService -->
@@ -15,20 +15,20 @@ Last update: 2/2/18 (gchadder3)
           <a href="#" class="btn-rotate">
             <i class="ti-view-grid"></i>
             <p>
-              <b>Project: </b><span>{{ activeProjectName }}</span>
+              Project: <span>{{ activeProjectName }}</span>
             </p>
           </a>
         </li>
-        <drop-down v-bind:title="currentUser.username" icon="ti-user">
+        <drop-down v-bind:title="activeUserName" icon="ti-user">
           <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-          <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
+          <li><a href="#/changepassword"><i class="ti-key"></i>&nbsp;Change password</a></li>
           <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
         </drop-down>
         <li class="divider"></li>
       </ul>
     </side-bar>
   </div>
-  
+
 </template>
 
 <script>
@@ -48,7 +48,20 @@ export default {
         return this.$store.state.activeProject.project.name
       }
     },
-  }, 
+
+    activeUserName() {
+      // Get the active user name -- the display name if defined; else the user name -- WARNING, duplicates TopNavbar.vue
+      var username = userService.currentUser().username;
+      var dispname = userService.currentUser().displayname;
+      var userlabel = '';
+      if (dispname === undefined || dispname === '') {
+        userlabel = username;
+      } else {
+        userlabel = dispname;
+      }
+      return 'User: '+userlabel
+    },
+  },
   methods: {
     logOut() {
       userService.logOut()

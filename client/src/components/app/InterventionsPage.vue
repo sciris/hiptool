@@ -1,20 +1,46 @@
 <!--
-InterventionsPage.vue -- InterventionsPage Vue component
+Define interventions
 
-Last update: 3/24/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
 
-    <div class="PageSection">
+    <div v-if="activeProjectName === ''">
+      <div style="font-style:italic">
+        <p>Hmm, I can't find any interventions...did you forget to <router-link class="link __blue" to="/projects">load a project</router-link>?</p>
+      </div>
+    </div>
+
+    <div class="PageSection" v-if="activeProjectName !== ''">
+
+      <button class="btn" @click="createNewSet">Create new intervention set</button>
+
+      <span>&nbsp;based on&nbsp;</span>
+
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option
+          v-for = "country in countryList"
+          :value="country"
+        >
+          {{country}}
+        </option>
+      </select>
+
+      <br/><br/>
+
       <input type="text"
              class="txbox"
-             style="margin-bottom: 20px"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto">
+      <table class="table table-bordered table-hover table-striped" style="width: 100%">
         <thead>
           <tr>
             <th @click="updateSorting('name')" class="sortable">
@@ -31,7 +57,7 @@ Last update: 3/24/18 (gchadder3)
             </th>
             <th>
               Select
-            </th>            
+            </th>
             <th @click="updateSorting('creationTime')" class="sortable">
               Created on
               <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -55,7 +81,7 @@ Last update: 3/24/18 (gchadder3)
               <span v-show="sortColumn != 'updatedTime'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-            </th>        
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -72,12 +98,12 @@ Last update: 3/24/18 (gchadder3)
 			        {{ intervSet.intervset.name }}
 			      </td>
             <td>
-              <button class="btn __green" @click="viewSet(intervSet)">View</button>
+              <button class="btn __green" @click="viewSet(intervSet)">Open</button>
             </td>
             <td>{{ intervSet.intervset.creationTime }}</td>
             <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
-              'No modification' }}</td>            
-            <td style="white-space: nowrap">         
+              'No modification' }}</td>
+            <td style="white-space: nowrap">
               <button class="btn" @click="copySet(intervSet)">Copy</button>
               <button class="btn" @click="renameSet(intervSet)">Rename</button>
               <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
@@ -85,26 +111,22 @@ Last update: 3/24/18 (gchadder3)
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="createNewSet">Create new</button>
     </div>
 
-    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
-<!--      <div class="PHText">
-        Page interface specific to {{ activeIntervSet.intervset.name }} intervention set
-      </div> -->
 
-      <div style="margin-top: 10px">
-        <table class="table table-bordered table-hover table-striped" style="width: auto">
+    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
+
+        <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
           <thead>
             <tr>
               <th>Active</th>
-              <th>Intervention name</th>
+              <th style="min-width:30%">Intervention&nbsp;name</th>
+              <th style="min-width:20%">Delivery&nbsp;platform</th>
               <th>Type</th>
-              <th>Delivery platform</th>
-              <th>icer</th>
-              <th>Unit cost</th>
-              <th>FRP</th>
+              <th>ICER</th>
+              <th>Unit&nbsp;cost</th>
               <th>Equity</th>
+              <th>FRP</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -112,109 +134,58 @@ Last update: 3/24/18 (gchadder3)
             <tr v-for="interv in interventionList">
               <td style="text-align: center">
                 <input type="checkbox" v-model="interv.active"/>
-              </td> 
-              <td>{{ interv[1] }}</td>
-              <td>{{ interv[4] }}</td>
-              <td>{{ interv[3] }}</td>
-              <td>{{ interv[5] }}</td>
-              <td>{{ interv[6] }}</td>
-              <td>{{ interv[7] }}</td>
-              <td>{{ interv[8] }}</td>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit name')"
+                       v-model="interv.name"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit platform')"
+                       v-model="interv.platform"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit type')"
+                       v-model="interv.type"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit ICER')"
+                       v-model="interv.icer"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit unit cost')"
+                       v-model="interv.unitcost"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit equity')"
+                       v-model="interv.equity"/>
+              </td>
+              <td>
+                <input type="text"
+                       class="txbox"
+                       @keyup.enter="notImplemented('Edit financial risk protection')"
+                       v-model="interv.frp"/>
+              </td>
               <td style="white-space: nowrap">
-                <i class="fas fa-edit"></i>
-                <i class="fas fa-copy"></i>
-                <i class="fas fa-download"></i>
-                <i class="fas fa-upload"></i>
-                <i class="fas fa-trash-alt"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button class="btn">Add new intervention</button>
+                <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
+                <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
+                <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
               </td>
             </tr>
           </tbody>
         </table>
-      </div>
-
-<!-- Old dummy table stuff
-      <div style="margin-top: 10px">
-        <table id="checkboxtable" class="table table-bordered" style="width: auto">
-          <tr>
-            <td>
-              Categories of intervention
-            </td>
-            <td>
-              <input type="checkbox" @click="intervAllCategoryClick" v-model="showAllIntervs"/> All
-            </td>
-            <td>
-              <input type="checkbox" v-model="showInfectiousIntervs"/> Infectious diseases
-            </td>
-          </tr>
-          <tr>
-            <td>
-              to show
-            </td>
-            <td>
-              <input type="checkbox" v-model="showCancerIntervs"/> Cancers
-            </td>
-            <td>
-              <input type="checkbox" v-model="showChildIntervs"/> Child care
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <div style="margin-top: 10px">
-        <table class="table table-bordered table-hover table-striped" style="width: auto">
-          <thead>
-            <tr>
-              <th>Included in optimizations</th>
-              <th>Intervention name</th>
-              <th>Total cost</th>
-              <th>Est. DALY averted</th>
-              <th>Unit cost</th>
-              <th>Coverage %</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="interv in filteredInterventions">
-              <td style="text-align: center">
-                <input type="checkbox" v-model="interv.included"/>
-              </td>
-              <td>{{ interv.interventionName }}</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>
-                <i class="fas fa-edit"></i>
-                <i class="fas fa-copy"></i>
-                <i class="fas fa-download"></i>
-                <i class="fas fa-upload"></i>
-                <i class="fas fa-trash-alt"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <button class="btn">Add new intervention</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top: 10px">
-        <span style="font-size: large">
-          <i class="fas fa-download"></i> Table of all
-        </span>
-        &nbsp; &nbsp;
-        <span style="font-size: large">
-          <i class="fas fa-download"></i> Selected
-        </span>
-      </div> -->
-
+      <button class="btn" @click="notImplemented('Add new intervention')">Add new intervention</button>
     </div>
   </div>
 </template>
@@ -230,100 +201,31 @@ export default {
 
   data() {
     return {
-      // Placeholder text for table filter box
-      filterPlaceholder: '\u{1f50e} Filter Intervention Set',
+      filterPlaceholder: 'Type here to filter intervention sets', // Placeholder text for table filter box
+      filterText: '', // Text in the table filter box
+      sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
+      sortReverse: false, // Sort in reverse order?
+      interventionSets: [], // List of objects for intervention sets the project has
+      activeIntervSet: {}, // Active intervention set
+      showAllIntervs: true, // Show all of the intervention categories
+      showCancerIntervs: false, // Show cancer interventions
+      showInfectiousIntervs: false, // Show infectious diseases interventions
+      showChildIntervs: false, // Show child care interventions
+      interventionList: [],
 
-      // Text in the table filter box
-      filterText: '',
-
-      // Column of table used for sorting the intervention sets
-      sortColumn: 'updatedTime',  // name, creationTime, updatedTime
-
-      // Sort in reverse order?
-      sortReverse: false,
-
-/* old intervention sets stuff to get rid of
-      // List of objects for intervention sets the project has
-      interventionSets:
-        [
-          {
-            setName: 'Default LMIC from DCP',
-            uid: 1
-          },
-          {
-            setName: 'Country defined set',
-            uid: 2
-          }
-        ], */
-
-      // List of objects for intervention sets the project has
-      interventionSets: [],
-
-      // Active intervention set
-      activeIntervSet: {},
-
-      // Show all of the intervention categories
-      showAllIntervs: true,
-
-      // Show cancer interventions
-      showCancerIntervs: false,
-
-      // Show infectious diseases interventions
-      showInfectiousIntervs: false,
-
-      // Show child care interventions
-      showChildIntervs: false,
-
-/* old dummy interventions used in the demo table to get rid of
-      // Interventions to be shown in the table
-      interventionList:
-        [
-          {
-            interventionName: 'Skin cancer removal',
-            uid: 1,
-            included: true,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'Brain tumor surgery',
-            uid: 2,
-            included: false,
-            intervCategory: 'cancer'
-          },
-          {
-            interventionName: 'TB vaccination',
-            uid: 3,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Measles vaccination',
-            uid: 4,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Polio vaccination',
-            uid: 5,
-            included: true,
-            intervCategory: 'infectious'
-          },
-          {
-            interventionName: 'Child checkup',
-            uid: 6,
-            included: false,
-            intervCategory: 'childcare'
-          }
-        ] */
-
-      interventionList: []
+      // CK: WARNING TEMP, should come from backend
+      country: 'Afghanistan',
+      countryList: [
+        'Afghanistan',
+        'Other',
+      ]
     }
   },
 
   computed: {
     activeProjectName() {
       if (this.$store.state.activeProject.project === undefined) {
-        return '[nothing]'
+        return ''
       } else {
         return this.$store.state.activeProject.project.name
       }
@@ -368,6 +270,17 @@ export default {
   },
 
   methods: {
+
+    notImplemented(message) {
+      this.$notifications.notify({
+        message: 'Function "' + message + '" not yet implemented',
+        icon: 'ti-face-sad',
+        type: 'warning',
+        verticalAlign: 'top',
+        horizontalAlign: 'center',
+      });
+    },
+
     updateIntervSets(setLastEntryActive=false) {
       console.log('updateIntervSets() called')
 
@@ -394,11 +307,11 @@ export default {
           this.interventionSets.forEach(theSet => {
 		        theSet.renaming = ''
 		      })
-          
-          // If we want to set the last entry active and we have any 
+
+          // If we want to set the last entry active and we have any
           // entries, do the setting.
           if ((setLastEntryActive) && (this.interventionSets.length > 0))
-            this.viewSet(this.interventionSets[this.interventionSets.length - 1])      
+            this.viewSet(this.interventionSets[this.interventionSets.length - 1])
         })
       }
     },
@@ -449,7 +362,7 @@ export default {
           }
           else if (this.sortColumn === 'updatedTime') {
             return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir
-          }          
+          }
         }
       )
     },
@@ -466,16 +379,28 @@ export default {
       .then(response => {
         // Set the interventions table list.
         this.interventionList = response.data.interventions
-        
+
         // Set the active values from the loaded in data.
         this.interventionList.forEach(theInterv => {
-		      theInterv.active = theInterv[0]
+		      theInterv.active = theInterv[0];
+          theInterv.name = theInterv[1];
+          theInterv.platform = theInterv[3];
+          theInterv.type = theInterv[4];
+          theInterv.icer = Number(theInterv[5]).toLocaleString();
+          theInterv.unitcost = Number(theInterv[6]).toLocaleString();
+          theInterv.equity = theInterv[7];
+          theInterv.frp = theInterv[8];
 		    })
-          
-        // Reset the bottom table sorting state.
-//        this.sortColumn2 = 'name'
-//        this.sortReverse2 = false
+
       })
+
+      this.$notifications.notify({
+        message: 'Intervention set "' + intervSet.intervset.name + '" now active',
+        icon: 'ti-check',
+        type: 'success',
+        verticalAlign: 'top',
+        horizontalAlign: 'center',
+      });
     },
 
     copySet(intervSet) {

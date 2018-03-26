@@ -1,14 +1,14 @@
 <!--
-ChangePasswordPage.vue -- Vue component for a page to change password
+About page
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018mar25
 -->
 
 <template>
   <div class="SitePage">
     <div style="max-width:800px; margin:auto" v-model="getVersionInfo">
-      <div style="text-align:center;"">
-        <img src="static/img/healthpriorlogo.png" width="250px">
+      <div style="text-align:center;">
+        <img src="static/img/healthpriorlogo-gray.png" width="250px">
       </div>
       <br/><br/>
       <p>The Health Services Prioritization Tool is currently under development. Development is supported through a partnership
@@ -37,16 +37,28 @@ Last update: 3/7/18 (gchadder3)
           <div class="divRowLabel">Hash: </div>
           <div class="divRowContent">{{ githash }}</div>
         </div>
+        <div class="divTableRow">
+          <div class="divRowLabel">Timestamp: </div>
+          <div class="divRowContent">{{ gitdate }}</div>
+        </div>
       </div>
     </div>
-    <!--<button @click="getVersionInfo">Updakte</button>-->
+      <!--<button @click="getVersionInfo">Updakte</button>-->
       <br/>
-      <div style="display:flex; justify-content:space-between;">
-        <img src="static/img/ucl-logo-transparent.png" height="50px">
-        <img src="static/img/burnet-logo-transparent.png" height="50px">
-        <img src="static/img/gatesfoundation-logo.png" height="50px">
-      </div>
+      <br/>
+      <div class="divTable" style="width:100%">
+        <div class="divTableBody">
+          <div class="divTableRow">
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/ucl-logo-transparent.png" height="60px"></div>
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/gatesfoundation-logo.png" height="60px"></div>
+          </div>
+          <div class="divTableRow">
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/burnet-logo-transparent.png" height="60px"></div>
+            <div class="divRowContent" style="text-align:center; padding-bottom:30px"><img src="static/img/world-bank-logo.png" height="60px"></div>
+          </div>
 
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -61,21 +73,23 @@ Last update: 3/7/18 (gchadder3)
 
     data () {
       return {
-        version: 'kk',
+        version: '',
         date: '',
         gitbranch: '',
-        githash: ''
+        githash: '',
+        gitdate: '',
       }
     },
 
     computed: {
       getVersionInfo() {
-        rpcservice.rpcCall('get_version_info')
+        rpcservice.rpcPublicCall('get_version_info')
           .then(response => {
             this.version = response.data['version'];
             this.date = response.data['date'];
             this.gitbranch = response.data['gitbranch'];
             this.githash = response.data['githash'];
+            this.gitdate = response.data['gitdate'];
           })
       },
     },

@@ -684,10 +684,11 @@ def get_version_info():
 	''' Return the informatino about the project. '''
 	gitinfo = sciris.utils.gitinfo(__file__)
 	version_info = {
-		'version': hptool.version,
-		'date': hptool.versiondate,
-		'gitbranch': gitinfo['branch'],
-		'githash': gitinfo['hash'],
+        'version': hptool.version,
+        'date': hptool.versiondate,
+        'gitbranch': gitinfo['branch'],
+        'githash': gitinfo['hash'],
+        'gitdate': gitinfo['date'],
 	}
 	return version_info
 
@@ -969,6 +970,8 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Create a new (empty) burden set.
         newBurdenSet = Burden(project=theProj, name=uniqueName)
+        dataPath = hptool.HPpath('data')
+        newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
         
         # Put the new burden set in the dictionary.
         theProj.burdensets[uniqueName] = newBurdenSet

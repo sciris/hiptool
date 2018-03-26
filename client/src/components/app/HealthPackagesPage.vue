@@ -1,11 +1,15 @@
 <!--
-HealthPackagesPage.vue -- HealthPackagesPage Vue component
+Define health packages
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
+
+    <div style="font-style:italic">
+      <p>This module is currently under development.</p>
+    </div>
 
     <div class="PageSection">
       <input type="text"

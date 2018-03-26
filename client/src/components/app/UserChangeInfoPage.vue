@@ -1,37 +1,62 @@
 <!--
-UserChangeInfoPage.vue -- Vue component for a page to change account info
+Change account info
 
-Last update: 3/7/18 (gchadder3)
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
 
+    <form name="ChangeUserInfo" @submit.prevent="tryChangeInfo" style="max-width: 500px; min-width: 100px; margin: 0 0">
+
     <div class="divTable">
       <div class="divTableBody">
-        <div class="divTableRow">
-          <div class="divRowLabel">Username: </div>
-          <div class="divRowContent"><input v-model='changeUserName'/></div>
+        <div class="divTableRow" style="line-height:40px">
+          <div class="divRowLabel">Username </div>
+          <div class="divRowContent section form-input-validate" style="min-width:100%; vertical-align:middle">
+            <input class="txbox __l"
+                   type="text"
+                   name="changeusername"
+                   required="required"
+                   v-model='changeUserName'/>
+          </div>
         </div>
-        <div class="divTableRow">
-          <div class="divRowLabel">Display name: </div>
-          <div class="divRowContent"><input v-model='changeDisplayName'/></div>
+        <div class="divTableRow" style="line-height:40px">
+          <div class="divRowLabel">Display&nbsp;name </div>
+          <div class="divRowContent section form-input-validate" style="min-width:100%; vertical-align:middle">
+            <input class="txbox __l"
+                   type="text"
+                   name="changedisplayname"
+                   v-model='changeDisplayName'/>
+          </div>
         </div>
-        <div class="divTableRow">
-          <div class="divRowLabel">Email: </div>
-          <div class="divRowContent"><input v-model='changeEmail'/></div>
+        <div class="divTableRow" style="line-height:40px">
+          <div class="divRowLabel">Email </div>
+          <div class="divRowContent section form-input-validate" style="min-width:100%; vertical-align:middle">
+            <input class="txbox __l"
+                   type="text"
+                   name="changedemail"
+                   v-model='changeEmail'/>
+          </div>
+          </div>
         </div>
-        <div class="divTableRow">
-          <div class="divRowLabel">Reenter password:</div>
-          <div class="divRowContent"><input v-model='changePassword'/></div>
+        <div class="divTableRow" style="line-height:40px">
+          <div class="divRowLabel">Enter&nbsp;password</div>
+          <div class="divRowContent section form-input-validate" style="min-width:100%; vertical-align:middle">
+            <input class="txbox __l"
+                   type="password"
+                   name="changepassword"
+                   required="required"
+                   v-model='changePassword'/>
+          </div>
         </div>
       </div>
-    </div>
 
-    <button class="btn __green" @click="tryChangeInfo">Update</button>
-    <br/>
+      <button type="submit" class="section btn __l __block">Update</button>
+      <br/>
+      <p v-if="changeResult != ''">{{ changeResult }}</p>
+    </form>
 
-    <p v-if="changeResult != ''">{{ changeResult }}</p>
   </div>
 </template>
 
@@ -84,7 +109,7 @@ export default {
         } else {
           // Set a failure result to show.
           this.$notifications.notify({
-            message: 'Failed to update user info',
+            message: 'Failed to update user info, please check password and try again',
             icon: 'ti-face-sad',
             type: 'danger',
             verticalAlign: 'top',

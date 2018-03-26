@@ -1,3 +1,9 @@
+<!--
+Definition of top navigation bar
+
+Last update: 2018-03-25
+-->
+
 <template>
   <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -11,7 +17,7 @@
         <a class="navbar-brand">{{routeName}}</a>
       </div>
       <div class="collapse navbar-collapse">
-        <!-- If you edit this section, make sure to fix the section in App.vue -->
+        <!-- If you edit this section, make sure to fix the section in App.vue for the narrow screen -->
         <ul class="nav navbar-nav navbar-right">
           <li>
             <a href="#" class="btn-rotate">
@@ -22,9 +28,9 @@
             </a>
           </li>
           <drop-down v-bind:title="activeUserName" icon="ti-user">
-            <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-            <li><a href="#/changepassword"><i class="ti-shield"></i>&nbsp;Change password</a></li>
-            <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
+            <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;&nbsp;Edit account</a></li>
+            <li><a href="#/changepassword"><i class="ti-key"></i>&nbsp;&nbsp;Change password</a></li>
+            <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;&nbsp;Log out</a></li>
           </drop-down>
         </ul>
       </div>
@@ -61,7 +67,16 @@
       },
 
       activeUserName() {
-        return 'User: '+userService.currentUser().username
+        // Get the active user name -- the display name if defined; else the user name
+        var username = userService.currentUser().username;
+        var dispname = userService.currentUser().displayname;
+        var userlabel = '';
+        if (dispname === undefined || dispname === '') {
+          userlabel = username;
+        } else {
+          userlabel = dispname;
+        }
+        return 'User: '+userlabel
       },
 
       // Theme function
