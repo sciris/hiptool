@@ -5,6 +5,7 @@ Version:
 from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp, HPException
 from hptool import SIticks, boxoff
 from pylab import figure, barh, arange
+import bokeh as bk
 
 class Burden(object):
     ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
@@ -51,7 +52,7 @@ class Burden(object):
         return output
         
     
-    def plottopcauses(self, which=None, n=None,axsize=None, figsize=None):
+    def plottopcauses(self, which=None, n=None, axsize=None, figsize=None, engine=None):
         '''
         Create a bar plot of the top causes of burden. By default, plots the top
         10 causes of DALYs.
@@ -63,6 +64,7 @@ class Burden(object):
         if n     is None: n     = 10
         if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
         if figsize is None: figsize  = (5,5)
+        if engine is None: engine = 'bokeh' # Choices are bokeh or matplotlib
         barw     = 0.8
         barcolor = (0.7,0,0.3)
         
@@ -97,15 +99,29 @@ class Burden(object):
             unitstr = ''
         
         # Create plot
-        yaxis = arange(len(barvals), 0, -1)
-        fig = figure(facecolor='w', figsize=figsize)
-        ax = fig.add_axes(axsize)
-        barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
-        ax.set_yticks(yaxis+barw/2.)
-        ax.set_yticklabels(barlabels)
-        SIticks(ax=ax,axis='x')
-        ax.set_xlabel(thisxlabel+unitstr)
-        ax.set_title(thistitle)
-        boxoff()
-        return fig
+        if engine=='matplotlib':
+            yaxis = arange(len(barvals), 0, -1)
+            fig = figure(facecolor='w', figsize=figsize)
+            ax = fig.add_axes(axsize)
+            barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
+            ax.set_yticks(yaxis+barw/2.)
+            ax.set_yticklabels(barlabels)
+            SIticks(ax=ax,axis='x')
+            ax.set_xlabel(thisxlabel+unitstr)
+            ax.set_title(thistitle)
+            boxoff()
+            return fig
+        elif engine=='bokeh':
+            from bokeh.plotting import figure
+            from bokeh.embed import components
+            
+            plot = figure()
+            plot.circle([1,2], [3,4])
+            
+            script, div = components(plot)
+            output = {'script':script, 'div':div}
+            return output
+        else:
+            raise HPException('Engine %s not found' % engine)
+            return None
         

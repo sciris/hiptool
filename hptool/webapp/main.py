@@ -1032,7 +1032,7 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
     
-def get_project_burden_plots(project_id, burdenset_numindex):
+def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
     ''' Plot the disease burden '''
     
 #    def fixgraph(graph, graph_dict):
@@ -1060,7 +1060,10 @@ def get_project_burden_plots(project_id, burdenset_numindex):
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        graph_dict = mpld3.fig_to_dict(fig)
+        if engine=='matplotlib':
+            graph_dict = mpld3.fig_to_dict(fig)
+        elif engine=='bokeh':
+            graph_dict = fig['script'] + '\n\n' + fig['div'] # Combine script and div
 #        graph_dict = fixgraph(fig, graph_dict)
         graphs.append(graph_dict)
     
