@@ -5,7 +5,6 @@ import Vue from 'vue'
 import GlobalComponents from './globalComponents'
 import GlobalDirectives from './globalDirectives'
 import Notifications from './components/generic/NotificationPlugin'
-import SideBar from './components/app/Sidebar'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -21,7 +20,6 @@ import 'es6-promise/auto'
 Vue.use(GlobalComponents);
 Vue.use(GlobalDirectives);
 Vue.use(Notifications); // WARNING, not used?
-Vue.use(SideBar);
 
 // global library setup
 Object.defineProperty(Vue.prototype, '$Chartist', {
