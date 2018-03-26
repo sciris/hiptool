@@ -239,9 +239,9 @@ Last update: 2018-03-25
 
   export default {
     name: 'DiseaseBurdenPage',
-    components: {
-        HotTable
-    },
+//    components: {
+//        HotTable
+//    },
     data() {
       return {
         // Placeholder text for table filter box
