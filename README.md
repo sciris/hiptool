@@ -74,10 +74,19 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
 
 No known issues; please use the quick start guide above.
 
-## Detailed installation instructions for Linux
+## Detailed installation instructions for Linuxgg
 
 No known issues; please use the quick start guide above.
 
 ## Detailed installation instructions for Mac
+1. Follow the mac installation instructions under [Sciris](http://github.com/optimamodel/sciris).
 
-No known issues; please use the quick start guide above.
+2. In the root Optima directory, clone [HPToop](https://github.com/optimamodel/hptool.git)
+
+3. If you are not in the virtual environment already, at the Optima directory run
+
+         . /venv/bin/activate
+
+4. Change to the `bin` subfolder and type `python run.py`.
+
+5. If it worked, go to `localhost:8091` in your browser to use the webapp.
