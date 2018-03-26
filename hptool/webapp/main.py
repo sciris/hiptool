@@ -1063,7 +1063,8 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
         if engine=='matplotlib':
             graph_dict = mpld3.fig_to_dict(fig)
         elif engine=='bokeh':
-            graph_dict = fig['script'] + '\n\n' + fig['div'] # Combine script and div
+            graph_dict = fig
+            fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines
 #        graph_dict = fixgraph(fig, graph_dict)
         graphs.append(graph_dict)
     
