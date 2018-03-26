@@ -2,82 +2,82 @@
 
 The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
 
-## Install sciris
-It is important that you install Sciris and Anaconda Python to get many of the dependencies needed for Numpy and Matplotlib.
+## Quick start guide
 
-## Installing the Python tool
+1. Install [Sciris](http://github.com/optimamodel/sciris)
 
-If you are installing these packages for the first time, look at **First time install** below.
+2. Install `hptool` by typing `python setup.py develop` in the root folder.
 
-Before you install, check that you are using the correct python
+3. Change to the `bin` subfolder and type `python run.py`.
 
-`which python`
+4. If it worked, go to `localhost:8091` in your browser to use the webapp.
 
-Should show that you are using Anaconda Python. If it says you are using the built in Python, you need to close down the terminal and open it again. 
+## Slow start guide
 
-To install, do
+1. Install [Sciris](http://github.com/optimamodel/sciris) and follow all installation instructions there.
 
-`python setup.py develop`
+2. Clone the `hptool` repository (yes, this one!).
 
-in the main folder. 
+3. Install `hptool` by typing `python setup.py develop` in the root folder.
 
-### If Anaconda Python fails
-NOTE: The below steps were used when a failed Aacoda Python install occurred. 
-You may need some, all or none of the below. 
-
-If you are starting from a fresh Ubuntu install, you may need to install Python setuptools 
-
-`sudo apt-get install python-setuptools`
-
-`sudo apt-get install python-dev`
-
-`sudo apt install gcc`
-
-Numpy requires cython:
-`easy_install --user cython`
-
-Matplotlib requires pkg-config, libfreetype6, and libpng12 
-
-`sudo apt-get install pkg-config`
-
-`sudo apt-get install libfreetype6-dev`
-
-`sudo apt-get install libpng12-dev` 
-
-EXCEPT: Ubuntu killed this library, so you need to get it here: https://packages.ubuntu.com/xenial/i386/libpng12-0/download
-
-## Installing the client
-
-In the `client` folder, run
-
+4. Test that you can import it by typing `import hptool`, e.g.
 ```
-npm install
-npm run build
+>>> import hptool
+HealthPrior 0.2.9 (2018-03-26)
+Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
+>>>
 ```
 
-## Refreshing the client
+5. Test that plotting works with `python -i scripts/example.py`, which should bring up a graph.
 
-If you have made changes to the frontend, you will need to do `npm run build` again.
+6. To build and start the webapp, change to the `bin` folder, and type `python run.py`. Note: this will take a lot of time (up to 15 min), especially on a first run!
 
-## Starting the server
+7. If it worked, you can go to `localhost:8091` in your browser and see the HealthPrior webapp.
 
-In the `webapp` folder, run
+8. If it didn't work, try each of the steps separately:
 
-`python start_server.py`
+  8a. Type `python install_client.py` to install the JavaScript modules. You should see output like this:
+  ```
+  your_computer:~/hptool/bin> python install_client.py
+  npm WARN optional Skipping failed optional dependency /karma/chokidar/fsevents:
+  npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.1.3
+  npm WARN optional Skipping failed optional dependency /chokidar/fsevents:
+  npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.1.3
+  ```
 
-This will start on port `localhost:8091`.
+  Don't worry about `WARN`, but _do_ worry about `ERR`! If you see `ERR`, that means that installation failed.
 
-## Development mode
+  8b. Type `python build_client.py` to build the JavaScript app. You should see output like:
+  ```
+  static/img/ucl-logo-transparent.png    35.5 kB          [emitted]         
+     static/img/world-bank-logo.png    30.7 kB          [emitted]         
+    static/mpld3.v0.3.1.dev1.min.js    37.6 kB          [emitted]         
 
-Instead of `npm run build` and `python start_server.py`, you can also run 
+  Build complete.
 
-`bash linux_dev_run`
+  Tip: built files are meant to be served over an HTTP server.
+  Opening index.html over file:// won't work.
+  ```
+  You should not see any warnings or errors on this step.
 
-which runs (in separate terminal windows):
+  8c. Type `python start_server.py` to start the server running. You should see something like:
+  ```
+  >> Doing other scirismain-specific initialization...
+  -- Welcome to the HealthPrior webapp, version 0.2.9 (2018-03-26) --
+  Site starting on 8091
+  Starting factory <twisted.web.server.Site instance at 0x7fedcb347dd0>
+  ```
 
-```
-python start_dev_server.py
-python start_dev_client.py
-```
+9. If that all worked, happy health-prioritizing! Please see the README in the `bin` folder for more options for how to run HealthPrior.
 
-This uses hot reloading, so any changes you make to the client code will be immediately live. Your site will be live at `localhost:8080`.
+## Detailed installation instructions for Windows
+
+No known issues; please use the quick start guide above.
+
+## Detailed installation instructions for Linux
+
+No known issues; please use the quick start guide above.
+
+## Detailed installation instructions for Mac
+
+No known issues; please use the quick start guide above.

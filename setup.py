@@ -32,7 +32,7 @@ setup(
     name='hptool',
     version=version,
     author='Cliff Kerr, George Chadderdon',
-    author_email='info@optimamodel.com',
+    author_email='info@hptool.org',
     description='Health Package Prioritization Tool',
     url='http://github.com/optimamodel/hptool',
     keywords=['optima','UHC'],
