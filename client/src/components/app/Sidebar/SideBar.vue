@@ -21,7 +21,7 @@
       </slot>
       <ul :class="navClasses">
         <!--By default vue-router adds an active class to each route link. This way the links are colored when clicked-->
-        <router-link v-for="(link,index) in sidebarLinks" :to="link.path" tag="li" :ref="link.name" :key="link.name + index">
+        <router-link v-for="(link, index) in sidebarLinks" :to="link.path" tag="li" :ref="link.name" :key="link.name + index">
           <a>
             <i :class="link.icon"></i>
 
@@ -36,7 +36,6 @@
   </div>
 </template>
 <script>
-  import MovingArrow from './MovingArrow.vue'
   export default {
     props: {
       type: {
@@ -68,10 +67,12 @@
         default: () => []
       }
     },
-    components: {
-      MovingArrow
-    },
     computed: {
+      arrowStyle () {
+        return {
+          transform: `translate3d(0px, ${this.arrowMovePx}px, 0px)`
+        }
+      },
       sidebarClasses () {
         if (this.type === 'sidebar') {
           return 'sidebar'
@@ -96,10 +97,6 @@
     },
     data () {
       return {
-        moveY: {
-          type: Number,
-          default: 0
-        },
         linkHeight: 60,
         activeLinkIndex: 0,
 
@@ -130,7 +127,7 @@
   }
 
 </script>
-<style scoped lang="scss">
+<style lang="scss">
   $bg-nude: #f4f3ef !default;
 
   .moving-arrow {
