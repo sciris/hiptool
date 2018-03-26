@@ -29,7 +29,7 @@ Last update: 2018-03-25
         <div class="modal-body">
           <h2>Register</h2>
 
-          <div class="section" v-if="loginResult != ''">{{ loginResult }}</div>
+          <div class="section" v-if="registerResult != ''">{{ registerResult }}</div>
 
           <div class="section form-input-validate">
             <input class="txbox __l"
@@ -67,6 +67,13 @@ Last update: 2018-03-25
 
           <button type="submit" class="section btn __l __block">Register</button>
 
+          <div class="section">
+            Already registered?
+            <router-link class="link __blue" to="/login">
+              Login
+            </router-link>
+          </div>
+
         </div>
       </form>
     </div>
@@ -87,8 +94,20 @@ export default {
       registerPassword: '',
       registerDisplayName: '',
       registerEmail: '',
-      registerResult: ''
+      registerResult: '',
+      version: '',
+      date: '',
     }
+  },
+
+  computed: {
+    getVersionInfo() {
+      rpcservice.rpcPublicCall('get_version_info')
+        .then(response => {
+          this.version = response.data['version'];
+          this.date = response.data['date'];
+        })
+    },
   },
 
   methods: {
@@ -96,30 +115,11 @@ export default {
       rpcservice.rpcRegisterCall('user_register', this.registerUserName,
         this.registerPassword, this.registerDisplayName, this.registerEmail)
       .then(response => {
-        if (response.data == 'success') {
-          this.registerResult = 'Success';
-          // Set a success result to show.
-          // CK: Can't show these since don't appear here
-//          this.$notifications.notify({
-//            message: 'Registered!',
-//            icon: 'ti-check',
-//            type: 'success',
-//            verticalAlign: 'top',
-//            horizontalAlign: 'center',
-//          });
-
-          // Navigate automatically to the login page.
-          router.push('/login')
-        } else {
-          // Set a failure result to show.
-          this.registerResult = 'Failure';
-//          this.$notifications.notify({
-//            message: 'Failed to register',
-//            icon: 'ti-face-sad',
-//            type: 'danger',
-//            verticalAlign: 'top',
-//            horizontalAlign: 'center',
-//          });
+        if (response.data == 'success') { // Set a success result to show.
+          this.registerResult = 'Success! Please wait while you are redirected...';
+          setTimeout(function() {router.push('/login')}, 2000); // Navigate automatically to the login page after a delay
+        } else { // Set a failure result to show.
+          this.registerResult = 'Failed to register; please try a different username and password';
         }
       })
       .catch(error => {
