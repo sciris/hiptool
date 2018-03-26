@@ -1,7 +1,7 @@
 <!--
 Footer for content pages
 
-Last update: 2018mar25
+Last update: 2018-03-25
 -->
 
 <template>

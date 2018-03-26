@@ -1,7 +1,7 @@
 <!--
 Help page -- ideally will have mostly in-app help a la HIV
 
-Last update: 2018mar25
+Last update: 2018-03-25
 -->
 
 <template>

@@ -1,18 +1,18 @@
 <!--
 Admin page
 
-Last update: 2018mar25
+Last update: 2018-03-25
 -->
 
 <template>
   <div class="SitePage">
-    <h2>Scatterplotter Users</h2>
+    <h2>HealthPrior Users</h2>
     <table v-if="usersList[0] != undefined">
       <tr>
         <th>Username</th>
-        <th>Display Name</th>
+        <th>Display name</th>
         <th>Email</th>
-        <th>Account Active?</th>
+        <th>Account active?</th>
         <th>Admin?</th>
         <th>Actions</th>
       </tr>
