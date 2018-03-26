@@ -17,9 +17,26 @@ Last update: 2018-03-25
 
       <button class="btn" @click="createNewSet">Create new intervention set</button>
 
+      <span>&nbsp;based on&nbsp;</span>
+
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option
+          v-for = "country in countryList"
+          :value="country"
+        >
+          {{country}}
+        </option>
+      </select>
+
+      <br/><br/>
+
       <input type="text"
              class="txbox"
-             style="margin-left:20px; margin-bottom:20px; display:inline-block; max-width:400px"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -159,7 +176,14 @@ export default {
       showCancerIntervs: false, // Show cancer interventions
       showInfectiousIntervs: false, // Show infectious diseases interventions
       showChildIntervs: false, // Show child care interventions
-      interventionList: []
+      interventionList: [],
+
+      // CK: WARNING TEMP, should come from backend
+      country: 'Afghanistan',
+      countryList: [
+        'Afghanistan',
+        'Other',
+      ]
     }
   },
 

@@ -17,9 +17,26 @@ Last update: 2018-03-25
 
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
 
+      <span>&nbsp;based on&nbsp;</span>
+
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option
+          v-for = "country in countryList"
+          :value="country"
+        >
+          {{country}}
+        </option>
+      </select>
+
+      <br/><br/>
+
       <input type="text"
              class="txbox"
-             style="margin-left:20px; margin-bottom:20px; display:inline-block; max-width:400px"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
              :placeholder="filterPlaceholder"
              v-model="filterText"/>
 
@@ -245,8 +262,6 @@ Last update: 2018-03-25
           colHeaders: true
         },
 
-
-
         // List of burden sets in the active project
         burdenSets: [],
 
@@ -261,7 +276,14 @@ Last update: 2018-03-25
         sortColumn2: 'name',  // name, country, creationTime, updatedTime
 
         // Sort diseases in reverse order?
-        sortReverse2: false
+        sortReverse2: false,
+
+        // CK: WARNING TEMP, should come from backend
+        country: 'Afghanistan',
+        countryList: [
+          'Afghanistan',
+          'Other',
+        ]
       }
     },
 
