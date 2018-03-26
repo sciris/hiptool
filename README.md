@@ -87,6 +87,6 @@ No known issues; please use the quick start guide above.
 
          . /venv/bin/activate
 
-4. Change to the `bin` subfolder and type `python run.py`.
+4. Change to the `bin` subfolder and type `pythonw run.py`.
 
 5. If it worked, go to `localhost:8091` in your browser to use the webapp.
