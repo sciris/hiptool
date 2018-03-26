@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/20/18 (gchadder3)
+Last update: 3/23/18 (gchadder3)
 """
 
 #
@@ -22,7 +22,7 @@ import sciris.user as user
 import sciris.project as project
 import hptool
 from hptool.webapp import config
-from hptool import uuid, dcp
+from hptool import uuid, dcp, Burden, Interventions
 
 
 #
@@ -500,7 +500,7 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print('-- Welcome to HealthPrior, version 0.2 --')
+    print('-- Welcome to the HealthPrior webapp, version %s (%s) --' % (hptool.version, hptool.versiondate))
     return None
     
 #
@@ -678,6 +678,20 @@ def json_sanitize_result(theResult):
 #        return str(theResult)
 
     return theResult
+
+
+def get_version_info():
+	''' Return the informatino about the project. '''
+	gitinfo = sciris.utils.gitinfo(__file__)
+	version_info = {
+        'version': hptool.version,
+        'date': hptool.versiondate,
+        'gitbranch': gitinfo['branch'],
+        'githash': gitinfo['hash'],
+        'gitdate': gitinfo['date'],
+	}
+	return version_info
+
 
 ##
 ## Project helper functions
@@ -904,7 +918,11 @@ def create_project_from_prj_file(prj_filename, user_id):
     
     # Return the new project UID in the return message.
     return { 'projectId': str(theProj.uid) }
-     
+
+##
+## Burden set RPCs
+##   
+    
 def get_project_burden_sets(project_id):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
@@ -920,7 +938,7 @@ def get_project_burden_sets(project_id):
     # Return the JSON-friendly result.
     return {'burdensets': map(get_burden_set_fe_repr, burdenSets)}
 
-def get_project_burden_set_diseases(project_id, burdenset_id):
+def get_project_burden_set_diseases(project_id, burdenset_numindex):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
     if request.endpoint != 'normalProjectRPC':
@@ -929,18 +947,92 @@ def get_project_burden_set_diseases(project_id, burdenset_id):
     # Get the Project object.
     theProj = project.load_project(project_id)
     
-    # Get the burden set that matches burdenset_id.
-    burdenSet = theProj.burden()  # TO DO: replace this with a call that handles ID
+    # Get the burden set that matches burdenset_numindex.
+    burdenSet = theProj.burden(key=burdenset_numindex)
     
+    # Return an empty list if no data is present.
+    if burdenSet.data is None:
+        return { 'diseases': [] }
+
     # Gather the list for all of the diseases.
-    diseaseData = [list(theDisease) for theDisease in burdenSet.data]
+    diseaseData = burdenSet.export(cols=['active','cause','dalys','deaths','prevalence'], header=False)
     
     # Return success.
     return { 'diseases': diseaseData }
     
+def create_burden_set(project_id, new_burden_set_name):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(new_burden_set_name, 
+            other_names=list(theProj.burdensets))
+        
+        # Create a new (empty) burden set.
+        newBurdenSet = Burden(project=theProj, name=uniqueName)
+        dataPath = hptool.HPpath('data')
+        newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
+        
+        # Put the new burden set in the dictionary.
+        theProj.burdensets[uniqueName] = newBurdenSet
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
     
-   
-def get_project_burden_plots(project_id, burdenset_id):
+    # Do the project update using the internal function.
+    update_project_with_fn(project_id, update_project_fn)
+
+    # Return the new burden sets.
+    return get_project_burden_sets(project_id)
+
+def delete_burden_set(project_id, burdenset_numindex):
+
+    def update_project_fn(theProj):
+        theProj.burdensets.pop(burdenset_numindex)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.    
+    update_project_with_fn(project_id, update_project_fn)   
+    
+def copy_burden_set(project_id, burdenset_numindex):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(theProj.burdensets[burdenset_numindex].name, 
+            other_names=list(theProj.burdensets))
+        
+        # Create a new burdenset which is a copy of the old one.
+        newBurdenSet = dcp(theProj.burdensets[burdenset_numindex])
+        
+        # Overwrite the old name with the new.
+        newBurdenSet.name = uniqueName
+       
+        # Put the new burden set in the dictionary.
+        theProj.burdensets[uniqueName] = newBurdenSet
+        
+    # Do the project update using the internal function.  
+    update_project_with_fn(project_id, update_project_fn)
+    
+    # Return the new burden sets.
+    return get_project_burden_sets(project_id) 
+
+def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
+
+    def update_project_fn(theProj):
+        # Overwrite the old name with the new.
+        theProj.burdensets[burdenset_numindex].name = new_burden_set_name
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+    
+def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
     ''' Plot the disease burden '''
     
 #    def fixgraph(graph, graph_dict):
@@ -957,8 +1049,8 @@ def get_project_burden_plots(project_id, burdenset_id):
     # Get the Project object.
     theProj = project.load_project(project_id)
     
-    # Get the burden set that matches burdenset_id.
-    burdenSet = theProj.burden()  # TO DO: replace this with a call that handles ID
+    # Get the burden set that matches burdenset_numindex.
+    burdenSet = theProj.burden(key=burdenset_numindex)
     
     figs = []
     for which in ['dalys','deaths','prevalence']:
@@ -968,7 +1060,11 @@ def get_project_burden_plots(project_id, burdenset_id):
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        graph_dict = mpld3.fig_to_dict(fig)
+        if engine=='matplotlib':
+            graph_dict = mpld3.fig_to_dict(fig)
+        elif engine=='bokeh':
+            graph_dict = fig
+            fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines
 #        graph_dict = fixgraph(fig, graph_dict)
         graphs.append(graph_dict)
     
@@ -977,6 +1073,9 @@ def get_project_burden_plots(project_id, burdenset_id):
             'graph2': graphs[1],
             'graph3': graphs[2],}
     
+##
+## Intervention set RPCs
+## 
     
 def get_project_interv_sets(project_id):
     # Check (for security purposes) that the function is being called by the 
@@ -993,7 +1092,7 @@ def get_project_interv_sets(project_id):
     # Return the JSON-friendly result.
     return {'intervsets': map(get_interv_set_fe_repr, intervSets)}
 
-def get_project_interv_set_intervs(project_id, intervset_id):
+def get_project_interv_set_intervs(project_id, intervset_numindex):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
     if request.endpoint != 'normalProjectRPC':
@@ -1002,8 +1101,12 @@ def get_project_interv_set_intervs(project_id, intervset_id):
     # Get the Project object.
     theProj = project.load_project(project_id)
     
-    # Get the intervention set that matches intervset_id.
-    intervSet = theProj.inter()  # TO DO: replace this with a call that handles ID
+    # Get the intervention set that matches intervset_numindex.
+    intervSet = theProj.inter(key=intervset_numindex)
+    
+    # Return an empty list if no data is present.
+    if intervSet.data is None:
+        return { 'interventions': [] } 
     
     # Gather the list for all of the interventions.
     intervData = [list(theInterv) for theInterv in intervSet.data]
@@ -1011,6 +1114,76 @@ def get_project_interv_set_intervs(project_id, intervset_id):
     # Return success.
     return { 'interventions': intervData }
 
+def create_interv_set(project_id, new_interv_set_name):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(new_interv_set_name, 
+            other_names=list(theProj.intersets))
+        
+        # Create a new (empty) intervention set.
+        newIntervSet = Interventions(project=theProj, name=uniqueName)
+        
+        # Put the new intervention set in the dictionary.
+        theProj.intersets[uniqueName] = newIntervSet
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.
+    update_project_with_fn(project_id, update_project_fn)
+
+    # Return the new intervention sets.
+    return get_project_interv_sets(project_id)
+
+def delete_interv_set(project_id, intervset_numindex):
+
+    def update_project_fn(theProj):
+        theProj.intersets.pop(intervset_numindex)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.    
+    update_project_with_fn(project_id, update_project_fn)   
+    
+def copy_interv_set(project_id, intervset_numindex):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(theProj.intersets[intervset_numindex].name, 
+            other_names=list(theProj.intersets))
+        
+        # Create a new intervention set which is a copy of the old one.
+        newIntervSet = dcp(theProj.intersets[intervset_numindex])
+        
+        # Overwrite the old name with the new.
+        newIntervSet.name = uniqueName
+       
+        # Put the new intervention set in the dictionary.
+        theProj.intersets[uniqueName] = newIntervSet
+        
+    # Do the project update using the internal function.  
+    update_project_with_fn(project_id, update_project_fn)
+    
+    # Return the new intervention sets.
+    return get_project_interv_sets(project_id)
+
+def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
+
+    def update_project_fn(theProj):
+        # Overwrite the old name with the new.
+        theProj.intersets[intervset_numindex].name = new_interv_set_name
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+    
 ##
 ## Temporary (development) RPCs
 ##

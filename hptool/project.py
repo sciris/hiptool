@@ -1,6 +1,6 @@
 from hptool import odict, uuid, today, version, gitinfo, objrepr, getdate
-from hptool import isnumber, printv
-from hptool import HPException, Burden, Interventions
+from hptool import printv, makefilepath, saveobj, dcp
+from hptool import Burden, Interventions
 
 
 #######################################################################################################
@@ -52,7 +52,7 @@ class Project(object):
         self.modified = today()
         self.spreadsheetdate = 'Spreadsheet never loaded'
         self.version = version
-        self.gitbranch, self.gitversion = gitinfo()
+        self.gitinfo = gitinfo(__file__)
         self.filename = None # File path, only present if self.save() is used
         self.warnings = None # Place to store information about warnings (mostly used during migrations)
 
@@ -85,11 +85,11 @@ class Project(object):
         output += '        HP version: %s\n'    % self.version
         output += '      Date created: %s\n'    % getdate(self.created)
         output += '     Date modified: %s\n'    % getdate(self.modified)
-        output += '        Git branch: %s\n'    % self.gitbranch
-        output += '       Git version: %s\n'    % self.gitversion
+        output += '        Git branch: %s\n'    % self.gitinfo['branch']
+        output += '          Git hash: %s\n'    % self.gitinfo['hash']
         output += '               UID: %s\n'    % self.uid
         output += '============================================================\n'
-        output += self.getwarnings(doprint=False) # Don't print since print later
+#        output += self.getwarnings(doprint=False) # Don't print since print later
         return output
     
     
@@ -98,9 +98,44 @@ class Project(object):
         info = odict()
         for attr in ['name', 'version', 'created', 'modified', 'gitbranch', 'gitversion', 'uid']:
             info[attr] = getattr(self, attr) # Populate the dictionary
-        info['parsetkeys'] = self.parsets.keys()
-        info['progsetkeys'] = self.parsets.keys()
+#        info['parsetkeys'] = self.parsets.keys()
+#        info['progsetkeys'] = self.parsets.keys()
         return info
+    
+    
+    def addwarning(self, message=None, **kwargs):
+        ''' Add a warning to the project, which is printed when migrated or loaded '''
+        if not hasattr(self, 'warnings') or type(self.warnings)!=str: # If no warnings attribute, create it
+            self.warnings = ''
+        self.warnings += '\n'*3+str(message) # # Add this warning
+        return None
+
+
+    def getwarnings(self, doprint=True):
+        ''' Tiny method to print the warnings in the project, if any '''
+        if hasattr(self, 'warnings') and self.warnings: # There are warnings
+            output = '\nWARNING: This project contains the following warnings:'
+            output += str(self.warnings)
+        else: # There are no warnings
+            output = ''
+        if output and doprint: # Print warnings if requested
+            print(output)
+        return output
+    
+    
+    def save(self, filename=None, folder=None, saveresults=False, verbose=2):
+        ''' Save the current project, by default using its name, and without results '''
+        fullpath = makefilepath(filename=filename, folder=folder, default=[self.filename, self.name], ext='prj', sanitize=True)
+        self.filename = fullpath # Store file path
+        if saveresults:
+            saveobj(fullpath, self, verbose=verbose)
+        else:
+            tmpproject = dcp(self) # Need to do this so we don't clobber the existing results
+#            tmpproject.restorelinks() # Make sure links are restored
+            tmpproject.cleanresults() # Get rid of all results
+            saveobj(fullpath, tmpproject, verbose=verbose) # Save it to file
+            del tmpproject # Don't need it hanging around any more
+        return fullpath
 
 
     #######################################################################################################
@@ -116,5 +151,11 @@ class Project(object):
         ''' Shortcut for getting the latest active interventions set, i.e. self.intersets[-1] '''
         try:    return self.intersets[key]
         except: return printv('Warning, interventions set not found!', 1, verbose) # Returns None
+    
+    def cleanresults(self):
+        ''' Remove all results '''
+        for key,result in self.results.items():
+            self.results.pop(key)
+        return None
         
 

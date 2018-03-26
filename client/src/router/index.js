@@ -2,145 +2,110 @@
 //
 // Last update: 2/21/18 (gchadder3)
 
+// Import main things
 import Vue from 'vue'
 import Router from 'vue-router'
-import DashboardLayout from '@/components/Dashboard/Layout/DashboardLayout.vue'
-// GeneralViews
-import NotFound from '@/components/GeneralViews/NotFoundPage.vue'
+import DashboardLayout from '@/components/app/DashboardLayout.vue'
 
-// Admin pages
-import Overview from '@/components/Dashboard/Views/Overview.vue'
-import UserProfile from '@/components/Dashboard/Views/UserProfile.vue'
-import Notifications from '@/components/Dashboard/Views/Notifications.vue'
-import Icons from '@/components/Dashboard/Views/Icons.vue'
-import Maps from '@/components/Dashboard/Views/Maps.vue'
-import Typography from '@/components/Dashboard/Views/Typography.vue'
-import TableList from '@/components/Dashboard/Views/TableList.vue'
-import ProjectsPage from '@/components/Dashboard/Views/ProjectsPage'
+// App views
+import NotFound from '@/components/generic/NotFoundPage.vue'
+import ProjectsPage from '@/components/app/ProjectsPage'
+import DiseaseBurdenPage from '@/components/app/DiseaseBurdenPage'
+import InterventionsPage from '@/components/app/InterventionsPage'
+import EquityPage from '@/components/app/EquityPage'
+import FinancialRiskPage from '@/components/app/FinancialRiskPage'
+import HealthPackagesPage from '@/components/app/HealthPackagesPage'
+import LoginPage from '@/components/app/LoginPage'
+import MainAdminPage from '@/components/app/MainAdminPage'
+import RegisterPage from '@/components/app/RegisterPage'
+import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
+import ChangePasswordPage from '@/components/app/ChangePasswordPage'
+import Help from '@/components/app/Help'
+import Contact from '@/components/app/Contact'
+import About from '@/components/app/About'
 
-// 
-import DiseaseBurdenPage from '@/components/Dashboard/Views/DiseaseBurdenPage'
-import InterventionsPage from '@/components/Dashboard/Views/InterventionsPage'
-import HealthPackagesPage from '@/components/Dashboard/Views/HealthPackagesPage'
-import MyPage from '@/components/Dashboard/Views/MyPage'
-import LoginPage from '@/components/Dashboard/Views/LoginPage'
-import MainAdminPage from '@/components/Dashboard/Views/MainAdminPage'
-import RegisterPage from '@/components/Dashboard/Views/RegisterPage'
-import UserChangeInfoPage from '@/components/Dashboard/Views/UserChangeInfoPage'
-import ChangePasswordPage from '@/components/Dashboard/Views/ChangePasswordPage'
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
     {
-      path: '/',
-      component: DashboardLayout,
-      redirect: '/admin/projects'
+      path: '/register',
+      name: 'Registration',
+      component: RegisterPage
     },
     {
       path: '/login',
-      name: 'LoginPage',
+      name: 'Login',
       component: LoginPage
     },
     {
-      path: '/admin',
+      path: '/',
       component: DashboardLayout,
-      redirect: '/admin/stats',
+      redirect: '/projects',
       children: [
         {
           path: 'projects',
-          name: 'ProjectsPage',
+          name: 'Manage projects',
           component: ProjectsPage
         },
         {
           path: 'bod',
-          name: 'DiseaseBurdenPage',
+          name: 'Define burden of disease',
           component: DiseaseBurdenPage
         },
         {
           path: 'interventions',
-          name: 'InterventionsPage',
+          name: 'Define interventions',
           component: InterventionsPage
         },
         {
+          path: 'equity',
+          name: 'Define equity',
+          component: EquityPage
+        },
+        {
+          path: 'financialrisk',
+          name: 'Define financial risk protection',
+          component: FinancialRiskPage
+        },
+        {
           path: 'healthpackages',
-          name: 'HealthPackagesPage',
+          name: 'Define health packages',
           component: HealthPackagesPage
         },
         {
-          path: 'mypage',
-          name: 'MyPage',
-          component: MyPage
-        },
-        {
           path: 'mainadmin',
-          name: 'MainAdminPage',
+          name: 'Admin',
           component: MainAdminPage
         },
         {
-          path: 'register',
-          name: 'RegisterPage',
-          component: RegisterPage
-        },
-        {
           path: 'changeinfo',
-          name: 'UserChangeInfoPage',
+          name: 'Edit account',
           component: UserChangeInfoPage
         },
         {
           path: 'changepassword',
-          name: 'ChangePasswordPage',
+          name: 'Change password',
           component: ChangePasswordPage
         },
         {
-          path: 'overview',
-          name: 'overview',
-          component: Overview
+          path: 'help',
+          name: 'Help',
+          component: Help
         },
         {
-          path: 'stats',
-          name: 'stats',
-          component: UserProfile
+          path: 'contact',
+          name: 'Contact',
+          component: Contact
         },
         {
-          path: 'notifications',
-          name: 'notifications',
-          component: Notifications
+          path: 'about',
+          name: 'About',
+          component: About
         },
-        {
-          path: 'icons',
-          name: 'icons',
-          component: Icons
-        },
-        {
-          path: 'maps',
-          name: 'maps',
-          component: Maps
-        },
-        {
-          path: 'typography',
-          name: 'typography',
-          component: Typography
-        },
-        {
-          path: 'table-list',
-          name: 'table-list',
-          component: TableList
-        }
-    ]
-  },
+      ]
+    },
     { path: '*', component: NotFound }
   ]
 })
-
-/**
- * Asynchronously load view (Webpack Lazy loading compatible)
- * The specified component must be inside the Views folder
- * @param  {string} name  the filename (basename) of the view to load.
-function view(name) {
-   var res= require('../components/Dashboard/Views/' + name + '.vue');
-   return res;
-};**/
-
-// export default routes

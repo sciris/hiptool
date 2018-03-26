@@ -4,8 +4,8 @@ import Vue from 'vue'
 // Plugins
 import GlobalComponents from './globalComponents'
 import GlobalDirectives from './globalDirectives'
-import Notifications from './components/UIComponents/NotificationPlugin'
-import SideBar from './components/UIComponents/SidebarPlugin'
+import Notifications from './components/generic/NotificationPlugin'
+import SideBar from './components/app/Sidebar'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -18,10 +18,10 @@ import './assets/sass/paper-dashboard.scss'
 import 'es6-promise/auto'
 
 // plugin setup
-Vue.use(GlobalComponents)
-Vue.use(GlobalDirectives)
-Vue.use(Notifications)
-Vue.use(SideBar)
+Vue.use(GlobalComponents);
+Vue.use(GlobalDirectives);
+Vue.use(Notifications); // WARNING, not used?
+Vue.use(SideBar);
 
 // global library setup
 Object.defineProperty(Vue.prototype, '$Chartist', {
