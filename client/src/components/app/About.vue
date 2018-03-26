@@ -22,23 +22,23 @@ Last update: 2018mar25
     <div class="divTable">
       <div class="divTableBody">
         <div class="divTableRow">
-          <div class="divRowLabel">Version: </div>
+          <div class="divRowLabel">Version </div>
           <div class="divRowContent">{{ version }}</div>
         </div>
         <div class="divTableRow">
-          <div class="divRowLabel">Date: </div>
+          <div class="divRowLabel">Date </div>
           <div class="divRowContent">{{ date }}</div>
         </div>
         <div class="divTableRow">
-          <div class="divRowLabel">Branch: </div>
+          <div class="divRowLabel">Branch </div>
           <div class="divRowContent">{{ gitbranch }}</div>
         </div>
         <div class="divTableRow">
-          <div class="divRowLabel">Hash: </div>
+          <div class="divRowLabel">Hash </div>
           <div class="divRowContent">{{ githash }}</div>
         </div>
         <div class="divTableRow">
-          <div class="divRowLabel">Timestamp: </div>
+          <div class="divRowLabel">Timestamp </div>
           <div class="divRowContent">{{ gitdate }}</div>
         </div>
       </div>
