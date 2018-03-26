@@ -4,7 +4,7 @@ The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for 
 
 ## Quick start guide
 
-1. Install [Sciris](http://github.com/optimamodel/sciris)
+1. Install [Sciris](http://github.com/optimamodel/sciris).
 
 2. Install `hptool` by typing `python setup.py develop` in the root folder.
 
