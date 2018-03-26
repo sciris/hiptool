@@ -234,7 +234,7 @@ Last update: 2018-03-25
   var filesaver = require('file-saver')
   import rpcservice from '@/services/rpc-service'
   import router from '@/router'
-  import HotTable from 'vue-handsontable-official';
+//  import HotTable from 'vue-handsontable-official';
   import Vue from 'vue';
 
   export default {
