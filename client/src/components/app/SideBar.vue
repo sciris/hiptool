@@ -21,7 +21,7 @@
       </slot>
       <ul :class="navClasses">
         <!--By default vue-router adds an active class to each route link. This way the links are colored when clicked-->
-        <router-link v-for="(link,index) in sidebarLinks" :to="link.path" tag="li" :ref="link.name" :key="link.name + index">
+        <router-link v-for="(link, index) in sidebarLinks" :to="link.path" tag="li" :ref="link.name" :key="link.name + index">
           <a>
             <i :class="link.icon"></i>
 
@@ -30,15 +30,14 @@
           </a>
         </router-link>
       </ul>
-      <moving-arrow :move-y="arrowMovePx">
-
-      </moving-arrow>
+      <div class="moving-arrow" :style="arrowStyle">
+      </div>
     </div>
   </div>
 </template>
 <script>
-  import MovingArrow from './MovingArrow.vue'
   export default {
+    name: 'side-bar',
     props: {
       type: {
         type: String,
@@ -63,16 +62,14 @@
           let acceptedValues = ['primary', 'info', 'success', 'warning', 'danger']
           return acceptedValues.indexOf(value) !== -1
         }
-      },
-      sidebarLinks: {
-        type: Array,
-        default: () => []
       }
     },
-    components: {
-      MovingArrow
-    },
     computed: {
+      arrowStyle () {
+        return {
+          transform: `translate3d(0px, ${this.arrowMovePx}px, 0px)`
+        }
+      },
       sidebarClasses () {
         if (this.type === 'sidebar') {
           return 'sidebar'
@@ -102,7 +99,54 @@
 
         windowWidth: 0,
         isWindows: false,
-        hasAutoHeight: false
+        hasAutoHeight: false,
+        sidebarLinks: [
+          {
+            name: 'Projects',
+            icon: 'ti-view-grid',
+            path: '/projects'
+          },
+          {
+            name: 'Disease burden',
+            icon: 'ti-bar-chart',
+            path: '/bod'
+          },
+          {
+            name: 'Interventions',
+            icon: 'ti-pulse',
+            path: '/interventions'
+          },
+          {
+            name: 'Equity',
+            icon: 'ti-ruler',
+            path: '/equity'
+          },
+          {
+            name: 'Financial risk',
+            icon: 'ti-bolt',
+            path: '/financialrisk'
+          },
+          {
+            name: 'Health packages',
+            icon: 'ti-heart',
+            path: '/healthpackages'
+          },
+          {
+            name: 'Help',
+            icon: 'ti-help',
+            path: '/help'
+          },
+          {
+            name: 'Contact',
+            icon: 'ti-comment-alt',
+            path: '/contact'
+          },
+          {
+            name: 'About',
+            icon: 'ti-shine',
+            path: '/about'
+          },
+        ]
       }
     },
     methods: {
@@ -127,6 +171,17 @@
   }
 
 </script>
-<style>
+<style lang="scss">
+  $bg-nude: #f4f3ef !default;
 
+  .moving-arrow {
+    border-right: 17px solid $bg-nude;
+    border-top: 17px solid transparent;
+    border-bottom: 17px solid transparent;
+    display: inline-block;
+    position: absolute;
+    left: 243px;
+    top: 95px;
+    transition: all 0.5s cubic-bezier(0.29, 1.42, 0.79, 1);
+  }
 </style>
