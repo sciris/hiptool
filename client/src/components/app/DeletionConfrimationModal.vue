@@ -1,24 +1,36 @@
 <template>
-  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+  <div class="">
+    <button id="show-modal" @click="showModal = true">Show Modal</button>
+    <!-- use the modal component, pass in the prop -->
+    <modal v-if="showModal" @close="showModal = false">
+    </modal>
+    <!-- Modal -->
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
 
-  <!-- Modal -->
-  <div id="myModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+          <div class="modal-header">
+            <slot name="header">
+              default header
+            </slot>
+          </div>
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Modal Header</h4>
-        </div>
-        <div class="modal-body">
-          <p>Some text in the modal.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <div class="modal-body">
+            <slot name="body">
+              default body
+            </slot>
+          </div>
+
+          <div class="modal-footer">
+            <slot name="footer">
+              default footer
+              <button class="modal-default-button" @click="$emit('close')">
+                OK
+              </button>
+            </slot>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -27,7 +39,9 @@
 export default {
   name: 'deletion-confrimation-modal',
   data () {
-    return {}
+    return {
+      showModal: false
+    }
   }
 }
 </script>

@@ -9,6 +9,7 @@ import SideBar from './components/app/Sidebar'
 import App from './App'
 import router from './router'
 import store from './store'
+import VueSweetalert2 from 'vue-sweetalert2';
 
 Vue.config.productionTip = false
 // library imports
@@ -22,6 +23,7 @@ Vue.use(GlobalComponents);
 Vue.use(GlobalDirectives);
 Vue.use(Notifications); // WARNING, not used?
 Vue.use(SideBar);
+Vue.use(VueSweetalert2);
 
 // global library setup
 Object.defineProperty(Vue.prototype, '$Chartist', {
