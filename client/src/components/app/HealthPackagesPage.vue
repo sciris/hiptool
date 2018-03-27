@@ -67,7 +67,7 @@ Last update: 2018-03-25
               <button class="btn __green" @click="viewPackage(healthPackage.uid)">View</button>
               <button class="btn" @click="copyPackage(healthPackage.uid)">Copy</button>
               <button class="btn" @click="renamePackage(healthPackage.uid)">Rename</button>
-              <button class="btn __red" @click="showAlert(healthPackage.uid)">Delete</button>
+              <button class="btn __red" @click="showAlert">Delete</button>
             </td>
           </tr>
           <tr>
@@ -85,6 +85,7 @@ Last update: 2018-03-25
         Page interface specific to {{ activePackage.packageName }} health package
       </div>
     </div>
+    <!--@click="deletePackage(healthPackage.uid)"-->
   </div>
 </template>
 
@@ -94,8 +95,9 @@ var filesaver = require('file-saver')
 import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 import DeletionConfrimationModal from "./DeletionConfrimationModal";
+import swal from 'sweetalert2'
 export default {
-  components: {DeletionConfrimationModal},
+  components: {DeletionConfrimationModal, swal},
   name: 'HealthPackagesPage',
 
   data() {
@@ -167,28 +169,9 @@ export default {
   },
 
   methods: {
-    showAlert(healthProject){
+    showAlert(){
       // Use sweetalret2
-      this.$swal({
-        type: 'info',
-        html:
-        'Are you sure you want to delete the selected projects? This action cannot be undone.',
-        showCloseButton: true,
-        showCancelButton: true,
-        focusConfirm: false,
-        confirmButtonText:
-          'Yes, delete the projects!',
-        // confirmButtonAriaLabel: 'Thumbs up, great!',
-        cancelButtonColor: '#404446',
-        confirmButtonColor: '#CC0000',
-        cancelButtonText:
-          'No',
-        // cancelButtonAriaLabel: 'Thumbs down',
-      }).then((result) => {
-        if (result.value === true) {
-          this.deletePackage(healthProject)
-        }
-      });
+      this.$swal('Hello Vue world!!!');
     },
     selectAll() {
       console.log('selectAll() called')
@@ -268,7 +251,6 @@ export default {
     },
 
     deletePackage(uid) {
-      console.log(uid)
       // Find the package that matches the UID passed in.
       let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
