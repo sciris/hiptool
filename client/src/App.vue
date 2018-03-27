@@ -5,28 +5,28 @@ Last update: 2/2/18 (gchadder3)
 -->
 
 <template>
-  <div :class="{'nav-open': $sidebar.showSidebar}">
+  <div :class="{'nav-open': route !== 'Login' || route !== 'Register'}">
     <router-view></router-view>
     <!--This sidebar appears only for screens smaller than 992px -- otherwise, it is rendered in TopNavbar.vue-->
-    <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">
-      <ul class="nav navbar-nav">
-        <!-- Below requires a userService -->
-        <li>
-          <a href="#" class="btn-rotate">
-            <i class="ti-view-grid"></i>
-            <p>
-              Project: <span>{{ activeProjectName }}</span>
-            </p>
-          </a>
-        </li>
-        <drop-down v-bind:title="activeUserName" icon="ti-user">
-          <li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>
-          <li><a href="#/changepassword"><i class="ti-key"></i>&nbsp;Change password</a></li>
-          <li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>
-        </drop-down>
-        <li class="divider"></li>
-      </ul>
-    </side-bar>
+    <!--<side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">-->
+      <!--<ul class="nav navbar-nav">-->
+        <!--&lt;!&ndash; Below requires a userService &ndash;&gt;-->
+        <!--<li>-->
+          <!--<a href="#" class="btn-rotate">-->
+            <!--<i class="ti-view-grid"></i>-->
+            <!--<p>-->
+              <!--Project: <span>{{ activeProjectName }}</span>-->
+            <!--</p>-->
+          <!--</a>-->
+        <!--</li>-->
+        <!--<drop-down v-bind:title="activeUserName" icon="ti-user">-->
+          <!--<li><a href="#/changeinfo"><i class="ti-pencil"></i>&nbsp;Edit account</a></li>-->
+          <!--<li><a href="#/changepassword"><i class="ti-key"></i>&nbsp;Change password</a></li>-->
+          <!--<li><a href="#" v-on:click=logOut()><i class="ti-car"></i>&nbsp;Log out</a></li>-->
+        <!--</drop-down>-->
+        <!--<li class="divider"></li>-->
+      <!--</ul>-->
+    <!--</side-bar>-->
   </div>
 
 </template>
@@ -35,6 +35,11 @@ Last update: 2/2/18 (gchadder3)
 import userService from '@/services/user-service'
 
 export default {
+  data () {
+    return {
+      route: this.$route.name
+    }
+  },
   computed: {
     // Health prior function
     currentUser: () => {
