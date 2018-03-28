@@ -79,5 +79,12 @@ No known issues; please use the quick start guide above.
 No known issues; please use the quick start guide above.
 
 ## Detailed installation instructions for Mac
+1. Follow the Mac installation instructions for [Sciris](http://github.com/optimamodel/sciris).
 
-No known issues; please use the quick start guide above.
+2. In the root `pyenv` folder (see Sciris instructions), clone [HPToop](https://github.com/optimamodel/hptool.git)
+
+3. Install `hptool` by typing `python setup.py develop` in the `pyenv/hptool` folder.
+
+4. Change to the `bin` subfolder and type `pythonw run.py`.
+
+5. If it worked, go to `localhost:8091` in your browser to use the webapp.
