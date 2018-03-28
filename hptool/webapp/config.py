@@ -32,10 +32,14 @@ WEBAPP_DIR = ROOT_DIR+'hptool/webapp'
 
 # Directory where uploaded files will be saved, as well as files saved to be 
 # downloadable to user machines.
-UPLOADS_DIR = ROOT_DIR+'uploads'
+# If commented out or omitted, a temporary directory will be kept for this, 
+# which will be erased when the application is halted.
+#TRANSFER_DIR = ROOT_DIR+'transferfiles'
 
 # Directory where files may be saved that the web app should be able to 
 # access.
+# If commented out or omitted, a temporary directory will be kept for this, 
+# which will be erased when the application is halted.
 FILESAVEROOT_DIR = ROOT_DIR+'savedfiles'
 
 # URL for the Redis database that the web app will use to manage 
