@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/23/18 (gchadder3)
+Last update: 3/27/18 (gchadder3)
 """
 
 #
@@ -377,7 +377,19 @@ def init_filepaths(theApp):
         else:
             ds.fileSaveRootPath = '%s%s%s' % (os.pardir, os.sep, 
                 current_app.config['FILESAVEROOT_DIR'])
-         
+
+    # Create a temporary downloads directory.
+    #ds.downloadsDir = ds.FileSaveDirectory(ds.uploadsPath)
+    ds.downloadsDir = ds.FileSaveDirectory()
+    
+    # Have the uploads directory use the same directory as the downloads 
+    # directory.
+    ds.uploadsDir = ds.downloadsDir
+    
+    # Show the downloads and uploads directories.
+    print '>> Downloads directory path: %s' % ds.downloadsDir.dirPath
+    print '>> Uploads directory path: %s' % ds.uploadsDir.dirPath
+        
     # If the datafiles path doesn't exist yet...
     if not os.path.exists(ds.fileSaveRootPath):
         # Create datafiles directory.
@@ -584,7 +596,7 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         # Grab the filename of this file, and generate the full upload path / 
         # filename.
         filename = secure_filename(file.filename)
-        uploaded_fname = os.path.join(ds.uploadsPath, filename)
+        uploaded_fname = os.path.join(ds.uploadsDir.dirPath, filename)
         
         # Save the file to the uploads directory.
         file.save(uploaded_fname)
@@ -613,11 +625,20 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         response.status_code = 201  # Status 201 = Created
         response.headers['filename'] = fileName
         
+        # Erase the actual file, since it is no longer needed. [?]
+        # Make sure this doesn't cause things to bomb!
+        #os.remove(result)
+        
         # Return the response message.
         return response
     
     # Otherwise (normal and upload RPCs), 
     else:
+        # If we are doing an upload....
+        if rpcType == 'upload':
+            # Erase the physical uploaded file, since it is no longer needed.
+            os.remove(uploaded_fname)
+        
         # If None was returned by the RPC function, return ''.
         if result is None:
             return ''
@@ -781,13 +802,6 @@ def get_interv_set_fe_repr(theIntervSet):
 #
 # RPC functions
 #
-
-##
-## User RPCs
-##
-
-# We will have some overrides here because we want to handle account editing 
-# and password changing in a way different than the defaults.
 
 ##
 ## Project RPCs
