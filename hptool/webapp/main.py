@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/23/18 (gchadder3)
+Last update: 3/29/18 (gchadder3)
 """
 
 #
@@ -970,6 +970,10 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Create a new (empty) burden set.
         newBurdenSet = Burden(project=theProj, name=uniqueName)
+                
+        # Load data from the Excel spreadsheet.
+        # NOTE: We may want to take this out later in favor leaving the 
+        # new sets empty to start.
         dataPath = hptool.HPpath('data')
         newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
         
@@ -1124,6 +1128,12 @@ def create_interv_set(project_id, new_interv_set_name):
         
         # Create a new (empty) intervention set.
         newIntervSet = Interventions(project=theProj, name=uniqueName)
+        
+        # Load data from the Excel spreadsheet.
+        # NOTE: We may want to take this out later in favor leaving the 
+        # new sets empty to start.
+        dataPath = hptool.HPpath('data')
+        newIntervSet.loaddata(dataPath+'dcp-data.xlsx')
         
         # Put the new intervention set in the dictionary.
         theProj.intersets[uniqueName] = newIntervSet
