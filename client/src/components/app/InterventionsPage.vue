@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018-03-25
+Last update: 2018-03-29
 -->
 
 <template>
@@ -178,7 +178,6 @@ Last update: 2018-03-25
                        v-model="interv.frp"/>
               </td>
               <td style="white-space: nowrap">
-                <button class="iconbtn" @click="notImplemented('Rename')"><i class="ti-pencil"></i></button>
                 <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
                 <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
               </td>
