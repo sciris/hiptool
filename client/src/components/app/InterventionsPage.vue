@@ -136,9 +136,10 @@ Last update: 2018-03-29
                 <input type="checkbox" v-model="interv.active"/>
               </td>
               <td>
+<!--                       @keyup.enter="notImplemented('Edit name')" -->             
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit name')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.name"/>
               </td>
               <td>
@@ -380,17 +381,17 @@ export default {
         this.interventionList = response.data.interventions
 
         // Set the active values from the loaded in data.
-        this.interventionList.forEach(theInterv => {
-		      theInterv.active = theInterv[0];
-          theInterv.name = theInterv[1];
-          theInterv.platform = theInterv[3];
-          theInterv.type = theInterv[4];
-          theInterv.icer = Number(theInterv[5]).toLocaleString();
-          theInterv.unitcost = Number(theInterv[6]).toLocaleString();
-          theInterv.equity = theInterv[7];
-          theInterv.frp = theInterv[8];
-		    })
-
+        for (let ind=0; ind < this.interventionList.length; ind++) {
+          this.interventionList[ind].numindex = ind
+		      this.interventionList[ind].active = this.interventionList[ind][0];
+          this.interventionList[ind].name = this.interventionList[ind][1];
+          this.interventionList[ind].platform = this.interventionList[ind][3];
+          this.interventionList[ind].type = this.interventionList[ind][4];
+          this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString();
+          this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString();
+          this.interventionList[ind].equity = this.interventionList[ind][7];
+          this.interventionList[ind].frp = this.interventionList[ind][8];          
+        }         
       })
 
       this.$notifications.notify({
@@ -469,6 +470,19 @@ export default {
         this.updateIntervSets()
       })
     },
+ 
+    updateInterv(interv) {
+      console.log('Update to be made')
+      console.log('Index: ', interv.numindex)        
+      console.log('Active?: ', interv.active)
+      console.log('Name: ', interv.name)
+      console.log('Platform: ', interv.platform)
+      console.log('Type: ', interv.type)
+      console.log('ICER: ', interv.icer)
+      console.log('Unit cost: ', interv.unitcost)
+      console.log('Equity: ', interv.equity)
+      console.log('FRP: ', interv.frp)      
+    },  
 
     intervAllCategoryClick() {
       this.showCancerIntervs = false

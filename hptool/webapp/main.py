@@ -1021,6 +1021,11 @@ def copy_burden_set(project_id, burdenset_numindex):
         # Put the new burden set in the dictionary.
         theProj.burdensets[uniqueName] = newBurdenSet
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}    
+    
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
     
@@ -1033,9 +1038,34 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
         # Overwrite the old name with the new.
         theProj.burdensets[burdenset_numindex].name = new_burden_set_name
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
-    
+
+def update_burden_set_disease(project_id, burdenset_numindex, 
+    disease_numindex, theData):
+
+    def update_project_fn(theProj):
+        # Set the data records for what gets passed in.
+        theDataRecord = theProj.burdensets[burdenset_numindex].data[disease_numindex]
+        theDataRecord[0] = theData[0]
+        theDataRecord[7] = theData[1]
+        theDataRecord[8] = theData[2]
+        theDataRecord[9] = theData[3]
+        theDataRecord[10] = theData[4]
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+
 def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
     ''' Plot the disease burden '''
     
@@ -1179,6 +1209,11 @@ def copy_interv_set(project_id, intervset_numindex):
         # Put the new intervention set in the dictionary.
         theProj.intersets[uniqueName] = newIntervSet
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
     
@@ -1190,6 +1225,11 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     def update_project_fn(theProj):
         # Overwrite the old name with the new.
         theProj.intersets[intervset_numindex].name = new_interv_set_name
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
