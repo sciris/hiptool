@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018-03-29
+Last update: 2018-03-30
 -->
 
 <template>
@@ -133,10 +133,11 @@ Last update: 2018-03-29
           <tbody>
             <tr v-for="interv in interventionList">
               <td style="text-align: center">
-                <input type="checkbox" v-model="interv.active"/>
+                <input type="checkbox" 
+                       @click="updateInterv(interv)"
+                       v-model="interv.active"/>
               </td>
-              <td>
-<!--                       @keyup.enter="notImplemented('Edit name')" -->             
+              <td>           
                 <input type="text"
                        class="txbox"
                        @keyup.enter="updateInterv(interv)"
@@ -145,37 +146,37 @@ Last update: 2018-03-29
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit platform')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.platform"/>
               </td>
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit type')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.type"/>
               </td>
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit ICER')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.icer"/>
               </td>
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit unit cost')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.unitcost"/>
               </td>
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit equity')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.equity"/>
               </td>
               <td>
                 <input type="text"
                        class="txbox"
-                       @keyup.enter="notImplemented('Edit financial risk protection')"
+                       @keyup.enter="updateInterv(interv)"
                        v-model="interv.frp"/>
               </td>
               <td style="white-space: nowrap">
@@ -389,8 +390,8 @@ export default {
           this.interventionList[ind].type = this.interventionList[ind][4];
           this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString();
           this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString();
-          this.interventionList[ind].equity = this.interventionList[ind][7];
-          this.interventionList[ind].frp = this.interventionList[ind][8];          
+          this.interventionList[ind].equity = this.interventionList[ind][8];
+          this.interventionList[ind].frp = this.interventionList[ind][7];          
         }         
       })
 
@@ -480,8 +481,23 @@ export default {
       console.log('Type: ', interv.type)
       console.log('ICER: ', interv.icer)
       console.log('Unit cost: ', interv.unitcost)
-      console.log('Equity: ', interv.equity)
       console.log('FRP: ', interv.frp)      
+      console.log('Equity: ', interv.equity)
+
+      // We need to filter out commas in the numeric strings.
+        
+      // Go to the server to update the intervention from the intervention set.
+      rpcservice.rpcProjectCall('update_interv_set_interv',
+        [this.$store.state.activeProject.project.id, 
+        this.activeIntervSet.intervset.numindex, 
+        interv.numindex, 
+        [interv.active, interv.name, interv.platform, interv.type, 
+        interv.icer, interv.unitcost, interv.frp, interv.equity]])
+      .then(response => {
+        // Update the display of the intervention list by rerunning the active 
+        // intervention set.
+        this.viewSet(this.activeIntervSet)
+      })      
     },  
 
     intervAllCategoryClick() {

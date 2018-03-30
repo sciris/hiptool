@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/29/18 (gchadder3)
+Last update: 3/30/18 (gchadder3)
 """
 
 #
@@ -1225,6 +1225,29 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     def update_project_fn(theProj):
         # Overwrite the old name with the new.
         theProj.intersets[intervset_numindex].name = new_interv_set_name
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+    
+def update_interv_set_interv(project_id, intervset_numindex, 
+    interv_numindex, theData):
+
+    def update_project_fn(theProj):
+        # Set the data records for what gets passed in.
+        theDataRecord = theProj.intersets[intervset_numindex].data[interv_numindex]
+        theDataRecord[0] = theData[0]
+        theDataRecord[1] = theData[1]
+        theDataRecord[3] = theData[2]
+        theDataRecord[4] = theData[3]
+        theDataRecord[5] = theData[4]
+        theDataRecord[6] = theData[5]
+        theDataRecord[7] = theData[6]
+        theDataRecord[8] = theData[7]
         
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.

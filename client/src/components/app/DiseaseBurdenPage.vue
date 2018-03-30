@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-03-29
+Last update: 2018-03-30
 -->
 
 <template>
@@ -183,10 +183,11 @@ Last update: 2018-03-29
         <tbody>
           <tr v-for="disease in sortedDiseases">
             <td style="text-align: center">
-              <input type="checkbox" v-model="disease.active"/>
+              <input type="checkbox" 
+                     @click="updateDisease(disease)"
+                     v-model="disease.active"/>
             </td>
             <td>
-            <!--                     @keyup.enter="notImplemented('Rename cause')" -->
               <input type="text"
                      class="txbox"
                      @keyup.enter="updateDisease(disease)"
@@ -195,19 +196,19 @@ Last update: 2018-03-29
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit DALYs')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.dalys"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit deaths')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.deaths"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit prevalence')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.prevalence"/>
             </td>
             <td style="white-space: nowrap; text-align:center">
@@ -615,7 +616,7 @@ Last update: 2018-03-29
         
         // We need to filter out commas in the numeric strings.
         
-        // Go to the server to get the diseases from the burden set.
+        // Go to the server to update the disease from the burden set.
         rpcservice.rpcProjectCall('update_burden_set_disease',
           [this.$store.state.activeProject.project.id, 
           this.activeBurdenSet.burdenset.numindex, 
@@ -623,8 +624,9 @@ Last update: 2018-03-29
           [disease.active, disease.cause, disease.dalys, disease.deaths, 
           disease.prevalence]])
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.
-          //this.updateBurdenSets()
+          // Update the display of the disease list by rerunning the active 
+          // burden set.
+          this.viewBurdenSet(this.activeBurdenSet)
         })          
       }
 
