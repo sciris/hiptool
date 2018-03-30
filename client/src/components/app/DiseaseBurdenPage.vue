@@ -184,7 +184,6 @@ Last update: 2018-03-30
           <tr v-for="disease in sortedDiseases">
             <td style="text-align: center">
               <input type="checkbox" 
-                     @click="updateDisease(disease)"
                      v-model="disease.active"/>
             </td>
             <td>
@@ -441,11 +440,11 @@ Last update: 2018-03-30
           // Set the active values from the loaded in data.
           for (let ind=0; ind < this.diseaseList.length; ind++) {
             this.diseaseList[ind].numindex = ind
-		        this.diseaseList[ind].active = this.diseaseList[ind][0];
-            this.diseaseList[ind].cause = this.diseaseList[ind][1];
-            this.diseaseList[ind].dalys = Number(this.diseaseList[ind][2]).toLocaleString();
-            this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString();
-            this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString();
+		        this.diseaseList[ind].active = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind].cause = this.diseaseList[ind][1]
+            this.diseaseList[ind].dalys = Number(this.diseaseList[ind][2]).toLocaleString()
+            this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString()
+            this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString()
 		      }
 
           // Reset the bottom table sorting state.
@@ -616,12 +615,15 @@ Last update: 2018-03-30
         
         // We need to filter out commas in the numeric strings.
         
+        // Do format filtering to prepare the data to pass to the RPC.
+        let filterActive = disease.active ? 1 : 0
+        
         // Go to the server to update the disease from the burden set.
         rpcservice.rpcProjectCall('update_burden_set_disease',
           [this.$store.state.activeProject.project.id, 
           this.activeBurdenSet.burdenset.numindex, 
           disease.numindex, 
-          [disease.active, disease.cause, disease.dalys, disease.deaths, 
+          [filterActive, disease.cause, disease.dalys, disease.deaths, 
           disease.prevalence]])
         .then(response => {
           // Update the display of the disease list by rerunning the active 

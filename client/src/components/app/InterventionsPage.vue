@@ -134,7 +134,6 @@ Last update: 2018-03-30
             <tr v-for="interv in interventionList">
               <td style="text-align: center">
                 <input type="checkbox" 
-                       @click="updateInterv(interv)"
                        v-model="interv.active"/>
               </td>
               <td>           
@@ -384,14 +383,14 @@ export default {
         // Set the active values from the loaded in data.
         for (let ind=0; ind < this.interventionList.length; ind++) {
           this.interventionList[ind].numindex = ind
-		      this.interventionList[ind].active = this.interventionList[ind][0];
-          this.interventionList[ind].name = this.interventionList[ind][1];
-          this.interventionList[ind].platform = this.interventionList[ind][3];
-          this.interventionList[ind].type = this.interventionList[ind][4];
-          this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString();
-          this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString();
-          this.interventionList[ind].equity = this.interventionList[ind][8];
-          this.interventionList[ind].frp = this.interventionList[ind][7];          
+		      this.interventionList[ind].active = (this.interventionList[ind][0] > 0)
+          this.interventionList[ind].name = this.interventionList[ind][1]
+          this.interventionList[ind].platform = this.interventionList[ind][3]
+          this.interventionList[ind].type = this.interventionList[ind][4]
+          this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
+          this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
+          this.interventionList[ind].equity = this.interventionList[ind][8]
+          this.interventionList[ind].frp = this.interventionList[ind][7]     
         }         
       })
 
@@ -485,13 +484,16 @@ export default {
       console.log('Equity: ', interv.equity)
 
       // We need to filter out commas in the numeric strings.
+      
+      // Do format filtering to prepare the data to pass to the RPC.
+      let filterActive = interv.active ? 1 : 0
         
       // Go to the server to update the intervention from the intervention set.
       rpcservice.rpcProjectCall('update_interv_set_interv',
         [this.$store.state.activeProject.project.id, 
         this.activeIntervSet.intervset.numindex, 
         interv.numindex, 
-        [interv.active, interv.name, interv.platform, interv.type, 
+        [filterActive, interv.name, interv.platform, interv.type, 
         interv.icer, interv.unitcost, interv.frp, interv.equity]])
       .then(response => {
         // Update the display of the intervention list by rerunning the active 
