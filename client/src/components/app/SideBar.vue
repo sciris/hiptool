@@ -158,6 +158,9 @@
           }
           return found
         })
+      },
+      displaySidebar: function (data) {
+        console.log(data)
       }
     },
     mounted () {

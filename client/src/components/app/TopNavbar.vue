@@ -38,10 +38,7 @@ Last update: 2018-03-25
   </nav>
 </template>
 <script>
-  import rpcservice from '@/services/rpc-service'
   import userService from '@/services/user-service'
-  import router from '@/router'
-
   export default {
     name: 'TopNavbar',
 
@@ -122,10 +119,10 @@ Last update: 2018-03-25
         this.activeNotifications = false
       },
       toggleSidebar () {
-        this.$sidebar.displaySidebar(!this.$sidebar.showSidebar)
+        this.$store.commit('changeToggleStatus')
       },
       hideSidebar () {
-        this.$sidebar.displaySidebar(false)
+        this.$store.commit('changeToggleStatus')
       }
     }
   }

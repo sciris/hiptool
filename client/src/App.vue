@@ -5,7 +5,7 @@ Last update: 2/2/18 (gchadder3)
 -->
 
 <template>
-  <div :class="{'nav-open': route !== 'Login' || route !== 'Register'}">
+  <div :class="{'nav-open': this.$store.state.menuToggle}">
     <router-view></router-view>
     <!--This sidebar appears only for screens smaller than 992px -- otherwise, it is rendered in TopNavbar.vue-->
     <!--<side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">-->
@@ -27,14 +27,16 @@ Last update: 2/2/18 (gchadder3)
         <!--<li class="divider"></li>-->
       <!--</ul>-->
     <!--</side-bar>-->
+    <side-bar type="navbar"></side-bar>
   </div>
 
 </template>
 
 <script>
 import userService from '@/services/user-service'
-
+import SideBar from './components/app/SideBar'
 export default {
+  components: {SideBar},
   data () {
     return {
       route: this.$route.name
@@ -72,7 +74,6 @@ export default {
       userService.logOut()
     },
   }
-
 }
 
 </script>
