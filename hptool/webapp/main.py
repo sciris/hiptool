@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/23/18 (gchadder3)
+Last update: 4/1/18 (gchadder3)
 """
 
 #
@@ -1032,7 +1032,7 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
     
-def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
+def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
     
 #    def fixgraph(graph, graph_dict):
