@@ -541,19 +541,19 @@ Last update: 2018-03-25
           this.serverresponse = response.data
 
           // Draw the figure in the 'fig01' div tag.
-          console.log('About to replace');
+/*           console.log('About to replace');
           document.getElementById("fig01").innerHTML = response.data.graph1.div;
           console.log('About to eval');
           console.log(response.data.graph1.script);
-          eval(response.data.graph1.script);
+          eval(response.data.graph1.script); */
 
-//          mpld3.draw_figure('fig01', response.data.graph1)
+          mpld3.draw_figure('fig01', response.data.graph1)
 //          mpld3.draw_figure('fig02', response.data.graph2)
 //          mpld3.draw_figure('fig03', response.data.graph3)
 
-          console.log('TEMP complete')
+/*           console.log('TEMP complete')
           document.getElementById("fig02").innerHTML = response.data.graph2.div;
-          eval(response.data.graph2.script);
+          eval(response.data.graph2.script); */
         })
         .catch(error => {
           // Pull out the error message.

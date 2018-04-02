@@ -1053,7 +1053,8 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     burdenSet = theProj.burden(key=burdenset_numindex)
     
     figs = []
-    for which in ['dalys','deaths','prevalence']:
+#    for which in ['dalys','deaths','prevalence']:
+    for which in ['dalys']:        
         fig = burdenSet.plottopcauses(which=which) # Create the figure
         figs.append(fig)
         
@@ -1069,9 +1070,10 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
         graphs.append(graph_dict)
     
     # Return success.
-    return {'graph1': graphs[0],
-            'graph2': graphs[1],
-            'graph3': graphs[2],}
+#    return {'graph1': graphs[0],
+#            'graph2': graphs[1],
+#            'graph3': graphs[2],}
+    return {'graph1': graphs[0],}
     
 ##
 ## Intervention set RPCs

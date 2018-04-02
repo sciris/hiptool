@@ -65,7 +65,7 @@ class Burden(object):
         if n     is None: n     = 10
         if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
         if figsize is None: figsize  = (5,5)
-        if engine is None: engine = 'bokeh' # Choices are bokeh or matplotlib
+        if engine is None: engine = 'matplotlib' # Choices are bokeh or matplotlib
         barw     = 0.8
         barcolor = (0.7,0,0.3)
         
@@ -114,6 +114,7 @@ class Burden(object):
             ax.set_xlabel(thisxlabel+unitstr)
             ax.set_title(thistitle)
             boxoff()
+            fig.show()  # remove this line later (it's there to see what the graph looks like in Python-land)
             return fig
         elif engine=='bokeh':
             barlabelsr = barlabels[::-1]
