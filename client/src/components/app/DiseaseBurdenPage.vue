@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-03-25
+Last update: 2018-04-04
 -->
 
 <template>
@@ -540,16 +540,57 @@ Last update: 2018-03-25
           // Pull out the response data.
           this.serverresponse = response.data
 
+          // mpld3 drawing code
+          
+          // Extract hack info.
+          let theFig = response.data.graph1
+          
+          // Get the x tick labels.
+          let xlabels
+          if ('xlabels' in theFig) {
+            xlabels = theFig.xlabels
+            delete theFig.xlabels
+          }
+          
+          // Get the y tick labels.
+          let ylabels
+          if ('ylabels' in theFig) {
+            ylabels = theFig.ylabels
+            delete theFig.ylabels
+          }
+            
+          // Draw the figure.
+          mpld3.draw_figure('fig01', theFig)
+          
+          // Do post-drawing hacks.
+          
+          // Overwrite the x tick labels.
+/*          if (xlabels !== undefined) {
+            let labelElems = document.querySelectorAll('.mpld3-xaxis > g.tick > text')
+            for (let i = 0; i < labelElems.length; i++) {
+              labelElems[i].innerHTML = xlabels[i]
+            }
+          } */
+          
+          // Overwrite the y tick labels.
+          if (ylabels !== undefined) {
+            let labelElems = document.querySelectorAll('.mpld3-yaxis > g.tick > text')
+            for (let i = 0; i < labelElems.length; i++) {
+              labelElems[i].innerHTML = ylabels[i]
+            }
+          }
+          
+//          mpld3.draw_figure('fig02', response.data.graph2)
+//          mpld3.draw_figure('fig03', response.data.graph3)
+          
+          // bokeh drawing code
+                   
           // Draw the figure in the 'fig01' div tag.
 /*           console.log('About to replace');
           document.getElementById("fig01").innerHTML = response.data.graph1.div;
           console.log('About to eval');
           console.log(response.data.graph1.script);
           eval(response.data.graph1.script); */
-
-          mpld3.draw_figure('fig01', response.data.graph1)
-//          mpld3.draw_figure('fig02', response.data.graph2)
-//          mpld3.draw_figure('fig03', response.data.graph3)
 
 /*           console.log('TEMP complete')
           document.getElementById("fig02").innerHTML = response.data.graph2.div;

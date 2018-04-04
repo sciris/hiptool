@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 4/1/18 (gchadder3)
+Last update: 4/3/18 (gchadder3)
 """
 
 #
@@ -1031,7 +1031,16 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
+
+def make_mpld3_graph_dict(theFig):
+    mpld3_dict = mpld3.fig_to_dict(theFig)
+    xlabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_xticklabels()]
+    mpld3_dict['xlabels'] = xlabels   
+    ylabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_yticklabels()]
+    mpld3_dict['ylabels'] = ylabels
     
+    return mpld3_dict
+
 def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
     
@@ -1062,7 +1071,7 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     graphs = []
     for fig in figs:
         if engine=='matplotlib':
-            graph_dict = mpld3.fig_to_dict(fig)
+            graph_dict = make_mpld3_graph_dict(fig)
         elif engine=='bokeh':
             graph_dict = fig
             fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines

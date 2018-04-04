@@ -91,6 +91,10 @@ class Burden(object):
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which]
         
+        # Truncate the bar labels (remove this soon).
+#        firstThreeLetters = lambda theString: theString[0:3]
+#        barlabels = map(firstThreeLetters, barlabels)
+        
         largestval = barvals[0]
         if largestval>1e6:
             barvals /= 1e6
