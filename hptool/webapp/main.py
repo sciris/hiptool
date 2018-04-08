@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 4/3/18 (gchadder3)
+Last update: 4/5/18 (gchadder3)
 """
 
 #
@@ -1032,12 +1032,57 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
+
+frontendfigsize = (5.5, 2)
+frontendpositionnolegend = [[0.19, 0.12], [0.85, 0.85]]
+from matplotlib.transforms import Bbox
+from numpy import array
+
+class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
+    """Hello World plugin"""
+    
+    JAVASCRIPT = """
+    mpld3.register_plugin("helloworld", HelloWorld);
+    HelloWorld.prototype = Object.create(mpld3.Plugin.prototype);
+    HelloWorld.prototype.constructor = HelloWorld;
+    function HelloWorld(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+    
+    HelloWorld.prototype.draw = function(){
+        this.fig.canvas.append("text")
+            .text("hello world")
+            .style("font-size", 72)
+            .style("opacity", 0.3)
+            .style("text-anchor", "middle")
+            .attr("x", this.fig.width / 2)
+            .attr("y", this.fig.height / 2)
+    }
+    """
+    def __init__(self):
+        self.dict_ = {"type": "helloworld"}
+        
 def make_mpld3_graph_dict(theFig):
+    # Handle figure size
+    zoom = 1.0
+    figsize = (frontendfigsize[0] * zoom, frontendfigsize[1] * zoom)
+    theFig.set_size_inches(figsize)
+    
+#    if len(theFig.axes) == 1:
+#        ax = theFig.axes[0]
+#        legend = ax.get_legend()
+#        if legend is None:
+#            ax.set_position(Bbox(array(frontendpositionnolegend)))  
+            
     mpld3_dict = mpld3.fig_to_dict(theFig)
-    xlabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_xticklabels()]
-    mpld3_dict['xlabels'] = xlabels   
-    ylabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_yticklabels()]
-    mpld3_dict['ylabels'] = ylabels
+    
+    # Pull the x and y tick labels out and put them in a separate place of the 
+    # dictionary to allow them to be recovered, since mpld3 seems to somehow 
+    # corrupt the information in fig_to_dict().
+#    xlabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_xticklabels()]
+#    mpld3_dict['xlabels'] = xlabels   
+#    ylabels = [theLabel.get_text() for theLabel in theFig.axes[0].get_yticklabels()]
+#    mpld3_dict['ylabels'] = ylabels
     
     return mpld3_dict
 
@@ -1063,10 +1108,12 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     
     figs = []
 #    for which in ['dalys','deaths','prevalence']:
-    for which in ['dalys']:        
+    for which in ['dalys']:          
         fig = burdenSet.plottopcauses(which=which) # Create the figure
         figs.append(fig)
-        
+        mpld3.plugins.connect(fig, HelloWorld())
+        fig.show()  # remove this when we're done with testing
+    
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:

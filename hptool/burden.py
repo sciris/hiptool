@@ -118,7 +118,6 @@ class Burden(object):
             ax.set_xlabel(thisxlabel+unitstr)
             ax.set_title(thistitle)
             boxoff()
-            fig.show()  # remove this line later (it's there to see what the graph looks like in Python-land)
             return fig
         elif engine=='bokeh':
             barlabelsr = barlabels[::-1]
