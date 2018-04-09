@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-04-04
+Last update: 2018-04-09
 -->
 
 <template>
@@ -117,7 +117,7 @@ Last update: 2018-04-04
       <div>
         <div id="fig01" style="float:left" ></div>
         <div id="fig02" style="float:left" ></div>
-        <!--<div id="fig03" style="float:left" ></div>-->
+        <div id="fig03" style="float:left" ></div>
       </div>
 
 
@@ -559,28 +559,27 @@ Last update: 2018-04-04
             delete theFig.ylabels
           }
     
-          // code from plugin cliff found
-          mpld3.register_plugin("helloworld", HelloWorld)
-          HelloWorld.prototype = Object.create(mpld3.Plugin.prototype)
-          HelloWorld.prototype.constructor = HelloWorld
-          function HelloWorld(fig, props){
-            mpld3.Plugin.call(this, fig, props)
-          }
-    
-          HelloWorld.prototype.draw = function(){
-              this.fig.canvas.append("text")
-                  .text("hello world")
-                  .style("font-size", 72)
-                  .style("opacity", 0.3)
-                  .style("text-anchor", "middle")
-                  .attr("x", this.fig.width / 2)
-                  .attr("y", this.fig.height / 2)
-          }
 
-
+          // Run the script passed in with the graph.
+          eval(response.data.graph1.script)
     
           // Draw the figure.
-          mpld3.draw_figure('fig01', theFig)
+          mpld3.draw_figure('fig01', response.data.graph1)
+          
+          
+          // Run the script passed in with the graph.
+/*          eval(response.data.graph2.script)
+    
+          // Draw the figure.
+          mpld3.draw_figure('fig02', response.data.graph2)
+          
+          
+          // Run the script passed in with the graph.
+          eval(response.data.graph3.script)
+    
+          // Draw the figure.
+          mpld3.draw_figure('fig03', response.data.graph3) */
+          
           
           // Do post-drawing hacks.
           
@@ -593,15 +592,13 @@ Last update: 2018-04-04
           } */
           
           // Overwrite the y tick labels.
-          if (ylabels !== undefined) {
+/*          if (ylabels !== undefined) {
             let labelElems = document.querySelectorAll('.mpld3-yaxis > g.tick > text')
             for (let i = 0; i < labelElems.length; i++) {
               labelElems[i].innerHTML = ylabels[i]
             }
-          }
+          } */
           
-//          mpld3.draw_figure('fig02', response.data.graph2)
-//          mpld3.draw_figure('fig03', response.data.graph3)
           
           // bokeh drawing code
                    

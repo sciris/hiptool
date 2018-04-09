@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 4/5/18 (gchadder3)
+Last update: 4/9/18 (gchadder3)
 """
 
 #
@@ -1042,12 +1042,12 @@ class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
     """Hello World plugin"""
     
     JAVASCRIPT = """
-    mpld3.register_plugin("helloworld", HelloWorld);
-    HelloWorld.prototype = Object.create(mpld3.Plugin.prototype);
-    HelloWorld.prototype.constructor = HelloWorld;
+    mpld3.register_plugin("helloworld", HelloWorld)
+    HelloWorld.prototype = Object.create(mpld3.Plugin.prototype)
+    HelloWorld.prototype.constructor = HelloWorld
     function HelloWorld(fig, props){
-        mpld3.Plugin.call(this, fig, props);
-    };
+        mpld3.Plugin.call(this, fig, props)
+    }
     
     HelloWorld.prototype.draw = function(){
         this.fig.canvas.append("text")
@@ -1107,18 +1107,20 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     burdenSet = theProj.burden(key=burdenset_numindex)
     
     figs = []
-#    for which in ['dalys','deaths','prevalence']:
+#    for which in ['dalys','deaths','prevalence']: 
     for which in ['dalys']:          
         fig = burdenSet.plottopcauses(which=which) # Create the figure
         figs.append(fig)
-        mpld3.plugins.connect(fig, HelloWorld())
         fig.show()  # remove this when we're done with testing
     
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
         if engine=='matplotlib':
+            figPlugin = HelloWorld()
+            mpld3.plugins.connect(fig, figPlugin)            
             graph_dict = make_mpld3_graph_dict(fig)
+            graph_dict['script'] = figPlugin.JAVASCRIPT
         elif engine=='bokeh':
             graph_dict = fig
             fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines
@@ -1129,7 +1131,7 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
 #    return {'graph1': graphs[0],
 #            'graph2': graphs[1],
 #            'graph3': graphs[2],}
-    return {'graph1': graphs[0],}
+    return {'graph1': graphs[0]}
     
 ##
 ## Intervention set RPCs
