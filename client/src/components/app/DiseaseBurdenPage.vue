@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-04-09
+Last update: 2018-04-10
 -->
 
 <template>
@@ -545,60 +545,27 @@ Last update: 2018-04-09
           // Extract hack info.
           let theFig = response.data.graph1
           
-          // Get the x tick labels.
-          let xlabels
-          if ('xlabels' in theFig) {
-            xlabels = theFig.xlabels
-            delete theFig.xlabels
-          }
           
-          // Get the y tick labels.
-          let ylabels
-          if ('ylabels' in theFig) {
-            ylabels = theFig.ylabels
-            delete theFig.ylabels
-          }
-    
-
           // Run the script passed in with the graph.
-          eval(response.data.graph1.script)
+//          eval(response.data.graph1.script)
     
           // Draw the figure.
           mpld3.draw_figure('fig01', response.data.graph1)
           
           
           // Run the script passed in with the graph.
-/*          eval(response.data.graph2.script)
+//          eval(response.data.graph2.script)
     
           // Draw the figure.
           mpld3.draw_figure('fig02', response.data.graph2)
           
           
           // Run the script passed in with the graph.
-          eval(response.data.graph3.script)
+//          eval(response.data.graph3.script)
     
           // Draw the figure.
-          mpld3.draw_figure('fig03', response.data.graph3) */
-          
-          
-          // Do post-drawing hacks.
-          
-          // Overwrite the x tick labels.
-/*          if (xlabels !== undefined) {
-            let labelElems = document.querySelectorAll('.mpld3-xaxis > g.tick > text')
-            for (let i = 0; i < labelElems.length; i++) {
-              labelElems[i].innerHTML = xlabels[i]
-            }
-          } */
-          
-          // Overwrite the y tick labels.
-/*          if (ylabels !== undefined) {
-            let labelElems = document.querySelectorAll('.mpld3-yaxis > g.tick > text')
-            for (let i = 0; i < labelElems.length; i++) {
-              labelElems[i].innerHTML = ylabels[i]
-            }
-          } */
-          
+          mpld3.draw_figure('fig03', response.data.graph3)
+               
           
           // bokeh drawing code
                    
