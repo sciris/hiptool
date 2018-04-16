@@ -114,13 +114,13 @@ class Burden(object):
             barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
             
             # This way of setting the ticks works for the present mpld3 code.
-            ax.set_yticks(arange(1, 11))   
-            ax.set_yticklabels(barlabels[::-1])  # need to reverse bar labels order
+#            ax.set_yticks(arange(1, 11))   
+#            ax.set_yticklabels(barlabels[::-1])  # need to reverse bar labels order
             
-            # This way of setting the ticks does NOT work for the present mpld3 code
+            # This way of setting the ticks does NOT work for the release mpld3 code
             # because the descending order of the ticks fouls things up.
-#            ax.set_yticks(arange(10, 0, -1))    
-#            ax.set_yticklabels(barlabels)
+            ax.set_yticks(arange(10, 0, -1))    
+            ax.set_yticklabels(barlabels)
             
             SIticks(ax=ax,axis='x')
             ax.set_xlabel(thisxlabel+unitstr)
