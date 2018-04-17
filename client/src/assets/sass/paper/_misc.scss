@@ -11,10 +11,12 @@ body {
 
 a {
   color: $info-color;
+  color: $color-blue;
 
   &:hover, &:focus {
     color: $info-states-color;
     text-decoration: none;
+    color: #54C1EA;
   }
 }
 
