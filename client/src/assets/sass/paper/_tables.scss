@@ -33,6 +33,8 @@ $table-bg-active:                    $table-bg-hover;
     background-color: #666;
     color:$white-color;
     text-align: left;
+    vertical-align: bottom;
+    border-bottom: 2px solid $table-line-color;
   }
 
   .radio,
