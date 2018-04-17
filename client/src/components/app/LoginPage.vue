@@ -52,7 +52,7 @@ Last update: 2018-03-25
 
           <div class="section">
             New user?
-            <router-link class="link __blue" to="/register">
+            <router-link to="/register">
               Register here
             </router-link>
           </div>
