@@ -12,6 +12,11 @@ $table-bg-active:                    $table-bg-hover;
 $table-border-color:                 #ddd; // table and cell border
 
 .table {
+  max-width: 100%;
+  width: 100%;
+  background-color: $table-bg;
+  margin-bottom: $line-height-computed;
+
   thead,
   tbody,
   tfoot {
@@ -26,6 +31,7 @@ $table-border-color:                 #ddd; // table and cell border
     font-weight: $font-weight-light;
     background-color: #666;
     color:$white-color;
+    text-align: left;
   }
 
   .radio,
