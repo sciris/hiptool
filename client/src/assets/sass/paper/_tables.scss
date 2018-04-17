@@ -9,8 +9,6 @@ $table-bg-accent:                    #efeff4; // for striping
 $table-bg-hover:                     #ddd; // CK: hover color for tables
 $table-bg-active:                    $table-bg-hover;
 
-$table-border-color:                 #ddd; // table and cell border
-
 .table {
   max-width: 100%;
   width: 100%;
@@ -23,6 +21,9 @@ $table-border-color:                 #ddd; // table and cell border
     tr > th,
     tr > td {
       border-top: 1px solid $table-line-color;
+      padding: $table-cell-padding;
+      line-height: $line-height-base;
+      vertical-align: middle;
     }
   }
   > thead > tr > th {
