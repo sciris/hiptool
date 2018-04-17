@@ -22,7 +22,6 @@ Last update: 2/14/18 (gchadder3)
 
 // Global variables, functions, and mixins
 @import 'main/variables';
-@import 'main/functions';
 @import 'main/mixins';
 
 // MCSS layers
@@ -40,6 +39,7 @@ Last update: 2/14/18 (gchadder3)
 
 @import "paper/variables";
 @import "paper/mixins";
+@import 'paper/functions';
 @import "paper/typography";
 // Core CSS
 @import "paper/misc";
