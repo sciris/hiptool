@@ -15,27 +15,27 @@
  */
 
 
-@import "paper/variables";
-@import "paper/mixins";
-@import 'paper/functions';
-@import "paper/typography";
+@import "project/variables";
+@import "project/mixins";
+@import 'project/functions';
+@import "project/typography";
 // Core CSS
-@import "paper/misc";
-@import "paper/sidebar-and-main-panel";
-@import "paper/buttons";
-@import "paper/inputs";
-@import "paper/alerts";
-@import "paper/tables";
-@import "paper/checkbox-radio";
-@import "paper/navbars";
-@import "paper/footers";
-@import "paper/modal";
+@import "project/misc";
+@import "project/sidebar-and-main-panel";
+@import "project/buttons";
+@import "project/inputs";
+@import "project/alerts";
+@import "project/tables";
+@import "project/checkbox-radio";
+@import "project/navbars";
+@import "project/footers";
+@import "project/modal";
 // Fancy Stuff
-@import "paper/dropdown";
-@import "paper/cards";
-@import "paper/chartist";
-@import "paper/responsive";
-@import "paper/textbox";
+@import "project/dropdown";
+@import "project/cards";
+@import "project/chartist";
+@import "project/responsive";
+@import "project/textbox";
 
 
 // Reserved just for code only your mother would love (and even then, not very 
