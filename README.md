@@ -68,7 +68,9 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
   Starting factory <twisted.web.server.Site instance at 0x7fedcb347dd0>
   ```
 
-9. If that all worked, happy health-prioritizing! Please see the README in the `bin` folder for more options for how to run HealthPrior.
+9. If that all worked, happy health-prioritizing!
+
+**Please see the README in the `bin` folder for more options for how to run HealthPrior.**
 
 ## Detailed installation instructions for Windows
 
