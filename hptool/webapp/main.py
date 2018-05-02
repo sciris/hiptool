@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/23/18 (gchadder3)
+Last update: 3/28/18 (gchadder3)
 """
 
 #
@@ -147,15 +147,12 @@ class ProjectSO(sobj.ScirisObject):
         return objInfo
     
     def saveAsFile(self, loadDir):
-        # Use the uploads directory to put the file in.
-        dirname = ds.uploadsPath
-    
         # Create a filename containing the project name followed by a .prj 
         # suffix.
         fileName = '%s.prj' % self.theProject.name
         
         # Generate the full file name with path.
-        fullFileName = '%s%s%s' % (dirname, os.sep, fileName)   
+        fullFileName = '%s%s%s' % (loadDir, os.sep, fileName)   
      
         # Write the object to a Gzip string pickle file.
         ds.objectToGzipStringPickleFile(fullFileName, self.theProject)
@@ -354,50 +351,56 @@ def init_filepaths(theApp):
     
     #  Using the current_app set to the passed in app..
     with theApp.app_context():
-        # Set the uploads path.
+        # Set the transfer directory path.
         
-        # If we have an absolute directory, use it.
-        if os.path.isabs(current_app.config['UPLOADS_DIR']):
-            ds.uploadsPath = current_app.config['UPLOADS_DIR']
-            
-        # Otherwise (we have a relative path), use it (correcting so it is with 
-        # respect to the sciris repo directory).
+        # If the config parameter is not there (or comment out), set the 
+        # path to None.
+        if 'TRANSFER_DIR' not in current_app.config:
+            transferDirPath = None
         else:
-            ds.uploadsPath = '%s%s%s' % (os.pardir, os.sep, 
-                current_app.config['UPLOADS_DIR'])  
+            # If we have an absolute directory, use it.
+            if os.path.isabs(current_app.config['TRANSFER_DIR']):
+                transferDirPath = current_app.config['TRANSFER_DIR']
+                
+            # Otherwise (we have a relative path), use it (correcting so it is with 
+            # respect to the sciris repo directory).
+            else:
+                transferDirPath = '%s%s%s' % (os.pardir, os.sep, 
+                    current_app.config['TRANSFER_DIR'])  
         
         # Set the file save root path.
         
-        # If we have an absolute directory, use it.
-        if os.path.isabs(current_app.config['FILESAVEROOT_DIR']):
-            ds.fileSaveRootPath = current_app.config['FILESAVEROOT_DIR']
-            
-        # Otherwise (we have a relative path), use it (correcting so it is with 
-        # respect to the sciris repo directory).
-        else:
-            ds.fileSaveRootPath = '%s%s%s' % (os.pardir, os.sep, 
-                current_app.config['FILESAVEROOT_DIR'])
-         
-    # If the datafiles path doesn't exist yet...
-    if not os.path.exists(ds.fileSaveRootPath):
-        # Create datafiles directory.
-        os.mkdir(ds.fileSaveRootPath)
-        
-        # Create an uploads subdirectory of this.
-        os.mkdir(ds.uploadsPath)
-        
-        # # Create the fake data for scatterplots.
-        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        # fullFileName = '%s%sgraph1.csv' % (ds.fileSaveRootPath, os.sep)
-        # sd.saveAsCsv(fullFileName)
-        
-        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        # fullFileName = '%s%sgraph2.csv' % (ds.fileSaveRootPath, os.sep)
-        # sd.saveAsCsv(fullFileName)
-        
-        # sd = model.ScatterplotData(model.makeUniformRandomData(50))
-        # fullFileName = '%s%sgraph3.csv' % (ds.fileSaveRootPath, os.sep)
-        # sd.saveAsCsv(fullFileName) 
+        # If the config parameter is not there (or comment out), set the 
+        # path to None.
+        if 'FILESAVEROOT_DIR' not in current_app.config:
+            fileSaveRootPath = None
+        else:        
+            # If we have an absolute directory, use it.
+            if os.path.isabs(current_app.config['FILESAVEROOT_DIR']):
+                fileSaveRootPath = current_app.config['FILESAVEROOT_DIR']
+                
+            # Otherwise (we have a relative path), use it (correcting so it is with 
+            # respect to the sciris repo directory).
+            else:
+                fileSaveRootPath = '%s%s%s' % (os.pardir, os.sep, 
+                    current_app.config['FILESAVEROOT_DIR'])
+
+    # Create a file save directory.
+    # Perhaps this is unnecessary for this particular webapp, but I'll leave 
+    # it in for now.
+    ds.fileSaveDir = ds.FileSaveDirectory(fileSaveRootPath, tempDir=False)
+    
+    # Create a downloads directory.
+    ds.downloadsDir = ds.FileSaveDirectory(transferDirPath, tempDir=True)
+    
+    # Have the uploads directory use the same directory as the downloads 
+    # directory.
+    ds.uploadsDir = ds.downloadsDir
+    
+    # Show the downloads and uploads directories.
+    print '>> File save directory path: %s' % ds.fileSaveDir.dirPath
+    print '>> Downloads directory path: %s' % ds.downloadsDir.dirPath
+    print '>> Uploads directory path: %s' % ds.uploadsDir.dirPath
         
 def init_datastore(theApp):
     # Create the DataStore object, setting up Redis.
@@ -584,7 +587,7 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         # Grab the filename of this file, and generate the full upload path / 
         # filename.
         filename = secure_filename(file.filename)
-        uploaded_fname = os.path.join(ds.uploadsPath, filename)
+        uploaded_fname = os.path.join(ds.uploadsDir.dirPath, filename)
         
         # Save the file to the uploads directory.
         file.save(uploaded_fname)
@@ -612,12 +615,21 @@ def doRPC(rpcType, handlerLocation, requestMethod, username=None):
         response = send_from_directory(dirName, fileName, as_attachment=True)
         response.status_code = 201  # Status 201 = Created
         response.headers['filename'] = fileName
+                
+        # Unfortunately, we cannot remove the actual file at this point 
+        # because it is in use during the actual download, so we rely on 
+        # later cleanup to remove download files.
         
         # Return the response message.
         return response
     
     # Otherwise (normal and upload RPCs), 
     else:
+        # If we are doing an upload....
+        if rpcType == 'upload':
+            # Erase the physical uploaded file, since it is no longer needed.
+            os.remove(uploaded_fname)
+        
         # If None was returned by the RPC function, return ''.
         if result is None:
             return ''
@@ -781,13 +793,6 @@ def get_interv_set_fe_repr(theIntervSet):
 #
 # RPC functions
 #
-
-##
-## User RPCs
-##
-
-# We will have some overrides here because we want to handle account editing 
-# and password changing in a way different than the defaults.
 
 ##
 ## Project RPCs
