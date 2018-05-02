@@ -69,7 +69,7 @@ Last update: 2018-03-25
 
           <div class="section">
             Already registered?
-            <router-link class="link __blue" to="/login">
+            <router-link to="/login">
               Login
             </router-link>
           </div>

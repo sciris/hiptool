@@ -72,6 +72,7 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
 
 **Please see the README in the `bin` folder for more options for how to run HealthPrior.**
 
+
 ## Detailed installation instructions for Windows
 
 No known issues; please use the quick start guide above.
