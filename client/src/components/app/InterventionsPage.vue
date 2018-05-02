@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018-03-30
+Last update: 2018-05-02
 -->
 
 <template>
@@ -482,19 +482,21 @@ export default {
       console.log('Unit cost: ', interv.unitcost)
       console.log('FRP: ', interv.frp)      
       console.log('Equity: ', interv.equity)
-
-      // We need to filter out commas in the numeric strings.
       
       // Do format filtering to prepare the data to pass to the RPC.
       let filterActive = interv.active ? 1 : 0
         
       // Go to the server to update the intervention from the intervention set.
+      // Note: filter out commas in the numeric fields.
       rpcservice.rpcProjectCall('update_interv_set_interv',
         [this.$store.state.activeProject.project.id, 
         this.activeIntervSet.intervset.numindex, 
         interv.numindex, 
         [filterActive, interv.name, interv.platform, interv.type, 
-        interv.icer, interv.unitcost, interv.frp, interv.equity]])
+        interv.icer.replace(/,/g, ''), 
+        interv.unitcost.replace(/,/g, ''), 
+        interv.frp.replace(/,/g, ''), 
+        interv.equity.replace(/,/g, '')]])
       .then(response => {
         // Update the display of the intervention list by rerunning the active 
         // intervention set.

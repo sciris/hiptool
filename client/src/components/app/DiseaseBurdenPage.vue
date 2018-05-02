@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-03-30
+Last update: 2018-05-02
 -->
 
 <template>
@@ -613,18 +613,19 @@ Last update: 2018-03-30
         console.log('Deaths: ', disease.deaths)
         console.log('Prevalence: ', disease.prevalence)
         
-        // We need to filter out commas in the numeric strings.
-        
         // Do format filtering to prepare the data to pass to the RPC.
         let filterActive = disease.active ? 1 : 0
         
         // Go to the server to update the disease from the burden set.
+        // Note: filter out commas in the numeric fields.
         rpcservice.rpcProjectCall('update_burden_set_disease',
           [this.$store.state.activeProject.project.id, 
           this.activeBurdenSet.burdenset.numindex, 
           disease.numindex, 
-          [filterActive, disease.cause, disease.dalys, disease.deaths, 
-          disease.prevalence]])
+          [filterActive, disease.cause, 
+          disease.dalys.replace(/,/g, ''), 
+          disease.deaths.replace(/,/g, ''), 
+          disease.prevalence.replace(/,/g, '')]])
         .then(response => {
           // Update the display of the disease list by rerunning the active 
           // burden set.
