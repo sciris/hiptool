@@ -65,7 +65,7 @@ class Burden(object):
         if n     is None: n     = 10
         if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
         if figsize is None: figsize  = (5,5)
-        if engine is None: engine = 'bokeh' # Choices are bokeh or matplotlib
+        if engine is None: engine = 'matplotlib' # Choices are bokeh or matplotlib
         barw     = 0.8
         barcolor = (0.7,0,0.3)
         
@@ -91,6 +91,10 @@ class Burden(object):
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which]
         
+        # Truncate the bar labels (remove this soon).
+#        firstThreeLetters = lambda theString: theString[0:3]
+#        barlabels = map(firstThreeLetters, barlabels)
+        
         largestval = barvals[0]
         if largestval>1e6:
             barvals /= 1e6
@@ -108,8 +112,16 @@ class Burden(object):
             ax = fig.add_axes(axsize)
             yaxis = arange(len(barvals), 0, -1)
             barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
-            ax.set_yticks(yaxis+barw/2.)
+            
+            # This way of setting the ticks works for the present mpld3 code.
+#            ax.set_yticks(arange(1, 11))   
+#            ax.set_yticklabels(barlabels[::-1])  # need to reverse bar labels order
+            
+            # This way of setting the ticks does NOT work for the release mpld3 code
+            # because the descending order of the ticks fouls things up.
+            ax.set_yticks(arange(10, 0, -1))    
             ax.set_yticklabels(barlabels)
+            
             SIticks(ax=ax,axis='x')
             ax.set_xlabel(thisxlabel+unitstr)
             ax.set_title(thistitle)

@@ -68,7 +68,9 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
   Starting factory <twisted.web.server.Site instance at 0x7fedcb347dd0>
   ```
 
-9. If that all worked, happy health-prioritizing! Please see the README in the `bin` folder for more options for how to run HealthPrior.
+9. If that all worked, happy health-prioritizing!
+
+**Please see the README in the `bin` folder for more options for how to run HealthPrior.**
 
 
 ## Detailed installation instructions for Windows
@@ -80,5 +82,12 @@ No known issues; please use the quick start guide above.
 No known issues; please use the quick start guide above.
 
 ## Detailed installation instructions for Mac
+1. Follow the Mac installation instructions for [Sciris](http://github.com/optimamodel/sciris).
 
-No known issues; please use the quick start guide above.
+2. In the root `pyenv` folder (see Sciris instructions), clone [HPToop](https://github.com/optimamodel/hptool.git)
+
+3. Install `hptool` by typing `python setup.py develop` in the `pyenv/hptool` folder.
+
+4. Change to the `bin` subfolder and type `pythonw run.py`.
+
+5. If it worked, go to `localhost:8091` in your browser to use the webapp.
