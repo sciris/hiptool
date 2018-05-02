@@ -6,9 +6,7 @@ Last update: 2018-03-25
 
 <template>
   <div class="wrapper">
-    <side-bar type="sidebar" :sidebar-links="$sidebar.sidebarLinks">
-
-    </side-bar>
+   <side-bar></side-bar>
     <notifications>
 
     </notifications>
@@ -27,12 +25,14 @@ Last update: 2018-03-25
 
 </style>
 <script>
+  import SideBar from './SideBar.vue'
   import TopNavbar from './TopNavbar.vue'
   import ContentFooter from './ContentFooter.vue'
   import DashboardContent from './Content.vue'
   export default {
     components: {
       TopNavbar,
+      SideBar,
       ContentFooter,
       DashboardContent
     },

@@ -9,8 +9,10 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    // Menu toggle boolean
+    menuToggle: false,
     // The currently logged in user
-    currentUser: {}, 
+    currentUser: {},
 
     // The project currently chosen by the user
     activeProject: {}
@@ -19,10 +21,14 @@ const store = new Vuex.Store({
   mutations: {
     newUser(state, user) {
       state.currentUser = user
-    }, 
+    },
 
     newActiveProject(state, project) {
       state.activeProject = project
+    },
+
+    changeToggleStatus (state) {
+      state.menuToggle = !state.menuToggle
     }
   }
 })

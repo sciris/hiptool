@@ -8,7 +8,7 @@ Last update: 2018-03-25
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle" :class="{toggled: $sidebar.showSidebar}" @click="toggleSidebar">
+        <button type="button" class="navbar-toggle"  @click="toggleSidebar">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar bar1"></span>
           <span class="icon-bar bar2"></span>
@@ -38,10 +38,7 @@ Last update: 2018-03-25
   </nav>
 </template>
 <script>
-  import rpcservice from '@/services/rpc-service'
   import userService from '@/services/user-service'
-  import router from '@/router'
-
   export default {
     name: 'TopNavbar',
 
@@ -122,10 +119,10 @@ Last update: 2018-03-25
         this.activeNotifications = false
       },
       toggleSidebar () {
-        this.$sidebar.displaySidebar(!this.$sidebar.showSidebar)
+        this.$store.commit('changeToggleStatus')
       },
       hideSidebar () {
-        this.$sidebar.displaySidebar(false)
+        this.$store.commit('changeToggleStatus')
       }
     }
   }
