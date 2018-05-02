@@ -70,6 +70,14 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
 
 9. If that all worked, happy health-prioritizing! Please see the README in the `bin` folder for more options for how to run HealthPrior.
 
+## Development mode
+
+Instead of `npm run build` and `python start_server.py`, you can also run 
+
+`bash linux_dev_run`
+
+This uses hot reloading, so any changes you make to the client code will be immediately live. Your site will be live at `localhost:8080`.
+
 ## Detailed installation instructions for Windows
 
 No known issues; please use the quick start guide above.
