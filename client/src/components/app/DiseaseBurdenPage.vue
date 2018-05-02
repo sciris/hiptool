@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-03-25
+Last update: 2018-04-10
 -->
 
 <template>
@@ -117,7 +117,7 @@ Last update: 2018-03-25
       <div>
         <div id="fig01" style="float:left" ></div>
         <div id="fig02" style="float:left" ></div>
-        <!--<div id="fig03" style="float:left" ></div>-->
+        <div id="fig03" style="float:left" ></div>
       </div>
 
 
@@ -540,20 +540,45 @@ Last update: 2018-03-25
           // Pull out the response data.
           this.serverresponse = response.data
 
+          // mpld3 drawing code
+          
+          // Extract hack info.
+          let theFig = response.data.graph1
+          
+          
+          // Run the script passed in with the graph.
+//          eval(response.data.graph1.script)
+    
+          // Draw the figure.
+          mpld3.draw_figure('fig01', response.data.graph1)
+          
+          
+          // Run the script passed in with the graph.
+//          eval(response.data.graph2.script)
+    
+          // Draw the figure.
+          mpld3.draw_figure('fig02', response.data.graph2)
+          
+          
+          // Run the script passed in with the graph.
+//          eval(response.data.graph3.script)
+    
+          // Draw the figure.
+          mpld3.draw_figure('fig03', response.data.graph3)
+               
+          
+          // bokeh drawing code
+                   
           // Draw the figure in the 'fig01' div tag.
-          console.log('About to replace');
+/*           console.log('About to replace');
           document.getElementById("fig01").innerHTML = response.data.graph1.div;
           console.log('About to eval');
           console.log(response.data.graph1.script);
-          eval(response.data.graph1.script);
+          eval(response.data.graph1.script); */
 
-//          mpld3.draw_figure('fig01', response.data.graph1)
-//          mpld3.draw_figure('fig02', response.data.graph2)
-//          mpld3.draw_figure('fig03', response.data.graph3)
-
-          console.log('TEMP complete')
+/*           console.log('TEMP complete')
           document.getElementById("fig02").innerHTML = response.data.graph2.div;
-          eval(response.data.graph2.script);
+          eval(response.data.graph2.script); */
         })
         .catch(error => {
           // Pull out the error message.

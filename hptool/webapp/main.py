@@ -1036,8 +1036,55 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
+
+
+frontendfigsize = (5.5, 2)
+frontendpositionnolegend = [[0.19, 0.12], [0.85, 0.85]]
+from matplotlib.transforms import Bbox
+from numpy import array
+from pylab import subplots
+
+class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
+    """Hello World plugin"""
     
-def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
+    JAVASCRIPT = """
+    mpld3.register_plugin("helloworld", HelloWorld)
+    HelloWorld.prototype = Object.create(mpld3.Plugin.prototype)
+    HelloWorld.prototype.constructor = HelloWorld
+    function HelloWorld(fig, props){
+        mpld3.Plugin.call(this, fig, props)
+    }
+    
+    HelloWorld.prototype.draw = function(){
+        this.fig.canvas.append("text")
+            .text("hello world")
+            .style("font-size", 72)
+            .style("opacity", 0.3)
+            .style("text-anchor", "middle")
+            .attr("x", this.fig.width / 2)
+            .attr("y", this.fig.height / 2)
+    }
+    """
+    def __init__(self):
+        self.dict_ = {"type": "helloworld"}
+        
+def make_mpld3_graph_dict(theFig):
+    # Handle figure size
+    zoom = 1.0
+    figsize = (frontendfigsize[0] * zoom, frontendfigsize[1] * zoom)
+    theFig.set_size_inches(figsize)
+    
+    if len(theFig.axes) == 1:
+        ax = theFig.axes[0]
+        legend = ax.get_legend()
+        if legend is None:
+            ax.set_position(Bbox(array(frontendpositionnolegend)))  
+            
+    mpld3_dict = mpld3.fig_to_dict(theFig)
+    
+    return mpld3_dict
+
+def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
     
 #    def fixgraph(graph, graph_dict):
@@ -1058,15 +1105,29 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='bokeh'):
     burdenSet = theProj.burden(key=burdenset_numindex)
     
     figs = []
-    for which in ['dalys','deaths','prevalence']:
+    for which in ['dalys','deaths','prevalence']:        
         fig = burdenSet.plottopcauses(which=which) # Create the figure
-        figs.append(fig)
         
+        # Test figure.  Make this go away once we're done playing around.
+#        fig, ax = subplots()
+#        points = ax.scatter(np.random.rand(40), np.random.rand(40),
+#                    s=300, alpha=0.3)
+#        ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+#        ax.set_xticklabels(['X1', 'X2', 'X3', 'X4', 'X5', 'X6'])
+#        ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+#        ax.set_yticklabels(['Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'])  
+        
+        figs.append(fig)
+#        fig.show()  # remove this when we're done with testing
+    
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
         if engine=='matplotlib':
-            graph_dict = mpld3.fig_to_dict(fig)
+#            figPlugin = HelloWorld()
+#            mpld3.plugins.connect(fig, figPlugin)            
+            graph_dict = make_mpld3_graph_dict(fig)
+#            graph_dict['script'] = figPlugin.JAVASCRIPT
         elif engine=='bokeh':
             graph_dict = fig
             fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines
