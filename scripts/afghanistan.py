@@ -9,8 +9,8 @@ import pylab as pl
 import numpy as np
 
 # Set things
-plot_dalys        = False
-plot_cascade      = True
+plot_dalys        = True
+plot_cascade      = False
 export            = False
 name              = 'Afghanistan'
 burdenfile        = hp.HPpath('data')+'ihme-gbd.xlsx'
@@ -56,7 +56,7 @@ df['frac_averted'] = df['dalys_averted']/df['total_dalys'] # To list large fract
 if plot_dalys:
     pl.figure(figsize=(10,6))
     max_entries = 11
-    colors = sc.gridcolors(ncolors=max_entries)
+    colors = sc.gridcolors(ncolors=max_entries+2)[2:]
     df.sort(col='dalys_averted', reverse=True)
     DA_data = df['dalys_averted']
     plot_data = list(DA_data[:max_entries-1])
