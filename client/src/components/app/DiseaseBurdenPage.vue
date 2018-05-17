@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-04-10
+Last update: 2018-05-02
 -->
 
 <template>
@@ -183,30 +183,31 @@ Last update: 2018-04-10
         <tbody>
           <tr v-for="disease in sortedDiseases">
             <td style="text-align: center">
-              <input type="checkbox" v-model="disease.active"/>
+              <input type="checkbox" 
+                     v-model="disease.active"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Rename cause')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.cause"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit DALYs')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.dalys"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit deaths')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.deaths"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
-                     @keyup.enter="notImplemented('Edit prevalence')"
+                     @keyup.enter="updateDisease(disease)"
                      v-model="disease.prevalence"/>
             </td>
             <td style="white-space: nowrap; text-align:center">
@@ -437,13 +438,14 @@ Last update: 2018-04-10
           this.diseaseList = response.data.diseases
 
           // Set the active values from the loaded in data.
-          this.diseaseList.forEach(theDisease => {
-		        theDisease.active = theDisease[0];
-            theDisease.cause = theDisease[1];
-            theDisease.dalys = Number(theDisease[2]).toLocaleString();
-            theDisease.deaths = Number(theDisease[3]).toLocaleString();
-            theDisease.prevalence = Number(theDisease[4]).toLocaleString();
-		      })
+          for (let ind=0; ind < this.diseaseList.length; ind++) {
+            this.diseaseList[ind].numindex = ind
+		        this.diseaseList[ind].active = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind].cause = this.diseaseList[ind][1]
+            this.diseaseList[ind].dalys = Number(this.diseaseList[ind][2]).toLocaleString()
+            this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString()
+            this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString()
+		      }
 
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
@@ -625,6 +627,35 @@ Last update: 2018-04-10
             }
           }
         )
+      },
+     
+      updateDisease(disease) {
+        console.log('Update to be made')
+        console.log('Index: ', disease.numindex)        
+        console.log('Active?: ', disease.active)
+        console.log('Cause: ', disease.cause)
+        console.log('DALYs: ', disease.dalys)
+        console.log('Deaths: ', disease.deaths)
+        console.log('Prevalence: ', disease.prevalence)
+        
+        // Do format filtering to prepare the data to pass to the RPC.
+        let filterActive = disease.active ? 1 : 0
+        
+        // Go to the server to update the disease from the burden set.
+        // Note: filter out commas in the numeric fields.
+        rpcservice.rpcProjectCall('update_burden_set_disease',
+          [this.$store.state.activeProject.project.id, 
+          this.activeBurdenSet.burdenset.numindex, 
+          disease.numindex, 
+          [filterActive, disease.cause, 
+          disease.dalys.replace(/,/g, ''), 
+          disease.deaths.replace(/,/g, ''), 
+          disease.prevalence.replace(/,/g, '')]])
+        .then(response => {
+          // Update the display of the disease list by rerunning the active 
+          // burden set.
+          this.viewBurdenSet(this.activeBurdenSet)
+        })          
       }
 
     }

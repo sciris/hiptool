@@ -1,7 +1,7 @@
 """
 main.py -- main code for Sciris users to change to create their web apps
     
-Last update: 3/28/18 (gchadder3)
+Last update: 3/30/18 (gchadder3)
 """
 
 #
@@ -975,6 +975,10 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Create a new (empty) burden set.
         newBurdenSet = Burden(project=theProj, name=uniqueName)
+                
+        # Load data from the Excel spreadsheet.
+        # NOTE: We may want to take this out later in favor leaving the 
+        # new sets empty to start.
         dataPath = hptool.HPpath('data')
         newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
         
@@ -1022,6 +1026,11 @@ def copy_burden_set(project_id, burdenset_numindex):
         # Put the new burden set in the dictionary.
         theProj.burdensets[uniqueName] = newBurdenSet
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}    
+    
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
     
@@ -1034,9 +1043,33 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
         # Overwrite the old name with the new.
         theProj.burdensets[burdenset_numindex].name = new_burden_set_name
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
+def update_burden_set_disease(project_id, burdenset_numindex, 
+    disease_numindex, theData):
+
+    def update_project_fn(theProj):
+        # Set the data records for what gets passed in.
+        theDataRecord = theProj.burdensets[burdenset_numindex].data[disease_numindex]
+        theDataRecord[0] = theData[0]
+        theDataRecord[7] = theData[1]
+        theDataRecord[8] = theData[2]
+        theDataRecord[9] = theData[3]
+        theDataRecord[10] = theData[4]
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
 
 frontendfigsize = (5.5, 2)
 frontendpositionnolegend = [[0.19, 0.12], [0.85, 0.85]]
@@ -1191,6 +1224,12 @@ def create_interv_set(project_id, new_interv_set_name):
         # Create a new (empty) intervention set.
         newIntervSet = Interventions(project=theProj, name=uniqueName)
         
+        # Load data from the Excel spreadsheet.
+        # NOTE: We may want to take this out later in favor leaving the 
+        # new sets empty to start.
+        dataPath = hptool.HPpath('data')
+        newIntervSet.loaddata(dataPath+'dcp-data.xlsx')
+        
         # Put the new intervention set in the dictionary.
         theProj.intersets[uniqueName] = newIntervSet
         
@@ -1235,6 +1274,11 @@ def copy_interv_set(project_id, intervset_numindex):
         # Put the new intervention set in the dictionary.
         theProj.intersets[uniqueName] = newIntervSet
         
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
     
@@ -1246,6 +1290,34 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     def update_project_fn(theProj):
         # Overwrite the old name with the new.
         theProj.intersets[intervset_numindex].name = new_interv_set_name
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+    
+def update_interv_set_interv(project_id, intervset_numindex, 
+    interv_numindex, theData):
+
+    def update_project_fn(theProj):
+        # Set the data records for what gets passed in.
+        theDataRecord = theProj.intersets[intervset_numindex].data[interv_numindex]
+        theDataRecord[0] = theData[0]
+        theDataRecord[1] = theData[1]
+        theDataRecord[3] = theData[2]
+        theDataRecord[4] = theData[3]
+        theDataRecord[5] = theData[4]
+        theDataRecord[6] = theData[5]
+        theDataRecord[7] = theData[6]
+        theDataRecord[8] = theData[7]
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
