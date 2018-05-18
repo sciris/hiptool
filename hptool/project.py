@@ -128,18 +128,11 @@ class Project(object):
         return output
     
     
-    def save(self, filename=None, folder=None, saveresults=False, verbose=2):
+    def save(self, filename=None, folder=None, verbose=2):
         ''' Save the current project, by default using its name, and without results '''
         fullpath = sc.makefilepath(filename=filename, folder=folder, default=[self.filename, self.name], ext='prj', sanitize=True)
         self.filename = fullpath # Store file path
-        if saveresults:
-            sc.saveobj(fullpath, self, verbose=verbose)
-        else:
-            tmpproject = sc.dcp(self) # Need to do this so we don't clobber the existing results
-#            tmpproject.restorelinks() # Make sure links are restored
-            tmpproject.cleanresults() # Get rid of all results
-            sc.saveobj(fullpath, tmpproject, verbose=verbose) # Save it to file
-            del tmpproject # Don't need it hanging around any more
+        sc.saveobj(fullpath, self, verbose=verbose)
         return fullpath
 
 
@@ -164,11 +157,5 @@ class Project(object):
         if key is None: key = hp.default_key
         try:    return self.packagesets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
-    
-    def cleanresults(self):
-        ''' Remove all results '''
-        for key,result in self.results.items():
-            self.results.pop(key)
-        return None
         
 

@@ -402,6 +402,8 @@ Last update: 2018-05-02
       },
 
       applyNameFilter(sets) {
+        console.log('CK TEST1')
+        console.log(sets)
         return sets.filter(theSet => theSet.burdenset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
 

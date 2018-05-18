@@ -1349,7 +1349,7 @@ def get_project_package_sets(project_id):
     # Return the JSON-friendly result.
     return {'packagesets': map(get_package_set_fe_repr, packageSets)}
 
-def get_project_package_set_diseases(project_id, packageset_numindex):
+def get_project_package_set_results(project_id, packageset_numindex):
     # Check (for security purposes) that the function is being called by the 
     # correct endpoint, and if not, fail.
     if request.endpoint != 'normalProjectRPC':
@@ -1366,7 +1366,7 @@ def get_project_package_set_diseases(project_id, packageset_numindex):
         return { 'results': [] }
 
     # Gather the list for all of the diseases.
-    resultData = packageSet.export(cols=['active','shortname','cause','coverage','total_prevalence','dalys_averted','total_dalys'], header=False)
+    resultData = packageSet.export(cols=['active','shortname','cause','coverage','dalys_averted'], header=False)
     
     # Return success.
     return { 'results': resultData }

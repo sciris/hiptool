@@ -119,93 +119,62 @@ Last update: 2018-05-18
       </div>
 
 
-
       <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
-          <th style="text-align:center">
-            Active
+          <th style="text-align:center">Active</th>
+          <th @click="updateSorting2('name')" class="sortable">Intervention
+            <span v-show="sortColumn2 == 'name' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('name')" class="sortable">
-            Cause name
-            <span v-show="sortColumn2 == 'name' && !sortReverse2">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn2 == 'name' && sortReverse2">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn2 != 'name'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
+          <th @click="updateSorting2('cause')" class="sortable">Cause of burden
+            <span v-show="sortColumn2 == 'cause' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('DALYs')" class="sortable">
-            DALYs
-            <span v-show="sortColumn2 == 'DALYs' && !sortReverse2">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn2 == 'DALYs' && sortReverse2">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn2 != 'DALYs'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
+          <th @click="updateSorting2('coverage')" class="sortable">Coverage
+            <span v-show="sortColumn2 == 'coverage' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'coverage' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'coverage'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('deaths')" class="sortable">
-            Deaths
-            <span v-show="sortColumn2 == 'deaths' && !sortReverse2">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn2 == 'deaths' && sortReverse2">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn2 != 'deaths'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
-          </th>
-          <th @click="updateSorting2('prevalence')" class="sortable">
-            Prevalence
-            <span v-show="sortColumn2 == 'prevalence' && !sortReverse2">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn2 == 'prevalence' && sortReverse2">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn2 != 'prevalence'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
+          <th @click="updateSorting2('averted')" class="sortable">DALYs averted
+            <span v-show="sortColumn2 == 'averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th style="text-align:center">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="disease in sortedDiseases">
+        <tr v-for="result in sortedResultss">
           <td style="text-align: center">
             <input type="checkbox"
-                   v-model="disease.active"/>
+                   v-model="result.active"/>
           </td>
           <td>
             <input type="text"
                    class="txbox"
-                   @keyup.enter="updateDisease(disease)"
-                   v-model="disease.cause"/>
+                   @keyup.enter="updateResult(result)"
+                   v-model="result.name"/>
           </td>
           <td>
             <input type="text"
                    class="txbox"
-                   @keyup.enter="updateDisease(disease)"
-                   v-model="disease.dalys"/>
+                   @keyup.enter="updateResult(result)"
+                   v-model="result.cause"/>
           </td>
           <td>
             <input type="text"
                    class="txbox"
-                   @keyup.enter="updateDisease(disease)"
-                   v-model="disease.deaths"/>
+                   @keyup.enter="updateResult(result)"
+                   v-model="result.coverage"/>
           </td>
           <td>
             <input type="text"
                    class="txbox"
-                   @keyup.enter="updateDisease(disease)"
-                   v-model="disease.prevalence"/>
+                   @keyup.enter="updateResult(result)"
+                   v-model="result.averted"/>
           </td>
           <td style="white-space: nowrap; text-align:center">
             <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
@@ -214,13 +183,6 @@ Last update: 2018-05-18
         </tr>
         </tbody>
       </table>
-
-      <!--<template>-->
-      <!--Testing handsontable-->
-      <!--<div id="hot-preview">-->
-      <!--<HotTable :root="root" :settings="hotSettings"></HotTable>-->
-      <!--</div>-->
-      <!--</template>-->
 
     </div>
   </div>
@@ -267,7 +229,7 @@ Last update: 2018-05-18
 
         // List of diseases.  Each list element is a list of the ailment name
         // and numbers associated with it.
-        diseaseList: [],
+        resultList: [],
 
         // Column of table used for sorting the diseases
         sortColumn2: 'name',  // name, country, creationTime, updatedTime
@@ -299,11 +261,11 @@ Last update: 2018-05-18
         return this.applyNameFilter(this.applySorting(this.packageSets))
       },
 
-      sortedDiseases() {
-        var sortedDiseaseList =  this.applySorting2(this.diseaseList);
+      sortedResults() {
+        var sortedResultList =  this.applySorting2(this.resultList);
         Vue.set(this.hotSettings, 'data', [[1,2,3]]);
-        console.log(sortedDiseaseList);
-        return sortedDiseaseList;
+        console.log(sortedResultList);
+        return sortedResultList;
       },
 
     },
@@ -400,6 +362,8 @@ Last update: 2018-05-18
       },
 
       applyNameFilter(sets) {
+        console.log('CK TEST2')
+        console.log(sets)
         return sets.filter(theSet => theSet.packageset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
 
@@ -427,20 +391,20 @@ Last update: 2018-05-18
         this.activePackageSet = packageSet
 
         // Go to the server to get the diseases from the package set.
-        rpcservice.rpcProjectCall('get_project_package_set_diseases',
+        rpcservice.rpcProjectCall('get_project_package_set_results',
           [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
           .then(response => {
-            // Set the disease list.
-            this.diseaseList = response.data.diseases
+            // Set the result list.
+            this.resultList = response.data.results
 
             // Set the active values from the loaded in data.
-            for (let ind=0; ind < this.diseaseList.length; ind++) {
-              this.diseaseList[ind].numindex = ind
-              this.diseaseList[ind].active = (this.diseaseList[ind][0] > 0)
-              this.diseaseList[ind].cause = this.diseaseList[ind][1]
-              this.diseaseList[ind].dalys = Number(this.diseaseList[ind][2]).toLocaleString()
-              this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString()
-              this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString()
+            for (let ind=0; ind < this.resultList.length; ind++) {
+              this.resultList[ind].numindex = ind
+              this.resultList[ind].active = (this.resultList[ind][0] > 0)
+              this.resultList[ind].name = this.resultList[ind][1]
+              this.resultList[ind].cause = this.resultList[ind][2]
+              this.resultList[ind].coverage = Number(this.resultList[ind][3]).toLocaleString()
+              this.resultList[ind].dalys_averted = Number(this.resultList[ind][4]).toLocaleString()
             }
 
             // Reset the bottom table sorting state.
@@ -466,7 +430,7 @@ Last update: 2018-05-18
         // Set the active project to the matched project.
         this.activePackageSet = packageSet
 
-        // Go to the server to get the diseases from the package set.
+        // Go to the server to get the results from the package set.
         rpcservice.rpcProjectCall('get_project_package_plots',
           [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
           .then(response => {
@@ -474,7 +438,6 @@ Last update: 2018-05-18
             let theFig = response.data.graph1 // Extract hack info.
             mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
             mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
-            mpld3.draw_figure('fig03', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.
@@ -572,53 +535,32 @@ Last update: 2018-05-18
         }
       },
 
-      applySorting2(diseases) {
-        return diseases.sort((disease1, disease2) =>
+      applySorting2(results) {
+        return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
             if (this.sortColumn2 === 'name') {
-              return (disease1[1] > disease2[1] ? sortDir: -sortDir)
+              return (result1[1] > result2[1] ? sortDir: -sortDir)
             }
-            else if (this.sortColumn2 === 'DALYs') {
-              return disease1[2] > disease2[2] ? sortDir: -sortDir
+            else if (this.sortColumn2 === 'cause') {
+              return result1[2] > result2[2] ? sortDir: -sortDir
             }
-            else if (this.sortColumn2 === 'deaths') {
-              return disease1[3] > disease2[3] ? sortDir: -sortDir
+            else if (this.sortColumn2 === 'coverage') {
+              return result1[3] > result2[3] ? sortDir: -sortDir
             }
-            else if (this.sortColumn2 === 'prevalence') {
-              return disease1[4] > disease2[4] ? sortDir: -sortDir
+            else if (this.sortColumn2 === 'averted') {
+              return result1[4] > result2[4] ? sortDir: -sortDir
             }
           }
         )
       },
 
-      updateDisease(disease) {
-        console.log('Update to be made')
-        console.log('Index: ', disease.numindex)
-        console.log('Active?: ', disease.active)
-        console.log('Cause: ', disease.cause)
-        console.log('DALYs: ', disease.dalys)
-        console.log('Deaths: ', disease.deaths)
-        console.log('Prevalence: ', disease.prevalence)
-
-        // Do format filtering to prepare the data to pass to the RPC.
-        let filterActive = disease.active ? 1 : 0
-
-        // Go to the server to update the disease from the package set.
-        // Note: filter out commas in the numeric fields.
-        rpcservice.rpcProjectCall('update_package_set_disease',
-          [this.$store.state.activeProject.project.id,
-            this.activePackageSet.packageset.numindex,
-            disease.numindex,
-            [filterActive, disease.cause,
-              disease.dalys.replace(/,/g, ''),
-              disease.deaths.replace(/,/g, ''),
-              disease.prevalence.replace(/,/g, '')]])
-          .then(response => {
-            // Update the display of the disease list by rerunning the active
-            // package set.
-            this.viewPackageSet(this.activePackageSet)
-          })
+      updateResult(result) {
+        console.log('Update to be made to results -- WARNING, not supported!')
+        console.log('Index: ', result.numindex)
+        console.log('Active?: ', result.active)
+        console.log('Cause: ', result.name)
+        console.log('DALYs: ', result.cause)
       }
 
     }
