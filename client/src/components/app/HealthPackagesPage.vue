@@ -15,24 +15,24 @@ Last update: 2018-05-18
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <button class="btn" @click="createNewPackageSet">Create new health benefits package</button>
+      <!--<button class="btn" @click="createNewPackageSet">Create new health benefits package</button>-->
 
-      <span>&nbsp;based on [FIX]</span>
+      <!--<span>&nbsp;based on [FIX]</span>-->
 
-      <select
-        title="countrySelect"
-        id="country"
-        :required="true"
-        v-model="country">
-        <option
-          v-for = "country in countryList"
-          :value="country"
-        >
-          {{country}}
-        </option>
-      </select>
+      <!--<select-->
+        <!--title="countrySelect"-->
+        <!--id="country"-->
+        <!--:required="true"-->
+        <!--v-model="country">-->
+        <!--<option-->
+          <!--v-for = "country in countryList"-->
+          <!--:value="country"-->
+        <!--&gt;-->
+          <!--{{country}}-->
+        <!--</option>-->
+      <!--</select>-->
 
-      <br/><br/>
+      <!--<br/><br/>-->
 
       <input type="text"
              class="txbox"
