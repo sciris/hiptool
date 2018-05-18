@@ -63,8 +63,8 @@ class Burden(object):
         # Handle options
         if which is None: which = 'dalys'
         if n     is None: n     = 10
-        if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
-        if figsize is None: figsize  = (5,5)
+        if axsize  is None: axsize   = (0.45, 0.15, 0.5, 0.8)
+        if figsize is None: figsize  = (12,5)
         if engine is None: engine = 'matplotlib' # Choices are bokeh or matplotlib
         barw     = 0.8
         barcolor = (0.7,0,0.3)
@@ -84,16 +84,11 @@ class Burden(object):
             raise HPException(errormsg)
         
         # Pull out data
-        
         burdendata = dcp(self.data)
         burdendata.sort(col=which, reverse=True)
         topdata = burdendata[:n]
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which]
-        
-        # Truncate the bar labels (remove this soon).
-#        firstThreeLetters = lambda theString: theString[0:3]
-#        barlabels = map(firstThreeLetters, barlabels)
         
         largestval = barvals[0]
         if largestval>1e6:
@@ -106,40 +101,16 @@ class Burden(object):
             unitstr = ''
         
         # Create plot
+        fig = figure(facecolor='none', figsize=figsize)
+        ax = fig.add_axes(axsize)
+        ax.set_facecolor('none')
+        yaxis = arange(len(barvals), 0, -1)
+        barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
+        ax.set_yticks(arange(10, 0, -1))    
+        ax.set_yticklabels(barlabels)
         
-        if engine=='matplotlib':
-            fig = figure(facecolor='w', figsize=figsize)
-            ax = fig.add_axes(axsize)
-            yaxis = arange(len(barvals), 0, -1)
-            barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
-            
-            # This way of setting the ticks works for the present mpld3 code.
-#            ax.set_yticks(arange(1, 11))   
-#            ax.set_yticklabels(barlabels[::-1])  # need to reverse bar labels order
-            
-            # This way of setting the ticks does NOT work for the release mpld3 code
-            # because the descending order of the ticks fouls things up.
-            ax.set_yticks(arange(10, 0, -1))    
-            ax.set_yticklabels(barlabels)
-            
-            SIticks(ax=ax,axis='x')
-            ax.set_xlabel(thisxlabel+unitstr)
-            ax.set_title(thistitle)
-            boxoff()
-            return fig
-        elif engine=='bokeh':
-            barlabelsr = barlabels[::-1]
-            barvalsr = barvals[::-1]
-            yaxis = arange(len(barvals))
-            p = bkfigure(y_range=barlabelsr)
-            p.hbar(y=yaxis+0.5, height=0.5, left=0, right=barvalsr, color="navy")
-            p.xaxis[0].axis_label = thisxlabel+unitstr
-            p.title.text = thistitle
-            
-            script, div = bkcomponents(p)
-            output = {'script':script, 'div':div}
-            return output
-        else:
-            raise HPException('Engine %s not found' % engine)
-            return None
-        
+        SIticks(ax=ax,axis='x')
+        ax.set_xlabel(thisxlabel+unitstr)
+        ax.set_title(thistitle)
+        boxoff()
+        return fig

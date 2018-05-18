@@ -1,6 +1,9 @@
-from hptool import odict, uuid, today, version, gitinfo, objrepr, getdate
-from hptool import printv, makefilepath, saveobj, dcp
-from hptool import Burden, Interventions
+#######################################################################################################
+## Imports and setup
+#######################################################################################################
+
+import hptool as hp
+import sciris.core as sc
 
 
 #######################################################################################################
@@ -14,10 +17,9 @@ class Project(object):
     The main HealthPrior project class. Almost all functionality is provided by this class.
 
     An HP project is based around 4 major lists:
-        1. burdens -- an odict of burden data
-        2. intervs -- an odict of program sets
-        3. optims -- an odict of optimization structures
-        4. results -- an odict of results associated with the choices above
+        1. burdensets  -- an odict of burden data
+        2. intersets   -- an odict of intervention sets
+        3. packagesets -- an odict of health packages
 
 
     Methods for structure lists:
@@ -35,56 +37,59 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='default', burdenfile=None, interventionsfile=None, country=None, verbose=2, **kwargs):
+    def __init__(self, name='default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
         ''' Initialize the project '''
 
         ## Define the structure sets
-        self.burdensets  = odict()
-        self.intersets   = odict()
-        self.optims      = odict()
-        self.results     = odict()
+        self.burdensets  = sc.odict()
+        self.intersets   = sc.odict()
+        self.packagesets = sc.odict()
 
         ## Define other quantities
         self.name = name
         self.country = country
-        self.uid = uuid()
-        self.created = today()
-        self.modified = today()
-        self.spreadsheetdate = 'Spreadsheet never loaded'
-        self.version = version
-        self.gitinfo = gitinfo(__file__)
+        self.uid = sc.uuid()
+        self.created = sc.today()
+        self.modified = sc.today()
+        self.version = hp.version
+        self.gitinfo = sc.gitinfo(__file__)
         self.filename = None # File path, only present if self.save() is used
         self.warnings = None # Place to store information about warnings (mostly used during migrations)
 
         ## Load burden spreadsheet, if available
         if burdenfile:
-            burden = Burden(project=self)
+            burden = hp.Burden(project=self)
             burden.loaddata(filename=burdenfile)
             self.burdensets['default'] = burden
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
-            interventions = Interventions(project=self)
+            interventions = hp.Interventions(project=self)
             interventions.loaddata(filename=interventionsfile)
             self.intersets['default'] = interventions
+        
+        ## Combine into health package, if available
+        if make_package and burdenfile and interventionsfile:
+            package = hp.HealthPackage(project=self)
+            package.make_package()
+            self.packagesets['default'] = package
 
         return None
 
 
     def __repr__(self):
         ''' Print out useful information when called '''
-        output = objrepr(self)
+        output = sc.objrepr(self)
         output += '      Project name: %s\n'    % self.name
         output += '           Country: %s\n'    % self.country
         output += '\n'
         output += '       Burden sets: %i\n'    % len(self.burdensets)
         output += ' Intervention sets: %i\n'    % len(self.intersets)
-        output += '     Optimizations: %i\n'    % len(self.optims)
-        output += '      Results sets: %i\n'    % len(self.results)
+        output += '   Health packages: %i\n'    % len(self.packagesets)
         output += '\n'
         output += '        HP version: %s\n'    % self.version
-        output += '      Date created: %s\n'    % getdate(self.created)
-        output += '     Date modified: %s\n'    % getdate(self.modified)
+        output += '      Date created: %s\n'    % sc.getdate(self.created)
+        output += '     Date modified: %s\n'    % sc.getdate(self.modified)
         output += '        Git branch: %s\n'    % self.gitinfo['branch']
         output += '          Git hash: %s\n'    % self.gitinfo['hash']
         output += '               UID: %s\n'    % self.uid
@@ -95,7 +100,7 @@ class Project(object):
     
     def getinfo(self):
         ''' Return an odict with basic information about the project'''
-        info = odict()
+        info = sc.odict()
         for attr in ['name', 'version', 'created', 'modified', 'gitbranch', 'gitversion', 'uid']:
             info[attr] = getattr(self, attr) # Populate the dictionary
 #        info['parsetkeys'] = self.parsets.keys()
@@ -125,15 +130,15 @@ class Project(object):
     
     def save(self, filename=None, folder=None, saveresults=False, verbose=2):
         ''' Save the current project, by default using its name, and without results '''
-        fullpath = makefilepath(filename=filename, folder=folder, default=[self.filename, self.name], ext='prj', sanitize=True)
+        fullpath = sc.makefilepath(filename=filename, folder=folder, default=[self.filename, self.name], ext='prj', sanitize=True)
         self.filename = fullpath # Store file path
         if saveresults:
-            saveobj(fullpath, self, verbose=verbose)
+            sc.saveobj(fullpath, self, verbose=verbose)
         else:
-            tmpproject = dcp(self) # Need to do this so we don't clobber the existing results
+            tmpproject = sc.dcp(self) # Need to do this so we don't clobber the existing results
 #            tmpproject.restorelinks() # Make sure links are restored
             tmpproject.cleanresults() # Get rid of all results
-            saveobj(fullpath, tmpproject, verbose=verbose) # Save it to file
+            sc.saveobj(fullpath, tmpproject, verbose=verbose) # Save it to file
             del tmpproject # Don't need it hanging around any more
         return fullpath
 
@@ -142,15 +147,23 @@ class Project(object):
     ### Utilities
     #######################################################################################################
 
-    def burden(self, key=-1, verbose=2):
+    def burden(self, key=None, verbose=2):
         ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
+        if key is None: key = hp.default_key
         try:    return self.burdensets[key]
-        except: return printv('Warning, burden set not found!', 1, verbose) # Returns None
+        except: return sc.printv('Warning, burden set not found!', 1, verbose) # Returns None
     
-    def inter(self, key=-1, verbose=2):
+    def inter(self, key=None, verbose=2):
         ''' Shortcut for getting the latest active interventions set, i.e. self.intersets[-1] '''
+        if key is None: key = hp.default_key
         try:    return self.intersets[key]
-        except: return printv('Warning, interventions set not found!', 1, verbose) # Returns None
+        except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
+    
+    def package(self, key=None, verbose=2):
+        ''' Shortcut for getting the latest active health packages set, i.e. self.intersets[-1] '''
+        if key is None: key = hp.default_key
+        try:    return self.packagesets[key]
+        except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
     
     def cleanresults(self):
         ''' Remove all results '''

@@ -131,7 +131,6 @@ class ProjectSO(sobj.ScirisObject):
         print 'Project Name: %s' % self.theProject.name
         print 'Creation Time: %s' % self.theProject.created
         print 'Update Time: %s' % self.theProject.modified
-        print 'Data Upload Time: %s' % self.theProject.spreadsheetdate
         
     def getUserFrontEndRepr(self):
         objInfo = {
@@ -141,7 +140,6 @@ class ProjectSO(sobj.ScirisObject):
                 'userId': self.ownerUID,
                 'creationTime': self.theProject.created,
                 'updatedTime': self.theProject.modified,
-                'dataUploadTime': self.theProject.spreadsheetdate
             }
         }
         return objInfo
@@ -468,7 +466,7 @@ def init_projects(theApp):
         print '>> Starting a demo project.'
         theProject = hptool.Project(name='Afghanistan test 1', 
             burdenfile=dataPath + 'ihme-gbd.xlsx', 
-            interventionsfile=dataPath + 'dcp-data.xlsx')  
+            interventionsfile=dataPath + 'dcp-data-afg-v1.xlsx')  
         theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
 #        theProjectSO = ProjectSO('Afghanistan test 1', 
 #            user.get_scirisdemo_user(), 
@@ -821,7 +819,7 @@ def create_new_project(user_id):
     # Create the project, loading in the desired spreadsheets.
     theProj = hptool.Project(name=newProjName, 
         burdenfile=dataPath + 'ihme-gbd.xlsx', 
-        interventionsfile=dataPath + 'dcp-data.xlsx')  
+        interventionsfile=dataPath + 'dcp-data-afg-v1.xlsx')  
     
     # Set the burden population size.
     theProj.burden().popsize = 36373.176 # From UN population division 
@@ -1103,15 +1101,15 @@ class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
         
 def make_mpld3_graph_dict(theFig):
     # Handle figure size
-    zoom = 1.0
-    figsize = (frontendfigsize[0] * zoom, frontendfigsize[1] * zoom)
-    theFig.set_size_inches(figsize)
+#    zoom = 1.0
+#    figsize = (frontendfigsize[0] * zoom, frontendfigsize[1] * zoom)
+#    theFig.set_size_inches(figsize)
     
-    if len(theFig.axes) == 1:
-        ax = theFig.axes[0]
-        legend = ax.get_legend()
-        if legend is None:
-            ax.set_position(Bbox(array(frontendpositionnolegend)))  
+#    if len(theFig.axes) == 1:
+#        ax = theFig.axes[0]
+#        legend = ax.get_legend()
+#        if legend is None:
+#            ax.set_position(Bbox(array(frontendpositionnolegend)))  
             
     mpld3_dict = mpld3.fig_to_dict(theFig)
     
@@ -1228,7 +1226,7 @@ def create_interv_set(project_id, new_interv_set_name):
         # NOTE: We may want to take this out later in favor leaving the 
         # new sets empty to start.
         dataPath = hptool.HPpath('data')
-        newIntervSet.loaddata(dataPath+'dcp-data.xlsx')
+        newIntervSet.loaddata(dataPath+'dcp-data-afg-v1.xlsx')
         
         # Put the new intervention set in the dictionary.
         theProj.intersets[uniqueName] = newIntervSet
