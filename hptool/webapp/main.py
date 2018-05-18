@@ -790,7 +790,7 @@ def get_interv_set_fe_repr(theIntervSet):
 
 def get_package_set_fe_repr(packageset):
     objInfo = {
-        'burdenset': {
+        'packageset': {
             'name': packageset.name,
             'uid': packageset.uid,
             'creationTime': packageset.created,
