@@ -20,9 +20,9 @@ import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import sciris.user as user
 import sciris.project as project
-import hptool
 from hptool.webapp import config
-from hptool import uuid, dcp, Burden, Interventions
+import sciris.core as sc
+import hptool as hp
 
 
 #
@@ -116,7 +116,7 @@ class ProjectSO(sobj.ScirisObject):
             super(ProjectSO, self).loadFromCopy(otherObject)
             
             # Copy the Project object itself.
-            self.theProject = dcp(otherObject.theProject)
+            self.theProject = sc.dcp(otherObject.theProject)
             
             # Copy the owner UID.
             self.ownerUID = otherObject.ownerUID
@@ -222,10 +222,10 @@ class ProjectSO(sobj.ScirisObject):
 #                    self.uid = validUID
 #                # Otherwise, generate a new random UUID using uuid4().
 #                else:
-#                    self.uid = uuid()
+#                    self.uid = sc.uuid()
 #            # Otherwise, generate a new random UUID using uuid4().
 #            else:
-#                self.uid = uuid()
+#                self.uid = sc.uuid()
 #                
 #            # Set the project name.
 #            self.name = name
@@ -458,13 +458,13 @@ def init_projects(theApp):
     # Else (no match)...
     else:
         # Load the data path holding the Excel files.
-        dataPath = hptool.HPpath('data')
+        dataPath = hp.HPpath('data')
     
         print '>> Creating a new ProjectCollection.'   
         project.theProjCollection.addToDataStore()
         
         print '>> Starting a demo project.'
-        theProject = hptool.Project(name='Afghanistan test 1', 
+        theProject = hp.Project(name='Afghanistan test 1', 
             burdenfile=dataPath + 'ihme-gbd.xlsx', 
             interventionsfile=dataPath + 'dcp-data-afg-v1.xlsx')  
         theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
@@ -474,7 +474,7 @@ def init_projects(theApp):
         project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a second demo project.'
-        theProject = hptool.Project(name='Afghanistan HBP equity')
+        theProject = hp.Project(name='Afghanistan HBP equity')
         theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
 #        theProjectSO = ProjectSO('Afghanistan HBP equity', 
 #            user.get_scirisdemo_user(), 
@@ -482,7 +482,7 @@ def init_projects(theApp):
         project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a third demo project.'
-        theProject = hptool.Project(name='Final Afghanistan HBP')
+        theProject = hp.Project(name='Final Afghanistan HBP')
         theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
 #        theProjectSO = ProjectSO('Final Afghanistan HBP', 
 #            user.get_scirisdemo_user(), 
@@ -490,7 +490,7 @@ def init_projects(theApp):
         project.theProjCollection.addObject(theProjectSO)
         
         print '>> Starting a fourth demo project.'
-        theProject = hptool.Project(name='Pakistan test 1')  
+        theProject = hp.Project(name='Pakistan test 1')  
         theProjectSO = ProjectSO(theProject, user.get_scirisdemo_user())
 #        theProjectSO = ProjectSO('Pakistan test 1', 
 #            user.get_scirisdemo_user(), 
@@ -501,7 +501,7 @@ def init_projects(theApp):
     project.theProjCollection.show()
     
 def init_main(theApp): 
-    print('-- Welcome to the HealthPrior webapp, version %s (%s) --' % (hptool.version, hptool.versiondate))
+    print('-- Welcome to the HealthPrior webapp, version %s (%s) --' % (hp.version, hp.versiondate))
     return None
     
 #
@@ -692,10 +692,10 @@ def json_sanitize_result(theResult):
 
 def get_version_info():
 	''' Return the informatino about the project. '''
-	gitinfo = sciris.utils.gitinfo(__file__)
+	gitinfo = sc.gitinfo(__file__)
 	version_info = {
-        'version': hptool.version,
-        'date': hptool.versiondate,
+        'version': hp.version,
+        'date': hp.versiondate,
         'gitbranch': gitinfo['branch'],
         'githash': gitinfo['hash'],
         'gitdate': gitinfo['date'],
@@ -718,7 +718,7 @@ def save_project(theProj):
     project_record = project.load_project_record(theProj.uid)
     
     # Copy the project, only save what we want...
-    new_project = dcp(theProj)
+    new_project = sc.dcp(theProj)
          
     # Create the new project entry and enter it into the ProjectCollection.
     # Note: We don't need to pass in project.uid as a 3rd argument because 
@@ -752,7 +752,7 @@ def save_project_as_new(theProj, user_id):
     """ 
     
     # Set a new project UID, so we aren't replicating the UID passed in.
-    theProj.uid = uuid()
+    theProj.uid = sc.uuid()
     
     # Create the new project entry and enter it into the ProjectCollection.
     theProjSO = ProjectSO(theProj, user_id)
@@ -788,6 +788,17 @@ def get_interv_set_fe_repr(theIntervSet):
     }
     return objInfo
 
+def get_package_set_fe_repr(packageset):
+    objInfo = {
+        'burdenset': {
+            'name': packageset.name,
+            'uid': packageset.uid,
+            'creationTime': packageset.created,
+            'updateTime': packageset.modified
+        }
+    }
+    return objInfo
+
 #
 # RPC functions
 #
@@ -811,13 +822,13 @@ def create_new_project(user_id):
         return {'error': 'Unauthorized RPC'}
     
     # Load the data path holding the Excel files.
-    dataPath = hptool.HPpath('data')
+    dataPath = hp.HPpath('data')
     
     # Get a unique name for the project to be added.
     newProjName = project.get_unique_name('New project', other_names=None)
     
     # Create the project, loading in the desired spreadsheets.
-    theProj = hptool.Project(name=newProjName, 
+    theProj = hp.Project(name=newProjName, 
         burdenfile=dataPath + 'ihme-gbd.xlsx', 
         interventionsfile=dataPath + 'dcp-data-afg-v1.xlsx')  
     
@@ -872,7 +883,7 @@ def copy_project(project_id):
     theProj = project_record.theProject
     
     # Make a copy of the project loaded in to work with.
-    new_project = dcp(theProj)
+    new_project = sc.dcp(theProj)
     
     # Just change the project name, and we have the new version of the 
     # Project object to be saved as a copy.
@@ -972,12 +983,12 @@ def create_burden_set(project_id, new_burden_set_name):
             other_names=list(theProj.burdensets))
         
         # Create a new (empty) burden set.
-        newBurdenSet = Burden(project=theProj, name=uniqueName)
+        newBurdenSet = hp.Burden(project=theProj, name=uniqueName)
                 
         # Load data from the Excel spreadsheet.
         # NOTE: We may want to take this out later in favor leaving the 
         # new sets empty to start.
-        dataPath = hptool.HPpath('data')
+        dataPath = hp.HPpath('data')
         newBurdenSet.loaddata(dataPath+'ihme-gbd.xlsx')
         
         # Put the new burden set in the dictionary.
@@ -1016,7 +1027,7 @@ def copy_burden_set(project_id, burdenset_numindex):
             other_names=list(theProj.burdensets))
         
         # Create a new burdenset which is a copy of the old one.
-        newBurdenSet = dcp(theProj.burdensets[burdenset_numindex])
+        newBurdenSet = sc.dcp(theProj.burdensets[burdenset_numindex])
         
         # Overwrite the old name with the new.
         newBurdenSet.name = uniqueName
@@ -1071,9 +1082,6 @@ def update_burden_set_disease(project_id, burdenset_numindex,
 
 frontendfigsize = (5.5, 2)
 frontendpositionnolegend = [[0.19, 0.12], [0.85, 0.85]]
-from matplotlib.transforms import Bbox
-from numpy import array
-from pylab import subplots
 
 class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
     """Hello World plugin"""
@@ -1220,12 +1228,12 @@ def create_interv_set(project_id, new_interv_set_name):
             other_names=list(theProj.intersets))
         
         # Create a new (empty) intervention set.
-        newIntervSet = Interventions(project=theProj, name=uniqueName)
+        newIntervSet = hp.Interventions(project=theProj, name=uniqueName)
         
         # Load data from the Excel spreadsheet.
         # NOTE: We may want to take this out later in favor leaving the 
         # new sets empty to start.
-        dataPath = hptool.HPpath('data')
+        dataPath = hp.HPpath('data')
         newIntervSet.loaddata(dataPath+'dcp-data-afg-v1.xlsx')
         
         # Put the new intervention set in the dictionary.
@@ -1264,7 +1272,7 @@ def copy_interv_set(project_id, intervset_numindex):
             other_names=list(theProj.intersets))
         
         # Create a new intervention set which is a copy of the old one.
-        newIntervSet = dcp(theProj.intersets[intervset_numindex])
+        newIntervSet = sc.dcp(theProj.intersets[intervset_numindex])
         
         # Overwrite the old name with the new.
         newIntervSet.name = uniqueName
@@ -1319,10 +1327,177 @@ def update_interv_set_interv(project_id, intervset_numindex,
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
+
+
+
+##
+## package set RPCs
+##   
+    
+def get_project_package_sets(project_id):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get a list of the package objects.
+    packageSets = [theProj.packagesets[ind] for ind in range(len(theProj.packagesets))] 
+    
+    # Return the JSON-friendly result.
+    return {'packagesets': map(get_package_set_fe_repr, packageSets)}
+
+def get_project_package_set_diseases(project_id, packageset_numindex):
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get the package set that matches packageset_numindex.
+    packageSet = theProj.package(key=packageset_numindex)
+    
+    # Return an empty list if no data is present.
+    if packageSet.results is None:
+        return { 'results': [] }
+
+    # Gather the list for all of the diseases.
+    resultData = packageSet.export(cols=['active','shortname','cause','coverage','total_prevalence','dalys_averted','total_dalys'], header=False)
+    
+    # Return success.
+    return { 'results': resultData }
+    
+def create_package_set(project_id, new_package_set_name):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(new_package_set_name, 
+            other_names=list(theProj.packagesets))
+        
+        # Create a new (empty) package set.
+        newpackageSet = hp.HealthPackage(project=theProj, name=uniqueName)
+        
+        # Put the new package set in the dictionary.
+        theProj.packagesets[uniqueName] = newpackageSet
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.
+    update_project_with_fn(project_id, update_project_fn)
+
+    # Return the new package sets.
+    return get_project_package_sets(project_id)
+
+def delete_package_set(project_id, packageset_numindex):
+
+    def update_project_fn(theProj):
+        theProj.packagesets.pop(packageset_numindex)
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Do the project update using the internal function.    
+    update_project_with_fn(project_id, update_project_fn)   
+    
+def copy_package_set(project_id, packageset_numindex):
+
+    def update_project_fn(theProj):
+        # Get a unique name (just in case the one provided collides with an 
+        # existing one).
+        uniqueName = project.get_unique_name(theProj.packagesets[packageset_numindex].name, 
+            other_names=list(theProj.packagesets))
+        
+        # Create a new packageset which is a copy of the old one.
+        newpackageSet = sc.dcp(theProj.packagesets[packageset_numindex])
+        
+        # Overwrite the old name with the new.
+        newpackageSet.name = uniqueName
+       
+        # Put the new package set in the dictionary.
+        theProj.packagesets[uniqueName] = newpackageSet
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}    
+    
+    # Do the project update using the internal function.  
+    update_project_with_fn(project_id, update_project_fn)
+    
+    # Return the new package sets.
+    return get_project_package_sets(project_id) 
+
+def rename_package_set(project_id, packageset_numindex, new_package_set_name):
+
+    def update_project_fn(theProj):
+        # Overwrite the old name with the new.
+        theProj.packagesets[packageset_numindex].name = new_package_set_name
+        
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'} 
+        
+    # Do the project update using the internal function. 
+    update_project_with_fn(project_id, update_project_fn)
+
+
+def get_project_package_plots(project_id, packageset_numindex):
+    ''' Plot the health packages '''
+    
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the Project object.
+    theProj = project.load_project(project_id)
+    
+    # Get the package set that matches packageset_numindex.
+    packageSet = theProj.package(key=packageset_numindex)
+    
+    figs = []
+    fig1 = packageSet.plot_dalys()
+    fig2 = packageSet.plot_cascade()
+    figs.append(fig1)
+    figs.append(fig2)
+    
+    # Gather the list for all of the diseases.
+    graphs = []
+    for fig in figs:
+        graph_dict = make_mpld3_graph_dict(fig)
+        graphs.append(graph_dict)
+    
+    # Return success.
+    return {'graph1': graphs[0],
+            'graph2': graphs[1],}
+
+
+
+
+
+    
+    
     
 ##
 ## Temporary (development) RPCs
 ##
+
+
+
+
+
+
+
+
 
 def tester_func_main(project_id):
     theProjRecord = project.load_project_record(project_id)
