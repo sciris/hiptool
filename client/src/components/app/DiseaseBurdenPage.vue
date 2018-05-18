@@ -112,14 +112,12 @@ Last update: 2018-05-02
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
-      <button class="btn" @click="makeGraph(activeBurdenSet)">Visualize</button>
 
       <div>
         <div id="fig01" style="float:left" ></div>
         <div id="fig02" style="float:left" ></div>
         <div id="fig03" style="float:left" ></div>
       </div>
-
 
 
 
@@ -183,7 +181,7 @@ Last update: 2018-05-02
         <tbody>
           <tr v-for="disease in sortedDiseases">
             <td style="text-align: center">
-              <input type="checkbox" 
+              <input type="checkbox"
                      v-model="disease.active"/>
             </td>
             <td>
@@ -404,6 +402,8 @@ Last update: 2018-05-02
       },
 
       applyNameFilter(sets) {
+        console.log('CK TEST1')
+        console.log(sets)
         return sets.filter(theSet => theSet.burdenset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
 
@@ -450,6 +450,9 @@ Last update: 2018-05-02
           // Reset the bottom table sorting state.
           this.sortColumn2 = 'name'
           this.sortReverse2 = false
+
+          // Plot graphs
+          this.makeGraph(burdenSet)
         })
 
         this.$notifications.notify({
@@ -459,6 +462,31 @@ Last update: 2018-05-02
           verticalAlign: 'top',
           horizontalAlign: 'center',
         });
+      },
+
+      makeGraph(burdenSet) {
+        console.log('makeGraph() called for ' + burdenSet.burdenset.name)
+
+        // Set the active project to the matched project.
+        this.activeBurdenSet = burdenSet
+
+        // Go to the server to get the diseases from the burden set.
+        rpcservice.rpcProjectCall('get_project_burden_plots',
+          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
+          .then(response => {
+            this.serverresponse = response.data // Pull out the response data.
+            let theFig = response.data.graph1 // Extract hack info.
+            mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
+            mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig03', response.data.graph3) // Draw the figure.
+          })
+          .catch(error => {
+            // Pull out the error message.
+            this.serverresponse = 'There was an error: ' + error.message
+
+            // Set the server error.
+            this.servererror = error.message
+          })
       },
 
       copyBurdenSet(burdenSet) {
@@ -529,67 +557,6 @@ Last update: 2018-05-02
         })
       },
 
-      makeGraph(burdenSet) {
-        console.log('makeGraph() called for ' + burdenSet.burdenset.name)
-
-        // Set the active project to the matched project.
-        this.activeBurdenSet = burdenSet
-
-        // Go to the server to get the diseases from the burden set.
-        rpcservice.rpcProjectCall('get_project_burden_plots',
-          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
-        .then(response => {
-          // Pull out the response data.
-          this.serverresponse = response.data
-
-          // mpld3 drawing code
-          
-          // Extract hack info.
-          let theFig = response.data.graph1
-          
-          
-          // Run the script passed in with the graph.
-//          eval(response.data.graph1.script)
-    
-          // Draw the figure.
-          mpld3.draw_figure('fig01', response.data.graph1)
-          
-          
-          // Run the script passed in with the graph.
-//          eval(response.data.graph2.script)
-    
-          // Draw the figure.
-          mpld3.draw_figure('fig02', response.data.graph2)
-          
-          
-          // Run the script passed in with the graph.
-//          eval(response.data.graph3.script)
-    
-          // Draw the figure.
-          mpld3.draw_figure('fig03', response.data.graph3)
-               
-          
-          // bokeh drawing code
-                   
-          // Draw the figure in the 'fig01' div tag.
-/*           console.log('About to replace');
-          document.getElementById("fig01").innerHTML = response.data.graph1.div;
-          console.log('About to eval');
-          console.log(response.data.graph1.script);
-          eval(response.data.graph1.script); */
-
-/*           console.log('TEMP complete')
-          document.getElementById("fig02").innerHTML = response.data.graph2.div;
-          eval(response.data.graph2.script); */
-        })
-        .catch(error => {
-          // Pull out the error message.
-          this.serverresponse = 'There was an error: ' + error.message
-
-          // Set the server error.
-          this.servererror = error.message
-        })
-      },
 
       updateSorting2(sortColumn) {
         console.log('updateSorting2() called')
@@ -628,34 +595,34 @@ Last update: 2018-05-02
           }
         )
       },
-     
+
       updateDisease(disease) {
         console.log('Update to be made')
-        console.log('Index: ', disease.numindex)        
+        console.log('Index: ', disease.numindex)
         console.log('Active?: ', disease.active)
         console.log('Cause: ', disease.cause)
         console.log('DALYs: ', disease.dalys)
         console.log('Deaths: ', disease.deaths)
         console.log('Prevalence: ', disease.prevalence)
-        
+
         // Do format filtering to prepare the data to pass to the RPC.
         let filterActive = disease.active ? 1 : 0
-        
+
         // Go to the server to update the disease from the burden set.
         // Note: filter out commas in the numeric fields.
         rpcservice.rpcProjectCall('update_burden_set_disease',
-          [this.$store.state.activeProject.project.id, 
-          this.activeBurdenSet.burdenset.numindex, 
-          disease.numindex, 
-          [filterActive, disease.cause, 
-          disease.dalys.replace(/,/g, ''), 
-          disease.deaths.replace(/,/g, ''), 
+          [this.$store.state.activeProject.project.id,
+          this.activeBurdenSet.burdenset.numindex,
+          disease.numindex,
+          [filterActive, disease.cause,
+          disease.dalys.replace(/,/g, ''),
+          disease.deaths.replace(/,/g, ''),
           disease.prevalence.replace(/,/g, '')]])
         .then(response => {
-          // Update the display of the disease list by rerunning the active 
+          // Update the display of the disease list by rerunning the active
           // burden set.
           this.viewBurdenSet(this.activeBurdenSet)
-        })          
+        })
       }
 
     }

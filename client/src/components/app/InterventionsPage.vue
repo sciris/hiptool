@@ -133,10 +133,10 @@ Last update: 2018-05-02
           <tbody>
             <tr v-for="interv in interventionList">
               <td style="text-align: center">
-                <input type="checkbox" 
+                <input type="checkbox"
                        v-model="interv.active"/>
               </td>
-              <td>           
+              <td>
                 <input type="text"
                        class="txbox"
                        @keyup.enter="updateInterv(interv)"
@@ -347,6 +347,8 @@ export default {
     },
 
     applyNameFilter(sets) {
+      console.log('CK TEST1b')
+      console.log(sets)
       return sets.filter(theSet => theSet.intervset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
     },
 
@@ -390,8 +392,8 @@ export default {
           this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
           this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
           this.interventionList[ind].equity = this.interventionList[ind][8]
-          this.interventionList[ind].frp = this.interventionList[ind][7]     
-        }         
+          this.interventionList[ind].frp = this.interventionList[ind][7]
+        }
       })
 
       this.$notifications.notify({
@@ -470,39 +472,39 @@ export default {
         this.updateIntervSets()
       })
     },
- 
+
     updateInterv(interv) {
       console.log('Update to be made')
-      console.log('Index: ', interv.numindex)        
+      console.log('Index: ', interv.numindex)
       console.log('Active?: ', interv.active)
       console.log('Name: ', interv.name)
       console.log('Platform: ', interv.platform)
       console.log('Type: ', interv.type)
       console.log('ICER: ', interv.icer)
       console.log('Unit cost: ', interv.unitcost)
-      console.log('FRP: ', interv.frp)      
+      console.log('FRP: ', interv.frp)
       console.log('Equity: ', interv.equity)
-      
+
       // Do format filtering to prepare the data to pass to the RPC.
       let filterActive = interv.active ? 1 : 0
-        
+
       // Go to the server to update the intervention from the intervention set.
       // Note: filter out commas in the numeric fields.
       rpcservice.rpcProjectCall('update_interv_set_interv',
-        [this.$store.state.activeProject.project.id, 
-        this.activeIntervSet.intervset.numindex, 
-        interv.numindex, 
-        [filterActive, interv.name, interv.platform, interv.type, 
-        interv.icer.replace(/,/g, ''), 
-        interv.unitcost.replace(/,/g, ''), 
-        interv.frp.replace(/,/g, ''), 
+        [this.$store.state.activeProject.project.id,
+        this.activeIntervSet.intervset.numindex,
+        interv.numindex,
+        [filterActive, interv.name, interv.platform, interv.type,
+        interv.icer.replace(/,/g, ''),
+        interv.unitcost.replace(/,/g, ''),
+        interv.frp.replace(/,/g, ''),
         interv.equity.replace(/,/g, '')]])
       .then(response => {
-        // Update the display of the intervention list by rerunning the active 
+        // Update the display of the intervention list by rerunning the active
         // intervention set.
         this.viewSet(this.activeIntervSet)
-      })      
-    },  
+      })
+    },
 
     intervAllCategoryClick() {
       this.showCancerIntervs = false
