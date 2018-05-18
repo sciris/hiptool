@@ -16,8 +16,8 @@ print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[37])
 
 print('\n\nExample interventions entry:\n\n%s' % P.intersets[0].data[37])
 
-P.burden().plottopcauses()
-P.package().plot_dalys()
+#P.burden().plottopcauses()
+P.package().plot_cascade()
 #P.burden().plottopcauses(which='prevalence', n=15)
 # dd = P.burden().export(cols=['cause','dalys','deaths','prevalence'])
 
