@@ -259,7 +259,9 @@ export default {
     },
 
     deletePackage() {
+      // get the selected health package uuid for deletion
       var uid = this.uid_holder
+      
       // Find the package that matches the UID passed in.
       let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
