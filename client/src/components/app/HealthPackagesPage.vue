@@ -67,7 +67,7 @@ Last update: 2018-03-25
               <button class="btn __green" @click="viewPackage(healthPackage.uid)">View</button>
               <button class="btn" @click="copyPackage(healthPackage.uid)">Copy</button>
               <button class="btn" @click="renamePackage(healthPackage.uid)">Rename</button>
-              <button class="btn __red" @click="deletePackage(healthPackage.uid)">Delete</button>
+              <button class="btn __red" @click="deleteModal(healthPackage.uid)">Delete</button>
             </td>
           </tr>
           <tr>
@@ -99,6 +99,8 @@ export default {
 
   data() {
     return {
+      // uid holder during deletion
+      uid_holder: '',
       // Placeholder text for table filter box
       filterPlaceholder: '\u{1f50e} Filter Health Packages',
 
@@ -242,12 +244,29 @@ export default {
 
       console.log('renamePackage() called for ' + matchPackage.packageName)
     },
+ // Confirmation alert
+    deleteModal(uid) {
+      this.uid_holder = uid
+      // Alert object data
+      var obj = {
+            message: 'Are you sure you want to delete the selected projects?',
+            useConfirmBtn: true,
+            customConfirmBtnClass: 'btn __red',
+            customCloseBtnClass: 'btn',
+            onConfirm: this.deletePackage
+          }
+      this.$Simplert.open(obj)
+    },
 
-    deletePackage(uid) {
+    deletePackage() {
+      var uid = this.uid_holder
       // Find the package that matches the UID passed in.
       let matchPackage = this.healthPackages.find(thePackage => thePackage.uid === uid)
 
       console.log('deletePackage() called for ' + matchPackage.packageName)
+
+      // removing data from the uid holder
+      this.uid_holder = ''
     },
 
     createNewPackage() {
