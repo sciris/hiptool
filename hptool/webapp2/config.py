@@ -16,7 +16,7 @@ you use a relative path, it is interpreted as being with respect to the
 "webapp directory," that is, the directory containing this config file and the 
 main webapp script that imports it.
  
-Last update: 5/24/18 (gchadder3)
+Last update: 5/26/18 (gchadder3)
 """
 
 # A secret key value used by Python Flask.
@@ -24,7 +24,7 @@ SECRET_KEY = 'Pick something unique for your site here'
 
 # Directory containing the client code.
 #   DEFAULT = '.'
-CLIENT_DIR = '../../client/dist'
+CLIENT_DIR = '../../client2/dist'
 
 # Directory containing the model code.  This is the primary Python code that 
 # the web app will rely on related to the actual model.
@@ -69,7 +69,3 @@ USE_USERS = True
 # spawns a new active account.  If this is set False, then an admin user has 
 # to manually activate the account for the user.
 REGISTER_AUTOACTIVATE = True
-
-# Flag for setting whether we use the projects functionality provided by 
-# Sciris in the webapp.
-USE_PROJECTS = False
