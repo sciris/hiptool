@@ -1,7 +1,7 @@
 <!--
 Login page
 
-Last update: 2018-03-25
+Last update: 2018-05-26
 -->
 
 <template>
@@ -81,7 +81,7 @@ Last update: 2018-03-25
 
     computed: {
       getVersionInfo() {
-        rpcservice.rpcPublicCall('get_version_info')
+        rpcservice.rpcCall('get_version_info')
           .then(response => {
             this.version = response.data['version'];
             this.date = response.data['date'];
