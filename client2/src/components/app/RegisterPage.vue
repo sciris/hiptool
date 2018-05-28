@@ -1,7 +1,7 @@
 <!--
 User registration page
 
-Last update: 2018-03-25
+Last update: 2018-05-28
 -->
 
 
@@ -83,6 +83,7 @@ Last update: 2018-03-25
 
 <script>
 import rpcservice from '@/services/rpc-service'
+import userservice from '@/services/user-service' 
 import router from '@/router'
 
 export default {
@@ -102,7 +103,7 @@ export default {
 
   computed: {
     getVersionInfo() {
-      rpcservice.rpcPublicCall('get_version_info')
+      rpcservice.rpcCall('get_version_info')
         .then(response => {
           this.version = response.data['version'];
           this.date = response.data['date'];
@@ -112,8 +113,8 @@ export default {
 
   methods: {
     tryRegister () {
-      rpcservice.rpcRegisterCall('user_register', this.registerUserName,
-        this.registerPassword, this.registerDisplayName, this.registerEmail)
+      userservice.registerUser(this.registerUserName, this.registerPassword, 
+        this.registerDisplayName, this.registerEmail)
       .then(response => {
         if (response.data == 'success') { // Set a success result to show.
           this.registerResult = 'Success! Please wait while you are redirected...';
