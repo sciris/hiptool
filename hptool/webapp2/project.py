@@ -15,6 +15,11 @@ import sciris2gc.user as user
 import sciris.core as sc
 import hptool as hp
 import os
+import uuid
+from zipfile import ZipFile
+from flask import request
+from flask_login import current_user
+from sciris.exceptions import ProjectDoesNotExist
 
 #
 # Globals
@@ -191,6 +196,8 @@ class ProjectCollection(sobj.ScirisCollection):
 #
 
 def init_projects():
+    global proj_collection
+    
     # Look for an existing ProjectCollection.
     proj_collection_uid = ds.data_store.get_uid_from_instance('projectscoll', 
         'Projects Collection')
@@ -248,14 +255,243 @@ def init_projects():
         
     # Show what's in the ProjectCollection.    
     proj_collection.show()
-
+        
 #
 # Other functions (mostly helpers for the RPCs)
 #
 
+def load_project_record(project_id, raise_exception=True):
+    """
+    Return the project DataStore reocord, given a project UID.
+    """ 
+    
+    # Load the matching ProjectSO object from the database.
+    project_record = proj_collection.get_object_by_uid(project_id)
 
+    # If we have no match, we may want to throw an exception.
+    if project_record is None:
+        if raise_exception:
+            raise ProjectDoesNotExist(id=project_id)
+            
+    # Return the Project object for the match (None if none found).
+    return project_record
+
+def load_project(project_id, raise_exception=True):
+    """
+    Return the Nutrition Project object, given a project UID, or None if no 
+    ID match is found.
+    """ 
+    
+    # Load the project record matching the ID passed in.
+    project_record = load_project_record(project_id, 
+        raise_exception=raise_exception)
+    
+    # If there is no match, raise an exception or return None.
+    if project_record is None:
+        if raise_exception:
+            raise ProjectDoesNotExist(id=project_id)
+        else:
+            return None
+        
+    # Return the found project.
+    return project_record.proj
+
+def load_project_summary_from_project_record(project_record):
+    """
+    Return the project summary, given the DataStore record.
+    """ 
+    
+    # Return the built project summary.
+    return project_record.get_user_front_end_repr()  
+          
+def get_unique_name(name, other_names=None):
+    """
+    Given a name and a list of other names, find a replacement to the name 
+    that doesn't conflict with the other names, and pass it back.
+    """
+    
+    # If no list of other_names is passed in, load up a list with all of the 
+    # names from the project summaries.
+    # TODO: The function call below will need to be replaced.
+    if other_names is None:
+        other_names = [p['project']['name'] for p in load_current_user_project_summaries(check_endpoint=False)['projects']]
+      
+    # Start with the passed in name.
+    i = 0
+    unique_name = name
+    
+    # Try adding an index (i) to the name until we find one that no longer 
+    # matches one of the other names in the list.
+    while unique_name in other_names:
+        i += 1
+        unique_name = "%s (%d)" % (name, i)
+        
+    # Return the found name.
+    return unique_name
 
 #
 # RPC functions
 #
 
+def get_scirisdemo_projects():
+    """
+    Return the projects associated with the Sciris Demo user.
+    """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Get the user UID for the _ScirisDemo user.
+    user_id = user.get_scirisdemo_user()
+   
+    # Get the ProjectSO entries matching the _ScirisDemo user UID.
+    project_entries = proj_collection.get_project_entries_by_user(user_id)
+
+    # Collect the project summaries for that user into a list.
+    project_summary_list = map(load_project_summary_from_project_record, 
+        project_entries)
+    
+    # Sort the projects by the project name.
+    sorted_summary_list = sorted(project_summary_list, 
+        key=lambda proj: proj['project']['name']) # Sorts by project name
+    
+    # Return a dictionary holding the project summaries.
+    output = {'projects': sorted_summary_list}
+    return output
+
+def load_project_summary(project_id):
+    """
+    Return the project summary, given the Project UID.
+    """ 
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}
+    
+    # Load the project record matching the UID of the project passed in.
+    project_entry = load_project_record(project_id)
+    
+    # Return a project summary from the accessed ProjectSO entry.
+    return load_project_summary_from_project_record(project_entry)
+
+@register_RPC(validation_type='nonanonymous user')
+def load_current_user_project_summaries():
+    """
+    Return project summaries for all projects the user has to the client.
+    """ 
+    
+    # Get the ProjectSO entries matching the user UID.
+    project_entries = proj_collection.get_project_entries_by_user(current_user.get_id())
+    
+    # Grab a list of project summaries from the list of ProjectSO objects we 
+    # just got.
+    return {'projects': map(load_project_summary_from_project_record, 
+        project_entries)}
+                
+def load_all_project_summaries():
+    """
+    Return project summaries for all projects to the client.
+    """ 
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Get all of the ProjectSO entries.
+    project_entries = proj_collection.get_all_objects()
+    
+    # Grab a list of project summaries from the list of ProjectSO objects we 
+    # just got.
+    return {'projects': map(load_project_summary_from_project_record, 
+        project_entries)}
+    
+def delete_projects(project_ids):
+    """
+    Delete all of the projects with the passed in UIDs.
+    """ 
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'normalProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Loop over the project UIDs of the projects to be deleted...
+    for project_id in project_ids:
+        # Load the project record matching the UID of the project passed in.
+        record = load_project_record(project_id, raise_exception=True)
+        
+        # If a matching record is found, delete the object from the 
+        # ProjectCollection.
+        if record is not None:
+            proj_collection.deleteObjectByUID(project_id)
+   
+def download_project(project_id):
+    """
+    For the passed in project UID, get the Project on the server, save it in a 
+    file, minus results, and pass the full path of this file back.
+    """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'downloadProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Load the project with the matching UID.
+    proj = load_project(project_id, raise_exception=True)
+    
+    # Use the downloads directory to put the file in.
+    dirname = ds.downloads_dir.dir_path
+        
+    # Create a filename containing the project name followed by a .prj 
+    # suffix.
+    file_name = '%s.prj' % proj.name
+        
+    # Generate the full file name with path.
+    full_file_name = '%s%s%s' % (dirname, os.sep, file_name)
+        
+    # Write the object to a Gzip string pickle file.
+    ds.object_to_gzip_string_pickle_file(full_file_name, proj)
+    
+    # Display the call information.
+    print(">> download_project %s" % (full_file_name))
+    
+    # Return the full filename.
+    return full_file_name
+
+def load_zip_of_prj_files(project_ids):
+    """
+    Given a list of project UIDs, make a .zip file containing all of these 
+    projects as .prj files, and return the full path to this file.
+    """
+    
+    # Check (for security purposes) that the function is being called by the 
+    # correct endpoint, and if not, fail.
+    if request.endpoint != 'downloadProjectRPC':
+        return {'error': 'Unauthorized RPC'}   
+    
+    # Use the downloads directory to put the file in.
+    dirname = ds.downloads_dir.dir_path
+
+    # Build a list of ProjectSO objects for each of the selected projects, 
+    # saving each of them in separate .prj files.
+    prjs = [load_project_record(id).save_as_file(dirname) for id in project_ids]
+    
+    # Make the zip file name and the full server file path version of the same..
+    zip_fname = '{}.zip'.format(uuid.uuid4())
+    server_zip_fname = os.path.join(dirname, zip_fname)
+    
+    # Create the zip file, putting all of the .prj files in a projects 
+    # directory.
+    with ZipFile(server_zip_fname, 'w') as zipfile:
+        for prj in prjs:
+            zipfile.write(os.path.join(dirname, prj), 'projects/{}'.format(prj))
+            
+    # Display the call information.
+    print(">> load_zip_of_prj_files %s" % (server_zip_fname))
+
+    # Return the server file name.
+    return server_zip_fname

@@ -1,7 +1,7 @@
 <!--
 Manage projects page
 
-Last update: 2018-03-25
+Last update: 2018-05-29
 -->
 
 <template>
@@ -254,7 +254,7 @@ export default {
       console.log('updateProjectSummaries() called')
 
       // Get the current user's project summaries from the server.
-      rpcservice.rpcProjectCall('load_current_user_project_summaries')
+      rpcservice.rpcCall('load_current_user_project_summaries')
       .then(response => {
         // Set the projects to what we received.
         this.projectSummaries = response.data.projects
