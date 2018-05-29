@@ -1,7 +1,7 @@
 """
 main.py -- main module for HealthPrior webapp.
     
-Last update: 5/26/18 (gchadder3)
+Last update: 5/29/18 (gchadder3)
 """
 
 # Imports
@@ -9,6 +9,7 @@ from sciris2gc.scirisapp import ScirisApp
 import config
 import sciris.core as sc
 import hptool as hp
+import project
 
 # Create the ScirisApp object.  NOTE: app.config will thereafter contain all 
 # of the configuration parameters, including for Flask.
@@ -31,6 +32,11 @@ def get_version_info():
 	}
 	return version_info
 
+# Register the RPCs in the test_rpcs.py module.
+app.add_RPC_dict(project.RPC_dict)
+
+# Initialize the projects.
+project.init_projects()
 
 # Run the client page with Flask and a Twisted server.
 app.run_server()
