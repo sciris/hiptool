@@ -1,7 +1,7 @@
 """
 main.py -- main module for HealthPrior webapp.
     
-Last update: 5/29/18 (gchadder3)
+Last update: 5/30/18 (gchadder3)
 """
 
 # Imports
@@ -32,7 +32,7 @@ def get_version_info():
 	}
 	return version_info
 
-# Register the RPCs in the test_rpcs.py module.
+# Register the RPCs in the project.py module.
 app.add_RPC_dict(project.RPC_dict)
 
 # Initialize the projects.
