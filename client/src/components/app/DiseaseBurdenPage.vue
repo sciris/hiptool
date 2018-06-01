@@ -113,10 +113,10 @@ Last update: 2018-05-02
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
 
-      <div>
-        <div id="fig01" style="float:left" ></div>
-        <div id="fig02" style="float:left" ></div>
-        <div id="fig03" style="float:left" ></div>
+      <div class="figures">
+        <div id="fig01"></div>
+        <div id="fig02"></div>
+        <div id="fig03"></div>
       </div>
 
 
@@ -628,6 +628,16 @@ Last update: 2018-05-02
     }
   }
 </script>
+
+<!--
+  Non-scoped styles are required for programmatically-generated elements.
+  An attempt is made to keep them as specific as possible to avoid issues.
+-->
+<style>
+  .SitePage .PageSection .figures svg {
+    width: 100%;
+  }
+</style>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
