@@ -1,7 +1,7 @@
 """
 main.py -- main module for HealthPrior webapp.
     
-Last update: 5/30/18 (gchadder3)
+Last update: 6/1/18 (gchadder3)
 """
 
 # Imports
@@ -36,7 +36,7 @@ def get_version_info():
 app.add_RPC_dict(project.RPC_dict)
 
 # Initialize the projects.
-project.init_projects()
+project.init_projects(app)
 
 # Run the client page with Flask and a Twisted server.
 app.run_server()

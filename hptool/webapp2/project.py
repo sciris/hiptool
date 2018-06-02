@@ -1,7 +1,7 @@
 """
 project.py -- code related to HealthPrior project management
     
-Last update: 5/30/18 (gchadder3)
+Last update: 6/1/18 (gchadder3)
 """
 
 #
@@ -199,7 +199,7 @@ class ProjectCollection(sobj.ScirisCollection):
 # Initialization function
 #
 
-def init_projects():
+def init_projects(app):
     global proj_collection  # need this to allow modification within the module
     
     # Look for an existing ProjectCollection.
@@ -212,7 +212,8 @@ def init_projects():
     
     # If there was a match...
     if proj_collection_uid is not None:
-        print '>> Loading ProjectCollection from the DataStore.'
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Loading ProjectCollection from the DataStore.'
         proj_collection.load_from_data_store() 
     
     # Else (no match)...
@@ -220,10 +221,12 @@ def init_projects():
         # Load the data path holding the Excel files.
         data_path = hp.HPpath('data')
     
-        print '>> Creating a new ProjectCollection.'   
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Creating a new ProjectCollection.'   
         proj_collection.add_to_data_store()
         
-        print '>> Starting a demo project.'
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Starting a demo project.'
         proj = hp.Project(name='Afghanistan test 1', 
             burdenfile=data_path + 'ihme-gbd.xlsx', 
             interventionsfile=data_path + 'dcp-data-afg-v1.xlsx')  
@@ -233,7 +236,8 @@ def init_projects():
 #            spreadsheet_path=None)
         proj_collection.add_object(projSO)
         
-        print '>> Starting a second demo project.'
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Starting a second demo project.'
         proj = hp.Project(name='Afghanistan HBP equity')
         projSO = ProjectSO(proj, user.get_scirisdemo_user())
 #        projSO = ProjectSO('Afghanistan HBP equity', 
@@ -241,7 +245,8 @@ def init_projects():
 #            spreadsheet_path=None)
         proj_collection.add_object(projSO)
         
-        print '>> Starting a third demo project.'
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Starting a third demo project.'
         proj = hp.Project(name='Final Afghanistan HBP')
         projSO = ProjectSO(proj, user.get_scirisdemo_user())
 #        projSO = ProjectSO('Final Afghanistan HBP', 
@@ -249,7 +254,8 @@ def init_projects():
 #            spreadsheet_path=None)
         proj_collection.add_object(projSO)
         
-        print '>> Starting a fourth demo project.'
+        if app.config['LOGGING_MODE'] == 'FULL':
+            print '>> Starting a fourth demo project.'
         proj = hp.Project(name='Pakistan test 1')  
         projSO = ProjectSO(proj, user.get_scirisdemo_user())
 #        projSO = ProjectSO('Pakistan test 1', 
@@ -257,8 +263,9 @@ def init_projects():
 #            spreadsheet_path=None)
         proj_collection.add_object(projSO)
         
-    # Show what's in the ProjectCollection.    
-    proj_collection.show()
+    if app.config['LOGGING_MODE'] == 'FULL':
+        # Show what's in the ProjectCollection.    
+        proj_collection.show()
         
 #
 # Other functions (mostly helpers for the RPCs)
@@ -402,6 +409,7 @@ def save_project_as_new(proj, user_id):
     proj_collection.add_object(projSO)  
 
     # Display the call information.
+    # TODO: have this so that it doesn't show when logging is turned off
     print(">> save_project_as_new '%s'" % proj.name)
 
     # Save the changed Project object to the DataStore.
@@ -548,6 +556,7 @@ def download_project(project_id):
     fileio.object_to_gzip_string_pickle_file(full_file_name, proj)
     
     # Display the call information.
+    # TODO: have this so that it doesn't show when logging is turned off
     print(">> download_project %s" % (full_file_name))
     
     # Return the full filename.
@@ -578,6 +587,7 @@ def load_zip_of_prj_files(project_ids):
             zipfile.write(os.path.join(dirname, prj), 'projects/{}'.format(prj))
             
     # Display the call information.
+    # TODO: have this so that it doesn't show when logging is turned off
     print(">> load_zip_of_prj_files %s" % (server_zip_fname))
 
     # Return the server file name.
@@ -604,6 +614,7 @@ def create_new_project(user_id):
     proj.burden().popsize = 36373.176 # From UN population division 
     
     # Display the call information.
+    # TODO: have this so that it doesn't show when logging is turned off
     print(">> create_new_project %s" % (proj.name))    
     
     # Save the new project in the DataStore.
@@ -653,6 +664,7 @@ def copy_project(project_id):
     user_id = current_user.get_id() 
     
     # Display the call information.
+    # TODO: have this so that it doesn't show when logging is turned off
     print(">> copy_project %s" % (new_project.name)) 
     
     # Save a DataStore projects record for the copy project.
