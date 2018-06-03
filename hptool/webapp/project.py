@@ -22,7 +22,6 @@ import dateutil
 import dateutil.tz
 from zipfile import ZipFile
 from flask_login import current_user
-from sciris.exceptions import ProjectDoesNotExist
 import mpld3
 
 #
@@ -287,7 +286,7 @@ def load_project_record(project_id, raise_exception=True):
     # If we have no match, we may want to throw an exception.
     if project_record is None:
         if raise_exception:
-            raise ProjectDoesNotExist(id=project_id)
+            raise Exception('ProjectDoesNotExist(id=%s)' % project_id)
             
     # Return the Project object for the match (None if none found).
     return project_record
@@ -305,7 +304,7 @@ def load_project(project_id, raise_exception=True):
     # If there is no match, raise an exception or return None.
     if project_record is None:
         if raise_exception:
-            raise ProjectDoesNotExist(id=project_id)
+            raise Exception('ProjectDoesNotExist(id=%s)' % project_id)
         else:
             return None
         
