@@ -819,65 +819,19 @@ def update_burden_set_disease(project_id, burdenset_numindex,
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
-# TODO: The variables and class below should be removed at some point.  They 
-# are there now for mpld3 testing.
-frontendfigsize = (5.5, 2)
-frontendpositionnolegend = [[0.19, 0.12], [0.85, 0.85]]
 
-class HelloWorld(mpld3.plugins.PluginBase):  # inherit from PluginBase
-    """Hello World plugin"""
-    
-    JAVASCRIPT = """
-    mpld3.register_plugin("helloworld", HelloWorld)
-    HelloWorld.prototype = Object.create(mpld3.Plugin.prototype)
-    HelloWorld.prototype.constructor = HelloWorld
-    function HelloWorld(fig, props){
-        mpld3.Plugin.call(this, fig, props)
-    }
-    
-    HelloWorld.prototype.draw = function(){
-        this.fig.canvas.append("text")
-            .text("hello world")
-            .style("font-size", 72)
-            .style("opacity", 0.3)
-            .style("text-anchor", "middle")
-            .attr("x", this.fig.width / 2)
-            .attr("y", this.fig.height / 2)
-    }
-    """
-    def __init__(self):
-        self.dict_ = {"type": "helloworld"}
+
 
 # TODO: move this into the helper functions.  It's here now for testing 
 # purposes.  Or, maybe remove dependency on this entirely, since it's a one-
 # liner.
 def make_mpld3_graph_dict(fig):
-    # Handle figure size
-#    zoom = 1.0
-#    figsize = (frontendfigsize[0] * zoom, frontendfigsize[1] * zoom)
-#    fig.set_size_inches(figsize)
-    
-#    if len(fig.axes) == 1:
-#        ax = fig.axes[0]
-#        legend = ax.get_legend()
-#        if legend is None:
-#            ax.set_position(Bbox(array(frontendpositionnolegend)))  
-            
     mpld3_dict = mpld3.fig_to_dict(fig)
-    
     return mpld3_dict
 
 @register_RPC(validation_type='nonanonymous user')
 def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
-    
-#    def fixgraph(graph, graph_dict):
-#        print('Warning, need to incorporate into mpld3')
-#        ylabels = [l.get_text() for l in graph.axes[0].get_yticklabels()]
-#        graph_dict['ylabels'] = ylabels
-#        xlabels = [l.get_text() for l in graph.axes[0].get_xticklabels()]
-#        graph_dict['xlabels'] = xlabels
-#        return graph_dict
     
     # Get the Project object.
     proj = load_project(project_id)
@@ -888,34 +842,15 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     figs = []
     for which in ['dalys','deaths','prevalence']:        
         fig = burdenset.plottopcauses(which=which) # Create the figure
-        
-        # Test figure.  Make this go away once we're done playing around.
-#        fig, ax = subplots()
-#        points = ax.scatter(np.random.rand(40), np.random.rand(40),
-#                    s=300, alpha=0.3)
-#        ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
-#        ax.set_xticklabels(['X1', 'X2', 'X3', 'X4', 'X5', 'X6'])
-#        ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
-#        ax.set_yticklabels(['Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'Y6'])  
-        
         figs.append(fig)
-#        fig.show()  # remove this when we're done with testing
     
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        if engine=='matplotlib':
-#            figPlugin = HelloWorld()
-#            mpld3.plugins.connect(fig, figPlugin)            
-            graph_dict = make_mpld3_graph_dict(fig)
-#            graph_dict['script'] = figPlugin.JAVASCRIPT
-        elif engine=='bokeh':
-            graph_dict = fig
-            fig['script'] = '\n'.join(fig['script'].split('\n')[2:-1]) # Remove first and last lines
-#        graph_dict = fixgraph(fig, graph_dict)
+        graph_dict = make_mpld3_graph_dict(fig)
         graphs.append(graph_dict)
     
-    # Return success.
+    # Return success -- WARNING, hard-coded to 3 graphs!
     return {'graph1': graphs[0],
             'graph2': graphs[1],
             'graph3': graphs[2],}
@@ -1161,6 +1096,6 @@ def get_project_package_plots(project_id, packageset_numindex):
         graph_dict = make_mpld3_graph_dict(fig)
         graphs.append(graph_dict)
     
-    # Return success.
+    # Return success -- WARNING, should not be hard-coded!
     return {'graph1': graphs[0],
             'graph2': graphs[1],}
