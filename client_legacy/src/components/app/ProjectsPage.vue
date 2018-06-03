@@ -1,7 +1,7 @@
 <!--
 Manage projects page
 
-Last update: 2018-05-29
+Last update: 2018-03-25
 -->
 
 <template>
@@ -254,7 +254,7 @@ export default {
       console.log('updateProjectSummaries() called')
 
       // Get the current user's project summaries from the server.
-      rpcservice.rpcCall('load_current_user_project_summaries')
+      rpcservice.rpcProjectCall('load_current_user_project_summaries')
       .then(response => {
         // Set the projects to what we received.
         this.projectSummaries = response.data.projects
@@ -267,7 +267,7 @@ export default {
       })
 
       // Get the demo project summaries from the server.
-/*      rpcservice.rpcCall('get_scirisdemo_projects')
+/*      rpcservice.rpcProjectCall('get_scirisdemo_projects')
       .then(response => {
         // Set the demo projects to what we received.
         this.demoProjectSummaries = response.data.projects
@@ -302,7 +302,7 @@ export default {
       console.log('createNewProject() called')
 
       // Have the server create a new project.
-      rpcservice.rpcCall('create_new_project', [this.$store.state.currentUser.UID])
+      rpcservice.rpcProjectCall('create_new_project', [this.$store.state.currentUser.UID])
       .then(response => {
         // Update the project summaries so the new project shows up on the list.
         this.updateProjectSummaries()
@@ -321,7 +321,7 @@ export default {
       console.log('uploadProjectFromFile() called')
 
       // Have the server upload the project.
-      rpcservice.rpcUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
+      rpcservice.rpcProjectUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
       .then(response => {
         // Update the project summaries so the new project shows up on the list.
         this.updateProjectSummaries()
@@ -430,7 +430,7 @@ export default {
       console.log('copyProject() called for ' + matchProject.project.name)
 
 	    // Have the server copy the project, giving it a new name.
-      rpcservice.rpcCall('copy_project', [uid])
+      rpcservice.rpcProjectCall('copy_project', [uid])
       .then(response => {
         // Update the project summaries so the copied program shows up on the list.
         this.updateProjectSummaries()
@@ -464,7 +464,7 @@ export default {
 
         // Have the server change the name of the project by passing in the new copy of the
         // summary.
-        rpcservice.rpcCall('update_project_from_summary', [newProjectSummary])
+        rpcservice.rpcProjectCall('update_project_from_summary', [newProjectSummary])
         .then(response => {
           // Update the project summaries so the rename shows up on the list.
           this.updateProjectSummaries()
@@ -490,7 +490,7 @@ export default {
       console.log('downloadProjectFile() called for ' + matchProject.project.name)
 
 	    // Make the server call to download the project to a .prj file.
-      rpcservice.rpcDownloadCall('download_project', [uid])
+      rpcservice.rpcProjectDownloadCall('download_project', [uid])
     },
 
     deleteSelectedProjects() {
@@ -502,7 +502,7 @@ export default {
 
       // Have the server delete the selected projects.
 	    if (selectProjectsUIDs.length > 0) {
-        rpcservice.rpcCall('delete_projects', [selectProjectsUIDs])
+        rpcservice.rpcProjectCall('delete_projects', [selectProjectsUIDs])
         .then(response => {
           // Update the project summaries so the deletions show up on the list.
           this.updateProjectSummaries()
@@ -519,7 +519,7 @@ export default {
 
       // Have the server download the selected projects.
 	    if (selectProjectsUIDs.length > 0)
-        rpcservice.rpcDownloadCall('load_zip_of_prj_files', [selectProjectsUIDs])
+        rpcservice.rpcProjectDownloadCall('load_zip_of_prj_files', [selectProjectsUIDs])
     }
   }
 }

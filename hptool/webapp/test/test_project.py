@@ -2,14 +2,14 @@
 test_project.py -- test module for project.py
 
 Usage:
-python -m unittest sciris2gc.test.test_project
+python -m unittest sciris.test.test_project
     
 Last update: 5/22/18 (gchadder3)
 """
 
 # Imports
 import unittest
-import sciris2gc.project as project
+import sciris.project as project
 import uuid
 import os
 

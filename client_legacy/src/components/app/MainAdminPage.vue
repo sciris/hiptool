@@ -1,7 +1,7 @@
 <!--
 Admin page
 
-Last update: 2018-05-28
+Last update: 2018-03-25
 -->
 
 <template>
@@ -39,7 +39,6 @@ Last update: 2018-05-28
 
 <script>
 import rpcservice from '@/services/rpc-service'
-import userservice from '@/services/user-service' 
 import router from '@/router'
 
 export default {
@@ -58,7 +57,7 @@ export default {
 
   methods: {
     getUsersInfo () {
-      userservice.getAllUsersInfo()
+      rpcservice.rpcAllGetUsersInfo('get_all_users')
       .then(response => {
         this.usersList = response.data
       })
@@ -69,7 +68,7 @@ export default {
     },
 
     activateAccount (username) {
-      userservice.activateUserAccount(username)
+      rpcservice.rpcAdminUserCall('admin_activate_account', username)
       .then(response => {
         // If the response was successful...
         if (response.data == 'success')
@@ -90,7 +89,7 @@ export default {
     },
 
     deactivateAccount (username) {
-      userservice.deactivateUserAccount(username)
+      rpcservice.rpcAdminUserCall('admin_deactivate_account', username)
       .then(response => {
         // If the response was successful...
         if (response.data == 'success')
@@ -111,7 +110,7 @@ export default {
     },
 
     grantAdmin (username) {
-      userservice.grantUserAdminRights(username)
+      rpcservice.rpcAdminUserCall('admin_grant_admin', username)
       .then(response => {
         // If the response was successful...
         if (response.data == 'success')
@@ -132,7 +131,7 @@ export default {
     },
 
     revokeAdmin (username) {
-      userservice.revokeUserAdminRights(username)
+      rpcservice.rpcAdminUserCall('admin_revoke_admin', username)
       .then(response => {
         // If the response was successful...
         if (response.data == 'success')
@@ -153,7 +152,7 @@ export default {
     },
 
     resetPassword (username) {
-      userservice.resetUserPassword(username)
+      rpcservice.rpcAdminUserCall('admin_reset_password', username)
       .then(response => {
         // If the response was successful...
         if (response.data == 'success')
@@ -174,7 +173,7 @@ export default {
     },
 
     deleteUser (username) {
-      userservice.deleteUser(username)
+      rpcservice.rpcAdminUserCall('admin_delete_user', username)
       .then(response => {
         // Give result message.
         this.adminResult = 'User deleted.'

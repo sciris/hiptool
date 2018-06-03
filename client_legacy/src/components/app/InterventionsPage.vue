@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018-05-29
+Last update: 2018-05-02
 -->
 
 <template>
@@ -292,7 +292,7 @@ export default {
       // Otherwise...
       else {
         // Get the active project's intervention sets.
-        rpcservice.rpcCall('get_project_interv_sets',
+        rpcservice.rpcProjectCall('get_project_interv_sets',
           [this.$store.state.activeProject.project.id])
         .then(response => {
           // Set the intervention set list to what we received.
@@ -376,7 +376,7 @@ export default {
       this.activeIntervSet = intervSet
 
       // Go to the server to get the interventions from the intervention set.
-      rpcservice.rpcCall('get_project_interv_set_intervs',
+      rpcservice.rpcProjectCall('get_project_interv_set_intervs',
         [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
       .then(response => {
         // Set the interventions table list.
@@ -391,8 +391,8 @@ export default {
           this.interventionList[ind].type = this.interventionList[ind][4]
           this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
           this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-          this.interventionList[ind].equity = Number(this.interventionList[ind][8]).toLocaleString()
-          this.interventionList[ind].frp = Number(this.interventionList[ind][7]).toLocaleString()
+          this.interventionList[ind].equity = this.interventionList[ind][8]
+          this.interventionList[ind].frp = this.interventionList[ind][7]
         }
       })
 
@@ -409,7 +409,7 @@ export default {
       console.log('copySet() called for ' + intervSet.intervset.name)
 
 	    // Have the server copy the intervention set, giving it a new name.
-      rpcservice.rpcCall('copy_interv_set',
+      rpcservice.rpcProjectCall('copy_interv_set',
         [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
       .then(response => {
         // Update the intervention sets so the new set shows up on the list.
@@ -428,7 +428,7 @@ export default {
 	    // Otherwise (it is to be renamed)...
 	    else {
         // Have the server change the name of the intervention set.
-        rpcservice.rpcCall('rename_interv_set',
+        rpcservice.rpcProjectCall('rename_interv_set',
           [this.$store.state.activeProject.project.id,
           intervSet.intervset.numindex, intervSet.renaming])
         .then(response => {
@@ -453,7 +453,7 @@ export default {
       console.log('deleteSet() called for ' + intervSet.intervset.name)
 
       // Go to the server to delete the intervention set.
-      rpcservice.rpcCall('delete_interv_set',
+      rpcservice.rpcProjectCall('delete_interv_set',
         [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
       .then(response => {
         // Update the intervention sets so the new set shows up on the list.
@@ -465,7 +465,7 @@ export default {
       console.log('createNewSet() called')
 
       // Go to the server to create the new intervention set.
-      rpcservice.rpcCall('create_interv_set',
+      rpcservice.rpcProjectCall('create_interv_set',
         [this.$store.state.activeProject.project.id, 'New intervention set'])
       .then(response => {
         // Update the intervention sets so the new set shows up on the list.
@@ -490,7 +490,7 @@ export default {
 
       // Go to the server to update the intervention from the intervention set.
       // Note: filter out commas in the numeric fields.
-      rpcservice.rpcCall('update_interv_set_interv',
+      rpcservice.rpcProjectCall('update_interv_set_interv',
         [this.$store.state.activeProject.project.id,
         this.activeIntervSet.intervset.numindex,
         interv.numindex,

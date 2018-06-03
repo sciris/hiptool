@@ -1,7 +1,7 @@
 <!--
 Change account info
 
-Last update: 2018-05-28
+Last update: 2018-03-25
 -->
 
 <template>
@@ -62,7 +62,6 @@ Last update: 2018-05-28
 
 <script>
 import rpcservice from '@/services/rpc-service'
-import userservice from '@/services/user-service'
 import router from '@/router'
 
 export default {
@@ -80,8 +79,8 @@ export default {
 
   methods: {
     tryChangeInfo () {
-      userservice.changeUserInfo(this.changeUserName, this.changePassword, 
-        this.changeDisplayName, this.changeEmail)
+      rpcservice.rpcUserChangeInfoCall('user_change_info', this.changeUserName,
+        this.changePassword, this.changeDisplayName, this.changeEmail)
       .then(response => {
         if (response.data == 'success') {
           // Set a success result to show.
@@ -94,7 +93,7 @@ export default {
           });
 
           // Read in the full current user information.
-          userservice.getCurrentUserInfo()
+          rpcservice.rpcGetCurrentUserInfo('get_current_user_info')
           .then(response2 => {
             // Set the username to what the server indicates.
             this.$store.commit('newUser', response2.data.user)

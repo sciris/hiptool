@@ -8,11 +8,11 @@ Last update: 6/1/18 (gchadder3)
 # Imports
 #
 
-from sciris2gc.rpcs import make_register_RPC
-import sciris2gc.fileio as fileio
-import sciris2gc.scirisobjects as sobj
-import sciris2gc.datastore as ds
-import sciris2gc.user as user
+from sciris.rpcs import make_register_RPC
+import sciris.fileio as fileio
+import sciris.scirisobjects as sobj
+import sciris.datastore as ds
+import sciris.user as user
 import sciris.core as sc
 import hptool as hp
 import os

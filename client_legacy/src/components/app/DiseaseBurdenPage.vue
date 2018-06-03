@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-05-29
+Last update: 2018-05-02
 -->
 
 <template>
@@ -347,7 +347,7 @@ Last update: 2018-05-29
         // Otherwise...
         else {
           // Get the active project's burden sets.
-          rpcservice.rpcCall('get_project_burden_sets',
+          rpcservice.rpcProjectCall('get_project_burden_sets',
             [this.$store.state.activeProject.project.id])
           .then(response => {
             // Set the burden set list to what we received.
@@ -431,7 +431,7 @@ Last update: 2018-05-29
         this.activeBurdenSet = burdenSet
 
         // Go to the server to get the diseases from the burden set.
-        rpcservice.rpcCall('get_project_burden_set_diseases',
+        rpcservice.rpcProjectCall('get_project_burden_set_diseases',
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
         .then(response => {
           // Set the disease list.
@@ -471,7 +471,7 @@ Last update: 2018-05-29
         this.activeBurdenSet = burdenSet
 
         // Go to the server to get the diseases from the burden set.
-        rpcservice.rpcCall('get_project_burden_plots',
+        rpcservice.rpcProjectCall('get_project_burden_plots',
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
@@ -493,7 +493,7 @@ Last update: 2018-05-29
         console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
 
 	      // Have the server copy the burden set, giving it a new name.
-        rpcservice.rpcCall('copy_burden_set',
+        rpcservice.rpcProjectCall('copy_burden_set',
           [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
         .then(response => {
           // Update the burden sets so the new set shows up on the list.
@@ -512,7 +512,7 @@ Last update: 2018-05-29
 	      // Otherwise (it is to be renamed)...
 	      else {
           // Have the server change the name of the burden set.
-          rpcservice.rpcCall('rename_burden_set',
+          rpcservice.rpcProjectCall('rename_burden_set',
             [this.$store.state.activeProject.project.id,
             burdenSet.burdenset.numindex, burdenSet.renaming])
           .then(response => {
@@ -537,7 +537,7 @@ Last update: 2018-05-29
         console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
 
         // Go to the server to delete the burden set.
-        rpcservice.rpcCall('delete_burden_set',
+        rpcservice.rpcProjectCall('delete_burden_set',
           [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
         .then(response => {
           // Update the burden sets so the new set shows up on the list.
@@ -549,7 +549,7 @@ Last update: 2018-05-29
         console.log('createNewBurdenSet() called')
 
         // Go to the server to create the new burden set.
-        rpcservice.rpcCall('create_burden_set',
+        rpcservice.rpcProjectCall('create_burden_set',
           [this.$store.state.activeProject.project.id, 'New burden set'])
         .then(response => {
           // Update the burden sets so the new set shows up on the list.
@@ -610,7 +610,7 @@ Last update: 2018-05-29
 
         // Go to the server to update the disease from the burden set.
         // Note: filter out commas in the numeric fields.
-        rpcservice.rpcCall('update_burden_set_disease',
+        rpcservice.rpcProjectCall('update_burden_set_disease',
           [this.$store.state.activeProject.project.id,
           this.activeBurdenSet.burdenset.numindex,
           disease.numindex,
