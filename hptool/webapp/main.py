@@ -4,15 +4,13 @@ main.py -- main module for HealthPrior webapp.
 Last update: 6/1/18 (gchadder3)
 """
 
-
+# Imports
+from sciris.scirisapp import ScirisApp
+import sciris.core as sc
+from . import config
+from . import project
 
 def make_app():
-
-	# Imports
-	from sciris.scirisapp import ScirisApp
-	from . import config
-	import sciris.core as sc
-	
 	# Create the ScirisApp object.  NOTE: app.config will thereafter contain all 
 	# of the configuration parameters, including for Flask.
 	app = ScirisApp(__file__, app_config=config)
@@ -38,7 +36,7 @@ def make_app():
 
 
 def run():
-	from . import project
+	
 	# Make the app
 	app = make_app()
 	
