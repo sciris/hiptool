@@ -9,6 +9,7 @@ from sciris.scirisapp import ScirisApp
 import sciris.core as sc
 from . import config
 from . import project
+import hptool as hp
 
 def make_app():
 	# Create the ScirisApp object.  NOTE: app.config will thereafter contain all 
