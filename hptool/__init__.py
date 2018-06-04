@@ -33,14 +33,6 @@ from .version import version, versiondate
 HPlicense = 'HealthPrior %s (%s)' % (version, versiondate)
 print(HPlicense)
 
-#####################################################################################################################
-### Load helper functions/modules
-#####################################################################################################################
-
-# Utilities -- import all
-from sciris.utils import *
-from sciris.colortools import *
-from sciris.fileio import *
 
 #####################################################################################################################
 ### Define debugging and exception functions/classes
@@ -91,9 +83,6 @@ from .burden import Burden
 from .interventions import Interventions
 from .healthpackage import HealthPackage
 from .project import Project
-
-# Webapp
-import webapp
 
 
 
