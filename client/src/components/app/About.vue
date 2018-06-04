@@ -1,7 +1,7 @@
 <!--
 About page
 
-Last update: 2018mar25
+Last update: 2018may28
 -->
 
 <template>
@@ -83,7 +83,7 @@ Last update: 2018mar25
 
     computed: {
       getVersionInfo() {
-        rpcservice.rpcPublicCall('get_version_info')
+        rpcservice.rpcCall('get_version_info')
           .then(response => {
             this.version = response.data['version'];
             this.date = response.data['date'];
