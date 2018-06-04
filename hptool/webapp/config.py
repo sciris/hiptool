@@ -45,3 +45,6 @@ REGISTER_AUTOACTIVATE = True
 
 # Default server port
 SERVER_PORT = 8091
+
+# Matplotlib backend
+MATPLOTLIB_BACKEND = 'Agg'
