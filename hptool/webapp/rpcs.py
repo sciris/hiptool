@@ -220,7 +220,7 @@ def get_package_set_fe_repr(packageset):
 #
 
 # RPC definitions
-register_RPC()
+@register_RPC()
 def get_version_info():
 	''' Return the information about the project. '''
 	gitinfo = sc.gitinfo(__file__)
