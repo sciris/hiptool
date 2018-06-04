@@ -14,7 +14,7 @@ class HealthPackage(object):
     def __init__(self, name='default', project=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
-        self.projectref = hp.Link(project) # Store pointer for the project, if available
+        self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.today() # Date created
         self.modified   = sc.today() # Date modified
         self.results    = None
