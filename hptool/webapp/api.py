@@ -1,5 +1,5 @@
 """
-project.py -- code related to HealthPrior project management
+api.py -- code related to HealthPrior project management
     
 Last update: 6/1/18 (gchadder3)
 """
@@ -8,13 +8,10 @@ Last update: 6/1/18 (gchadder3)
 # Imports
 #
 
-from sciris.rpcs import make_register_RPC
 import sciris.fileio as fileio
 import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import sciris.user as user
-import sciris.core as sc
-import hptool as hp
 import os
 import uuid
 import datetime
@@ -23,6 +20,10 @@ import dateutil.tz
 from zipfile import ZipFile
 from flask_login import current_user
 import mpld3
+
+import sciris.web as sw
+import sciris.core as sc
+import hptool as hp
 
 #
 # Globals
@@ -36,7 +37,7 @@ proj_collection = None
 RPC_dict = {}
 
 # RPC registration decorator factory created using call to make_register_RPC().
-register_RPC = make_register_RPC(RPC_dict)
+register_RPC = sw.make_register_RPC(RPC_dict)
 
 #
 # Classes
