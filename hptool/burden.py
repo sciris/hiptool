@@ -102,7 +102,7 @@ class Burden(object):
         ax.set_facecolor('none')
         yaxis = pl.arange(len(barvals), 0, -1)
         pl.barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
-        ax.set_yticks(arange(10, 0, -1))    
+        ax.set_yticks(pl.arange(10, 0, -1))    
         ax.set_yticklabels(barlabels)
         
         sc.SIticks(ax=ax,axis='x')

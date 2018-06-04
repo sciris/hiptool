@@ -35,7 +35,7 @@ def make_app():
 
 
 def run():
-	
+
 	# Make the app
 	app = make_app()
 	
