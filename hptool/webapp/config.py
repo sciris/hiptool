@@ -23,7 +23,6 @@ Last update: 5/31/18 (gchadder3)
 SECRET_KEY = 'Pick something unique for your site here'
 
 # Directory containing the client code.
-#   DEFAULT = '.'
 CLIENT_DIR = '../../client/dist'
 
 # Flag for setting whether we use the datastore functionality provided by 
@@ -43,3 +42,6 @@ USE_USERS = True
 # spawns a new active account.  If this is set False, then an admin user has 
 # to manually activate the account for the user.
 REGISTER_AUTOACTIVATE = True
+
+# Default server port
+SERVER_PORT = 8091
