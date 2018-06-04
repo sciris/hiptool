@@ -2,9 +2,11 @@
 Version:
 """
 
-import hptool as hp
+import numpy as np
 import pylab as pl
+import hptool as hp
 import sciris.core as sc
+
 
 class HealthPackage(object):
     ''' 
@@ -43,7 +45,7 @@ class HealthPackage(object):
         nrows = origdata.nrows()
         
         # Create new dataframe
-        df = sc.dataframe(cols=['active'], data=pl.ones(nrows))
+        df = sc.dataframe(cols=['active'], data=np.ones(nrows))
         for col in ['shortname']+critical_cols: # Copy columns over
             df[col] = origdata[col]
         
@@ -88,7 +90,7 @@ class HealthPackage(object):
         DA_data = df['dalys_averted']
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
-        plot_data = pl.array(plot_data)/1e3
+        plot_data = np.array(plot_data)/1e3
         plot_data = plot_data.round()
         total_averted = (plot_data.sum()/1e3)
         data_labels = ['%i'%datum for datum in plot_data]
@@ -121,7 +123,7 @@ class HealthPackage(object):
         DA_labels = df['shortname'][inds]
         npts = len(DA_data)
         colors = sc.gridcolors(npts, limits=(0.25,0.75))
-        x = pl.arange(len(DA_data))
+        x = np.arange(len(DA_data))
         pl.axes(ax_size)
         for pt in range(npts):
             loc = x[pt:]
