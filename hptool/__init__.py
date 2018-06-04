@@ -84,6 +84,8 @@ from .interventions import Interventions
 from .healthpackage import HealthPackage
 from .project import Project
 
+# Import webapp
+import webapp
 
 
 
