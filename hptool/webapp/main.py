@@ -18,5 +18,5 @@ def run():
     app.run_server() # Run the client page with Flask and a Twisted server.
     return None
 
-if __name__ == 'main':
+if __name__ == '__main__':
     run()
