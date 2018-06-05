@@ -9,7 +9,6 @@ Last update: 2018jun04 by cliffk
 #
 
 import os
-import uuid
 import datetime
 import dateutil
 import dateutil.tz
@@ -357,7 +356,7 @@ def load_zip_of_prj_files(project_ids):
     prjs = [load_project_record(id).save_as_file(dirname) for id in project_ids]
     
     # Make the zip file name and the full server file path version of the same..
-    zip_fname = '{}.zip'.format(uuid.uuid4())
+    zip_fname = '%s.zip' % str(sc.uuid())
     server_zip_fname = os.path.join(dirname, zip_fname)
     
     # Create the zip file, putting all of the .prj files in a projects 
