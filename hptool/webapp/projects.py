@@ -204,11 +204,11 @@ def init_projects(app):
         data_path = hp.HPpath('data')
     
         if app.config['LOGGING_MODE'] == 'FULL':
-            print '>> Creating a new ProjectCollection.'   
+            print('>> Creating a new ProjectCollection.') 
         proj_collection.add_to_data_store()
         
         if app.config['LOGGING_MODE'] == 'FULL':
-            print '>> Starting a demo project.'
+            print('>> Starting a demo project.')
         proj = hp.Project(name='Afghanistan test 1', 
             burdenfile=data_path + 'ihme-gbd.xlsx', 
             interventionsfile=data_path + 'dcp-data-afg-v1.xlsx')  
