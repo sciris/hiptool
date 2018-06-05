@@ -56,7 +56,7 @@ class ProjectSO(sobj.ScirisObject):
         
         # Make sure the owner UID argument is a valid UUID, converting a hex 
         # text to a UUID object, if needed.        
-        valid_uuid = sobj.get_valid_uuid(owner_uid)
+        valid_uuid = sc.uuid(owner_uid)
         
         # If we have a valid UUID...
         if valid_uuid is not None:       
@@ -145,7 +145,7 @@ class ProjectCollection(sobj.ScirisCollection):
     def get_user_front_end_repr(self, owner_uid):
         # Make sure the argument is a valid UUID, converting a hex text to a
         # UUID object, if needed.        
-        valid_uuid = sobj.get_valid_uuid(owner_uid)
+        valid_uuid = sc.uuid(owner_uid)
         
         # If we have a valid UUID...
         if valid_uuid is not None:               
@@ -162,7 +162,7 @@ class ProjectCollection(sobj.ScirisCollection):
     def get_project_entries_by_user(self, owner_uid):
         # Make sure the argument is a valid UUID, converting a hex text to a
         # UUID object, if needed.        
-        valid_uuid = sobj.get_valid_uuid(owner_uid)
+        valid_uuid = sc.uuid(owner_uid)
         
         # If we have a valid UUID...
         if valid_uuid is not None:    
