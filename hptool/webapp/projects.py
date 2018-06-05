@@ -8,6 +8,8 @@ import sciris.scirisobjects as sobj
 import sciris.datastore as ds
 import hptool as hp
 import sciris.user as user
+import sciris.core as sc
+import os
 
 
 #
@@ -17,8 +19,6 @@ import sciris.user as user
 # The ProjectCollection object for all of the app's projects.  Gets 
 # initialized by and loaded by init_projects().
 proj_collection = None
-
-
 
 
 #
