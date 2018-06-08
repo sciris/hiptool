@@ -4,13 +4,11 @@ Classes for handling projects as Sciris objects
 Version: 2018jun04 by cliffk
 '''
 
-import sciris.scirisobjects as sobj
-import sciris.datastore as ds
-import hptool as hp
-import sciris.user as user
-import sciris.core as sc
 import os
-
+import hptool as hp
+import sciris.core as sc
+import sciris.web as sw
+import sciris.weblib.user as user
 
 #
 # Globals
@@ -25,7 +23,7 @@ proj_collection = None
 # Classes
 #
 
-class ProjectSO(sobj.ScirisObject):
+class ProjectSO(sw.ScirisObject):
     """
     A ScirisObject-wrapped Optima Nutrition Project object.
     
@@ -112,13 +110,13 @@ class ProjectSO(sobj.ScirisObject):
         full_file_name = '%s%s%s' % (load_dir, os.sep, file_name)   
      
         # Write the object to a Gzip string pickle file.
-        ds.object_to_gzip_string_pickle_file(full_file_name, self.proj)
+        sw.datastore.object_to_gzip_string_pickle_file(full_file_name, self.proj)
         
         # Return the filename (not the full one).
         return self.proj.name + ".prj"
     
         
-class ProjectCollection(sobj.ScirisCollection):
+class ProjectCollection(sw.ScirisCollection):
     """
     A collection of Projects.
     
@@ -185,8 +183,7 @@ def init_projects(app):
     global proj_collection  # need this to allow modification within the module
     
     # Look for an existing ProjectCollection.
-    proj_collection_uid = ds.data_store.get_uid_from_instance('projectscoll', 
-        'Projects Collection')
+    proj_collection_uid = sw.datastore.data_store.get_uid_from_instance('projectscoll', 'Projects Collection')
     
     # Create the projects collection object.  Note, that if no match was found, 
     # this will be assigned a new UID.    
