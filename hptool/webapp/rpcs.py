@@ -17,7 +17,7 @@ from flask_login import current_user
 import mpld3
 
 import sciris.corelib.fileio as fileio # WARNING, make better
-import sciris.user as user
+import sciris.weblib.user as user
 import sciris.core as sc
 import sciris.web as sw
 
