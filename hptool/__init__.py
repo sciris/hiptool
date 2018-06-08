@@ -29,18 +29,11 @@ Version: 2018mar19
 # Specify the version, for the purposes of figuring out which version was used to create a project
 from .version import version, versiondate
 
+
 # Print the license
 HPlicense = 'HealthPrior %s (%s)' % (version, versiondate)
 print(HPlicense)
 
-#####################################################################################################################
-### Load helper functions/modules
-#####################################################################################################################
-
-# Utilities -- import all
-from sciris.utils import *
-from sciris.colortools import *
-from sciris.fileio import *
 
 #####################################################################################################################
 ### Define debugging and exception functions/classes
@@ -59,16 +52,18 @@ def HPpath(subdir=None, trailingsep=True):
 
 
 # Debugging information
-def debuginfo(dooutput=False, shalength=7):
-    output = '\nHealthPrior debugging info:\n'
-    output += '   Version: %s\n' % version
-    output += '   Branch:  %s\n' % gitinfo()[0]
-    output += '   SHA:     %s\n' % gitinfo()[1][:shalength]
-    output += '   Path:    %s\n' % HPpath()
-    if dooutput: 
-        return output
+def debuginfo(output=False):
+    import sciris.core as sc
+    outstr = '\nHealthPrior debugging info:\n'
+    outstr += '   Version: %s\n' % version
+    outstr += '   Branch:  %s\n' % sc.gitinfo()['branch']
+    outstr += '   SHA:     %s\n' % sc.gitinfo()['hash']
+    outstr += '   Date:    %s\n' % sc.gitinfo()['date']
+    outstr += '   Path:    %s\n' % HPpath()
+    if output:
+        return outstr
     else: 
-        print(output)
+        print(outstr)
         return None
 
 class HPException(Exception):
@@ -92,9 +87,8 @@ from .interventions import Interventions
 from .healthpackage import HealthPackage
 from .project import Project
 
-# Webapp
+# Import webapp
 import webapp
-
 
 
 
