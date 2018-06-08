@@ -2,11 +2,8 @@
 Version:
 """
 
-from hptool import uuid, Link, today, defaultrepr, getdate, loadspreadsheet, dcp, HPException
-from hptool import SIticks, boxoff
-from pylab import figure, barh, arange, array
-from bokeh.plotting import figure as bkfigure
-from bokeh.embed import components as bkcomponents
+import sciris.core as sc
+import pylab as pl
 
 class Burden(object):
     ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
@@ -21,28 +18,28 @@ class Burden(object):
     '''
     
     def __init__(self, name='default', project=None):
-        self.name = name # Name of the parameter set, e.g. 'default'
-        self.uid = uuid() # ID
-        self.projectref = Link(project) # Store pointer for the project, if available
-        self.created = today() # Date created
-        self.modified = today() # Date modified
-        self.data = None
-        self.filename = None
-        self.popsize = None
+        self.name       = name # Name of the parameter set, e.g. 'default'
+        self.uid        = sc.uuid() # ID
+        self.projectref = sc.Link(project) # Store pointer for the project, if available
+        self.created    = sc.today() # Date created
+        self.modified   = sc.today() # Date modified
+        self.data       = None
+        self.filename   = None
+        self.popsize    = None
     
     def __repr__(self):
         ''' Print out useful information when called'''
-        output  = defaultrepr(self)
+        output  = sc.desc(self)
         output += 'Burden set name: %s\n'    % self.name
-        output += '   Date created: %s\n'    % getdate(self.created)
-        output += '  Date modified: %s\n'    % getdate(self.modified)
+        output += '   Date created: %s\n'    % sc.getdate(self.created)
+        output += '  Date modified: %s\n'    % sc.getdate(self.modified)
         output += '            UID: %s\n'    % self.uid
         output += '============================================================\n'
         return output
     
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet '''
-        self.data = loadspreadsheet(filename=filename, folder=folder)
+        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
         return None
     
@@ -53,7 +50,7 @@ class Burden(object):
         return output
         
     
-    def plottopcauses(self, which=None, n=None, axsize=None, figsize=None, engine=None):
+    def plottopcauses(self, which=None, n=None, axsize=None, figsize=None):
         '''
         Create a bar plot of the top causes of burden. By default, plots the top
         10 causes of DALYs.
@@ -61,11 +58,10 @@ class Burden(object):
         Version: 2018mar17        
         '''
         # Handle options
-        if which is None: which = 'dalys'
-        if n     is None: n     = 10
-        if axsize  is None: axsize   = (0.15, 0.15, 0.8, 0.8)
-        if figsize is None: figsize  = (5,5)
-        if engine is None: engine = 'matplotlib' # Choices are bokeh or matplotlib
+        if which   is None: which   = 'dalys'
+        if n       is None: n       = 10
+        if axsize  is None: axsize  = (0.45, 0.15, 0.5, 0.8)
+        if figsize is None: figsize = (12,5)
         barw     = 0.8
         barcolor = (0.7,0,0.3)
         
@@ -84,16 +80,11 @@ class Burden(object):
             raise HPException(errormsg)
         
         # Pull out data
-        
-        burdendata = dcp(self.data)
+        burdendata = sc.dcp(self.data)
         burdendata.sort(col=which, reverse=True)
         topdata = burdendata[:n]
         barlabels = topdata['cause'].tolist()
         barvals   = topdata[which]
-        
-        # Truncate the bar labels (remove this soon).
-#        firstThreeLetters = lambda theString: theString[0:3]
-#        barlabels = map(firstThreeLetters, barlabels)
         
         largestval = barvals[0]
         if largestval>1e6:
@@ -106,40 +97,16 @@ class Burden(object):
             unitstr = ''
         
         # Create plot
+        fig = pl.figure(facecolor='none', figsize=figsize)
+        ax = fig.add_axes(axsize)
+        ax.set_facecolor('none')
+        yaxis = pl.arange(len(barvals), 0, -1)
+        pl.barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
+        ax.set_yticks(pl.arange(10, 0, -1))    
+        ax.set_yticklabels(barlabels)
         
-        if engine=='matplotlib':
-            fig = figure(facecolor='w', figsize=figsize)
-            ax = fig.add_axes(axsize)
-            yaxis = arange(len(barvals), 0, -1)
-            barh(yaxis, barvals, height=barw, facecolor=barcolor, edgecolor='none')
-            
-            # This way of setting the ticks works for the present mpld3 code.
-#            ax.set_yticks(arange(1, 11))   
-#            ax.set_yticklabels(barlabels[::-1])  # need to reverse bar labels order
-            
-            # This way of setting the ticks does NOT work for the release mpld3 code
-            # because the descending order of the ticks fouls things up.
-            ax.set_yticks(arange(10, 0, -1))    
-            ax.set_yticklabels(barlabels)
-            
-            SIticks(ax=ax,axis='x')
-            ax.set_xlabel(thisxlabel+unitstr)
-            ax.set_title(thistitle)
-            boxoff()
-            return fig
-        elif engine=='bokeh':
-            barlabelsr = barlabels[::-1]
-            barvalsr = barvals[::-1]
-            yaxis = arange(len(barvals))
-            p = bkfigure(y_range=barlabelsr)
-            p.hbar(y=yaxis+0.5, height=0.5, left=0, right=barvalsr, color="navy")
-            p.xaxis[0].axis_label = thisxlabel+unitstr
-            p.title.text = thistitle
-            
-            script, div = bkcomponents(p)
-            output = {'script':script, 'div':div}
-            return output
-        else:
-            raise HPException('Engine %s not found' % engine)
-            return None
-        
+        sc.SIticks(ax=ax,axis='x')
+        ax.set_xlabel(thisxlabel+unitstr)
+        ax.set_title(thistitle)
+        sc.boxoff()
+        return fig

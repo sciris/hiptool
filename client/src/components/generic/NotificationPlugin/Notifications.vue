@@ -7,8 +7,15 @@ Last updated: 2018-03-26
 <template>
   <div class="notifications">
     <transition-group name="list">
-      <notification v-for="(notification,index) in notifications" :key="index" :message="notification.message" :icon="notification.icon" :type="notification.type" :vertical-align="notification.verticalAlign" :horizontal-align="notification.horizontalAlign" @on-close="removeNotification(index)">
-
+       <notification v-for="(notification,index) in notifications" :key="index"
+                    :message="notification.message"
+                    :icon="notification.icon"
+                    :type="notification.type"
+                    :vertical-align="notification.verticalAlign"
+                    :horizontal-align="notification.horizontalAlign"
+                    @on-close="removeNotification(index)"
+                    style="padding-top: 10px; padding-bottom: 10px"
+     >
       </notification>
     </transition-group>
 
@@ -34,6 +41,10 @@ Last updated: 2018-03-26
 
 </script>
 <style lang="scss">
+  i {
+    font-size: 1.5em;
+  }
+  
   .list-item {
     display: inline-block;
     margin-right: 10px;
