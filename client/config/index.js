@@ -28,9 +28,9 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // proxy all requests starting with /api to http://localhost:5000
+      // proxy all requests starting with /api to http://localhost:8091
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8091', // CK: testing to get to listen on a different port...
         changeOrigin: true,
         pathRewrite: {
           '^/api': '/api'
