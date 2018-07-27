@@ -14,7 +14,7 @@
       @click="close">×
     </button>
     <div>
-      <span data-notify="message" style="font-size: 0.95em;" :class="icon" class="alert-icon"></span>
+      <span data-notify="message" :class="icon" class="alert-icon" style="font-size:20px"></span>
       <span data-notify="message" v-html="message"></span>
     </div>
 
@@ -44,7 +44,11 @@
       timeout: {
         type: Number,
         default: 2000
-      }
+      },
+      timestamp: {
+        type: Date,
+        default: () => new Date()
+      },      
     },
     data () {
       return {}
@@ -74,7 +78,8 @@
     },
     methods: {
       close () {
-        this.$emit('on-close')
+//        console.log('Trying to close: ', this.timestamp)
+        this.$parent.$emit('on-close', this.timestamp)  
       }
     },
     mounted () {
