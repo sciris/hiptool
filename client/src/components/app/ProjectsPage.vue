@@ -1,7 +1,7 @@
 <!--
 Manage projects page
 
-Last update: 2018-07-26
+Last update: 2018-07-27
 -->
 
 <template>
@@ -134,6 +134,18 @@ Last update: 2018-07-26
         <button class="btn" @click="downloadSelectedProjects">Download selected</button>
       </div>
     </div>
+    
+    <!-- Popup spinner -->
+    <modal name="popup-spinner" 
+           height="80px" 
+           width="85px" 
+           style="opacity: 0.6">
+      <clip-loader color="#0000ff" 
+                   size="50px" 
+                   style="padding: 15px">
+      </clip-loader>
+    </modal> 
+    
   </div>
 </template>
 
@@ -144,10 +156,15 @@ import rpcservice from '@/services/rpc-service'
 import router from '@/router'
 //import PaperNotification from './components/generic/NotificationPlugin/Notification.vue'
 //import PaperNotification from './components/generic/NotificationPlugin'
+import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 
 export default {
   name: 'ProjectsPage',
-
+  
+  components: {
+    ClipLoader
+  },
+  
   data() {
     return {
       // List of projects to choose from (by project name)
@@ -341,6 +358,12 @@ export default {
     createNewProject() {
       console.log('createNewProject() called')
 
+      // Bring up a spinner.
+      this.$modal.show('popup-spinner')
+        
+      // Start the loading bar.
+      this.$Progress.start()
+      
       // Have the server create a new project.
       rpcservice.rpcCall('create_new_project', [this.$store.state.currentUser.UID])
       .then(response => {
@@ -348,15 +371,38 @@ export default {
         // Note: There's no easy way to get the new project UID to tell the 
         // project update to choose the new project because the RPC cannot pass 
         // it back.
-        this.updateProjectSummaries(null)
-
+        this.updateProjectSummaries(null) 
+        
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Finish the loading bar.
+        this.$Progress.finish()
+        
+        // Success popup.
         this.$notifications.notify({
           message: 'New project created',
           icon: 'ti-check',
           type: 'success',
           verticalAlign: 'top',
           horizontalAlign: 'center',
-        });
+        })
+      })
+      .catch(error => {
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Fail the loading bar.
+        this.$Progress.fail()
+        
+        // Failure popup.
+        this.$notifications.notify({
+          message: 'Could not add new project',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })      
       })
     },
 
@@ -366,8 +412,46 @@ export default {
       // Have the server upload the project.
       rpcservice.rpcUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
       .then(response => {
+        // Bring up a spinner.
+        this.$modal.show('popup-spinner')
+        
+        // Start the loading bar.  (This is here because we don't want the 
+        // progress bar running when the user is picking a file to upload.)
+        this.$Progress.start()        
+        
         // Update the project summaries so the new project shows up on the list.
         this.updateProjectSummaries(response.data.projectId)
+        
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Finish the loading bar.
+        this.$Progress.finish()
+        
+        // Success popup.
+        this.$notifications.notify({
+          message: 'New project uploaded',
+          icon: 'ti-check',
+          type: 'success',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })       
+      })
+      .catch(error => {
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Fail the loading bar.
+        this.$Progress.fail()
+        
+        // Failure popup.
+        this.$notifications.notify({
+          message: 'Could not upload file',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })      
       })
     },
 
@@ -456,7 +540,8 @@ export default {
 
       // Set the active project to the matched project.
       this.$store.commit('newActiveProject', matchProject)
-
+      
+      // Success popup.
       this.$notifications.notify({
         message: 'Project "'+matchProject.project.name+'" loaded',
         icon: 'ti-check',
@@ -471,21 +556,50 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('copyProject() called for ' + matchProject.project.name)
-
+      
+      // Bring up a spinner.
+      this.$modal.show('popup-spinner')
+        
+      // Start the loading bar.
+      this.$Progress.start()
+      
 	    // Have the server copy the project, giving it a new name.
       rpcservice.rpcCall('copy_project', [uid])
       .then(response => {
         // Update the project summaries so the copied program shows up on the list.
         this.updateProjectSummaries(response.data.projectId)
+                
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Finish the loading bar.
+        this.$Progress.finish()
+        
+        // Success popup.
+        this.$notifications.notify({
+          message: 'Project "'+matchProject.project.name+'" copied',
+          icon: 'ti-check',
+          type: 'success',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })        
       })
-
-      this.$notifications.notify({
-        message: 'Project "'+matchProject.project.name+'" copied',
-        icon: 'ti-check',
-        type: 'success',
-        verticalAlign: 'top',
-        horizontalAlign: 'center',
-      });
+      .catch(error => {
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Fail the loading bar.
+        this.$Progress.fail()
+        
+        // Failure popup.
+        this.$notifications.notify({
+          message: 'Could not copy project',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })
+      })
     },
 
     renameProject(projectSummary) {
@@ -504,19 +618,47 @@ export default {
 
         // Rename the project name in the client list from what's in the textbox.
         newProjectSummary.project.name = projectSummary.renaming
-
+        
+        // Bring up a spinner.
+        this.$modal.show('popup-spinner')
+        
+        // Start the loading bar.
+        this.$Progress.start()
+        
         // Have the server change the name of the project by passing in the new copy of the
         // summary.
         rpcservice.rpcCall('update_project_from_summary', [newProjectSummary])
         .then(response => {
           // Update the project summaries so the rename shows up on the list.
-          this.updateProjectSummaries(newProjectSummary.project.id)
-
+          this.updateProjectSummaries(newProjectSummary.project.id)      
+          
 		      // Turn off the renaming mode.
 		      projectSummary.renaming = ''
+          
+          // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Finish the loading bar.
+          this.$Progress.finish()          
+        })
+        .catch(error => {
+          // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Fail the loading bar.
+          this.$Progress.fail()
+        
+          // Failure popup.
+          this.$notifications.notify({
+            message: 'Could not rename project',
+            icon: 'ti-face-sad',
+            type: 'warning',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          })      
         })
       }
-
+      
 	    // This silly hack is done to make sure that the Vue component gets updated by this function call.
 	    // Something about resetting the project name informs the Vue component it needs to
 	    // update, whereas the renaming attribute fails to update it.
@@ -531,9 +673,38 @@ export default {
       let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
 
       console.log('downloadProjectFile() called for ' + matchProject.project.name)
-
+      
+      // Bring up a spinner.
+      this.$modal.show('popup-spinner')
+        
+      // Start the loading bar.
+      this.$Progress.start()
+      
 	    // Make the server call to download the project to a .prj file.
       rpcservice.rpcDownloadCall('download_project', [uid])
+      .then(response => {
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Finish the loading bar.
+        this.$Progress.finish()          
+      })
+      .catch(error => {
+        // Dispel the spinner.
+        this.$modal.hide('popup-spinner')
+          
+        // Fail the loading bar.
+        this.$Progress.fail()
+        
+        // Failure popup.
+        this.$notifications.notify({
+          message: 'Could not download project',
+          icon: 'ti-face-sad',
+          type: 'warning',
+          verticalAlign: 'top',
+          horizontalAlign: 'center',
+        })      
+      })      
     },
 
     // Confirmation alert
@@ -565,6 +736,12 @@ export default {
 
       // Have the server delete the selected projects.
 	    if (selectProjectsUIDs.length > 0) {
+        // Bring up a spinner.
+        this.$modal.show('popup-spinner')
+        
+        // Start the loading bar.
+        this.$Progress.start()
+        
         rpcservice.rpcCall('delete_projects', [selectProjectsUIDs])
         .then(response => {
           // Get the active project ID.
@@ -585,7 +762,29 @@ export default {
           // Update the project summaries so the deletions show up on the list. 
           // Make sure it tries to set the project that was active (if any).
           this.updateProjectSummaries(activeProjectId)
+          
+           // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Finish the loading bar.
+          this.$Progress.finish()
         })
+        .catch(error => {
+          // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Fail the loading bar.
+          this.$Progress.fail()
+        
+          // Failure popup.
+          this.$notifications.notify({
+            message: 'Could not delete project/s',
+            icon: 'ti-face-sad',
+            type: 'warning',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          })      
+        })            
 	    }
     },
 
@@ -597,8 +796,38 @@ export default {
       console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
 
       // Have the server download the selected projects.
-	    if (selectProjectsUIDs.length > 0)
+	    if (selectProjectsUIDs.length > 0) {
+        // Bring up a spinner.
+        this.$modal.show('popup-spinner')
+        
+        // Start the loading bar.
+        this.$Progress.start()
+        
         rpcservice.rpcDownloadCall('load_zip_of_prj_files', [selectProjectsUIDs])
+        .then(response => {
+          // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Finish the loading bar.
+          this.$Progress.finish()          
+        })
+        .catch(error => {
+          // Dispel the spinner.
+          this.$modal.hide('popup-spinner')
+          
+          // Fail the loading bar.
+          this.$Progress.fail()
+        
+          // Failure popup.
+          this.$notifications.notify({
+            message: 'Could not download project/s',
+            icon: 'ti-face-sad',
+            type: 'warning',
+            verticalAlign: 'top',
+            horizontalAlign: 'center',
+          })      
+        })        
+      }
     }
   }
 }
