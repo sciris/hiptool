@@ -410,7 +410,7 @@ export default {
       console.log('uploadProjectFromFile() called')
 
       // Have the server upload the project.
-      rpcservice.rpcUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {})
+      rpcservice.rpcUploadCall('create_project_from_prj_file', [this.$store.state.currentUser.UID], {}, '.prj')
       .then(response => {
         // Bring up a spinner.
         this.$modal.show('popup-spinner')
