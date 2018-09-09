@@ -48,7 +48,7 @@ def HPpath(subdir=None, trailingsep=True):
 
 # Debugging information
 def debuginfo(output=False):
-    import sciris.core as sc
+    import sciris as sc
     outstr = '\nHealthPrior debugging info:\n'
     outstr += '   Version: %s\n' % version
     outstr += '   Branch:  %s\n' % sc.gitinfo()['branch']
