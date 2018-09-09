@@ -17,7 +17,7 @@ Last update: 2018-05-26
           </span>
           <br/><br/>
           <div style="font-size:14px; font-weight:normal">
-            Beta version {{ version }} ({{ date }})
+            Version {{ version }} ({{ date }})
           </div>
         </div>
       </div>
@@ -63,8 +63,8 @@ Last update: 2018-05-26
 </template>
 
 <script>
-  import rpcservice from '@/services/rpc-service'
-  import userservice from '@/services/user-service'  
+  import rpcs from '@/services/rpc-service'
+  import userservice from '@/services/user-service'
   import router from '@/router'
 
   export default {
@@ -82,7 +82,7 @@ Last update: 2018-05-26
 
     computed: {
       getVersionInfo() {
-        rpcservice.rpcCall('get_version_info')
+        rpcs.rpc('get_version_info')
         .then(response => {
           this.version = response.data['version'];
           this.date = response.data['date'];
@@ -118,7 +118,8 @@ Last update: 2018-05-26
           }
         })
         .catch(error => {
-          this.loginResult = 'Server error.  Please try again later.'
+          console.log('Login failed: ' + error.message)
+          this.loginResult = "We're sorry, it seems we're having trouble communicating with the server.  Please contact support or try again later."
         })
       }
     }
