@@ -1,31 +1,19 @@
 '''
 Classes for handling projects as Sciris objects
 
-Version: 2018jun04 by cliffk
+Version: 2018sep06
 '''
 
 import os
+import sciris as sc
+import scirisweb as sw
 import hptool as hp
-import sciris.core as sc
-import sciris.web as sw
-import sciris.weblib.user as user
-import sciris.weblib.datastore as ds
-import sciris.corelib.fileio as fileio
 
-#
 # Globals
-#
-
-# The ProjectCollection object for all of the app's projects.  Gets 
-# initialized by and loaded by init_projects().
-proj_collection = None
+proj_collection = None # The ProjectCollection object for all of the app's projects.  Gets initialized by and loaded by init_projects().
 
 
-#
-# Classes
-#
-
-class ProjectSO(sw.ScirisObject):
+class ProjectSO(sw.Blob):
     """
     A ScirisObject-wrapped Optima Nutrition Project object.
     
@@ -34,7 +22,7 @@ class ProjectSO(sw.ScirisObject):
             void -- constructor
         load_from_copy(other_object): void -- assuming other_object is another 
             object of our type, copy its contents to us (calls the 
-            ScirisObject superclass version of this method also)   
+            Blob superclass version of this method also)   
         show(): void -- print the contents of the object
         get_user_front_end_repr(): dict -- get a JSON-friendly dictionary 
             representation of the object state the front-end uses for non-
@@ -69,7 +57,7 @@ class ProjectSO(sw.ScirisObject):
             
             # Set the owner (User) UID.
             self.owner_uid = valid_uuid
-        
+            
     def load_from_copy(self, other_object):
         if type(other_object) == type(self):
             # Do the superclass copying.
@@ -85,12 +73,12 @@ class ProjectSO(sw.ScirisObject):
         # Show superclass attributes.
         super(ProjectSO, self).show()  
         
-        # Show the Optima defined display text for the project.
-        print '---------------------'
-        print 'Owner User UID: %s' % self.owner_uid.hex
-        print 'Project Name: %s' % self.proj.name
-        print 'Creation Time: %s' % self.proj.created
-        print 'Update Time: %s' % self.proj.modified
+        # Show the defined display text for the project.
+        print('---------------------')
+        print('Owner user UID: %s' % self.owner_uid.hex)
+        print('Project name: %s' % self.proj.name)
+        print('Creation time: %s' % self.proj.created)
+        print('Update time: %s' % self.proj.modified)
             
     def get_user_front_end_repr(self):
         obj_info = {
@@ -98,8 +86,9 @@ class ProjectSO(sw.ScirisObject):
                 'id': self.uid,
                 'name': self.proj.name,
                 'userId': self.owner_uid,
+                'hasData':      len(self.proj.datasets)>0,
                 'creationTime': self.proj.created,
-                'updatedTime': self.proj.modified     
+                'updatedTime': self.proj.modified
             }
         }
         return obj_info
@@ -113,13 +102,13 @@ class ProjectSO(sw.ScirisObject):
         full_file_name = '%s%s%s' % (load_dir, os.sep, file_name)   
      
         # Write the object to a Gzip string pickle file.
-        fileio.object_to_gzip_string_pickle_file(full_file_name, self.proj)
+        sc.saveobj(full_file_name, self.proj)
         
         # Return the filename (not the full one).
         return self.proj.name + ".prj"
     
         
-class ProjectCollection(sw.ScirisCollection):
+class ProjectCollection(sw.BlobDict):
     """
     A collection of Projects.
     
@@ -149,7 +138,7 @@ class ProjectCollection(sw.ScirisCollection):
         valid_uuid = sc.uuid(owner_uid)
         
         # If we have a valid UUID...
-        if valid_uuid is not None:
+        if valid_uuid is not None: 
             # If we are storing things inside the obj_dict...
             if self.objs_within_coll:              
                 # Get dictionaries for each Project in the dictionary.
@@ -162,7 +151,7 @@ class ProjectCollection(sw.ScirisCollection):
             else:
                 projects_info = []
                 for uid in self.ds_uuid_set:
-                    obj = ds.data_store.retrieve(uid)
+                    obj = sw.globalvars.data_store.retrieve(uid)
                     if obj.owner_uid == valid_uuid:
                         projects_info.append(obj.get_user_front_end_repr())
                 return projects_info
@@ -190,7 +179,7 @@ class ProjectCollection(sw.ScirisCollection):
             else:
                 project_entries = []
                 for uid in self.ds_uuid_set:
-                    obj = ds.data_store.retrieve(uid)
+                    obj = sw.globalvars.data_store.retrieve(uid)
                     if obj.owner_uid == valid_uuid:
                         project_entries.append(obj)
                 return project_entries
@@ -208,7 +197,7 @@ def init_projects(app):
     global proj_collection  # need this to allow modification within the module
     
     # Look for an existing ProjectCollection.
-    proj_collection_uid = ds.data_store.get_uid_from_instance('projectscoll', 'Projects Collection')
+    proj_collection_uid = sw.globalvars.data_store.get_uid('projectscoll', 'Projects Collection')
     
     # Create the projects collection object.  Note, that if no match was found, 
     # this will be assigned a new UID.    
@@ -217,33 +206,50 @@ def init_projects(app):
     # If there was a match...
     if proj_collection_uid is not None:
         if app.config['LOGGING_MODE'] == 'FULL':
-            print '>> Loading ProjectCollection from the DataStore.'
+            print('>> Loading ProjectCollection from the DataStore.')
         proj_collection.load_from_data_store() 
     
     # Else (no match)...
     else:
-        # Load the data path holding the Excel files.
-        data_path = hp.HPpath('data')
-    
         if app.config['LOGGING_MODE'] == 'FULL':
             print('>> Creating a new ProjectCollection.') 
         proj_collection.add_to_data_store()
         
         if app.config['LOGGING_MODE'] == 'FULL':
             print('>> Starting a demo project.')
-        proj = hp.Project(name='Afghanistan test 1', 
-            burdenfile=data_path + 'ihme-gbd.xlsx', 
-            interventionsfile=data_path + 'dcp-data-afg-v1.xlsx')  
-        projSO = ProjectSO(proj, user.get_scirisdemo_user())
-        proj_collection.add_object(projSO)
-        
-        if app.config['LOGGING_MODE'] == 'FULL':
-            print '>> Starting a second demo project.'
         proj = hp.Project(name='Afghanistan HBP equity')
-        projSO = ProjectSO(proj, user.get_scirisdemo_user())
+        projSO = ProjectSO(proj, sw.get_scirisdemo_user())
         proj_collection.add_object(projSO)
-        
         
     if app.config['LOGGING_MODE'] == 'FULL':
         # Show what's in the ProjectCollection.    
         proj_collection.show()
+        
+def apptasks_load_projects(config):
+    global proj_collection  # need this to allow modification within the module 
+    
+    # We need to load in the whole DataStore here because the Celery worker 
+    # (in which this function is running) will not know about the same context 
+    # from the datastore.py module that the server code will.
+    
+    # Create the DataStore object, setting up Redis.
+    sw.globalvars.data_store = sw.DataStore(redis_db_URL=config.REDIS_URL)
+    
+    # Load the DataStore state from disk.
+    sw.globalvars.data_store.load()
+    
+    # Look for an existing ProjectCollection.
+    proj_collection_uid = sw.globalvars.data_store.get_uid('projectscoll', 'Projects Collection')
+    
+    # Create the projects collection object.  Note, that if no match was found, 
+    # this will be assigned a new UID.    
+    proj_collection = ProjectCollection(proj_collection_uid)
+    
+    # If there was a match...
+    if proj_collection_uid is not None:  
+        # Load the project collection from the DataStore.
+        proj_collection.load_from_data_store()        
+        
+#        proj_collection.show()      
+    
+    return None

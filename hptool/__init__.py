@@ -85,19 +85,7 @@ from .project import Project
 # Import webapp
 import webapp
 
-# Import web functions
-try:
-    from . import webapp
-    webapptext = 'with webapp'
-except Exception as webapp_exception:
-    import traceback as _traceback
-    webapp_error = _traceback.format_exc()
-    webapptext = 'without webapp (see webapp_error for details)'
-
-# Print the license
 # Print the license
 HPlicense = 'HealthPrior %s (%s)' % (version, versiondate)
-print(HPlicense + ' ' + webapptext)
-
-del HPlicense, webapptext
+print(HPlicense)
 

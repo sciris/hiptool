@@ -1,44 +1,29 @@
 """
 rpcs.py -- code related to HealthPrior project management
     
-Last update: 2018jun04 by cliffk
+Last update: 2018sep09 by cliffk
 """
 
 #
-# Imports
+# Imports and globals
 #
 
 import os
-import datetime
-import dateutil
-import dateutil.tz
 from zipfile import ZipFile
 from flask_login import current_user
-import mpld3
-
-import sciris.corelib.fileio as fileio # WARNING, make better
-import sciris.weblib.user as user
-import sciris.core as sc
-import sciris.web as sw
-
+import sciris as sc
+import scirisweb as sw
 import hptool as hp
 from . import projects as prj
 
-# Dictionary to hold all of the registered RPCs in this module.
-RPC_dict = {}
+RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
+RPC = sw.make_register_RPC(RPC_dict) # RPC registration decorator factory created using call to make_register_RPC().
 
-# RPC registration decorator factory created using call to make_register_RPC().
-register_RPC = sw.make_register_RPC(RPC_dict)
 
-        
 #
 # Other functions (mostly helpers for the RPCs)
 #
-    
-def now_utc():
-    ''' Get the current time, in UTC time '''
-    now = datetime.datetime.now(dateutil.tz.tzutc())
-    return now
+
 
 def load_project_record(project_id, raise_exception=True):
     """
@@ -237,7 +222,7 @@ def get_version_info():
 ## Project RPCs
 ##
     
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_scirisdemo_projects():
     """
     Return the projects associated with the Sciris Demo user.
@@ -261,7 +246,7 @@ def get_scirisdemo_projects():
     output = {'projects': sorted_summary_list}
     return output
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def load_project_summary(project_id):
     """
     Return the project summary, given the Project UID.
@@ -273,7 +258,7 @@ def load_project_summary(project_id):
     # Return a project summary from the accessed prj.ProjectSO entry.
     return load_project_summary_from_project_record(project_entry)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def load_current_user_project_summaries():
     """
     Return project summaries for all projects the user has to the client.
@@ -281,7 +266,7 @@ def load_current_user_project_summaries():
     
     return load_current_user_project_summaries2()
 
-@register_RPC(validation_type='nonanonymous user')                
+@RPC()                
 def load_all_project_summaries():
     """
     Return project summaries for all projects to the client.
@@ -295,7 +280,7 @@ def load_all_project_summaries():
     return {'projects': map(load_project_summary_from_project_record, 
         project_entries)}
             
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def delete_projects(project_ids):
     """
     Delete all of the projects with the passed in UIDs.
@@ -372,7 +357,7 @@ def load_zip_of_prj_files(project_ids):
     # Return the server file name.
     return server_zip_fname
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def create_new_project(user_id):
     """
     Create a new HealthPrior project.
@@ -402,7 +387,7 @@ def create_new_project(user_id):
     # Return the new project UID in the return message.
     return { 'projectId': str(proj.uid) }
  
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def update_project_from_summary(project_summary):
     """
     Given the passed in project summary, update the underlying project 
@@ -421,7 +406,7 @@ def update_project_from_summary(project_summary):
     # Save the changed project to the DataStore.
     save_project(proj)
     
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def copy_project(project_id):
     """
     Given a project UID, creates a copy of the project with a new UID and 
@@ -484,7 +469,7 @@ def create_project_from_prj_file(prj_filename, user_id):
 ## Burden set RPCs
 ##  
     
-@register_RPC(validation_type='nonanonymous user')     
+@RPC()     
 def get_project_burden_sets(project_id):
     # Get the Project object.
     proj = load_project(project_id)
@@ -495,7 +480,7 @@ def get_project_burden_sets(project_id):
     # Return the JSON-friendly result.
     return {'burdensets': map(get_burden_set_fe_repr, burdensets)}
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_project_burden_set_diseases(project_id, burdenset_numindex):
     # Get the Project object.
     proj = load_project(project_id)
@@ -513,7 +498,7 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
     # Return success.
     return { 'diseases': disease_data }
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def create_burden_set(project_id, new_burden_set_name):
 
     def update_project_fn(proj):
@@ -540,7 +525,7 @@ def create_burden_set(project_id, new_burden_set_name):
     # Return the new burden sets.
     return get_project_burden_sets(project_id)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def delete_burden_set(project_id, burdenset_numindex):
 
     def update_project_fn(proj):
@@ -549,7 +534,7 @@ def delete_burden_set(project_id, burdenset_numindex):
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def copy_burden_set(project_id, burdenset_numindex):
 
     def update_project_fn(proj):
@@ -573,7 +558,7 @@ def copy_burden_set(project_id, burdenset_numindex):
     # Return the new burden sets.
     return get_project_burden_sets(project_id) 
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
 
     def update_project_fn(proj):
@@ -583,7 +568,7 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def update_burden_set_disease(project_id, burdenset_numindex, 
     disease_numindex, data):
 
@@ -609,7 +594,7 @@ def make_mpld3_graph_dict(fig):
     mpld3_dict = mpld3.fig_to_dict(fig)
     return mpld3_dict
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
     
@@ -639,7 +624,7 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
 ## Intervention set RPCs
 ## 
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def get_project_interv_sets(project_id):
     # Get the Project object.
     proj = load_project(project_id)
@@ -650,7 +635,7 @@ def get_project_interv_sets(project_id):
     # Return the JSON-friendly result.
     return {'intervsets': map(get_interv_set_fe_repr, interv_sets)}
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_project_interv_set_intervs(project_id, intervset_numindex):
     # Get the Project object.
     proj = load_project(project_id)
@@ -668,7 +653,7 @@ def get_project_interv_set_intervs(project_id, intervset_numindex):
     # Return success.
     return { 'interventions': interv_data }
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def create_interv_set(project_id, new_interv_set_name):
 
     def update_project_fn(proj):
@@ -695,7 +680,7 @@ def create_interv_set(project_id, new_interv_set_name):
     # Return the new intervention sets.
     return get_project_interv_sets(project_id)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def delete_interv_set(project_id, intervset_numindex):
 
     def update_project_fn(proj):
@@ -704,7 +689,7 @@ def delete_interv_set(project_id, intervset_numindex):
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def copy_interv_set(project_id, intervset_numindex):
 
     def update_project_fn(proj):
@@ -728,7 +713,7 @@ def copy_interv_set(project_id, intervset_numindex):
     # Return the new intervention sets.
     return get_project_interv_sets(project_id)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
 
     def update_project_fn(proj):
@@ -738,7 +723,7 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def update_interv_set_interv(project_id, intervset_numindex, 
     interv_numindex, data):
 
@@ -761,7 +746,7 @@ def update_interv_set_interv(project_id, intervset_numindex,
 ## Package set RPCs
 ##   
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def get_project_package_sets(project_id):
     # Get the Project object.
     proj = load_project(project_id)
@@ -772,7 +757,7 @@ def get_project_package_sets(project_id):
     # Return the JSON-friendly result.
     return {'packagesets': map(get_package_set_fe_repr, packagesets)}
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_project_package_set_results(project_id, packageset_numindex):
     # Get the Project object.
     proj = load_project(project_id)
@@ -790,7 +775,7 @@ def get_project_package_set_results(project_id, packageset_numindex):
     # Return success.
     return { 'results': result_data }
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def create_package_set(project_id, new_package_set_name):
 
     def update_project_fn(proj):
@@ -811,7 +796,7 @@ def create_package_set(project_id, new_package_set_name):
     # Return the new package sets.
     return get_project_package_sets(project_id)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def delete_package_set(project_id, packageset_numindex):
 
     def update_project_fn(proj):
@@ -820,7 +805,7 @@ def delete_package_set(project_id, packageset_numindex):
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
 
-@register_RPC(validation_type='nonanonymous user')    
+@RPC()    
 def copy_package_set(project_id, packageset_numindex):
 
     def update_project_fn(proj):
@@ -844,7 +829,7 @@ def copy_package_set(project_id, packageset_numindex):
     # Return the new package sets.
     return get_project_package_sets(project_id) 
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def rename_package_set(project_id, packageset_numindex, new_package_set_name):
 
     def update_project_fn(proj):
@@ -854,7 +839,7 @@ def rename_package_set(project_id, packageset_numindex, new_package_set_name):
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
-@register_RPC(validation_type='nonanonymous user')
+@RPC()
 def get_project_package_plots(project_id, packageset_numindex):
     ''' Plot the health packages '''
     
