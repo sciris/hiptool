@@ -253,7 +253,7 @@
 
   padding: $padding-base-vertical $padding-base-horizontal;
 
-  @include btn-styles($default-color, $default-states-color);
+  //@include btn-styles($default-color, $default-states-color);
   @include transition($fast-transition-time, linear);
 
   &:hover,
@@ -282,27 +282,27 @@
 // Apply the mixin to the buttons
 //.btn-default { @include btn-styles($default-color, $default-states-color); }
 .navbar .navbar-nav > li > a.btn-primary, .btn-primary {
-  @include btn-styles($primary-color, $primary-states-color);
+  //@include btn-styles($primary-color, $primary-states-color);
 }
 
 .navbar .navbar-nav > li > a.btn-success, .btn-success {
-  @include btn-styles($success-color, $success-states-color);
+  //@include btn-styles($success-color, $success-states-color);
 }
 
 .navbar .navbar-nav > li > a.btn-info, .btn-info {
-  @include btn-styles($info-color, $info-states-color);
+  //@include btn-styles($info-color, $info-states-color);
 }
 
 .navbar .navbar-nav > li > a.btn-warning, .btn-warning {
-  @include btn-styles($warning-color, $warning-states-color);
+  //@include btn-styles($warning-color, $warning-states-color);
 }
 
 .navbar .navbar-nav > li > a.btn-danger, .btn-danger {
-  @include btn-styles($danger-color, $danger-states-color);
+  //@include btn-styles($danger-color, $danger-states-color);
 }
 
 .btn-neutral {
-  @include btn-styles($white-color, $white-color);
+  //@include btn-styles($white-color, $white-color);
 
   &:hover,
   &:focus {
@@ -348,16 +348,16 @@
 }
 
 .btn-lg {
-  @include btn-size($padding-large-vertical, $padding-large-horizontal, $font-size-large, $border-radius-btn-large, $line-height-small);
+  //@include btn-size($padding-large-vertical, $padding-large-horizontal, $font-size-large, $border-radius-btn-large, $line-height-small);
   font-weight: $font-weight-normal;
 }
 
 .btn-sm {
-  @include btn-size($padding-small-vertical, $padding-small-horizontal, $font-size-small, $border-radius-btn-small, $line-height-small);
+  //@include btn-size($padding-small-vertical, $padding-small-horizontal, $font-size-small, $border-radius-btn-small, $line-height-small);
 }
 
 .btn-xs {
-  @include btn-size($padding-xs-vertical, $padding-xs-horizontal, $font-size-xs, $border-radius-btn-small, $line-height-small);
+  //@include btn-size($padding-xs-vertical, $padding-xs-horizontal, $font-size-xs, $border-radius-btn-small, $line-height-small);
 }
 
 .btn-wd {

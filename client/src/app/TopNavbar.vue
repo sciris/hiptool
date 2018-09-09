@@ -37,8 +37,9 @@ Last update: 2018-07-27
     </div>
   </nav>
 </template>
+
+
 <script>
-  import rpcservice from '@/services/rpc-service'
   import userService from '@/services/user-service'
   import router from '@/router'
 

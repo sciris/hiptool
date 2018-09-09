@@ -278,7 +278,7 @@ export default {
       console.log('updateProjectSummaries() called')
 
       // Get the current user's project summaries from the server.
-      rpcservice.rpcCall('load_current_user_project_summaries')
+      rpcs.rpc('load_current_user_project_summaries')
       .then(response => {
         let lastCreationTime = null
         let lastCreatedID = null
@@ -365,7 +365,7 @@ export default {
       this.$Progress.start()
       
       // Have the server create a new project.
-      rpcservice.rpcCall('create_new_project', [this.$store.state.currentUser.UID])
+      rpcs.rpc('create_new_project', [this.$store.state.currentUser.UID])
       .then(response => {
         // Update the project summaries so the new project shows up on the list.
         // Note: There's no easy way to get the new project UID to tell the 
@@ -564,7 +564,7 @@ export default {
       this.$Progress.start()
       
 	    // Have the server copy the project, giving it a new name.
-      rpcservice.rpcCall('copy_project', [uid])
+      rpcs.rpc('copy_project', [uid])
       .then(response => {
         // Update the project summaries so the copied program shows up on the list.
         this.updateProjectSummaries(response.data.projectId)
@@ -627,7 +627,7 @@ export default {
         
         // Have the server change the name of the project by passing in the new copy of the
         // summary.
-        rpcservice.rpcCall('update_project_from_summary', [newProjectSummary])
+        rpcs.rpc('update_project_from_summary', [newProjectSummary])
         .then(response => {
           // Update the project summaries so the rename shows up on the list.
           this.updateProjectSummaries(newProjectSummary.project.id)      
@@ -742,7 +742,7 @@ export default {
         // Start the loading bar.
         this.$Progress.start()
         
-        rpcservice.rpcCall('delete_projects', [selectProjectsUIDs])
+        rpcs.rpc('delete_projects', [selectProjectsUIDs])
         .then(response => {
           // Get the active project ID.
           let activeProjectId = this.$store.state.activeProject.project.id

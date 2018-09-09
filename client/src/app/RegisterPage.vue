@@ -82,7 +82,7 @@ Last update: 2018-05-28
 
 
 <script>
-import rpcservice from '@/services/rpc-service'
+import rpcs from '@/services/rpc-service'
 import userservice from '@/services/user-service' 
 import router from '@/router'
 
@@ -103,7 +103,7 @@ export default {
 
   computed: {
     getVersionInfo() {
-      rpcservice.rpcCall('get_version_info')
+      rpcs.rpc('get_version_info')
         .then(response => {
           this.version = response.data['version'];
           this.date = response.data['date'];
@@ -116,7 +116,7 @@ export default {
       userservice.registerUser(this.registerUserName, this.registerPassword, 
         this.registerDisplayName, this.registerEmail)
       .then(response => {
-        if (response.data == 'success') { // Set a success result to show.
+        if (response.data === 'success') { // Set a success result to show.
           this.registerResult = 'Success! Please wait while you are redirected...';
           setTimeout(function() {router.push('/login')}, 2000); // Navigate automatically to the login page after a delay
         } else { // Set a failure result to show.

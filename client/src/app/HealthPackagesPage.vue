@@ -191,16 +191,13 @@ Last update: 2018-05-29
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
-  import rpcservice from '@/services/rpc-service'
+  import rpcs from '@/services/rpc-service'
   import router from '@/router'
-  //  import HotTable from 'vue-handsontable-official';
   import Vue from 'vue';
 
   export default {
     name: 'HealthPackagesPage',
-//    components: {
-//        HotTable
-//    },
+
     data() {
       return {
         // Placeholder text for table filter box
@@ -307,7 +304,7 @@ Last update: 2018-05-29
         // Otherwise...
         else {
           // Get the active project's health package sets.
-          rpcservice.rpcCall('get_project_package_sets',
+          rpcs.rpc('get_project_package_sets',
             [this.$store.state.activeProject.project.id])
             .then(response => {
               // Set the package set list to what we received.
@@ -391,7 +388,7 @@ Last update: 2018-05-29
         this.activePackageSet = packageSet
 
         // Go to the server to get the diseases from the package set.
-        rpcservice.rpcCall('get_project_package_set_results',
+        rpcs.rpc('get_project_package_set_results',
           [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
           .then(response => {
             // Set the result list.
@@ -431,7 +428,7 @@ Last update: 2018-05-29
         this.activePackageSet = packageSet
 
         // Go to the server to get the results from the package set.
-        rpcservice.rpcCall('get_project_package_plots',
+        rpcs.rpc('get_project_package_plots',
           [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
@@ -452,7 +449,7 @@ Last update: 2018-05-29
         console.log('copyPackageSet() called for ' + packageSet.packageset.name)
 
         // Have the server copy the package set, giving it a new name.
-        rpcservice.rpcCall('copy_package_set',
+        rpcs.rpc('copy_package_set',
           [this.$store.state.activeProject.project.id, packageSet.packageset.numindex])
           .then(response => {
             // Update the package sets so the new set shows up on the list.
@@ -471,7 +468,7 @@ Last update: 2018-05-29
         // Otherwise (it is to be renamed)...
         else {
           // Have the server change the name of the package set.
-          rpcservice.rpcCall('rename_package_set',
+          rpcs.rpc('rename_package_set',
             [this.$store.state.activeProject.project.id,
               packageSet.packageset.numindex, packageSet.renaming])
             .then(response => {
@@ -496,7 +493,7 @@ Last update: 2018-05-29
         console.log('deletePackageSet() called for ' + packageSet.packageset.name)
 
         // Go to the server to delete the package set.
-        rpcservice.rpcCall('delete_package_set',
+        rpcs.rpc('delete_package_set',
           [this.$store.state.activeProject.project.id, packageSet.packageset.numindex])
           .then(response => {
             // Update the package sets so the new set shows up on the list.
@@ -508,7 +505,7 @@ Last update: 2018-05-29
         console.log('createNewPackageSet() called')
 
         // Go to the server to create the new package set.
-        rpcservice.rpcCall('create_package_set',
+        rpcs.rpc('create_package_set',
           [this.$store.state.activeProject.project.id, 'New package set'])
           .then(response => {
             // Update the package sets so the new set shows up on the list.
