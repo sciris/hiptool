@@ -1,28 +1,28 @@
 // index.js -- vue-router path configuration code
 //
-// Last update: 2/21/18 (gchadder3)
+// Last update: 2018-09-09
 
 // Import main things
 import Vue from 'vue'
 import Router from 'vue-router'
-import DashboardLayout from '@/components/app/DashboardLayout.vue'
+import DashboardLayout from '@/app/DashboardLayout.vue'
 
 // App views
-import NotFound from '@/components/generic/NotFoundPage.vue'
-import ProjectsPage from '@/components/app/ProjectsPage'
-import DiseaseBurdenPage from '@/components/app/DiseaseBurdenPage'
-import InterventionsPage from '@/components/app/InterventionsPage'
-import EquityPage from '@/components/app/EquityPage'
-import FinancialRiskPage from '@/components/app/FinancialRiskPage'
-import HealthPackagesPage from '@/components/app/HealthPackagesPage'
-import LoginPage from '@/components/app/LoginPage'
-import MainAdminPage from '@/components/app/MainAdminPage'
-import RegisterPage from '@/components/app/RegisterPage'
-import UserChangeInfoPage from '@/components/app/UserChangeInfoPage'
-import ChangePasswordPage from '@/components/app/ChangePasswordPage'
-import Help from '@/components/app/Help'
-import Contact from '@/components/app/Contact'
-import About from '@/components/app/About'
+import NotFound from '@/app/NotFoundPage.vue'
+import ProjectsPage from '@/app/ProjectsPage'
+import DiseaseBurdenPage from '@/app/DiseaseBurdenPage'
+import InterventionsPage from '@/app/InterventionsPage'
+import EquityPage from '@/app/EquityPage'
+import FinancialRiskPage from '@/app/FinancialRiskPage'
+import HealthPackagesPage from '@/app/HealthPackagesPage'
+import LoginPage from '@/app/LoginPage'
+import MainAdminPage from '@/app/MainAdminPage'
+import RegisterPage from '@/app/RegisterPage'
+import UserChangeInfoPage from '@/app/UserChangeInfoPage'
+import ChangePasswordPage from '@/app/ChangePasswordPage'
+import Help from '@/app/Help'
+import Contact from '@/app/Contact'
+import About from '@/app/About'
 
 
 Vue.use(Router);

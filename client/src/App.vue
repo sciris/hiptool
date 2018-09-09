@@ -1,16 +1,16 @@
 <!--
 App.vue -- App component, the main page
 
-Last update: 7/26/18 (gchadder3)
+Last update: 2018-09-09
 -->
 
 <template>
   <div :class="{'nav-open': $sidebar.showSidebar}">
     <simplert></simplert>
     <router-view></router-view>
-    <vue-progress-bar></vue-progress-bar>      
-    <!--This sidebar appears only for screens smaller than 992px -- otherwise, it is rendered in TopNavbar.vue-->
-    <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks">
+    <vue-progress-bar></vue-progress-bar>
+    <popup-spinner size="75px" padding="15px" title="Please wait..."></popup-spinner>
+    <side-bar type="navbar" :sidebar-links="$sidebar.sidebarLinks"> <!--This sidebar appears only for screens smaller than 992px -- otherwise, it is rendered in TopNavbar.vue-->
       <ul class="nav navbar-nav">
         <!-- Below requires a userService -->
         <li>
@@ -38,7 +38,6 @@ import userService from '@/services/user-service'
 
 export default {
   computed: {
-    // Health prior function
     currentUser: () => {
       return userService.currentUser()
     },
@@ -86,4 +85,7 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 } */
+
+  // Modal dialog styling.
+  @import './sass/_dialogs.scss';
 </style>
