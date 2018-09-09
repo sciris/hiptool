@@ -138,7 +138,7 @@ def update_project_with_fn(project_id, update_project_fn):
     update_project_fn(proj)
     
     # Set the updating time to now.
-    proj.modified = now_utc()
+    proj.modified = sc.now()
     
     # Save the changed project.
     save_project(proj) 
@@ -158,7 +158,6 @@ def save_project_as_new(proj, user_id):
     prj.proj_collection.add_object(projSO)  
 
     # Display the call information.
-    # TODO: have this so that it doesn't show when logging is turned off
     print(">> save_project_as_new '%s'" % proj.name)
 
     # Save the changed Project object to the DataStore.
@@ -204,7 +203,7 @@ def get_package_set_fe_repr(packageset):
 #
 
 # RPC definitions
-@register_RPC()
+@RPC()
 def get_version_info():
 	''' Return the information about the project. '''
 	gitinfo = sc.gitinfo(__file__)
@@ -229,7 +228,7 @@ def get_scirisdemo_projects():
     """
     
     # Get the user UID for the _ScirisDemo user.
-    user_id = user.get_scirisdemo_user()
+    user_id = sw.get_scirisdemo_user()
    
     # Get the prj.ProjectSO entries matching the _ScirisDemo user UID.
     project_entries = prj.proj_collection.get_project_entries_by_user(user_id)
@@ -289,14 +288,14 @@ def delete_projects(project_ids):
     # Loop over the project UIDs of the projects to be deleted...
     for project_id in project_ids:
         # Load the project record matching the UID of the project passed in.
-        record = load_project_record(project_id, raise_exception=True)
         
+        record = load_project_record(project_id, raise_exception=True)
         # If a matching record is found, delete the object from the 
         # ProjectCollection.
         if record is not None:
             prj.proj_collection.delete_object_by_uid(project_id)
 
-@register_RPC(call_type='download', validation_type='nonanonymous user')   
+@RPC(call_type='download')   
 def download_project(project_id):
     """
     For the passed in project UID, get the Project on the server, save it in a 
@@ -307,7 +306,7 @@ def download_project(project_id):
     proj = load_project(project_id, raise_exception=True)
     
     # Use the downloads directory to put the file in.
-    dirname = fileio.downloads_dir.dir_path
+    dirname = sw.globalvars.downloads_dir.dir_path
         
     # Create a filename containing the project name followed by a .prj 
     # suffix.
@@ -317,16 +316,15 @@ def download_project(project_id):
     full_file_name = '%s%s%s' % (dirname, os.sep, file_name)
         
     # Write the object to a Gzip string pickle file.
-    fileio.object_to_gzip_string_pickle_file(full_file_name, proj)
+    sc.saveobj(full_file_name, proj)
     
     # Display the call information.
-    # TODO: have this so that it doesn't show when logging is turned off
     print(">> download_project %s" % (full_file_name))
     
     # Return the full filename.
     return full_file_name
 
-@register_RPC(call_type='download', validation_type='nonanonymous user')
+@RPC(call_type='download')
 def load_zip_of_prj_files(project_ids):
     """
     Given a list of project UIDs, make a .zip file containing all of these 
@@ -334,7 +332,7 @@ def load_zip_of_prj_files(project_ids):
     """
     
     # Use the downloads directory to put the file in.
-    dirname = fileio.downloads_dir.dir_path
+    dirname = sw.globalvars.downloads_dir.dir_path
 
     # Build a list of prj.ProjectSO objects for each of the selected projects, 
     # saving each of them in separate .prj files.
@@ -351,7 +349,6 @@ def load_zip_of_prj_files(project_ids):
             zipfile.write(os.path.join(dirname, project), 'projects/{}'.format(project))
             
     # Display the call information.
-    # TODO: have this so that it doesn't show when logging is turned off
     print(">> load_zip_of_prj_files %s" % (server_zip_fname))
 
     # Return the server file name.
@@ -378,7 +375,6 @@ def create_new_project(user_id):
     proj.burden().popsize = 36373.176 # From UN population division 
     
     # Display the call information.
-    # TODO: have this so that it doesn't show when logging is turned off
     print(">> create_new_project %s" % (proj.name))    
     
     # Save the new project in the DataStore.
@@ -401,7 +397,7 @@ def update_project_from_summary(project_summary):
     proj.name = project_summary['project']['name']
     
     # Set the modified time to now.
-    proj.modified = now_utc()
+    proj.modified = sc.now()
     
     # Save the changed project to the DataStore.
     save_project(proj)
@@ -428,7 +424,6 @@ def copy_project(project_id):
     user_id = current_user.get_id() 
     
     # Display the call information.
-    # TODO: have this so that it doesn't show when logging is turned off
     print(">> copy_project %s" % (new_project.name)) 
     
     # Save a DataStore projects record for the copy project.
@@ -440,7 +435,7 @@ def copy_project(project_id):
     # Return the UID for the new projects record.
     return { 'projectId': copy_project_id }
 
-@register_RPC(call_type='upload', validation_type='nonanonymous user')
+@RPC(call_type='upload')
 def create_project_from_prj_file(prj_filename, user_id):
     """
     Given a .prj file name and a user UID, create a new project from the file 
@@ -452,7 +447,7 @@ def create_project_from_prj_file(prj_filename, user_id):
     
     # Try to open the .prj file, and return an error message if this fails.
     try:
-        proj = fileio.gzip_string_pickle_file_to_object(prj_filename)
+        proj = sc.loadobj(prj_filename)
     except Exception:
         return { 'error': 'BadFileFormatError' }
     
@@ -586,14 +581,6 @@ def update_burden_set_disease(project_id, burdenset_numindex,
 
 
 
-
-# TODO: move this into the helper functions.  It's here now for testing 
-# purposes.  Or, maybe remove dependency on this entirely, since it's a one-
-# liner.
-def make_mpld3_graph_dict(fig):
-    mpld3_dict = mpld3.fig_to_dict(fig)
-    return mpld3_dict
-
 @RPC()
 def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
     ''' Plot the disease burden '''
@@ -612,7 +599,7 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        graph_dict = make_mpld3_graph_dict(fig)
+        graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
     
     # Return success -- WARNING, hard-coded to 3 graphs!
