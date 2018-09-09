@@ -1,6 +1,5 @@
 <template>
 
-<--! WARNING, sidebar is broken! -->
   <div :class="sidebarClasses"
        :data-background-color="backgroundColor"
        :data-active-color="activeColor">
