@@ -17,7 +17,7 @@ import hptool as hp
 from . import projects as prj
 
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
-RPC = sw.make_register_RPC(RPC_dict) # RPC registration decorator factory created using call to make_register_RPC().
+RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using call to make_register_RPC().
 
 
 #
