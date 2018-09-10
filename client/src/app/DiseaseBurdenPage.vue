@@ -117,10 +117,10 @@ Last update: 2018-05-29
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
 
-      <div>
-        <div id="fig01" style="float:left" ></div>
-        <div id="fig02" style="float:left" ></div>
-        <div id="fig03" style="float:left" ></div>
+      <div v-show="showingPlots">
+        <div id="fig1" style="float:left" ></div>
+        <div id="fig2" style="float:left" ></div>
+        <div id="fig3" style="float:left" ></div>
       </div>
 
 
@@ -221,13 +221,6 @@ Last update: 2018-05-29
       </table>
       <button class="btn" @click="notImplemented('Add new burden type')">Add new burden type</button>
 
-      <!--<template>-->
-        <!--Testing handsontable-->
-        <!--<div id="hot-preview">-->
-          <!--<HotTable :root="root" :settings="hotSettings"></HotTable>-->
-        <!--</div>-->
-      <!--</template>-->
-
     </div>
   </div>
 </template>
@@ -237,6 +230,7 @@ Last update: 2018-05-29
   var filesaver = require('file-saver')
   import status from '@/services/status-service'
   import rpcs from '@/services/rpc-service'
+  import utils from '@/services/utils'
   import router from '@/router'
   import Vue from 'vue';
 
@@ -245,48 +239,22 @@ Last update: 2018-05-29
 
     data() {
       return {
-
         filterPlaceholder: 'Type here to filter burden sets', // Placeholder text for table filter box
-
-
         filterText: '', // Text in the table filter box
-
-
         sortColumn: 'updatedTime',  // Column of table used for sorting the burden sets // name, creationTime, updatedTime
-
-
         sortReverse: false, // Sort in reverse order?
-
-        root: 'test-hot',
-        hotSettings: {
-          data: [['sample', 'data']],
-          colHeaders: true
-        },
-
-        // List of burden sets in the active project
-        burdenSets: [],
-
-        // Active burden set
-        activeBurdenSet: {},
-
-        // List of diseases.  Each list element is a list of the ailment name
-        // and numbers associated with it.
-        diseaseList: [],
-
-        // Column of table used for sorting the diseases
-        sortColumn2: 'name',  // name, country, creationTime, updatedTime
-
-        // Sort diseases in reverse order?
-        sortReverse2: false,
-
-        // CK: WARNING TEMP, should come from backend
-        country: 'Afghanistan',
+        burdenSets: [], // List of burden sets in the active project
+        activeBurdenSet: {}, // Active burden set
+        diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
+        sortColumn2: 'name',  // Column of table used for sorting the diseases
+        sortReverse2: false, // Sort diseases in reverse order?
+        country: 'Afghanistan', // CK: WARNING TEMP, should come from backend
         countryList: [
           'Afghanistan',
           'Other',
         ],
-
         serverresponse: 'no response',
+        showingPlots: false,
       }
     },
 
@@ -305,7 +273,6 @@ Last update: 2018-05-29
 
       sortedDiseases() {
         var sortedDiseaseList =  this.applySorting2(this.diseaseList);
-        Vue.set(this.hotSettings, 'data', [[1,2,3]]);
         console.log(sortedDiseaseList);
         return sortedDiseaseList;
       },
@@ -328,8 +295,18 @@ Last update: 2018-05-29
 
     methods: {
 
-      notImplemented(message) {
-        status.fail(this, message)
+      notImplemented() {
+        status.fail(this, 'This feature is not implemented')
+      },
+
+      clearGraphs(numfigs) { return utils.clearGraphs(this, numfigs)},
+
+      showPlots() {
+        this.showingPlots = true
+      },
+
+      hidePlots() {
+        this.showingPlots = false
       },
 
       updateBurdenSets(setLastEntryActive) {
@@ -455,19 +432,15 @@ Last update: 2018-05-29
 
       makeGraph(burdenSet) {
         console.log('makeGraph() called for ' + burdenSet.burdenset.name)
-
-        // Set the active project to the matched project.
-        this.activeBurdenSet = burdenSet
-
-        // Go to the server to get the diseases from the burden set.
-        rpcs.rpc('get_project_burden_plots',
+        this.activeBurdenSet = burdenSet // Set the active project to the matched project.
+        this.clearGraphs(3)
+        rpcs.rpc('get_project_burden_plots',  // Go to the server to get the diseases from the burden set.
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
-            let theFig = response.data.graph1 // Extract hack info.
-            mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
-            mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
-            mpld3.draw_figure('fig03', response.data.graph3) // Draw the figure.
+            mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
+            mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.
