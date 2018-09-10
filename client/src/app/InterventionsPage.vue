@@ -257,6 +257,7 @@ Last update: 2018-05-29
         activeIntervSet: {}, // Active intervention set
         interventionList: [],
         interventionDict: [], // Store values as a dict instead of a list -- WARNING, kludgy!
+        sortedIntervDict: [],
 
         // CK: WARNING TEMP, should come from backend
         country: 'Afghanistan',
@@ -280,11 +281,6 @@ Last update: 2018-05-29
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
 
-      sortedIntervDict() {
-        var sortedDict =  this.applySorting2(this.interventionDict);
-        return sortedDict
-      },
-
     },
 
     created() {
@@ -298,6 +294,7 @@ Last update: 2018-05-29
         // Load the intervention sets from the active project, telling the function
         // to also set the active intervention set to the last item.
         this.updateIntervSets(true)
+        this.makeSortedIntervDict()
       }
     },
 
@@ -305,6 +302,10 @@ Last update: 2018-05-29
 
       notImplemented(message) {
         status.fail(this, 'Function "' + message + '" not yet implemented')
+      },
+
+      makeSortedIntervDict() { // Don't get me started on the naming
+        this.sortedIntervDict =  this.applySorting2(this.interventionList);
       },
 
       updateIntervSets(setLastEntryActive) {
@@ -371,6 +372,7 @@ Last update: 2018-05-29
           // Set the sorting for non-reverse.
           this.sortReverse = false
         }
+        this.makeSortedIntervDict()
       },
 
       applyNameFilter(sets) {
@@ -409,12 +411,12 @@ Last update: 2018-05-29
       },
 
       applySorting2(intervs) {
-        return intervs.sort((interv1, interv2) =>
-          {
-            let sortDir = this.sortReverse2 ? -1: 1
-            return (String(interv1[this.sortColumn2]) > String(interv2[this.sortColumn2]) ? sortDir: -sortDir)
-          }
-        )
+        console.log('applySorting2() called')
+        let sorteds = intervs.sort((interv1, interv2) => {
+          let sortDir = this.sortReverse2 ? -1: 1
+          return (String(interv1[this.sortColumn2]) > String(interv2[this.sortColumn2]) ? sortDir: -sortDir)
+        })
+        return sorteds
       },
 
       viewSet(intervSet) {
