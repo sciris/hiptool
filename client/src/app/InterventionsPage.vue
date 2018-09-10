@@ -255,10 +255,6 @@ Last update: 2018-05-29
         sortReverse2: false, // Sort in reverse order?
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
-        showAllIntervs: true, // Show all of the intervention categories
-        showCancerIntervs: false, // Show cancer interventions
-        showInfectiousIntervs: false, // Show infectious diseases interventions
-        showChildIntervs: false, // Show child care interventions
         interventionList: [],
         interventionDict: [], // Store values as a dict instead of a list -- WARNING, kludgy!
 
