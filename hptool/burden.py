@@ -29,7 +29,7 @@ class Burden(object):
     
     def __repr__(self):
         ''' Print out useful information when called'''
-        output  = sc.desc(self)
+        output  = sc.prepr(self)
         output += 'Burden set name: %s\n'    % self.name
         output += '   Date created: %s\n'    % sc.getdate(self.created)
         output += '  Date modified: %s\n'    % sc.getdate(self.modified)
