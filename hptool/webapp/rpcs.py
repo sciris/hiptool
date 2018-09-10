@@ -42,7 +42,7 @@ def savefile(filename, obj, online=True):
 def sanitize(vals, forcefloat=False, verbose=True, allowstrings=True):
     ''' Make sure values are numeric, and either return nans or skip vals that aren't -- WARNING, duplicates lots of other things!'''
     if verbose: print('Sanitizing vals of %s: %s' % (type(vals), vals))
-    if sc.checktype(vals, 'arraylike'):
+    if isinstance(vals, list):
         as_array = False if forcefloat else True
     else:
         vals = [vals]
@@ -646,7 +646,6 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
 @RPC()
 def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, data):
     proj = load_project(project_id)
-    data = sanitize(data)
     data_record = proj.burdensets[burdenset_numindex].data[disease_numindex]
     print('Modifying')
     print(data_record)
@@ -697,6 +696,38 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
             'graph3': graphs[2],}
     
     
+
+
+@RPC()
+def add_burden(project_id, intervkey):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    ['active', 'cause', 'dalys', 'deaths', 'prevalence']
+    placeholder = [0, '~Cause of burden~', 0, 0, 0]
+    data[data.nrows()] = placeholder
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def copy_burden(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    value = sc.dcp(data[index])
+    value[1] += ' (copy)'
+    data.insert(row=index, value=value)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def delete_burden(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    data.pop(index)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
 
 ###################################################################################
 ### Intervention set RPCs

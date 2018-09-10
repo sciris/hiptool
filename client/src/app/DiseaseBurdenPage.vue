@@ -213,14 +213,14 @@ Last update: 2018-05-29
                      @keyup.enter="updateDisease(disease)"
                      v-model="disease.prevalence"/>
             </td>
-            <td style="white-space: nowrap; text-align:center">
-              <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
-              <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
+            <td style="white-space: nowrap">
+              <button class="iconbtn" @click="copyBurden(disease)" data-tooltip="Copy burden"><i class="ti-layers"></i></button>
+              <button class="iconbtn" @click="deleteBurden(disease)" data-tooltip="Delete burden"><i class="ti-trash"></i></button>
             </td>
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="notImplemented('Add new burden type')">Add new burden type</button>
+      <button class="btn" @click="addBurden">Add new burden</button>
 
     </div>
   </div>
@@ -595,7 +595,34 @@ Last update: 2018-05-29
         .then(response => {
           status.succeed(this, 'Burden set updated')
         })
-      }
+      },
+
+      addBurden() {
+        console.log('Adding item')
+        rpcs.rpc('add_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden added')
+          })
+      },
+
+      copyBurden(burden) {
+        console.log('Item to copy:', burden.numindex)
+        rpcs.rpc('copy_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, burden.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden copied')
+          })
+      },
+
+      deleteBurden(burden) {
+        console.log('Item to delete:', burden.numindex)
+        rpcs.rpc('delete_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, burden.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden deleted')
+          })
+      },
 
     }
   }

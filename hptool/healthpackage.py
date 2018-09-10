@@ -63,8 +63,10 @@ class HealthPackage(object):
                 tmp_burden = burdenset.data.findrow(key=key, col='cause', asdict=True)
             except:
                 raise hp.HPException('Burden "%s" not found' % key)
-            df['total_dalys',r] = tmp_burden['dalys']
-            df['total_prevalence',r] = tmp_burden['prevalence']
+            try:    df['total_dalys',r] = tmp_burden['dalys']
+            except: df['total_dalys',r] = 0 # Warning, will want to fix
+            try:    df['total_prevalence',r] = tmp_burden['prevalence']
+            except: df['total_prevalence',r] = 0
         
         # Calculate 80% coverage
         print('Not calculating 80% coverage since denominators are wrong')
