@@ -17,7 +17,7 @@ class Burden(object):
     From http://ghdx.healthdata.org/gbd-results-tool
     '''
     
-    def __init__(self, name='default', project=None):
+    def __init__(self, name='Default', project=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available

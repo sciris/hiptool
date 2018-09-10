@@ -13,7 +13,7 @@ class HealthPackage(object):
     Class to hold the results from the analysis.
     '''
     
-    def __init__(self, name='default', project=None):
+    def __init__(self, name='Default', project=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
@@ -23,7 +23,7 @@ class HealthPackage(object):
     
     def __repr__(self):
         ''' Print out useful information when called'''
-        output  = sc.defaultrepr(self)
+        output  = sc.prepr(self)
         output += 'Health packages name: %s\n'    % self.name
         output += '        Date created: %s\n'    % sc.getdate(self.created)
         output += '       Date modified: %s\n'    % sc.getdate(self.modified)

@@ -122,11 +122,12 @@ Last update: 2018-05-29
           <th>Active</th>
           <th style="min-width:30%">Intervention&nbsp;name</th>
           <th style="min-width:20%">Delivery&nbsp;platform</th>
-          <th>Type</th>
+          <th>Cause&nbsp;of&nbsp;burden</th>
           <th>ICER</th>
           <th>Unit&nbsp;cost</th>
-          <th>Equity</th>
+          <th>Spending</th>
           <th>FRP</th>
+          <th>Equity</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -170,13 +171,19 @@ Last update: 2018-05-29
             <input type="text"
                    class="txbox"
                    @keyup.enter="updateInterv(interv)"
-                   v-model="interv.equity"/>
+                   v-model="interv.spend"/>
           </td>
           <td>
             <input type="text"
                    class="txbox"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.frp"/>
+          </td>
+          <td>
+            <input type="text"
+                   class="txbox"
+                   @keyup.enter="updateInterv(interv)"
+                   v-model="interv.equity"/>
           </td>
           <td style="white-space: nowrap">
             <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
@@ -386,8 +393,9 @@ Last update: 2018-05-29
               this.interventionList[ind].type = this.interventionList[ind][4]
               this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
               this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].equity = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].spend = Number(this.interventionList[ind][7]).toLocaleString()
               this.interventionList[ind].frp = Number(this.interventionList[ind][8]).toLocaleString()
+              this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
 

@@ -20,15 +20,14 @@ function getUniqueName(fileName, otherNames) {
   return tryName
 }
 
-function placeholders(startVal) {
-  var indices = []
-  if (!startVal) {
-    startVal = 0
+function updateSorting(vm, sortColumn) {
+  console.log('updateSorting() called')
+  if (vm.sortColumn === sortColumn) { // If the active sorting column is clicked...
+    vm.sortReverse = !vm.sortReverse // Reverse the sort.
+  } else { // Otherwise.
+    vm.sortColumn = sortColumn // Select the new column for sorting.
+    vm.sortReverse = false // Set the sorting for non-reverse.
   }
-  for (var i = startVal; i <= 100; i++) {
-    indices.push(i);
-  }
-  return indices;
 }
 
 function projectID(vm) {
@@ -49,107 +48,6 @@ function hasData(vm) {
   }
 }
 
-function simStart(vm) {
-  if (vm.$store.state.activeProject.project === undefined) {
-    return ''
-  } else {
-    return vm.$store.state.activeProject.project.sim_start
-  }
-}
-
-function simEnd(vm) {
-  if (vm.$store.state.activeProject.project === undefined) {
-    return ''
-  } else {
-    return vm.$store.state.activeProject.project.sim_end
-  }
-}
-
-function simYears(vm) {
-  if (vm.$store.state.activeProject.project === undefined) {
-    return []
-  } else {
-    var sim_start = vm.$store.state.activeProject.project.sim_start
-    var sim_end = vm.$store.state.activeProject.project.sim_end
-    var years = []
-    for (var i = sim_start; i <= sim_end; i++) {
-      years.push(i);
-    }
-    console.log('sim years: ' + years)
-    return years;
-  }
-}
-
-function activePops(vm) {
-  if (vm.$store.state.activeProject.project === undefined) {
-    return ''
-  } else {
-    let pop_pairs = vm.$store.state.activeProject.project.pops
-    let pop_list = ["All"]
-    for(let i = 0; i < pop_pairs.length; ++i) {
-      pop_list.push(pop_pairs[i][1]);
-    }
-    return pop_list
-  }
-}
-
-function getPlotOptions(vm) {
-  console.log('getPlotOptions() called')
-  let project_id = projectID(vm)
-  rpcs.rpc('get_supported_plots', [project_id, true])
-    .then(response => {
-      vm.plotOptions = response.data // Get the parameter values
-    })
-    .catch(error => {
-      status.failurePopup(vm, 'Could not get plot options: ' + error.message)
-    })
-}
-
-function makeGraphs(vm, graphdata) {
-  let waitingtime = 0.5
-  console.log('makeGraphs() called')
-  status.start(vm) // Start indicating progress.
-  vm.hasGraphs = true
-  sleep(waitingtime * 1000)
-    .then(response => {
-      var n_plots = graphdata.length
-      console.log('Rendering ' + n_plots + ' graphs')
-      for (var index = 0; index <= n_plots; index++) {
-        console.log('Rendering plot ' + index)
-        var divlabel = 'fig' + index
-        var div = document.getElementById(divlabel); // CK: Not sure if this is necessary? To ensure the div is clear first
-        while (div.firstChild) {
-          div.removeChild(div.firstChild);
-        }
-        try {
-          console.log(graphdata[index]);
-          mpld3.draw_figure(divlabel, graphdata[index], function (fig, element) {
-            fig.setXTicks(6, function (d) {
-              return d3.format('.0f')(d);
-            });
-            // fig.setYTicks(null, function (d) {
-            //   return d3.format('.2s')(d);
-            // });
-          });
-        }
-        catch (error) {
-          console.log('Making graphs failed: ' + error.message);
-        }
-      }
-    })
-  status.succeed(vm, 'Graphs created') // Indicate success.
-}
-
-function clearGraphs(vm) {
-  for (var index = 0; index <= 100; index++) {
-    var divlabel = 'fig' + index
-    var div = document.getElementById(divlabel); // CK: Not sure if this is necessary? To ensure the div is clear first
-    while (div.firstChild) {
-      div.removeChild(div.firstChild);
-    }
-    vm.hasGraphs = false
-  }
-}
 
 function exportGraphs(vm, project_id) {
   console.log('exportGraphs() called')
@@ -212,16 +110,9 @@ function scaleFigs(frac) {
 export default {
   sleep,
   getUniqueName,
-  placeholders,
+  updateSorting,
   projectID,
   hasData,
-  simStart,
-  simEnd,
-  simYears,
-  activePops,
-  getPlotOptions,
-  makeGraphs,
-  clearGraphs,
   exportGraphs,
   exportResults,
   scaleFigs,

@@ -37,7 +37,7 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
+    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
         ''' Initialize the project '''
 
         ## Define the structure sets
@@ -59,19 +59,19 @@ class Project(object):
         if burdenfile:
             burden = hp.Burden(project=self)
             burden.loaddata(filename=burdenfile)
-            self.burdensets['default'] = burden
+            self.burdensets['Default'] = burden
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
             interventions = hp.Interventions(project=self)
             interventions.loaddata(filename=interventionsfile)
-            self.intersets['default'] = interventions
+            self.intersets['Default'] = interventions
         
         ## Combine into health package, if available
         if make_package and burdenfile and interventionsfile:
             package = hp.HealthPackage(project=self)
             package.make_package()
-            self.packagesets['default'] = package
+            self.packagesets['Default'] = package
 
         return None
 
