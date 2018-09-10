@@ -453,15 +453,19 @@ def create_project_from_prj_file(prj_filename, user_id):
 
 
 @RPC(call_type='upload')
-def upload_set(set_filename, project_id, which):
+def upload_set(set_filename, project_id, which, key=None):
     proj = load_project(project_id)
-    if   which == 'burdenset':  projsets = proj.burdensets
-    elif which == 'intervset':  projsets = proj.intersets
-    elif which == 'packageset': projsets = proj.packagesets
+    if   which == 'burdenset':  thisset = proj.burden(key)
+    elif which == 'intervset':  thisset = proj.interv(key)
+    elif which == 'packageset': thisset = proj.package(key)
     else:  raise Exception('Set %s not found' % which)
     
+    thisset.loaddata(set_filename)
+    
     proj.modified = sc.now()
+    print('Loaded data into 
     save_project(proj)
+    return None
     
 
 ###################################################################################
@@ -622,7 +626,7 @@ def get_project_interv_sets(project_id):
     proj = load_project(project_id)
     
     # Get a list of the Interventions objects.
-    interv_sets = [proj.intersets[ind] for ind in range(len(proj.intersets))] 
+    interv_sets = [proj.intervsets[ind] for ind in range(len(proj.intervsets))] 
     
     # Return the JSON-friendly result.
     return {'intervsets': map(get_interv_set_fe_repr, interv_sets)}
@@ -633,7 +637,7 @@ def get_project_interv_set_intervs(project_id, intervset_numindex=None):
     proj = load_project(project_id)
     
     # Get the intervention set that matches intervset_numindex.
-    intervset = proj.inter(key=intervset_numindex)
+    intervset = proj.interv(key=intervset_numindex)
     
     # Return an empty list if no data is present.
     if intervset.data is None:
@@ -652,7 +656,7 @@ def create_interv_set(project_id, new_interv_set_name):
         # Get a unique name (just in case the one provided collides with an 
         # existing one).
         unique_name = get_unique_name(new_interv_set_name, 
-            other_names=list(proj.intersets))
+            other_names=list(proj.intervsets))
         
         # Create a new (empty) intervention set.
         new_intervset = hp.Interventions(project=proj, name=unique_name)
@@ -664,7 +668,7 @@ def create_interv_set(project_id, new_interv_set_name):
         new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
         
         # Put the new intervention set in the dictionary.
-        proj.intersets[unique_name] = new_intervset
+        proj.intervsets[unique_name] = new_intervset
         
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
@@ -676,7 +680,7 @@ def create_interv_set(project_id, new_interv_set_name):
 def delete_interv_set(project_id, intervset_numindex):
 
     def update_project_fn(proj):
-        proj.intersets.pop(intervset_numindex)
+        proj.intervsets.pop(intervset_numindex)
         
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
@@ -687,17 +691,17 @@ def copy_interv_set(project_id, intervset_numindex):
     def update_project_fn(proj):
         # Get a unique name (just in case the one provided collides with an 
         # existing one).
-        unique_name = get_unique_name(proj.intersets[intervset_numindex].name, 
-            other_names=list(proj.intersets))
+        unique_name = get_unique_name(proj.intervsets[intervset_numindex].name, 
+            other_names=list(proj.intervsets))
         
         # Create a new intervention set which is a copy of the old one.
-        new_intervset = sc.dcp(proj.intersets[intervset_numindex])
+        new_intervset = sc.dcp(proj.intervsets[intervset_numindex])
         
         # Overwrite the old name with the new.
         new_intervset.name = unique_name
        
         # Put the new intervention set in the dictionary.
-        proj.intersets[unique_name] = new_intervset
+        proj.intervsets[unique_name] = new_intervset
         
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
@@ -710,7 +714,7 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
 
     def update_project_fn(proj):
         # Overwrite the old name with the new.
-        proj.intersets[intervset_numindex].name = new_interv_set_name
+        proj.intervsets[intervset_numindex].name = new_interv_set_name
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
@@ -721,7 +725,7 @@ def update_interv_set_interv(project_id, intervset_numindex,
 
     def update_project_fn(proj):
         # Set the data records for what gets passed in.
-        data_record = proj.intersets[intervset_numindex].data[interv_numindex]
+        data_record = proj.intervsets[intervset_numindex].data[interv_numindex]
         data_record[0] = data[0]
         data_record[1] = data[1]
         data_record[3] = data[2]

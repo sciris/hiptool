@@ -32,13 +32,13 @@ class HealthPackage(object):
         output += '============================================================\n'
         return output
     
-    def make_package(self, burdenset=None, interset=None):
+    def make_package(self, burdenset=None, intervset=None):
         ''' Make results '''
         burdenset = self.projectref().burden(key=burdenset)
-        interset  = self.projectref().inter(key=interset)
+        intervset  = self.projectref().interv(key=intervset)
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
-        origdata = sc.dcp(interset.data)
+        origdata = sc.dcp(intervset.data)
         critical_cols = ['cause', 'unitcost', 'spend', 'icer']
         for col in critical_cols:
             origdata.filter_out(key='', col=col, verbose=True)

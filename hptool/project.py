@@ -18,7 +18,7 @@ class Project(object):
 
     An HP project is based around 4 major lists:
         1. burdensets  -- an odict of burden data
-        2. intersets   -- an odict of intervention sets
+        2. intervsets   -- an odict of intervention sets
         3. packagesets -- an odict of health packages
 
 
@@ -42,7 +42,7 @@ class Project(object):
 
         ## Define the structure sets
         self.burdensets  = sc.odict()
-        self.intersets   = sc.odict()
+        self.intervsets   = sc.odict()
         self.packagesets = sc.odict()
 
         ## Define other quantities
@@ -65,7 +65,7 @@ class Project(object):
         if interventionsfile:
             interventions = hp.Interventions(project=self)
             interventions.loaddata(filename=interventionsfile)
-            self.intersets['Default'] = interventions
+            self.intervsets['Default'] = interventions
         
         ## Combine into health package, if available
         if make_package and burdenfile and interventionsfile:
@@ -83,7 +83,7 @@ class Project(object):
         output += '           Country: %s\n'    % self.country
         output += '\n'
         output += '       Burden sets: %i\n'    % len(self.burdensets)
-        output += ' Intervention sets: %i\n'    % len(self.intersets)
+        output += ' Intervention sets: %i\n'    % len(self.intervsets)
         output += '   Health packages: %i\n'    % len(self.packagesets)
         output += '\n'
         output += '        HP version: %s\n'    % self.version
@@ -122,14 +122,14 @@ class Project(object):
         try:    return self.burdensets[key]
         except: return sc.printv('Warning, burden set not found!', 1, verbose) # Returns None
     
-    def inter(self, key=None, verbose=2):
+    def interv(self, key=None, verbose=2):
         ''' Shortcut for getting the latest active interventions set, i.e. self.intersets[-1] '''
         if key is None: key = hp.default_key
-        try:    return self.intersets[key]
+        try:    return self.intervsets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
     
     def package(self, key=None, verbose=2):
-        ''' Shortcut for getting the latest active health packages set, i.e. self.intersets[-1] '''
+        ''' Shortcut for getting the latest active health packages set, i.e. self.intervsets[-1] '''
         if key is None: key = hp.default_key
         try:    return self.packagesets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
