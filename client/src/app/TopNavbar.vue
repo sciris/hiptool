@@ -10,6 +10,9 @@ Last update: 2018-07-27
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" :class="{toggled: $sidebar.showSidebar}" @click="toggleSidebar">
           <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar bar1"></span>
+          <span class="icon-bar bar2"></span>
+          <span class="icon-bar bar3"></span>
         </button>
         <a class="navbar-brand">{{routeName}}</a>
       </div>
