@@ -1,3 +1,7 @@
+$disabled-background: #444444;
+$disabled-border-color: #999;
+$disabled-color: #FFF;
+
 .btn {
   @extend .btn.__m;
   @extend .btn.__medium-blue;
@@ -228,6 +232,38 @@
     &.__active:hover {
       background: lighten(#bbbbbb, 5%);
       border-color: #bbbbbb;
+      color: #FFF;
+    }
+  }
+
+  &.__trans {
+    background: transparent;
+    border: transparent 1px solid;
+    color: #FFF;
+
+    &:disabled {
+      background: transparent;
+      border-color: transparent;
+      color: $disabled-color;
+    }
+
+    &:hover:not(:disabled) {
+      background: transparent;
+      border: #fff 1px solid;
+      color: #FFF;
+    }
+
+    &.__active,
+    &:active:not(:disabled) {
+      background: transparent;
+      border-color: transparent;
+      color: #FFF;
+    }
+
+    &.__active,
+    &.__active:hover {
+      background: transparent;
+      border-color: transparent;
       color: #FFF;
     }
   }

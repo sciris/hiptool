@@ -85,7 +85,7 @@ Last update: 2018-08-18
           .then(response => {
             if (response.data == 'success') {
               // Set a success result to show.
-              status.succeed(this, User info updated')
+              status.succeed(this, 'User info updated')
 
               // Read in the full current user information.
               userservice.getCurrentUserInfo()
