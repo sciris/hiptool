@@ -97,7 +97,7 @@ Last update: 2018-05-29
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
 			      </td>
-            <td><button class="btn __green" @click="viewBurdenSet(burdenSet)">Open</button></td>
+            <td><button class="btn __green" @click="viewBurdenSet(burdenSet, true)">Open</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
@@ -404,7 +404,7 @@ Last update: 2018-05-29
         )
       },
 
-      viewBurdenSet(burdenSet) {
+      viewBurdenSet(burdenSet, verbose) {
         console.log('viewBurdenSet() called for ' + burdenSet.burdenset.name)
 
         // Set the active project to the burdenSet passed in.
@@ -434,8 +434,9 @@ Last update: 2018-05-29
           // Plot graphs
           this.makeGraph(burdenSet)
         })
-
-        status.succeed(this, 'Burden set "' + burdenSet.burdenset.name + '" now active')
+        if (verbose) {
+          status.succeed(this, 'Burden set "' + burdenSet.burdenset.name + '" now active')
+        }
       },
 
       makeGraph(burdenSet) {
