@@ -217,9 +217,10 @@ def get_version_info():
 	return version_info
 
 
-##
-## Project RPCs
-##
+
+###################################################################################
+###  Project RPCs
+################################################################################### 
     
 @RPC()
 def get_scirisdemo_projects():
@@ -460,9 +461,11 @@ def create_project_from_prj_file(prj_filename, user_id):
     # Return the new project UID in the return message.
     return { 'projectId': str(proj.uid) }
 
-##
-## Burden set RPCs
-##  
+
+
+###################################################################################
+###  Burden set RPCs
+################################################################################### 
     
 @RPC()     
 def get_project_burden_sets(project_id):
@@ -607,9 +610,11 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
             'graph2': graphs[1],
             'graph3': graphs[2],}
     
-##
-## Intervention set RPCs
-## 
+    
+
+###################################################################################
+### Intervention set RPCs
+###################################################################################
 
 @RPC()    
 def get_project_interv_sets(project_id):
@@ -729,9 +734,10 @@ def update_interv_set_interv(project_id, intervset_numindex,
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
-##
-## Package set RPCs
-##   
+
+###################################################################################
+###  Package set RPCs
+################################################################################### 
 
 @RPC()    
 def get_project_package_sets(project_id):
