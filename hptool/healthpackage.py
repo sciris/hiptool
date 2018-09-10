@@ -33,7 +33,7 @@ class HealthPackage(object):
         output += '============================================================\n'
         return output
     
-    def make_package(self, burdenset=None, intervset=None):
+    def make_package(self, burdenset=None, intervset=None, verbose=True):
         ''' Make results '''
         burdenset = self.projectref().burden(key=burdenset)
         intervset  = self.projectref().interv(key=intervset)
@@ -76,6 +76,8 @@ class HealthPackage(object):
         df['frac_averted'] = df['dalys_averted']/(self.eps+df['total_dalys']) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
         self.data = df # Store it
+        if verbose:
+            print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, burdenset.name, intervset.name))
         return None
 
     def loaddata(self, filename=None, folder=None):

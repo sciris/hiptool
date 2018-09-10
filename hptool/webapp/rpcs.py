@@ -825,6 +825,19 @@ def update_interv_set_interv(project_id, intervset_numindex, interv_numindex, da
     save_project(proj)
     return None
 
+@RPC()    
+def add_interv(project_id, intervset_numindex):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervset_numindex].data
+    placeholder = ['<Intervention Number>', '<Name>', '<Full name>', '<Platform>', '<Cause>', '<ICER>', '<Unit cost>', '<Spend>', '<FRP>', '<Equity>', '<HPP>', '<Implemented>', '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
+    print('TEMP')
+    print(data.cols)
+    data[data.nrows()] = placeholder
+    print('New intervention set record:')
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
 
 ###################################################################################
 ###  Package set RPCs

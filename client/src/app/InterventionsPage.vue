@@ -92,7 +92,7 @@ Last update: 2018-05-29
             {{ intervSet.intervset.name }}
           </td>
           <td>
-            <button class="btn __green" @click="viewSet(intervSet)">Open</button>
+            <button class="btn __green" @click="viewSet(intervSet, true)">Open</button>
           </td>
           <td>{{ intervSet.intervset.creationTime }}</td>
           <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
@@ -224,13 +224,13 @@ Last update: 2018-05-29
                    v-model="interv.equity"/>
           </td>
           <td style="white-space: nowrap">
-            <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
-            <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
+            <button class="iconbtn" @click="copyInterv(interv)" data-tooltip="Copy intervention"><i class="ti-layers"></i></button>
+            <button class="iconbtn" @click="deleteInterv(interv)" data-tooltip="Delete intervention"><i class="ti-trash"></i></button>
           </td>
         </tr>
         </tbody>
       </table>
-      <button class="btn" @click="notImplemented('Add new intervention')">Add new intervention</button>
+      <button class="btn" @click="addInterv">Add new intervention</button>
     </div>
   </div>
 </template>
@@ -411,9 +411,9 @@ Last update: 2018-05-29
         return intervs.sort((interv1, interv2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]) > String(interv2[1]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]) > String(interv2[3]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'type')     { return (String(interv1[4]) > String(interv2[4]) ? sortDir: -sortDir) }
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]).toLowerCase() > String(interv2[1]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'type')     { return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
@@ -423,7 +423,7 @@ Last update: 2018-05-29
         )
       },
 
-      viewSet(intervSet) {
+      viewSet(intervSet, verbose) {
         console.log('viewSet() called for ' + intervSet.intervset.name)
 
         // Set the active intervention set to the matched intervention set.
@@ -450,8 +450,9 @@ Last update: 2018-05-29
               this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
-
-        status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
+        if (verbose) {
+          status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
+        }
       },
 
       copySet(intervSet) {
@@ -567,14 +568,36 @@ Last update: 2018-05-29
               interv.equity.replace(/,/g, '')]])
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention set updated')
           })
       },
 
-      intervAllCategoryClick() {
-        this.showCancerIntervs = false
-        this.showInfectiousIntervs = false
-        this.showChildIntervs = false
-      }
+      addInterv() {
+        console.log('Adding item')
+        rpcs.rpc('add_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention added')
+          })
+      },
+
+      copyInterv(interv) {
+        console.log('Item to copy:', interv.numindex)
+        rpcs.rpc('copy_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention copied')
+          })
+      },
+
+      deleteInterv(interv) {
+        console.log('Item to delete:', interv.numindex)
+        rpcs.rpc('delete_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention deleted')
+          })
+      },
     }
   }
 </script>
