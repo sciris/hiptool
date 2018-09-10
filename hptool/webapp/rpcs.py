@@ -118,6 +118,7 @@ def save_project(proj):
     
     # Copy the project, only save what we want...
     new_project = sc.dcp(proj)
+    new_project.modified = sc.now()
          
     # Create the new project entry and enter it into the ProjectCollection.
     # Note: We don't need to pass in project.uid as a 3rd argument because 
@@ -136,9 +137,6 @@ def update_project_with_fn(project_id, update_project_fn):
     
     # Execute the passed-in function that modifies the project.
     update_project_fn(proj)
-    
-    # Set the updating time to now.
-    proj.modified = sc.now()
     
     # Save the changed project.
     save_project(proj) 
@@ -340,7 +338,7 @@ def load_zip_of_prj_files(project_ids):
     prjs = [load_project_record(id).save_as_file(dirname) for id in project_ids]
     
     # Make the zip file name and the full server file path version of the same..
-    zip_fname = '%s.zip' % str(sc.uuid())
+    zip_fname = 'Projects.zip'
     server_zip_fname = os.path.join(dirname, sc.sanitizefilename(zip_fname))
     
     # Create the zip file, putting all of the .prj files in a projects 
@@ -454,6 +452,17 @@ def create_project_from_prj_file(prj_filename, user_id):
     return { 'projectId': str(proj.uid) }
 
 
+@RPC(call_type='upload')
+def upload_set(set_filename, project_id, which):
+    proj = load_project(project_id)
+    if   which == 'burdenset':  projsets = proj.burdensets
+    elif which == 'intervset':  projsets = proj.intersets
+    elif which == 'packageset': projsets = proj.packagesets
+    else:  raise Exception('Set %s not found' % which)
+    
+    proj.modified = sc.now()
+    save_project(proj)
+    
 
 ###################################################################################
 ###  Burden set RPCs
@@ -483,7 +492,7 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
         return { 'diseases': [] }
 
     # Gather the list for all of the diseases.
-    disease_data = burdenset.export(cols=['active','cause','dalys','deaths','prevalence'], header=False)
+    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False)
     
     # Return success.
     return { 'diseases': disease_data }
@@ -755,7 +764,7 @@ def get_project_package_set_results(project_id, packageset_numindex):
         return { 'results': [] }
 
     # Gather the list for all of the diseases.
-    result_data = packageset.export(cols=['active','shortname','cause','coverage','dalys_averted'], header=False)
+    result_data = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted'], header=False)
     
     # Return success.
     return { 'results': result_data }

@@ -19,7 +19,8 @@ class HealthPackage(object):
         self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
-        self.results    = None
+        self.results    = None # The data
+        return None
     
     def __repr__(self):
         ''' Print out useful information when called'''
@@ -75,7 +76,13 @@ class HealthPackage(object):
 
         self.results = df # Store it
         return None
-    
+
+    def loaddata(self, filename=None, folder=None):
+        ''' Load data from a spreadsheet '''
+        self.results = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.filename = filename
+        return None
+        
     def export(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
         output = self.results.jsonify(cols=cols, rows=rows, header=header)
