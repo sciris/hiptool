@@ -35,6 +35,7 @@ Last update: 2018-09-09
 
 <script>
 import userService from '@/services/user-service'
+import Vue from 'vue'; // This needs to appear somewhere but only once
 
 export default {
   computed: {
