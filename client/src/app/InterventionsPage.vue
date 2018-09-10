@@ -164,8 +164,9 @@ Last update: 2018-05-29
             <span v-show="sortColumn2 == 'equity' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'equity'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th>Equity</th>
-          <th>Actions</th>
+          <th>
+            Actions
+          </th>
         </tr>
         </thead>
         <tbody>
@@ -356,8 +357,9 @@ Last update: 2018-05-29
 
               // If we want to set the last entry active and we have any
               // entries, do the setting.
-              if ((setLastEntryActive) && (this.interventionSets.length > 0))
+              if (this.interventionSets.length > 0) {
                 this.viewSet(this.interventionSets[this.interventionSets.length - 1])
+              }
             })
         }
       },
