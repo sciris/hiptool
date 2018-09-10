@@ -9,7 +9,7 @@ Last update: 2018-05-29
 
     <div v-if="activeProjectName === ''">
       <div style="font-style:italic">
-        <p>Hmm, I can't find any disease burdens...did you forget to <router-link to="/projects">load a project</router-link>?</p>
+        <p>Hmm, I can't find any disease burdens...did you forget to load a project?</p>
       </div>
     </div>
 
@@ -333,7 +333,7 @@ Last update: 2018-05-29
         });
       },
 
-      updateBurdenSets(setLastEntryActive=false) {
+      updateBurdenSets(setLastEntryActive) {
         console.log('updateBurdenSets() called')
 
         // If there is no active project, clear the burdenSets list.

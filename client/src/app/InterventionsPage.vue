@@ -281,7 +281,7 @@ export default {
       });
     },
 
-    updateIntervSets(setLastEntryActive=false) {
+    updateIntervSets(setLastEntryActive) {
       console.log('updateIntervSets() called')
 
       // If there is no active project, clear the interventionSets list.

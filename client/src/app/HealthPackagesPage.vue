@@ -293,7 +293,7 @@ Last update: 2018-05-29
         });
       },
 
-      updatePackageSets(setLastEntryActive=false) {
+      updatePackageSets(setLastEntryActive) {
         console.log('updatePackageSets() called')
 
         // If there is no active project, clear the packageSets list.
