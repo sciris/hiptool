@@ -111,6 +111,8 @@ Last update: 2018-05-29
           </tr>
         </tbody>
       </table>
+      <button class="btn" @click="showPlots">Show plots</button>
+      <button class="btn" @click="hidePlots">Hide plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -243,17 +245,17 @@ Last update: 2018-05-29
 
     data() {
       return {
-        // Placeholder text for table filter box
-        filterPlaceholder: 'Type here to filter burden sets',
 
-        // Text in the table filter box
-        filterText: '',
+        filterPlaceholder: 'Type here to filter burden sets', // Placeholder text for table filter box
 
-        // Column of table used for sorting the burden sets
-        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
 
-        // Sort in reverse order?
-        sortReverse: false,
+        filterText: '', // Text in the table filter box
+
+
+        sortColumn: 'updatedTime',  // Column of table used for sorting the burden sets // name, creationTime, updatedTime
+
+
+        sortReverse: false, // Sort in reverse order?
 
         root: 'test-hot',
         hotSettings: {
@@ -396,7 +398,6 @@ Last update: 2018-05-29
       },
 
       applyNameFilter(sets) {
-        console.log('CK TEST1')
         console.log(sets)
         return sets.filter(theSet => theSet.burdenset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
@@ -487,6 +488,23 @@ Last update: 2018-05-29
           // Update the burden sets so the new set shows up on the list.
           this.updateBurdenSets()
         })
+      },
+
+      uploadBurdenSet(burdenSet) {
+        console.log('uploadBurdenSet() called for ' + burdenSet.burdenset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updateBurdenSets()
+            status.succeed(this, 'Burden set uploaded')
+          })
+      },
+
+      downloadBurdenSet(burdenSet) {
+        console.log('downloadBurdenSet() called for ' + burdenSet.burdenset.name)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex])
+          .then(response => {
+            this.updateBurdenSets()
+          })
       },
 
       renameBurdenSet(burdenSet) {
@@ -591,17 +609,10 @@ Last update: 2018-05-29
         // Go to the server to update the disease from the burden set.
         // Note: filter out commas in the numeric fields.
         rpcs.rpc('update_burden_set_disease',
-          [this.$store.state.activeProject.project.id,
-          this.activeBurdenSet.burdenset.numindex,
-          disease.numindex,
-          [filterActive, disease.cause,
-          disease.dalys.replace(/,/g, ''),
-          disease.deaths.replace(/,/g, ''),
-          disease.prevalence.replace(/,/g, '')]])
+          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
+          [disease.active, disease.cause, disease.dalys, disease.deaths, disease.prevalence]])
         .then(response => {
-          // Update the display of the disease list by rerunning the active
-          // burden set.
-          this.viewBurdenSet(this.activeBurdenSet)
+          status.succeed(this, 'Burden set updated')
         })
       }
 
