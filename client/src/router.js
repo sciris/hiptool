@@ -59,16 +59,16 @@ export default new Router({
           name: 'Define interventions',
           component: InterventionsPage
         },
-        {
-          path: 'equity',
-          name: 'Define equity',
-          component: EquityPage
-        },
-        {
-          path: 'financialrisk',
-          name: 'Define financial risk protection',
-          component: FinancialRiskPage
-        },
+        // {
+        //   path: 'equity',
+        //   name: 'Define equity',
+        //   component: EquityPage
+        // },
+        // {
+        //   path: 'financialrisk',
+        //   name: 'Define financial risk protection',
+        //   component: FinancialRiskPage
+        // },
         {
           path: 'healthpackages',
           name: 'Define health packages',

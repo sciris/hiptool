@@ -18,16 +18,16 @@ const SidebarStore = {
       icon: 'ti-pulse',
       path: '/interventions'
     },
-    {
-      name: 'Equity',
-      icon: 'ti-ruler',
-      path: '/equity'
-    },
-    {
-      name: 'Financial risk',
-      icon: 'ti-bolt',
-      path: '/financialrisk'
-    },
+    // {
+    //   name: 'Equity',
+    //   icon: 'ti-ruler',
+    //   path: '/equity'
+    // },
+    // {
+    //   name: 'Financial risk',
+    //   icon: 'ti-bolt',
+    //   path: '/financialrisk'
+    // },
     {
       name: 'Health packages',
       icon: 'ti-heart',
