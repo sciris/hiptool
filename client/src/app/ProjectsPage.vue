@@ -152,6 +152,7 @@ Last update: 2018-07-27
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
+  import status from '@/services/status-service'
   import rpcs from '@/services/rpc-service'
   import router from '@/router'
   import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
@@ -325,13 +326,7 @@ Last update: 2018-07-27
           })
           .catch(error => {
             // Failure popup.
-            this.$notifications.notify({
-              message: 'Could not load projects',
-              icon: 'ti-face-sad',
-              type: 'warning',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.fail(this, 'Could not load projects')
           })
       },
 
@@ -378,13 +373,7 @@ Last update: 2018-07-27
             this.$Progress.finish()
 
             // Success popup.
-            this.$notifications.notify({
-              message: 'New project created',
-              icon: 'ti-check',
-              type: 'success',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.succeed(this, 'New project created')
           })
           .catch(error => {
             // Dispel the spinner.
@@ -394,13 +383,7 @@ Last update: 2018-07-27
             this.$Progress.fail()
 
             // Failure popup.
-            this.$notifications.notify({
-              message: 'Could not add new project',
-              icon: 'ti-face-sad',
-              type: 'warning',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.fail(this, 'Could not add new project')
           })
       },
 
@@ -427,13 +410,7 @@ Last update: 2018-07-27
             this.$Progress.finish()
 
             // Success popup.
-            this.$notifications.notify({
-              message: 'New project uploaded',
-              icon: 'ti-check',
-              type: 'success',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.succeed(this, 'New project uploaded')
           })
           .catch(error => {
             // Dispel the spinner.
@@ -443,13 +420,7 @@ Last update: 2018-07-27
             this.$Progress.fail()
 
             // Failure popup.
-            this.$notifications.notify({
-              message: 'Could not upload file',
-              icon: 'ti-face-sad',
-              type: 'warning',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.fail(this, 'Could not upload file', error)
           })
       },
 
@@ -540,13 +511,7 @@ Last update: 2018-07-27
         this.$store.commit('newActiveProject', matchProject)
 
         // Success popup.
-        this.$notifications.notify({
-          message: 'Project "'+matchProject.project.name+'" loaded',
-          icon: 'ti-check',
-          type: 'success',
-          verticalAlign: 'top',
-          horizontalAlign: 'center',
-        });
+        status.succeed(this, 'Project "'+matchProject.project.name+'" loaded')
       },
 
       copyProject(uid) {
@@ -574,13 +539,7 @@ Last update: 2018-07-27
             this.$Progress.finish()
 
             // Success popup.
-            this.$notifications.notify({
-              message: 'Project "'+matchProject.project.name+'" copied',
-              icon: 'ti-check',
-              type: 'success',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.succeed(this, 'Project "'+matchProject.project.name+'" copied')
           })
           .catch(error => {
             // Dispel the spinner.
@@ -590,13 +549,7 @@ Last update: 2018-07-27
             this.$Progress.fail()
 
             // Failure popup.
-            this.$notifications.notify({
-              message: 'Could not copy project',
-              icon: 'ti-face-sad',
-              type: 'warning',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.fail(this, 'Could not copy project', error)
           })
       },
 
@@ -647,13 +600,7 @@ Last update: 2018-07-27
               this.$Progress.fail()
 
               // Failure popup.
-              this.$notifications.notify({
-                message: 'Could not rename project',
-                icon: 'ti-face-sad',
-                type: 'warning',
-                verticalAlign: 'top',
-                horizontalAlign: 'center',
-              })
+              status.fail(this, 'Could not rename project', error)
             })
         }
 
@@ -695,13 +642,7 @@ Last update: 2018-07-27
             this.$Progress.fail()
 
             // Failure popup.
-            this.$notifications.notify({
-              message: 'Could not download project',
-              icon: 'ti-face-sad',
-              type: 'warning',
-              verticalAlign: 'top',
-              horizontalAlign: 'center',
-            })
+            status.fail(this, 'Could not download project', error)
           })
       },
 
@@ -775,13 +716,7 @@ Last update: 2018-07-27
               this.$Progress.fail()
 
               // Failure popup.
-              this.$notifications.notify({
-                message: 'Could not delete project/s',
-                icon: 'ti-face-sad',
-                type: 'warning',
-                verticalAlign: 'top',
-                horizontalAlign: 'center',
-              })
+              status.fail(this, 'Could not delete project/s', error)
             })
         }
       },
@@ -817,13 +752,7 @@ Last update: 2018-07-27
               this.$Progress.fail()
 
               // Failure popup.
-              this.$notifications.notify({
-                message: 'Could not download project/s',
-                icon: 'ti-face-sad',
-                type: 'warning',
-                verticalAlign: 'top',
-                horizontalAlign: 'center',
-              })
+              status.fail(this, 'Could not download project/s', error)
             })
         }
       }

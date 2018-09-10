@@ -231,6 +231,7 @@ Last update: 2018-05-29
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
+  import status from '@/services/status-service'
   import rpcs from '@/services/rpc-service'
   import router from '@/router'
   import Vue from 'vue';
@@ -324,13 +325,7 @@ Last update: 2018-05-29
     methods: {
 
       notImplemented(message) {
-        this.$notifications.notify({
-          message: 'Function "' + message + '" not yet implemented',
-          icon: 'ti-face-sad',
-          type: 'warning',
-          verticalAlign: 'top',
-          horizontalAlign: 'center',
-        });
+        status.fail(this, message)
       },
 
       updateBurdenSets(setLastEntryActive) {
@@ -452,13 +447,7 @@ Last update: 2018-05-29
           this.makeGraph(burdenSet)
         })
 
-        this.$notifications.notify({
-          message: 'Burden set "' + burdenSet.burdenset.name + '" now active',
-          icon: 'ti-check',
-          type: 'success',
-          verticalAlign: 'top',
-          horizontalAlign: 'center',
-        });
+        status.succeed(this, 'Burden set "' + burdenSet.burdenset.name + '" now active')
       },
 
       makeGraph(burdenSet) {

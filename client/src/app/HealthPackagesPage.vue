@@ -192,6 +192,7 @@ Last update: 2018-05-29
   import axios from 'axios'
   var filesaver = require('file-saver')
   import rpcs from '@/services/rpc-service'
+  import status from '@/services/status-service'
   import router from '@/router'
   import Vue from 'vue';
 
@@ -284,13 +285,7 @@ Last update: 2018-05-29
     methods: {
 
       notImplemented(message) {
-        this.$notifications.notify({
-          message: 'Function "' + message + '" not yet implemented',
-          icon: 'ti-face-sad',
-          type: 'warning',
-          verticalAlign: 'top',
-          horizontalAlign: 'center',
-        });
+        status.fail(this, 'Function "' + message + '" not yet implemented')
       },
 
       updatePackageSets(setLastEntryActive) {
@@ -412,13 +407,7 @@ Last update: 2018-05-29
             this.makeGraph(packageSet)
           })
 
-        this.$notifications.notify({
-          message: 'Health package "' + packageSet.packageset.name + '" now active',
-          icon: 'ti-check',
-          type: 'success',
-          verticalAlign: 'top',
-          horizontalAlign: 'center',
-        });
+        status.succeed(this, 'Health package "' + packageSet.packageset.name + '" now active')
       },
 
       makeGraph(packageSet) {
