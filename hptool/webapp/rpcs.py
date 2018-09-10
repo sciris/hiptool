@@ -143,7 +143,7 @@ def update_project_with_fn(project_id, update_project_fn):
     # Save the changed project.
     save_project(proj) 
     
-def save_project_as_new(proj, user_id):
+def save_project_as_new(proj, user_id, uid=None):
     """
     Given a Project object and a user UID, wrap the Project in a new prj.ProjectSO 
     object and put this in the project collection, after getting a fresh UID
@@ -151,7 +151,7 @@ def save_project_as_new(proj, user_id):
     """ 
     
     # Set a new project UID, so we aren't replicating the UID passed in.
-    proj.uid = sc.uuid()
+    proj.uid = sc.uuid(uid)
     
     # Create the new project entry and enter it into the ProjectCollection.
     projSO = prj.ProjectSO(proj, user_id)
@@ -361,19 +361,11 @@ def create_new_project(user_id):
     Create a new HealthPrior project.
     """
     
-    # Load the data path holding the Excel files.
-    data_path = hp.HPpath('data')
-    
     # Get a unique name for the project to be added.
     new_proj_name = get_unique_name('New project', other_names=None)
     
-    # Create the project, loading in the desired spreadsheets.
-    proj = hp.Project(name=new_proj_name, 
-        burdenfile=data_path + 'ihme-gbd.xlsx', 
-        interventionsfile=data_path + 'dcp-data-afg-v1.xlsx')  
-    
-    # Set the burden population size.
-    proj.burden().popsize = 36373.176 # From UN population division 
+    # Create the project, loading in the desired spreadsheets.  
+    proj = hp.demo(name=new_proj_name)
     
     # Display the call information.
     print(">> create_new_project %s" % (proj.name))    

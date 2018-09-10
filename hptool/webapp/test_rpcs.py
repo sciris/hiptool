@@ -2,37 +2,30 @@
 ### Housekeeping
 ###########################################################################
 
-import pylab as pl
 import sciris as sc
-import atomica.ui as au
-from atomica_apps import rpcs, main
-pl.switch_backend('Qt4Agg')
+import hptool as hp
+from hptool.webapp import rpcs, main
 
 torun = [
-'project_io',
+#'project_io',
 'intervset_io',
 ]
 
 
 # Set parameters
-tool = ['tb','cascade'][1] # Change this to change between TB and Cascade
-default_which = {'tb':'tb', 'cascade':'hypertension'}[tool]
 user_id  = '12345678123456781234567812345678' # This is the hard-coded UID of the "demo" user
 proj_id  = sc.uuid(as_string=True) # These can all be the same
-cache_id = sc.uuid(as_string=True) # These can all be the same
 
 
 ###########################################################################
 ### Definitions
 ###########################################################################
 
-def demoproj(which=None, online=True):
-    if which is None: which = default_which
-    P = au.demo(which=which)
-    P.name = 'RPCs test %s' % proj_id[:6]
+def demoproj(online=True):
+    name = 'RPCs test %s' % proj_id[:6]
+    P = hp.demo(name=name)
     if online:
         rpcs.save_project_as_new(P, user_id=user_id, uid=proj_id)
-        rpcs.make_results_cache_entry(cache_id)
     return P
 
 def heading(string, style=None):
@@ -48,11 +41,11 @@ def heading(string, style=None):
 ### Run the tests
 ###########################################################################
 
-string = 'Starting tests for:\n  tool = %s\n  which = %s\n  user = %s\n  proj = %s' % (tool, default_which, user_id, proj_id)
+string = 'Starting tests for:\n  user = %s\n  proj = %s' % (user_id, proj_id)
 heading(string, 'big')
 T = sc.tic()
-app = main.make_app(which=tool)
-proj = demoproj(which=default_which, online=True)
+app = main.make_app()
+proj = demoproj()
 
 
 if 'project_io' in torun:
@@ -62,10 +55,8 @@ if 'project_io' in torun:
     print(P)
 
 
-get_project_interv_set_intervs
 
 if 'intervset_io' in torun:
     heading('Running intervset_io', 'big')
-    uid = rpcs.save_project_as_new(proj, user_id=user_id)
-    output = rpcs.load_project_record(uid)
+    output = rpcs.get_project_interv_set_intervs(proj_id)
     sc.pp(output)

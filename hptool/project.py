@@ -135,3 +135,11 @@ class Project(object):
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
         
 
+def demo(name=None):
+    if name is None: name = 'Default'
+    datadir = hp.HPpath('data')
+    burdenpath = datadir + 'ihme-gbd.xlsx'
+    datapath = datadir + 'dcp-data-afg-v1.xlsx'
+    project = Project(name=name, burdenfile=burdenpath, interventionsfile=datapath)  
+    project.burden().popsize = 34.66e6 # From UN population division 
+    return project
