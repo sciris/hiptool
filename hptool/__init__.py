@@ -80,7 +80,7 @@ default_key = -1 # Define what the default key is -- WARNING, move
 from .burden import Burden
 from .interventions import Interventions
 from .healthpackage import HealthPackage
-from .project import Project
+from .project import Project, demo
 
 # Import webapp
 import webapp

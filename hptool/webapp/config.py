@@ -48,3 +48,6 @@ SERVER_PORT = 8091
 
 # Matplotlib backend
 MATPLOTLIB_BACKEND = 'Agg'
+
+# Slack logging configuration
+SLACK = None # {'to':'webapp-logs', 'from':'hptool-bot', 'token':'~/.slackurl'}

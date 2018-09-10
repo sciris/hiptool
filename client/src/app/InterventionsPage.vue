@@ -72,15 +72,9 @@ Last update: 2018-05-29
           </th>
           <th @click="updateSorting('updatedTime')" class="sortable">
             Last modified
-            <span v-show="sortColumn == 'updatedTime' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn == 'updatedTime' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn != 'updatedTime'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
+            <span v-show="sortColumn == 'updatedTime' && !sortReverse"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn == 'updatedTime' && sortReverse"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn != 'updatedTime'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th>Actions</th>
         </tr>
@@ -98,7 +92,7 @@ Last update: 2018-05-29
             {{ intervSet.intervset.name }}
           </td>
           <td>
-            <button class="btn __green" @click="viewSet(intervSet)">Open</button>
+            <button class="btn __green" @click="viewSet(intervSet, true)">Open</button>
           </td>
           <td>{{ intervSet.intervset.creationTime }}</td>
           <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
@@ -106,6 +100,8 @@ Last update: 2018-05-29
           <td style="white-space: nowrap">
             <button class="btn" @click="copySet(intervSet)">Copy</button>
             <button class="btn" @click="renameSet(intervSet)">Rename</button>
+            <button class="btn" @click="uploadIntervSet(intervSet)">Upload</button>
+            <button class="btn" @click="downloadIntervSet(intervSet)">Download</button>
             <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
           </td>
         </tr>
@@ -120,18 +116,61 @@ Last update: 2018-05-29
         <thead>
         <tr>
           <th>Active</th>
-          <th style="min-width:30%">Intervention&nbsp;name</th>
-          <th style="min-width:20%">Delivery&nbsp;platform</th>
-          <th>Type</th>
-          <th>ICER</th>
-          <th>Unit&nbsp;cost</th>
-          <th>Equity</th>
-          <th>FRP</th>
-          <th>Actions</th>
+          <th @click="updateSorting2('name')" class="sortable" style="min-width:30%">
+            Intervention&nbsp;name
+            <span v-show="sortColumn2 == 'name' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('platform')" class="sortable" style="min-width:30%">
+            Delivery&nbsp;platform
+            <span v-show="sortColumn2 == 'platform' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'platform' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'platform'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('type')" class="sortable" style="min-width:30%">
+            Cause&nbsp;of&nbsp;burden
+            <span v-show="sortColumn2 == 'type' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'type' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'type'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('icer')" class="sortable" style="min-width:30%">
+            ICER
+            <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('unitcost')" class="sortable" style="min-width:30%">
+            Unit&nbsp;cost
+            <span v-show="sortColumn2 == 'unitcost' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'unitcost' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'unitcost'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('spend')" class="sortable" style="min-width:30%">
+            Spending
+            <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('frp')" class="sortable" style="min-width:30%">
+            FRP
+            <span v-show="sortColumn2 == 'frp' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'frp' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'frp'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('equity')" class="sortable" style="min-width:30%">
+            Equity
+            <span v-show="sortColumn2 == 'equity' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'equity' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'equity'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th>
+            Actions
+          </th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="interv in interventionList">
+        <tr v-for="interv in sortedIntervList">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="interv.active"/>
@@ -170,7 +209,7 @@ Last update: 2018-05-29
             <input type="text"
                    class="txbox"
                    @keyup.enter="updateInterv(interv)"
-                   v-model="interv.equity"/>
+                   v-model="interv.spend"/>
           </td>
           <td>
             <input type="text"
@@ -178,14 +217,20 @@ Last update: 2018-05-29
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.frp"/>
           </td>
+          <td>
+            <input type="text"
+                   class="txbox"
+                   @keyup.enter="updateInterv(interv)"
+                   v-model="interv.equity"/>
+          </td>
           <td style="white-space: nowrap">
-            <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
-            <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
+            <button class="iconbtn" @click="copyInterv(interv)" data-tooltip="Copy intervention"><i class="ti-layers"></i></button>
+            <button class="iconbtn" @click="deleteInterv(interv)" data-tooltip="Delete intervention"><i class="ti-trash"></i></button>
           </td>
         </tr>
         </tbody>
       </table>
-      <button class="btn" @click="notImplemented('Add new intervention')">Add new intervention</button>
+      <button class="btn" @click="addInterv">Add new intervention</button>
     </div>
   </div>
 </template>
@@ -206,12 +251,10 @@ Last update: 2018-05-29
         filterText: '', // Text in the table filter box
         sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
+        sortColumn2: 'name',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
+        sortReverse2: false, // Sort in reverse order?
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
-        showAllIntervs: true, // Show all of the intervention categories
-        showCancerIntervs: false, // Show cancer interventions
-        showInfectiousIntervs: false, // Show infectious diseases interventions
-        showChildIntervs: false, // Show child care interventions
         interventionList: [],
 
         // CK: WARNING TEMP, should come from backend
@@ -236,29 +279,16 @@ Last update: 2018-05-29
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
 
-      filteredInterventions() {
-        if (this.showAllIntervs) {
-          return this.interventionList
-        } else {
-          return this.interventionList.filter(interv =>
-            {
-              if (interv.intervCategory === 'cancer')
-                return this.showCancerIntervs
-              else if (interv.intervCategory === 'infectious')
-                return this.showInfectiousIntervs
-              else if (interv.intervCategory === 'childcare')
-                return this.showChildIntervs
-              else
-                return false
-            }
-          )
-        }
-      }
+      sortedIntervList() {
+        var sortedList =  this.applySorting2(this.interventionList);
+        return sortedList
+      },
+
     },
 
     created() {
       // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) {
         router.push('/login')
       }
 
@@ -305,8 +335,9 @@ Last update: 2018-05-29
 
               // If we want to set the last entry active and we have any
               // entries, do the setting.
-              if ((setLastEntryActive) && (this.interventionSets.length > 0))
+              if (this.interventionSets.length > 0) {
                 this.viewSet(this.interventionSets[this.interventionSets.length - 1])
+              }
             })
         }
       },
@@ -342,7 +373,6 @@ Last update: 2018-05-29
       },
 
       applyNameFilter(sets) {
-        console.log('CK TEST1b')
         console.log(sets)
         return sets.filter(theSet => theSet.intervset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
@@ -351,20 +381,49 @@ Last update: 2018-05-29
         return sets.sort((set1, set2) =>
           {
             let sortDir = this.sortReverse ? -1: 1
-            if (this.sortColumn === 'name') {
-              return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn === 'creationTime') {
-              return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir
-            }
-            else if (this.sortColumn === 'updatedTime') {
-              return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir
-            }
+            if      (this.sortColumn === 'name')         {return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'creationTime') {return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir}
+            else if (this.sortColumn === 'updatedTime')  {return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir}
           }
         )
       },
 
-      viewSet(intervSet) {
+
+      updateSorting2(sortColumn) {
+        console.log('updateSorting2() called')
+
+        // If the active sorting column is clicked...
+        if (this.sortColumn2 === sortColumn) {
+          // Reverse the sort.
+          this.sortReverse2 = !this.sortReverse2
+        }
+        // Otherwise.
+        else {
+          // Select the new column for sorting.
+          this.sortColumn2 = sortColumn
+
+          // Set the sorting for non-reverse.
+          this.sortReverse2 = false
+        }
+      },
+
+      applySorting2(intervs) {
+        return intervs.sort((interv1, interv2) =>
+          {
+            let sortDir = this.sortReverse2 ? -1: 1
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]).toLowerCase() > String(interv2[1]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'type')     { return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
+          }
+        )
+      },
+
+      viewSet(intervSet, verbose) {
         console.log('viewSet() called for ' + intervSet.intervset.name)
 
         // Set the active intervention set to the matched intervention set.
@@ -386,12 +445,14 @@ Last update: 2018-05-29
               this.interventionList[ind].type = this.interventionList[ind][4]
               this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
               this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].equity = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].frp = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].spend = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].frp = Number(this.interventionList[ind][8]).toLocaleString()
+              this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
-
-        status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
+        if (verbose) {
+          status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
+        }
       },
 
       copySet(intervSet) {
@@ -403,6 +464,23 @@ Last update: 2018-05-29
           .then(response => {
             // Update the intervention sets so the new set shows up on the list.
             this.updateIntervSets()
+          })
+      },
+
+      uploadIntervSet(intervSet) {
+        console.log('uploadIntervSet() called for ' + intervSet.intervset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updateIntervSets()
+            status.succeed(this, 'Intervention set uploaded')
+          })
+      },
+
+      downloadIntervSet(intervSet) {
+        console.log('downloadIntervSet() called for ' + intervSet.intervset.name)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex])
+          .then(response => {
+            console.log('Downloaded')
           })
       },
 
@@ -489,17 +567,37 @@ Last update: 2018-05-29
               interv.frp.replace(/,/g, ''),
               interv.equity.replace(/,/g, '')]])
           .then(response => {
-            // Update the display of the intervention list by rerunning the active
-            // intervention set.
-            this.viewSet(this.activeIntervSet)
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention set updated')
           })
       },
 
-      intervAllCategoryClick() {
-        this.showCancerIntervs = false
-        this.showInfectiousIntervs = false
-        this.showChildIntervs = false
-      }
+      addInterv() {
+        console.log('Adding item')
+        rpcs.rpc('add_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention added')
+          })
+      },
+
+      copyInterv(interv) {
+        console.log('Item to copy:', interv.numindex)
+        rpcs.rpc('copy_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention copied')
+          })
+      },
+
+      deleteInterv(interv) {
+        console.log('Item to delete:', interv.numindex)
+        rpcs.rpc('delete_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+          .then(response => {
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
+            status.succeed(this, 'Intervention deleted')
+          })
+      },
     }
   }
 </script>

@@ -18,7 +18,7 @@ class Project(object):
 
     An HP project is based around 4 major lists:
         1. burdensets  -- an odict of burden data
-        2. intersets   -- an odict of intervention sets
+        2. intervsets   -- an odict of intervention sets
         3. packagesets -- an odict of health packages
 
 
@@ -37,12 +37,12 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
+    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
         ''' Initialize the project '''
 
         ## Define the structure sets
         self.burdensets  = sc.odict()
-        self.intersets   = sc.odict()
+        self.intervsets   = sc.odict()
         self.packagesets = sc.odict()
 
         ## Define other quantities
@@ -59,19 +59,19 @@ class Project(object):
         if burdenfile:
             burden = hp.Burden(project=self)
             burden.loaddata(filename=burdenfile)
-            self.burdensets['default'] = burden
+            self.burdensets['Default'] = burden
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
             interventions = hp.Interventions(project=self)
             interventions.loaddata(filename=interventionsfile)
-            self.intersets['default'] = interventions
+            self.intervsets['Default'] = interventions
         
         ## Combine into health package, if available
         if make_package and burdenfile and interventionsfile:
             package = hp.HealthPackage(project=self)
             package.make_package()
-            self.packagesets['default'] = package
+            self.packagesets['Default'] = package
 
         return None
 
@@ -83,7 +83,7 @@ class Project(object):
         output += '           Country: %s\n'    % self.country
         output += '\n'
         output += '       Burden sets: %i\n'    % len(self.burdensets)
-        output += ' Intervention sets: %i\n'    % len(self.intersets)
+        output += ' Intervention sets: %i\n'    % len(self.intervsets)
         output += '   Health packages: %i\n'    % len(self.packagesets)
         output += '\n'
         output += '        HP version: %s\n'    % self.version
@@ -110,6 +110,12 @@ class Project(object):
         self.filename = fullpath # Store file path
         sc.saveobj(fullpath, self, verbose=verbose)
         return fullpath
+    
+    
+    def restorelinks(self):
+        for thisset in self.burdensets.values() + self.intervsets.values() + self.packagesets.values():
+            thisset.projectref = sc.Link(self)
+        return None
 
 
     #######################################################################################################
@@ -122,16 +128,24 @@ class Project(object):
         try:    return self.burdensets[key]
         except: return sc.printv('Warning, burden set not found!', 1, verbose) # Returns None
     
-    def inter(self, key=None, verbose=2):
+    def interv(self, key=None, verbose=2):
         ''' Shortcut for getting the latest active interventions set, i.e. self.intersets[-1] '''
         if key is None: key = hp.default_key
-        try:    return self.intersets[key]
+        try:    return self.intervsets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
     
     def package(self, key=None, verbose=2):
-        ''' Shortcut for getting the latest active health packages set, i.e. self.intersets[-1] '''
+        ''' Shortcut for getting the latest active health packages set, i.e. self.intervsets[-1] '''
         if key is None: key = hp.default_key
         try:    return self.packagesets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
         
 
+def demo(name=None):
+    if name is None: name = 'Default'
+    datadir = hp.HPpath('data')
+    burdenpath = datadir + 'ihme-gbd.xlsx'
+    datapath = datadir + 'dcp-data-afg-v1.xlsx'
+    project = Project(name=name, burdenfile=burdenpath, interventionsfile=datapath)  
+    project.burden().popsize = 34.66e6 # From UN population division 
+    return project

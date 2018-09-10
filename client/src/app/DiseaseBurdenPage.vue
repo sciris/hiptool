@@ -104,19 +104,24 @@ Last update: 2018-05-29
             <td style="white-space: nowrap">
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
               <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
+              <button class="btn" @click="uploadBurdenSet(burdenSet)">Upload</button>
+              <button class="btn" @click="downloadBurdenSet(burdenSet)">Download</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>
         </tbody>
       </table>
+      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
+      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
+      <button class="btn" @click="downloadPlots">Download plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
 
-      <div>
-        <div id="fig01" style="float:left" ></div>
-        <div id="fig02" style="float:left" ></div>
-        <div id="fig03" style="float:left" ></div>
+      <div v-show="showingPlots">
+        <div id="fig1" style="float:left" ></div>
+        <div id="fig2" style="float:left" ></div>
+        <div id="fig3" style="float:left" ></div>
       </div>
 
 
@@ -208,21 +213,14 @@ Last update: 2018-05-29
                      @keyup.enter="updateDisease(disease)"
                      v-model="disease.prevalence"/>
             </td>
-            <td style="white-space: nowrap; text-align:center">
-              <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
-              <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
+            <td style="white-space: nowrap">
+              <button class="iconbtn" @click="copyBurden(disease)" data-tooltip="Copy burden"><i class="ti-layers"></i></button>
+              <button class="iconbtn" @click="deleteBurden(disease)" data-tooltip="Delete burden"><i class="ti-trash"></i></button>
             </td>
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="notImplemented('Add new burden type')">Add new burden type</button>
-
-      <!--<template>-->
-        <!--Testing handsontable-->
-        <!--<div id="hot-preview">-->
-          <!--<HotTable :root="root" :settings="hotSettings"></HotTable>-->
-        <!--</div>-->
-      <!--</template>-->
+      <button class="btn" @click="addBurden">Add new burden</button>
 
     </div>
   </div>
@@ -233,6 +231,7 @@ Last update: 2018-05-29
   var filesaver = require('file-saver')
   import status from '@/services/status-service'
   import rpcs from '@/services/rpc-service'
+  import utils from '@/services/utils'
   import router from '@/router'
   import Vue from 'vue';
 
@@ -241,48 +240,22 @@ Last update: 2018-05-29
 
     data() {
       return {
-        // Placeholder text for table filter box
-        filterPlaceholder: 'Type here to filter burden sets',
-
-        // Text in the table filter box
-        filterText: '',
-
-        // Column of table used for sorting the burden sets
-        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
-
-        // Sort in reverse order?
-        sortReverse: false,
-
-        root: 'test-hot',
-        hotSettings: {
-          data: [['sample', 'data']],
-          colHeaders: true
-        },
-
-        // List of burden sets in the active project
-        burdenSets: [],
-
-        // Active burden set
-        activeBurdenSet: {},
-
-        // List of diseases.  Each list element is a list of the ailment name
-        // and numbers associated with it.
-        diseaseList: [],
-
-        // Column of table used for sorting the diseases
-        sortColumn2: 'name',  // name, country, creationTime, updatedTime
-
-        // Sort diseases in reverse order?
-        sortReverse2: false,
-
-        // CK: WARNING TEMP, should come from backend
-        country: 'Afghanistan',
+        filterPlaceholder: 'Type here to filter burden sets', // Placeholder text for table filter box
+        filterText: '', // Text in the table filter box
+        sortColumn: 'updatedTime',  // Column of table used for sorting the burden sets // name, creationTime, updatedTime
+        sortReverse: false, // Sort in reverse order?
+        burdenSets: [], // List of burden sets in the active project
+        activeBurdenSet: {}, // Active burden set
+        diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
+        sortColumn2: 'name',  // Column of table used for sorting the diseases
+        sortReverse2: false, // Sort diseases in reverse order?
+        country: 'Afghanistan', // CK: WARNING TEMP, should come from backend
         countryList: [
           'Afghanistan',
           'Other',
         ],
-
         serverresponse: 'no response',
+        showingPlots: false,
       }
     },
 
@@ -301,7 +274,6 @@ Last update: 2018-05-29
 
       sortedDiseases() {
         var sortedDiseaseList =  this.applySorting2(this.diseaseList);
-        Vue.set(this.hotSettings, 'data', [[1,2,3]]);
         console.log(sortedDiseaseList);
         return sortedDiseaseList;
       },
@@ -310,7 +282,7 @@ Last update: 2018-05-29
 
     created() {
       // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) {
         router.push('/login')
       }
 
@@ -324,8 +296,25 @@ Last update: 2018-05-29
 
     methods: {
 
-      notImplemented(message) {
-        status.fail(this, message)
+      notImplemented() {
+        status.fail(this, 'This feature is not implemented')
+      },
+
+      clearGraphs(numfigs) { return utils.clearGraphs(this, numfigs)},
+
+      showPlots() {
+        this.showingPlots = true
+      },
+
+      hidePlots() {
+        this.showingPlots = false
+      },
+
+      downloadPlots() {
+        rpcs.download('download_figures', [])
+          .then(response => {
+            console.log('Downloaded figures')
+          })
       },
 
       updateBurdenSets(setLastEntryActive) {
@@ -394,7 +383,6 @@ Last update: 2018-05-29
       },
 
       applyNameFilter(sets) {
-        console.log('CK TEST1')
         console.log(sets)
         return sets.filter(theSet => theSet.burdenset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
@@ -452,19 +440,15 @@ Last update: 2018-05-29
 
       makeGraph(burdenSet) {
         console.log('makeGraph() called for ' + burdenSet.burdenset.name)
-
-        // Set the active project to the matched project.
-        this.activeBurdenSet = burdenSet
-
-        // Go to the server to get the diseases from the burden set.
-        rpcs.rpc('get_project_burden_plots',
+        this.activeBurdenSet = burdenSet // Set the active project to the matched project.
+        this.clearGraphs(3)
+        rpcs.rpc('get_project_burden_plots',  // Go to the server to get the diseases from the burden set.
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
-            let theFig = response.data.graph1 // Extract hack info.
-            mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
-            mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
-            mpld3.draw_figure('fig03', response.data.graph3) // Draw the figure.
+            mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
+            mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.
@@ -485,6 +469,23 @@ Last update: 2018-05-29
           // Update the burden sets so the new set shows up on the list.
           this.updateBurdenSets()
         })
+      },
+
+      uploadBurdenSet(burdenSet) {
+        console.log('uploadBurdenSet() called for ' + burdenSet.burdenset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updateBurdenSets()
+            status.succeed(this, 'Burden set uploaded')
+          })
+      },
+
+      downloadBurdenSet(burdenSet) {
+        console.log('downloadBurdenSet() called for ' + burdenSet.burdenset.name)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex])
+          .then(response => {
+            console.log('Downloaded')
+          })
       },
 
       renameBurdenSet(burdenSet) {
@@ -566,18 +567,10 @@ Last update: 2018-05-29
         return diseases.sort((disease1, disease2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if (this.sortColumn2 === 'name') {
-              return (disease1[1] > disease2[1] ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn2 === 'DALYs') {
-              return disease1[2] > disease2[2] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'deaths') {
-              return disease1[3] > disease2[3] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'prevalence') {
-              return disease1[4] > disease2[4] ? sortDir: -sortDir
-            }
+            if      (this.sortColumn2 === 'name')       {return (disease1[1] > disease2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'DALYs')      {return disease1[2] > disease2[2] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'deaths')     {return disease1[3] > disease2[3] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'prevalence') {return disease1[4] > disease2[4] ? sortDir: -sortDir}
           }
         )
       },
@@ -597,19 +590,39 @@ Last update: 2018-05-29
         // Go to the server to update the disease from the burden set.
         // Note: filter out commas in the numeric fields.
         rpcs.rpc('update_burden_set_disease',
-          [this.$store.state.activeProject.project.id,
-          this.activeBurdenSet.burdenset.numindex,
-          disease.numindex,
-          [filterActive, disease.cause,
-          disease.dalys.replace(/,/g, ''),
-          disease.deaths.replace(/,/g, ''),
-          disease.prevalence.replace(/,/g, '')]])
+          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
+          [disease.active, disease.cause, disease.dalys, disease.deaths, disease.prevalence]])
         .then(response => {
-          // Update the display of the disease list by rerunning the active
-          // burden set.
-          this.viewBurdenSet(this.activeBurdenSet)
+          status.succeed(this, 'Burden set updated')
         })
-      }
+      },
+
+      addBurden() {
+        console.log('Adding item')
+        rpcs.rpc('add_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden added')
+          })
+      },
+
+      copyBurden(burden) {
+        console.log('Item to copy:', burden.numindex)
+        rpcs.rpc('copy_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, burden.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden copied')
+          })
+      },
+
+      deleteBurden(burden) {
+        console.log('Item to delete:', burden.numindex)
+        rpcs.rpc('delete_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, burden.numindex])
+          .then(response => {
+            this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
+            status.succeed(this, 'Burden deleted')
+          })
+      },
 
     }
   }

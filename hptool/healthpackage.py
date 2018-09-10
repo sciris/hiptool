@@ -13,17 +13,19 @@ class HealthPackage(object):
     Class to hold the results from the analysis.
     '''
     
-    def __init__(self, name='default', project=None):
+    def __init__(self, name='Default', project=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
-        self.results    = None
+        self.data       = None # The data
+        self.eps        = 1e-4 # A nonzero value to help with division
+        return None
     
     def __repr__(self):
         ''' Print out useful information when called'''
-        output  = sc.defaultrepr(self)
+        output  = sc.prepr(self)
         output += 'Health packages name: %s\n'    % self.name
         output += '        Date created: %s\n'    % sc.getdate(self.created)
         output += '       Date modified: %s\n'    % sc.getdate(self.modified)
@@ -31,13 +33,13 @@ class HealthPackage(object):
         output += '============================================================\n'
         return output
     
-    def make_package(self, burdenset=None, interset=None):
+    def make_package(self, burdenset=None, intervset=None, verbose=True):
         ''' Make results '''
         burdenset = self.projectref().burden(key=burdenset)
-        interset  = self.projectref().inter(key=interset)
+        intervset  = self.projectref().interv(key=intervset)
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
-        origdata = sc.dcp(interset.data)
+        origdata = sc.dcp(intervset.data)
         critical_cols = ['cause', 'unitcost', 'spend', 'icer']
         for col in critical_cols:
             origdata.filter_out(key='', col=col, verbose=True)
@@ -50,7 +52,7 @@ class HealthPackage(object):
             df[col] = origdata[col]
         
         # Calculate people covered (spending/unitcost)
-        df['coverage'] = df['spend']/df['unitcost']
+        df['coverage'] = df['spend']/(self.eps+df['unitcost'])
         
         # Pull out DALYS and prevalence
         df.addcol('total_dalys')
@@ -61,28 +63,43 @@ class HealthPackage(object):
                 tmp_burden = burdenset.data.findrow(key=key, col='cause', asdict=True)
             except:
                 raise hp.HPException('Burden "%s" not found' % key)
-            df['total_dalys',r] = tmp_burden['dalys']
-            df['total_prevalence',r] = tmp_burden['prevalence']
+            try:    df['total_dalys',r] = tmp_burden['dalys']
+            except: df['total_dalys',r] = 0 # Warning, will want to fix
+            try:    df['total_prevalence',r] = tmp_burden['prevalence']
+            except: df['total_prevalence',r] = 0
         
         # Calculate 80% coverage
         print('Not calculating 80% coverage since denominators are wrong')
         
         # Current DALYs averted (spend/icer)
-        df['dalys_averted'] = df['spend']/df['icer']
+        df['dalys_averted'] = df['spend']/(self.eps+df['icer'])
         
         # Current % of DALYs averted (dalys_averted/total_dalys)
-        df['frac_averted'] = df['dalys_averted']/df['total_dalys'] # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
+        df['frac_averted'] = df['dalys_averted']/(self.eps+df['total_dalys']) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
-        self.results = df # Store it
+        self.data = df # Store it
+        if verbose:
+            print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, burdenset.name, intervset.name))
+        return None
+
+    def loaddata(self, filename=None, folder=None):
+        ''' Load data from a spreadsheet '''
+        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.filename = filename
         return None
     
-    def export(self, cols=None, rows=None, header=None):
+    def savedata(self, filename=None, folder=None):
+        ''' Export data from a spreadsheet '''
+        filepath = self.data.export(filename=filename)
+        return filepath
+        
+    def jsonify(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
-        output = self.results.jsonify(cols=cols, rows=rows, header=header)
+        output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
         
     def plot_dalys(self):
-        df = self.results
+        df = self.data
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -112,7 +129,7 @@ class HealthPackage(object):
         else:
             fig_size = (16,8)
             ax_size = [0.05,0.45,0.9,0.5]
-        df = self.results
+        df = self.data
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
@@ -151,5 +168,5 @@ class HealthPackage(object):
             tl.set_color(colors[t])
         
         pl.gca().set_facecolor('none')
-        pl.title('Investment cascade for Afghanistan')
+        pl.title('Investment cascade')
         return fig

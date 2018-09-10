@@ -65,6 +65,7 @@ class ProjectSO(sw.Blob):
             
             # Copy the Project object itself.
             self.proj = sc.dcp(other_object.proj)
+            self.proj.restorelinks()
             
             # Copy the owner UID.
             self.owner_uid = other_object.owner_uid

@@ -15,24 +15,6 @@ Last update: 2018-05-29
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <!--<button class="btn" @click="createNewPackageSet">Create new health benefits package</button>-->
-
-      <!--<span>&nbsp;based on [FIX]</span>-->
-
-      <!--<select-->
-        <!--title="countrySelect"-->
-        <!--id="country"-->
-        <!--:required="true"-->
-        <!--v-model="country">-->
-        <!--<option-->
-          <!--v-for = "country in countryList"-->
-          <!--:value="country"-->
-        <!--&gt;-->
-          <!--{{country}}-->
-        <!--</option>-->
-      <!--</select>-->
-
-      <!--<br/><br/>-->
 
       <input type="text"
              class="txbox"
@@ -104,18 +86,22 @@ Last update: 2018-05-29
           <td style="white-space: nowrap">
             <button class="btn" @click="renamePackageSet(packageSet)">Rename</button>
             <button class="btn" @click="copyPackageSet(packageSet)">Copy</button>
+            <button class="btn" @click="downloadPackageSet(packageSet)">Download</button>
             <button class="btn __red" @click="deletePackageSet(packageSet)">Delete</button>
           </td>
         </tr>
         </tbody>
       </table>
+      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
+      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
+      <button class="btn" @click="downloadPlots">Download plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
 
-      <div>
-        <div id="fig01" style="float:left" ></div>
-        <div id="fig02" style="float:left" ></div>
+      <div v-show="showingPlots">
+        <div id="fig1" style="float:left" ></div>
+        <div id="fig2" style="float:left" ></div>
       </div>
 
 
@@ -133,17 +119,21 @@ Last update: 2018-05-29
             <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('coverage')" class="sortable">Coverage
+          <th @click="updateSorting2('coverage')" class="sortable">Number of people covered
             <span v-show="sortColumn2 == 'coverage' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'coverage' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'coverage'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('averted')" class="sortable">DALYs averted
+          <th @click="updateSorting2('averted')" class="sortable">DALYs averted (per year)
             <span v-show="sortColumn2 == 'averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th style="text-align:center">Actions</th>
+          <th @click="updateSorting2('percentage')" class="sortable">DALYs averted (%)
+            <span v-show="sortColumn2 == 'percentage' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'percentage' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'percentage'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
         </tr>
         </thead>
         <tbody>
@@ -153,32 +143,19 @@ Last update: 2018-05-29
                    v-model="result.active"/>
           </td>
           <td>
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="updateResult(result)"
-                   v-model="result.name"/>
+            {{ result.name }}
           </td>
           <td>
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="updateResult(result)"
-                   v-model="result.cause"/>
+            {{ result.cause }}
           </td>
           <td>
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="updateResult(result)"
-                   v-model="result.coverage"/>
+            {{ result.coverage }}
           </td>
           <td>
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="updateResult(result)"
-                   v-model="result.averted"/>
+            {{ result.averted }}
           </td>
-          <td style="white-space: nowrap; text-align:center">
-            <button class="iconbtn" @click="notImplemented('Copy')"><i class="ti-layers"></i></button>
-            <button class="iconbtn" @click="notImplemented('Delete')"><i class="ti-trash"></i></button>
+          <td>
+            {{ result.percentage }}
           </td>
         </tr>
         </tbody>
@@ -194,6 +171,7 @@ Last update: 2018-05-29
   import rpcs from '@/services/rpc-service'
   import status from '@/services/status-service'
   import router from '@/router'
+  import utils from '@/services/utils'
   import Vue from 'vue';
 
   export default {
@@ -201,48 +179,17 @@ Last update: 2018-05-29
 
     data() {
       return {
-        // Placeholder text for table filter box
-        filterPlaceholder: 'Type here to filter health packages',
-
-        // Text in the table filter box
-        filterText: '',
-
-        // Column of table used for sorting the health package sets
-        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
-
-        // Sort in reverse order?
-        sortReverse: false,
-
-        root: 'test-hot',
-        hotSettings: {
-          data: [['sample', 'data']],
-          colHeaders: true
-        },
-
-        // List of health package sets in the active project
-        packageSets: [],
-
-        // Active health package set
-        activePackageSet: {},
-
-        // List of diseases.  Each list element is a list of the ailment name
-        // and numbers associated with it.
-        resultList: [],
-
-        // Column of table used for sorting the diseases
-        sortColumn2: 'name',  // name, country, creationTime, updatedTime
-
-        // Sort diseases in reverse order?
-        sortReverse2: false,
-
-        // CK: WARNING TEMP, should come from backend
-        country: 'Afghanistan',
-        countryList: [
-          'Afghanistan',
-          'Other',
-        ],
-
+        filterPlaceholder: 'Type here to filter health packages', // Placeholder text for table filter box
+        filterText: '', // Text in the table filter box
+        sortColumn: 'updatedTime',  // Column of table used for sorting the health package sets // name, creationTime, updatedTime
+        sortReverse: false, // Sort in reverse order?
+        packageSets: [], // List of health package sets in the active project
+        activePackageSet: {}, // Active health package set
+        resultList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
+        sortColumn2: 'name',  // Column of table used for sorting the diseases // name, country, creationTime, updatedTime
+        sortReverse2: true, // Sort diseases in reverse order?
         serverresponse: 'no response',
+        showingPlots: false,
       }
     },
 
@@ -261,7 +208,6 @@ Last update: 2018-05-29
 
       sortedResults() {
         var sortedResultList =  this.applySorting2(this.resultList);
-        Vue.set(this.hotSettings, 'data', [[1,2,3]]);
         console.log(sortedResultList);
         return sortedResultList;
       },
@@ -286,6 +232,23 @@ Last update: 2018-05-29
 
       notImplemented(message) {
         status.fail(this, 'Function "' + message + '" not yet implemented')
+      },
+
+      clearGraphs(numfigs) { return utils.clearGraphs(this, numfigs)},
+
+      showPlots() {
+        this.showingPlots = true
+      },
+
+      hidePlots() {
+        this.showingPlots = false
+      },
+
+      downloadPlots() {
+        rpcs.download('download_figures', [])
+          .then(response => {
+            console.log('Downloaded figures')
+          })
       },
 
       updatePackageSets(setLastEntryActive) {
@@ -395,8 +358,9 @@ Last update: 2018-05-29
               this.resultList[ind].active = (this.resultList[ind][0] > 0)
               this.resultList[ind].name = this.resultList[ind][1]
               this.resultList[ind].cause = this.resultList[ind][2]
-              this.resultList[ind].coverage = Number(this.resultList[ind][3]).toLocaleString()
-              this.resultList[ind].dalys_averted = Number(this.resultList[ind][4]).toLocaleString()
+              this.resultList[ind].coverage = Math.round(Number(this.resultList[ind][3])).toLocaleString()
+              this.resultList[ind].averted = Math.round(Number(this.resultList[ind][4])).toLocaleString()
+              this.resultList[ind].percentage = (Number(this.resultList[ind][5])*100).toLocaleString() // Convert to percentage
             }
 
             // Reset the bottom table sorting state.
@@ -415,6 +379,7 @@ Last update: 2018-05-29
 
         // Set the active project to the matched project.
         this.activePackageSet = packageSet
+        this.clearGraphs(2)
 
         // Go to the server to get the results from the package set.
         rpcs.rpc('get_project_package_plots',
@@ -422,8 +387,8 @@ Last update: 2018-05-29
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
             let theFig = response.data.graph1 // Extract hack info.
-            mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
-            mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
+            mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.
@@ -443,6 +408,23 @@ Last update: 2018-05-29
           .then(response => {
             // Update the package sets so the new set shows up on the list.
             this.updatePackageSets()
+          })
+      },
+
+      uploadPackageSet(packageSet) {
+        console.log('uploadPackageSet() called for ' + packageSet.packageset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updatePackageSets()
+            status.succeed(this, 'Package set uploaded')
+          })
+      },
+
+      downloadPackageSet(packageSet) {
+        console.log('downloadPackageSet() called for ' + packageSet.packageset)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex])
+          .then(response => {
+            console.log('Downloaded')
           })
       },
 
@@ -525,18 +507,11 @@ Last update: 2018-05-29
         return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if (this.sortColumn2 === 'name') {
-              return (result1[1] > result2[1] ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn2 === 'cause') {
-              return result1[2] > result2[2] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'coverage') {
-              return result1[3] > result2[3] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'averted') {
-              return result1[4] > result2[4] ? sortDir: -sortDir
-            }
+            if      (this.sortColumn2 === 'name') {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'cause') {return result1[2] > result2[2] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'coverage') {return result1[3] > result2[3] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'averted') {return result1[4] > result2[4] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'percentage') {return result1[5] > result2[5] ? sortDir: -sortDir}
           }
         )
       },

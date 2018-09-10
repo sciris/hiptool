@@ -11,6 +11,7 @@ Last update: 2018sep09 by cliffk
 import os
 from zipfile import ZipFile
 from flask_login import current_user
+import numpy as np
 import sciris as sc
 import scirisweb as sw
 import hptool as hp
@@ -18,11 +19,60 @@ from . import projects as prj
 
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
 RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using call to make_register_RPC().
-
+figures_filename = 'Figures.pdf'
 
 #
 # Other functions (mostly helpers for the RPCs)
 #
+
+def getpath(filename, online=True):
+    if online:
+        dirname = sw.globalvars.downloads_dir.dir_path # Use the downloads directory to put the file in.
+        fullpath = os.path.join(dirname, filename) # Generate the full file name with path.
+    else:
+        fullpath = filename
+    return fullpath
+
+def savefile(filename, obj, online=True):
+    fullpath = getpath(filename=filename, online=online)
+    sc.saveobj(fullpath, obj)
+    return fullpath
+
+
+def sanitize(vals, forcefloat=False, verbose=True, allowstrings=True):
+    ''' Make sure values are numeric, and either return nans or skip vals that aren't -- WARNING, duplicates lots of other things!'''
+    if verbose: print('Sanitizing vals of %s: %s' % (type(vals), vals))
+    if isinstance(vals, list):
+        as_array = False if forcefloat else True
+    else:
+        vals = [vals]
+        as_array = False
+    output = []
+    for val in vals:
+        if val in [None, '']:
+            sanival = ''
+        else:
+            try:
+                sanival = val
+                factor = 1.0
+                if sc.isstring(sanival):
+                    sanival = sanival.replace(',','') # Remove commas, if present
+                    sanival = sanival.replace('$','') # Remove dollars, if present
+                    # if val.endswith('%'): factor = 0.01 # Scale if percentage has been used -- CK: not used since already converted from percentage
+                sanival = float(sanival)*factor
+            except Exception as E:
+                if allowstrings:
+                    print('Allowing string "%s" to pass (%s)' % (val, repr(E)))
+                    sanival = str(val)
+                else:
+                    print('Could not sanitize value "%s": %s; returning nan' % (val, repr(E)))
+                    sanival = np.nan
+        output.append(sanival)
+    if as_array:
+        return output
+    else:
+        return output[0]
+  
 
 
 def load_project_record(project_id, raise_exception=True):
@@ -48,8 +98,7 @@ def load_project(project_id, raise_exception=True):
     """ 
     
     # Load the project record matching the ID passed in.
-    project_record = load_project_record(project_id, 
-        raise_exception=raise_exception)
+    project_record = load_project_record(project_id, raise_exception=raise_exception)
     
     # If there is no match, raise an exception or return None.
     if project_record is None:
@@ -57,9 +106,13 @@ def load_project(project_id, raise_exception=True):
             raise Exception('ProjectDoesNotExist(id=%s)' % project_id)
         else:
             return None
+    
+    # Restore links
+    proj = project_record.proj
+    proj.restorelinks()
         
     # Return the found project.
-    return project_record.proj
+    return proj
 
 def load_project_summary_from_project_record(project_record):
     """
@@ -118,6 +171,7 @@ def save_project(proj):
     
     # Copy the project, only save what we want...
     new_project = sc.dcp(proj)
+    new_project.modified = sc.now()
          
     # Create the new project entry and enter it into the ProjectCollection.
     # Note: We don't need to pass in project.uid as a 3rd argument because 
@@ -137,13 +191,10 @@ def update_project_with_fn(project_id, update_project_fn):
     # Execute the passed-in function that modifies the project.
     update_project_fn(proj)
     
-    # Set the updating time to now.
-    proj.modified = sc.now()
-    
     # Save the changed project.
     save_project(proj) 
     
-def save_project_as_new(proj, user_id):
+def save_project_as_new(proj, user_id, uid=None):
     """
     Given a Project object and a user UID, wrap the Project in a new prj.ProjectSO 
     object and put this in the project collection, after getting a fresh UID
@@ -151,7 +202,7 @@ def save_project_as_new(proj, user_id):
     """ 
     
     # Set a new project UID, so we aren't replicating the UID passed in.
-    proj.uid = sc.uuid()
+    proj.uid = sc.uuid(uid)
     
     # Create the new project entry and enter it into the ProjectCollection.
     projSO = prj.ProjectSO(proj, user_id)
@@ -217,9 +268,10 @@ def get_version_info():
 	return version_info
 
 
-##
-## Project RPCs
-##
+
+###################################################################################
+###  Project RPCs
+################################################################################### 
     
 @RPC()
 def get_scirisdemo_projects():
@@ -339,7 +391,7 @@ def load_zip_of_prj_files(project_ids):
     prjs = [load_project_record(id).save_as_file(dirname) for id in project_ids]
     
     # Make the zip file name and the full server file path version of the same..
-    zip_fname = '%s.zip' % str(sc.uuid())
+    zip_fname = 'Projects.zip'
     server_zip_fname = os.path.join(dirname, sc.sanitizefilename(zip_fname))
     
     # Create the zip file, putting all of the .prj files in a projects 
@@ -360,19 +412,11 @@ def create_new_project(user_id):
     Create a new HealthPrior project.
     """
     
-    # Load the data path holding the Excel files.
-    data_path = hp.HPpath('data')
-    
     # Get a unique name for the project to be added.
     new_proj_name = get_unique_name('New project', other_names=None)
     
-    # Create the project, loading in the desired spreadsheets.
-    proj = hp.Project(name=new_proj_name, 
-        burdenfile=data_path + 'ihme-gbd.xlsx', 
-        interventionsfile=data_path + 'dcp-data-afg-v1.xlsx')  
-    
-    # Set the burden population size.
-    proj.burden().popsize = 36373.176 # From UN population division 
+    # Create the project, loading in the desired spreadsheets.  
+    proj = hp.demo(name=new_proj_name)
     
     # Display the call information.
     print(">> create_new_project %s" % (proj.name))    
@@ -460,9 +504,44 @@ def create_project_from_prj_file(prj_filename, user_id):
     # Return the new project UID in the return message.
     return { 'projectId': str(proj.uid) }
 
-##
-## Burden set RPCs
-##  
+
+def get_set(proj, which, key):
+    if   which == 'burdenset':        thisset = proj.burden(key)
+    elif which == 'interventionset':  thisset = proj.interv(key) # Full name since used in filenames
+    elif which == 'packageset':       thisset = proj.package(key)
+    else: raise Exception('Set %s not found' % which)
+    return thisset
+    
+
+@RPC(call_type='upload')
+def upload_set(filename, project_id, which, key=None):
+    proj = load_project(project_id)
+    thisset = get_set(proj, which, key)
+    thisset.loaddata(filename)
+    print('Loaded data into %s %s' % (which, thisset.name))
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+    
+@RPC(call_type='download')
+def download_set(project_id, which, key=None):
+    proj = load_project(project_id)
+    thisset = get_set(proj, which, key)
+    filepath = getpath('%s_%s.xlsx' % (thisset.name, which))
+    thisset.savedata(filepath)
+    print('Downloading data from %s %s' % (which, thisset.name))
+    return filepath
+
+@RPC(call_type='download')
+def download_figures():
+    filepath = getpath(figures_filename) # Must match 
+    print('Downloading figures from %s' % filepath)
+    return filepath
+
+
+###################################################################################
+###  Burden set RPCs
+################################################################################### 
     
 @RPC()     
 def get_project_burden_sets(project_id):
@@ -488,7 +567,7 @@ def get_project_burden_set_diseases(project_id, burdenset_numindex):
         return { 'diseases': [] }
 
     # Gather the list for all of the diseases.
-    disease_data = burdenset.export(cols=['active','cause','dalys','deaths','prevalence'], header=False)
+    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False)
     
     # Return success.
     return { 'diseases': disease_data }
@@ -513,6 +592,7 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Put the new burden set in the dictionary.
         proj.burdensets[unique_name] = new_burden_set
+        proj.package().make_package() # Update with the latest data
         
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
@@ -564,25 +644,28 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()
-def update_burden_set_disease(project_id, burdenset_numindex, 
-    disease_numindex, data):
-
-    def update_project_fn(proj):
-        # Set the data records for what gets passed in.
-        data_record = proj.burdensets[burdenset_numindex].data[disease_numindex]
-        data_record[0] = data[0]
-        data_record[7] = data[1]
-        data_record[8] = data[2]
-        data_record[9] = data[3]
-        data_record[10] = data[4]
-        
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
+def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, data):
+    proj = load_project(project_id)
+    data_record = proj.burdensets[burdenset_numindex].data[disease_numindex]
+    print('Modifying')
+    print(data_record)
+    print('to')
+    print(data)
+    if len(data_record) != len(data):
+        print('WARNING, lengths do not match: %s vs. %s' % (len(data_record), len(data)))
+    for i,datum in enumerate(data):
+        data_record[i] = sanitize(datum)
+    
+    proj.package().make_package() # Update with the latest data
+    proj.modified = sc.now()
+    save_project(proj)
+    print('Done updating burden set.')
+    return None
 
 
 
 @RPC()
-def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
+def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib', dosave=True):
     ''' Plot the disease burden '''
     
     # Get the Project object.
@@ -602,14 +685,53 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
         graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
     
+    if dosave:
+        filepath = getpath(filename=figures_filename)
+        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+        print('Figures saved to %s' % filepath)
+    
     # Return success -- WARNING, hard-coded to 3 graphs!
     return {'graph1': graphs[0],
             'graph2': graphs[1],
             'graph3': graphs[2],}
     
-##
-## Intervention set RPCs
-## 
+    
+
+
+@RPC()
+def add_burden(project_id, intervkey):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    ['active', 'cause', 'dalys', 'deaths', 'prevalence']
+    placeholder = [0, '~Cause of burden~', 0, 0, 0]
+    data[data.nrows()] = placeholder
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def copy_burden(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    value = sc.dcp(data[index])
+    value[1] += ' (copy)'
+    data.insert(row=index, value=value)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def delete_burden(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.burdensets[intervkey].data
+    data.pop(index)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+###################################################################################
+### Intervention set RPCs
+###################################################################################
 
 @RPC()    
 def get_project_interv_sets(project_id):
@@ -617,18 +739,18 @@ def get_project_interv_sets(project_id):
     proj = load_project(project_id)
     
     # Get a list of the Interventions objects.
-    interv_sets = [proj.intersets[ind] for ind in range(len(proj.intersets))] 
+    interv_sets = [proj.intervsets[ind] for ind in range(len(proj.intervsets))] 
     
     # Return the JSON-friendly result.
     return {'intervsets': map(get_interv_set_fe_repr, interv_sets)}
 
 @RPC()
-def get_project_interv_set_intervs(project_id, intervset_numindex):
+def get_project_interv_set_intervs(project_id, intervset_numindex=None):
     # Get the Project object.
     proj = load_project(project_id)
     
     # Get the intervention set that matches intervset_numindex.
-    intervset = proj.inter(key=intervset_numindex)
+    intervset = proj.interv(key=intervset_numindex)
     
     # Return an empty list if no data is present.
     if intervset.data is None:
@@ -647,7 +769,7 @@ def create_interv_set(project_id, new_interv_set_name):
         # Get a unique name (just in case the one provided collides with an 
         # existing one).
         unique_name = get_unique_name(new_interv_set_name, 
-            other_names=list(proj.intersets))
+            other_names=list(proj.intervsets))
         
         # Create a new (empty) intervention set.
         new_intervset = hp.Interventions(project=proj, name=unique_name)
@@ -659,7 +781,9 @@ def create_interv_set(project_id, new_interv_set_name):
         new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
         
         # Put the new intervention set in the dictionary.
-        proj.intersets[unique_name] = new_intervset
+        proj.intervsets[unique_name] = new_intervset
+        
+        proj.package().make_package() # Update with the latest data
         
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
@@ -671,7 +795,8 @@ def create_interv_set(project_id, new_interv_set_name):
 def delete_interv_set(project_id, intervset_numindex):
 
     def update_project_fn(proj):
-        proj.intersets.pop(intervset_numindex)
+        proj.intervsets.pop(intervset_numindex)
+        proj.package().make_package() # Update with the latest data
         
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
@@ -682,17 +807,17 @@ def copy_interv_set(project_id, intervset_numindex):
     def update_project_fn(proj):
         # Get a unique name (just in case the one provided collides with an 
         # existing one).
-        unique_name = get_unique_name(proj.intersets[intervset_numindex].name, 
-            other_names=list(proj.intersets))
+        unique_name = get_unique_name(proj.intervsets[intervset_numindex].name, 
+            other_names=list(proj.intervsets))
         
         # Create a new intervention set which is a copy of the old one.
-        new_intervset = sc.dcp(proj.intersets[intervset_numindex])
+        new_intervset = sc.dcp(proj.intervsets[intervset_numindex])
         
         # Overwrite the old name with the new.
         new_intervset.name = unique_name
        
         # Put the new intervention set in the dictionary.
-        proj.intersets[unique_name] = new_intervset
+        proj.intervsets[unique_name] = new_intervset
         
     # Do the project update using the internal function.  
     update_project_with_fn(project_id, update_project_fn)
@@ -705,33 +830,65 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
 
     def update_project_fn(proj):
         # Overwrite the old name with the new.
-        proj.intersets[intervset_numindex].name = new_interv_set_name
+        proj.intervsets[intervset_numindex].name = new_interv_set_name
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()    
-def update_interv_set_interv(project_id, intervset_numindex, 
-    interv_numindex, data):
+def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
+    proj = load_project(project_id)
+    data_record = proj.intervsets[intervkey].data[interv_numindex]
+    print('Original intervention set record:')
+    print(data_record)
+    data_record[0] = sanitize(data[0])
+    data_record[1] = data[1]
+    data_record[3] = sanitize(data[2])
+    data_record[4] = sanitize(data[3])
+    data_record[5] = sanitize(data[4])
+    data_record[6] = sanitize(data[5])
+    data_record[7] = sanitize(data[6])
+    data_record[8] = sanitize(data[7])
+    print('New intervention set record:')
+    print(data_record)
+    proj.package().make_package() # Update with the latest data
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
 
-    def update_project_fn(proj):
-        # Set the data records for what gets passed in.
-        data_record = proj.intersets[intervset_numindex].data[interv_numindex]
-        data_record[0] = data[0]
-        data_record[1] = data[1]
-        data_record[3] = data[2]
-        data_record[4] = data[3]
-        data_record[5] = data[4]
-        data_record[6] = data[5]
-        data_record[7] = data[6]
-        data_record[8] = data[7]
-        
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
+@RPC()
+def add_interv(project_id, intervkey):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervkey].data
+    placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
+    data[data.nrows()] = placeholder
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
 
-##
-## Package set RPCs
-##   
+@RPC()
+def copy_interv(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervkey].data
+    value = sc.dcp(data[index])
+    value[1] += ' (copy)'
+    data.insert(row=index, value=value)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def delete_interv(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervkey].data
+    data.pop(index)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+###################################################################################
+###  Package set RPCs
+################################################################################### 
 
 @RPC()    
 def get_project_package_sets(project_id):
@@ -753,11 +910,11 @@ def get_project_package_set_results(project_id, packageset_numindex):
     packageset = proj.package(key=packageset_numindex)
     
     # Return an empty list if no data is present.
-    if packageset.results is None:
+    if packageset.data is None:
         return { 'results': [] }
 
     # Gather the list for all of the diseases.
-    result_data = packageset.export(cols=['active','shortname','cause','coverage','dalys_averted'], header=False)
+    result_data = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False)
     
     # Return success.
     return { 'results': result_data }
@@ -827,7 +984,7 @@ def rename_package_set(project_id, packageset_numindex, new_package_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()
-def get_project_package_plots(project_id, packageset_numindex):
+def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     ''' Plot the health packages '''
     
     # Get the Project object.
@@ -847,6 +1004,11 @@ def get_project_package_plots(project_id, packageset_numindex):
     for fig in figs:
         graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
+    
+    if dosave:
+        filepath = getpath(filename=figures_filename)
+        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+        print('Figures saved to %s' % filepath)
     
     # Return success -- WARNING, should not be hard-coded!
     return {'graph1': graphs[0],
