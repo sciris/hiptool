@@ -17,6 +17,7 @@ Last update: 2018-05-26
           </span>
           <br/><br/>
           <div style="font-size:14px; font-weight:normal">
+            Health Services Prioritization Tool<br>
             Version {{ version }} ({{ date }})
           </div>
         </div>
