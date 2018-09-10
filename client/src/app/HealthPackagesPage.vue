@@ -170,6 +170,7 @@ Last update: 2018-05-29
   import rpcs from '@/services/rpc-service'
   import status from '@/services/status-service'
   import router from '@/router'
+  import utils from '@/services/utils'
   import Vue from 'vue';
 
   export default {
