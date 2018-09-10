@@ -92,8 +92,9 @@ Last update: 2018-05-29
         </tr>
         </tbody>
       </table>
-      <button class="btn" @click="showPlots">Show plots</button>
-      <button class="btn" @click="hidePlots">Hide plots</button>
+      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
+      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
+      <button class="btn" @click="downloadPlots">Download plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
@@ -241,6 +242,13 @@ Last update: 2018-05-29
 
       hidePlots() {
         this.showingPlots = false
+      },
+
+      downloadPlots() {
+        rpcs.download('download_figures', [])
+          .then(response => {
+            console.log('Downloaded figures')
+          })
       },
 
       updatePackageSets(setLastEntryActive) {

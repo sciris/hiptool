@@ -19,7 +19,7 @@ from . import projects as prj
 
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
 RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using call to make_register_RPC().
-
+figures_filename = 'Figures.pdf'
 
 #
 # Other functions (mostly helpers for the RPCs)
@@ -530,6 +530,13 @@ def download_set(project_id, which, key=None):
     print('Downloading data from %s %s' % (which, thisset.name))
     return filepath
 
+@RPC(call_type='download')
+def download_figures():
+    filepath = getpath(figures_filename) # Must match 
+    print('Downloading figures from %s' % filepath)
+    return filepath
+
+
 ###################################################################################
 ###  Burden set RPCs
 ################################################################################### 
@@ -655,7 +662,7 @@ def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, 
 
 
 @RPC()
-def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'):
+def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib', dosave=True):
     ''' Plot the disease burden '''
     
     # Get the Project object.
@@ -674,6 +681,11 @@ def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib'
     for fig in figs:
         graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
+    
+    if dosave:
+        filepath = getpath(filename=figures_filename)
+        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+        print('Figures saved to %s' % filepath)
     
     # Return success -- WARNING, hard-coded to 3 graphs!
     return {'graph1': graphs[0],
@@ -903,7 +915,7 @@ def rename_package_set(project_id, packageset_numindex, new_package_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()
-def get_project_package_plots(project_id, packageset_numindex):
+def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     ''' Plot the health packages '''
     
     # Get the Project object.
@@ -923,6 +935,11 @@ def get_project_package_plots(project_id, packageset_numindex):
     for fig in figs:
         graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
+    
+    if dosave:
+        filepath = getpath(filename=figures_filename)
+        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+        print('Figures saved to %s' % filepath)
     
     # Return success -- WARNING, should not be hard-coded!
     return {'graph1': graphs[0],
