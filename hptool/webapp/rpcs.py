@@ -805,9 +805,9 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()    
-def update_interv_set_interv(project_id, intervset_numindex, interv_numindex, data):
+def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
     proj = load_project(project_id)
-    data_record = proj.intervsets[intervset_numindex].data[interv_numindex]
+    data_record = proj.intervsets[intervkey].data[interv_numindex]
     print('Original intervention set record:')
     print(data_record)
     data_record[0] = sanitize(data[0])
@@ -825,17 +825,35 @@ def update_interv_set_interv(project_id, intervset_numindex, interv_numindex, da
     save_project(proj)
     return None
 
-@RPC()    
-def add_interv(project_id, intervset_numindex):
+@RPC()
+def add_interv(project_id, intervkey):
     proj = load_project(project_id)
-    data = proj.intervsets[intervset_numindex].data
+    data = proj.intervsets[intervkey].data
     placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
     data[data.nrows()] = placeholder
-    print('New intervention set record:')
     proj.modified = sc.now()
     save_project(proj)
     return None
 
+@RPC()
+def copy_interv(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervkey].data
+    value = sc.dcp(data[index])
+    value[1] += ' (copy)'
+    data.insert(row=index, value=value)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
+
+@RPC()
+def delete_interv(project_id, intervkey, index):
+    proj = load_project(project_id)
+    data = proj.intervsets[intervkey].data
+    data.pop(index)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
 
 ###################################################################################
 ###  Package set RPCs
