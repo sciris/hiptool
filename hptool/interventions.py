@@ -43,7 +43,6 @@ class Interventions(object):
         ''' Load data from a spreadsheet '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
-        print("TEMP data uploadedddddddddddddddddddd")
         return None
     
     def savedata(self, filename=None, folder=None):
