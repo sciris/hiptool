@@ -288,29 +288,11 @@ Last update: 2018-05-29
         return sortedList
       },
 
-//      filteredInterventions() {
-//        if (this.showAllIntervs) {
-//          return this.interventionList
-//        } else {
-//          return this.interventionList.filter(interv =>
-//            {
-//              if (interv.intervCategory === 'cancer')
-//                return this.showCancerIntervs
-//              else if (interv.intervCategory === 'infectious')
-//                return this.showInfectiousIntervs
-//              else if (interv.intervCategory === 'childcare')
-//                return this.showChildIntervs
-//              else
-//                return false
-//            }
-//          )
-//        }
-//      }
     },
 
     created() {
       // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) {
         router.push('/login')
       }
 
@@ -579,18 +561,9 @@ Last update: 2018-05-29
         // Go to the server to update the intervention from the intervention set.
         // Note: filter out commas in the numeric fields.
         rpcs.rpc('update_interv_set_interv',
-          [this.$store.state.activeProject.project.id,
-            this.activeIntervSet.intervset.numindex,
-            interv.numindex,
-            [filterActive, interv.name, interv.platform, interv.type,
-              interv.icer.replace(/,/g, ''),
-              interv.unitcost.replace(/,/g, ''),
-              interv.frp.replace(/,/g, ''),
-              interv.equity.replace(/,/g, '')]])
+          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, this.interventionList])
           .then(response => {
-            // Update the display of the intervention list by rerunning the active
-            // intervention set.
-            this.viewSet(this.activeIntervSet)
+            this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
           })
       },
 
