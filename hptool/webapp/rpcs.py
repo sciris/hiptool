@@ -568,17 +568,16 @@ def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()
-def update_burden_set_disease(project_id, burdenset_numindex, 
-    disease_numindex, data):
+def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, data):
 
     def update_project_fn(proj):
         # Set the data records for what gets passed in.
         data_record = proj.burdensets[burdenset_numindex].data[disease_numindex]
         data_record[0] = data[0]
-        data_record[7] = data[1]
-        data_record[8] = data[2]
-        data_record[9] = data[3]
-        data_record[10] = data[4]
+        data_record[1] = data[1]
+        data_record[2] = data[2]
+        data_record[3] = data[3]
+        data_record[4] = data[4]
         
     # Do the project update using the internal function. 
     update_project_with_fn(project_id, update_project_fn)

@@ -19,7 +19,7 @@ class HealthPackage(object):
         self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
-        self.results    = None # The data
+        self.data    = None # The data
         return None
     
     def __repr__(self):
@@ -74,22 +74,27 @@ class HealthPackage(object):
         # Current % of DALYs averted (dalys_averted/total_dalys)
         df['frac_averted'] = df['dalys_averted']/df['total_dalys'] # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
-        self.results = df # Store it
+        self.data = df # Store it
         return None
 
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet '''
-        self.results = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
         return None
+    
+    def savedata(self, filename=None, folder=None):
+        ''' Export data from a spreadsheet '''
+        filepath = self.data.export(filename=filename)
+        return filepath
         
     def export(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
-        output = self.results.jsonify(cols=cols, rows=rows, header=header)
+        output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
         
     def plot_dalys(self):
-        df = self.results
+        df = self.data
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -119,7 +124,7 @@ class HealthPackage(object):
         else:
             fig_size = (16,8)
             ax_size = [0.05,0.45,0.9,0.5]
-        df = self.results
+        df = self.data
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
