@@ -555,6 +555,12 @@ Last update: 2018-05-29
         console.log('FRP: ', interv.frp)
         console.log('Equity: ', interv.equity)
 
+        this.interventionList[interv.numindex] = interv
+
+        console.log('wtf')
+        console.log(interv)
+        console.log(this.interventionList[interv.numindex])
+
         // Do format filtering to prepare the data to pass to the RPC.
         let filterActive = interv.active ? 1 : 0
 

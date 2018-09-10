@@ -798,12 +798,14 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()    
-def update_interv_set_interv(project_id, intervkey, interv_numindex, newdata):
+def update_interv_set_interv(project_id, intervkey, newdata):
     
     proj = load_project(project_id)
     intervdata = proj.intervsets[intervkey].data
     
     for r,rowdata in enumerate(newdata):
+        print(r)
+        print(rowdata)
         intervdata[r] = rowdata
     
     # WARNING, this should be a method of dataframes!

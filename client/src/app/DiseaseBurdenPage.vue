@@ -282,7 +282,7 @@ Last update: 2018-05-29
 
     created() {
       // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) {
         router.push('/login')
       }
 
