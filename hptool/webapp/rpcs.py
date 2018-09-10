@@ -798,23 +798,21 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
     update_project_with_fn(project_id, update_project_fn)
 
 @RPC()    
-def update_interv_set_interv(project_id, intervset_numindex, 
-    interv_numindex, data):
-
-    def update_project_fn(proj):
-        # Set the data records for what gets passed in.
-        data_record = proj.intervsets[intervset_numindex].data[interv_numindex]
-        data_record[0] = data[0]
-        data_record[1] = data[1]
-        data_record[3] = data[2]
-        data_record[4] = data[3]
-        data_record[5] = data[4]
-        data_record[6] = data[5]
-        data_record[7] = data[6]
-        data_record[8] = data[7]
+def update_interv_set_interv(project_id, intervkey, interv_numindex, newdata):
+    
+    proj = load_project(project_id)
+    intervdata = proj.intervsets[intervkey].data
+    
+    for r,rowdata in enumerate(newdata):
+        intervdata[r] = rowdata
+    
+    # WARNING, this should be a method of dataframes!
+    if intervdata.nrows()>len(newdata):
+        intervdata.rmrows(range(len(newdata), intervdata.nrows()))
         
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
+    proj.modified = sc.now()
+    save_project(proj)
+    return None
 
 
 ###################################################################################
