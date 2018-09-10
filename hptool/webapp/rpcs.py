@@ -41,10 +41,8 @@ def savefile(filename, obj, online=True):
 
 def sanitize(vals, forcefloat=False, verbose=True, allowstrings=True):
     ''' Make sure values are numeric, and either return nans or skip vals that aren't -- WARNING, duplicates lots of other things!'''
-    print('Sanitizing this:')
-    print(vals)
     if verbose: print('Sanitizing vals of %s: %s' % (type(vals), vals))
-    if sc.isiterable(vals):
+    if sc.checktype(vals, 'arraylike'):
         as_array = False if forcefloat else True
     else:
         vals = [vals]
@@ -64,6 +62,7 @@ def sanitize(vals, forcefloat=False, verbose=True, allowstrings=True):
                 sanival = float(sanival)*factor
             except Exception as E:
                 if allowstrings:
+                    print('Allowing string "%s" to pass (%s)' % (val, repr(E)))
                     sanival = str(val)
                 else:
                     print('Could not sanitize value "%s": %s; returning nan' % (val, repr(E)))
@@ -99,8 +98,7 @@ def load_project(project_id, raise_exception=True):
     """ 
     
     # Load the project record matching the ID passed in.
-    project_record = load_project_record(project_id, 
-        raise_exception=raise_exception)
+    project_record = load_project_record(project_id, raise_exception=raise_exception)
     
     # If there is no match, raise an exception or return None.
     if project_record is None:
@@ -108,9 +106,13 @@ def load_project(project_id, raise_exception=True):
             raise Exception('ProjectDoesNotExist(id=%s)' % project_id)
         else:
             return None
+    
+    # Restore links
+    proj = project_record.proj
+    proj.restorelinks()
         
     # Return the found project.
-    return project_record.proj
+    return proj
 
 def load_project_summary_from_project_record(project_record):
     """
@@ -653,7 +655,7 @@ def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, 
     if len(data_record) != len(data):
         print('WARNING, lengths do not match: %s vs. %s' % (len(data_record), len(data)))
     for i,datum in enumerate(data):
-        data_record[i] = datum
+        data_record[i] = sanitize(datum)
     
     proj.package().make_package() # Update with the latest data
     proj.modified = sc.now()
@@ -806,14 +808,18 @@ def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
 def update_interv_set_interv(project_id, intervset_numindex, interv_numindex, data):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervset_numindex].data[interv_numindex]
-    data_record[0] = data[0]
+    print('Original intervention set record:')
+    print(data_record)
+    data_record[0] = sanitize(data[0])
     data_record[1] = data[1]
-    data_record[3] = data[2]
-    data_record[4] = data[3]
-    data_record[5] = data[4]
-    data_record[6] = data[5]
-    data_record[7] = data[6]
-    data_record[8] = data[7]
+    data_record[3] = sanitize(data[2])
+    data_record[4] = sanitize(data[3])
+    data_record[5] = sanitize(data[4])
+    data_record[6] = sanitize(data[5])
+    data_record[7] = sanitize(data[6])
+    data_record[8] = sanitize(data[7])
+    print('New intervention set record:')
+    print(data_record)
     proj.package().make_package() # Update with the latest data
     proj.modified = sc.now()
     save_project(proj)

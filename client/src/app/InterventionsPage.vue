@@ -557,7 +557,14 @@ Last update: 2018-05-29
         // Go to the server to update the intervention from the intervention set.
         // Note: filter out commas in the numeric fields.
         rpcs.rpc('update_interv_set_interv',
-          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, this.interventionList])
+          [this.$store.state.activeProject.project.id,
+            this.activeIntervSet.intervset.numindex,
+            interv.numindex,
+            [filterActive, interv.name, interv.platform, interv.type,
+              interv.icer.replace(/,/g, ''),
+              interv.unitcost.replace(/,/g, ''),
+              interv.frp.replace(/,/g, ''),
+              interv.equity.replace(/,/g, '')]])
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
           })

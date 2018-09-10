@@ -19,7 +19,8 @@ class HealthPackage(object):
         self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
-        self.data    = None # The data
+        self.data       = None # The data
+        self.eps        = 1e-4 # A nonzero value to help with division
         return None
     
     def __repr__(self):
@@ -51,7 +52,7 @@ class HealthPackage(object):
             df[col] = origdata[col]
         
         # Calculate people covered (spending/unitcost)
-        df['coverage'] = df['spend']/df['unitcost']
+        df['coverage'] = df['spend']/(self.eps+df['unitcost'])
         
         # Pull out DALYS and prevalence
         df.addcol('total_dalys')
@@ -69,10 +70,10 @@ class HealthPackage(object):
         print('Not calculating 80% coverage since denominators are wrong')
         
         # Current DALYs averted (spend/icer)
-        df['dalys_averted'] = df['spend']/df['icer']
+        df['dalys_averted'] = df['spend']/(self.eps+df['icer'])
         
         # Current % of DALYs averted (dalys_averted/total_dalys)
-        df['frac_averted'] = df['dalys_averted']/df['total_dalys'] # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
+        df['frac_averted'] = df['dalys_averted']/(self.eps+df['total_dalys']) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
         self.data = df # Store it
         return None

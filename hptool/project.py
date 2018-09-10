@@ -110,6 +110,12 @@ class Project(object):
         self.filename = fullpath # Store file path
         sc.saveobj(fullpath, self, verbose=verbose)
         return fullpath
+    
+    
+    def restorelinks(self):
+        for thisset in self.burdensets.values() + self.intervsets.values() + self.packagesets.values():
+            thisset.projectref = sc.Link(self)
+        return None
 
 
     #######################################################################################################
