@@ -628,7 +628,7 @@ def get_project_interv_sets(project_id):
     return {'intervsets': map(get_interv_set_fe_repr, interv_sets)}
 
 @RPC()
-def get_project_interv_set_intervs(project_id, intervset_numindex):
+def get_project_interv_set_intervs(project_id, intervset_numindex=None):
     # Get the Project object.
     proj = load_project(project_id)
     

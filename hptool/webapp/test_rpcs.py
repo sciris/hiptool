@@ -10,6 +10,7 @@ pl.switch_backend('Qt4Agg')
 
 torun = [
 'project_io',
+'intervset_io',
 ]
 
 
@@ -59,3 +60,12 @@ if 'project_io' in torun:
     uid = rpcs.save_project_as_new(proj, user_id=user_id)
     P = rpcs.load_project_record(uid)
     print(P)
+
+
+get_project_interv_set_intervs
+
+if 'intervset_io' in torun:
+    heading('Running intervset_io', 'big')
+    uid = rpcs.save_project_as_new(proj, user_id=user_id)
+    output = rpcs.load_project_record(uid)
+    sc.pp(output)
