@@ -18,7 +18,7 @@ Last update: 2018-05-28
           </span>
           <br/><br/>
           <div style="font-size:14px; font-weight:normal">
-            Beta version {{ version }} ({{ date }})
+            Version {{ version }} ({{ date }})
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@ Last update: 2018-05-28
 
 <script>
 import rpcs from '@/services/rpc-service'
-import userservice from '@/services/user-service' 
+import userservice from '@/services/user-service'
 import router from '@/router'
 
 export default {
@@ -113,7 +113,7 @@ export default {
 
   methods: {
     tryRegister () {
-      userservice.registerUser(this.registerUserName, this.registerPassword, 
+      userservice.registerUser(this.registerUserName, this.registerPassword,
         this.registerDisplayName, this.registerEmail)
       .then(response => {
         if (response.data === 'success') { // Set a success result to show.
@@ -124,7 +124,8 @@ export default {
         }
       })
       .catch(error => {
-        this.registerResult = 'Server error.  Please try again later.'
+          console.log('Register failed', error)
+          this.registerResult = "We're sorry, it seems we're having trouble communicating with the server.  Please contact support or try again later."
       })
     }
   }
