@@ -566,18 +566,10 @@ Last update: 2018-05-29
         return diseases.sort((disease1, disease2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if (this.sortColumn2 === 'name') {
-              return (disease1[1] > disease2[1] ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn2 === 'DALYs') {
-              return disease1[2] > disease2[2] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'deaths') {
-              return disease1[3] > disease2[3] ? sortDir: -sortDir
-            }
-            else if (this.sortColumn2 === 'prevalence') {
-              return disease1[4] > disease2[4] ? sortDir: -sortDir
-            }
+            if      (this.sortColumn2 === 'name')       {return (disease1[1] > disease2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'DALYs')      {return disease1[2] > disease2[2] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'deaths')     {return disease1[3] > disease2[3] ? sortDir: -sortDir}
+            else if (this.sortColumn2 === 'prevalence') {return disease1[4] > disease2[4] ? sortDir: -sortDir}
           }
         )
       },

@@ -126,11 +126,11 @@ Last update: 2018-05-29
             <span v-show="sortColumn2 == 'platform' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'platform'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('cause')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('type')" class="sortable" style="min-width:30%">
             Cause&nbsp;of&nbsp;burden
-            <span v-show="sortColumn2 == 'cause' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+            <span v-show="sortColumn2 == 'type' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'type' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'type'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th @click="updateSorting2('icer')" class="sortable" style="min-width:30%">
             ICER
@@ -144,11 +144,11 @@ Last update: 2018-05-29
             <span v-show="sortColumn2 == 'unitcost' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'unitcost'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('spending')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('spend')" class="sortable" style="min-width:30%">
             Spending
-            <span v-show="sortColumn2 == 'spending' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'spending' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'spending'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+            <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th @click="updateSorting2('frp')" class="sortable" style="min-width:30%">
             FRP
@@ -281,27 +281,28 @@ Last update: 2018-05-29
       },
 
       sortedIntervList() {
-        return this.applySorting2(this.interventionList)
+        var sortedList =  this.applySorting2(this.interventionList);
+        return sortedList
       },
 
-      filteredInterventions() {
-        if (this.showAllIntervs) {
-          return this.interventionList
-        } else {
-          return this.interventionList.filter(interv =>
-            {
-              if (interv.intervCategory === 'cancer')
-                return this.showCancerIntervs
-              else if (interv.intervCategory === 'infectious')
-                return this.showInfectiousIntervs
-              else if (interv.intervCategory === 'childcare')
-                return this.showChildIntervs
-              else
-                return false
-            }
-          )
-        }
-      }
+//      filteredInterventions() {
+//        if (this.showAllIntervs) {
+//          return this.interventionList
+//        } else {
+//          return this.interventionList.filter(interv =>
+//            {
+//              if (interv.intervCategory === 'cancer')
+//                return this.showCancerIntervs
+//              else if (interv.intervCategory === 'infectious')
+//                return this.showInfectiousIntervs
+//              else if (interv.intervCategory === 'childcare')
+//                return this.showChildIntervs
+//              else
+//                return false
+//            }
+//          )
+//        }
+//      }
     },
 
     created() {
@@ -426,17 +427,17 @@ Last update: 2018-05-29
       },
 
       applySorting2(intervs) {
-        return intervs.sort((interv1, intervs2) =>
+        return intervs.sort((interv1, interv2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')     { return (interv1[1] > intervs2[1] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (interv1[3] > intervs2[3] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'type')     { return (interv1[4] > intervs2[4] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'icer')     { return (interv1[5] > intervs2[5] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'unitcost') { return (interv1[6] > intervs2[6] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'spend')    { return (interv1[7] > intervs2[7] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'frp')      { return (interv1[8] > intervs2[8] ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'equity')   { return (interv1[9] > intervs2[9] ? sortDir: -sortDir) }
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]) > String(interv2[1]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]) > String(interv2[3]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'type')     { return (String(interv1[4]) > String(interv2[4]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
           }
         )
       },
