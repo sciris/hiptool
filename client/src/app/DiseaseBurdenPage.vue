@@ -104,6 +104,8 @@ Last update: 2018-05-29
             <td style="white-space: nowrap">
               <button class="btn" @click="renameBurdenSet(burdenSet)">Rename</button>
               <button class="btn" @click="copyBurdenSet(burdenSet)">Copy</button>
+              <button class="btn" @click="uploadBurdenSet(burdenSet)">Upload</button>
+              <button class="btn" @click="downloadBurdenSet(burdenSet)">Download</button>
               <button class="btn __red" @click="deleteBurdenSet(burdenSet)">Delete</button>
             </td>
           </tr>

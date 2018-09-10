@@ -24,6 +24,18 @@ RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using
 # Other functions (mostly helpers for the RPCs)
 #
 
+def getpath(filename, online=True):
+    if online:
+        dirname = sw.globalvars.downloads_dir.dir_path # Use the downloads directory to put the file in.
+        fullpath = os.path.join(dirname, filename) # Generate the full file name with path.
+    else:
+        fullpath = filename
+    return fullpath
+
+def savefile(filename, obj, online=True):
+    fullpath = getpath(filename=filename, online=online)
+    sc.saveobj(fullpath, obj)
+    return fullpath
 
 def load_project_record(project_id, raise_exception=True):
     """
@@ -452,21 +464,32 @@ def create_project_from_prj_file(prj_filename, user_id):
     return { 'projectId': str(proj.uid) }
 
 
+def get_set(proj, which, key):
+    if   which == 'burdenset':        thisset = proj.burden(key)
+    elif which == 'interventionset':  thisset = proj.interv(key)
+    elif which == 'packageset':       thisset = proj.package(key)
+    else: raise Exception('Set %s not found' % which)
+    return thisset
+    
+
 @RPC(call_type='upload')
 def upload_set(set_filename, project_id, which, key=None):
     proj = load_project(project_id)
-    if   which == 'burdenset':  thisset = proj.burden(key)
-    elif which == 'intervset':  thisset = proj.interv(key)
-    elif which == 'packageset': thisset = proj.package(key)
-    else:  raise Exception('Set %s not found' % which)
-    
+    thisset = get_set(proj, which, key)
     thisset.loaddata(set_filename)
-    
+    print('Loaded data into %s %s' % (which, thisset.name))
     proj.modified = sc.now()
-    print('Loaded data into 
     save_project(proj)
     return None
     
+@RPC(call_type='download')
+def download_set(project_id, which, key=None):
+    proj = load_project(project_id)
+    thisset = get_set(proj, which, key)
+    filepath = getpath('%s_%s.xlsx' % (thisset.name, which))
+    thisset.savedata(filepath)
+    print('Downloading data from %s %s' % (which, thisset.name))
+    return filepath
 
 ###################################################################################
 ###  Burden set RPCs

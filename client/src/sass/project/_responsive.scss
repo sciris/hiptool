@@ -1,4 +1,4 @@
-@media (min-width: 992px) {
+@media (min-width: 1392px) {
   .navbar {
     min-height: 75px;
   }
@@ -86,7 +86,7 @@
 
 /*          Changes for small display      */
 
-@media (max-width: 991px) {
+@media (max-width: 1391px) {
   .sidebar {
     display: none;
   }
@@ -431,7 +431,7 @@
 
 //overwrite table responsive for 768px screens
 
-@media (min-width: 992px) {
+@media (min-width: 1392px) {
   .table-full-width {
     margin-left: -15px;
     margin-right: -15px;
@@ -442,7 +442,7 @@
 
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1391px) {
   .table-responsive {
     width: 100%;
     margin-bottom: 15px;
