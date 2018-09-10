@@ -170,7 +170,7 @@ Last update: 2018-05-29
         </tr>
         </thead>
         <tbody>
-        <tr v-for="interv in sortedIntervList">
+        <tr v-for="interv in sortedIntervDict">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="interv.active"/>
@@ -260,6 +260,7 @@ Last update: 2018-05-29
         showInfectiousIntervs: false, // Show infectious diseases interventions
         showChildIntervs: false, // Show child care interventions
         interventionList: [],
+        interventionDict: [], // Store values as a dict instead of a list -- WARNING, kludgy!
 
         // CK: WARNING TEMP, should come from backend
         country: 'Afghanistan',
@@ -283,9 +284,9 @@ Last update: 2018-05-29
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
 
-      sortedIntervList() {
-        var sortedList =  this.applySorting2(this.interventionList);
-        return sortedList
+      sortedIntervDict() {
+        var sortedDict =  this.applySorting2(this.interventionDict);
+        return sortedDict
       },
 
     },
@@ -415,14 +416,7 @@ Last update: 2018-05-29
         return intervs.sort((interv1, interv2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]) > String(interv2[1]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]) > String(interv2[3]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'type')     { return (String(interv1[4]) > String(interv2[4]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
+            return (String(interv1[this.sortColumn2]) > String(interv2[this.sortColumn2]) ? sortDir: -sortDir)
           }
         )
       },
@@ -441,17 +435,20 @@ Last update: 2018-05-29
             this.interventionList = response.data.interventions
 
             // Set the active values from the loaded in data.
+            this.interventionDict = []
             for (let ind=0; ind < this.interventionList.length; ind++) {
-              this.interventionList[ind].numindex = ind
-              this.interventionList[ind].active = (this.interventionList[ind][0] > 0)
-              this.interventionList[ind].name = this.interventionList[ind][1]
-              this.interventionList[ind].platform = this.interventionList[ind][3]
-              this.interventionList[ind].type = this.interventionList[ind][4]
-              this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
-              this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].spend = Number(this.interventionList[ind][7]).toLocaleString()
-              this.interventionList[ind].frp = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
+              let tmpDict = {}
+              tmpDict.numindex = ind
+              tmpDict.active = (this.interventionList[ind][0] > 0)
+              tmpDict.name = this.interventionList[ind][1]
+              tmpDict.platform = this.interventionList[ind][3]
+              tmpDict.type = this.interventionList[ind][4]
+              tmpDict.icer = Number(this.interventionList[ind][5]).toLocaleString()
+              tmpDict.unitcost = Number(this.interventionList[ind][6]).toLocaleString()
+              tmpDict.spend = Number(this.interventionList[ind][7]).toLocaleString()
+              tmpDict.frp = Number(this.interventionList[ind][8]).toLocaleString()
+              tmpDict.equity = Number(this.interventionList[ind][9]).toLocaleString()
+              this.interventionDict.push(tmpDict)
             }
           })
 
@@ -555,10 +552,19 @@ Last update: 2018-05-29
         console.log('FRP: ', interv.frp)
         console.log('Equity: ', interv.equity)
 
-        this.interventionList[interv.numindex] = interv
+        this.interventionList[interv.numindex][0] = interv.active
+        this.interventionList[interv.numindex][1] = interv.name
+        this.interventionList[interv.numindex][3] = interv.platform
+        this.interventionList[interv.numindex][4] = interv.type
+        this.interventionList[interv.numindex][5] = interv.icer
+        this.interventionList[interv.numindex][6] = interv.unitcost
+        this.interventionList[interv.numindex][7] = interv.spend
+        this.interventionList[interv.numindex][8] = interv.frp
+        this.interventionList[interv.numindex][9] = interv.equity
 
         console.log('wtf')
         console.log(interv)
+        console.log(interv.name)
         console.log(this.interventionList[interv.numindex])
 
         // Do format filtering to prepare the data to pass to the RPC.
