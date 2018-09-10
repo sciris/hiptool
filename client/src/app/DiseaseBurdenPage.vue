@@ -476,7 +476,7 @@ Last update: 2018-05-29
         console.log('downloadBurdenSet() called for ' + burdenSet.burdenset.name)
         rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex])
           .then(response => {
-            this.updateBurdenSets()
+            console.log('Downloaded')
           })
       },
 

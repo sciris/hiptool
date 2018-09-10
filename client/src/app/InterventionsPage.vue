@@ -100,6 +100,8 @@ Last update: 2018-05-29
           <td style="white-space: nowrap">
             <button class="btn" @click="copySet(intervSet)">Copy</button>
             <button class="btn" @click="renameSet(intervSet)">Rename</button>
+            <button class="btn" @click="uploadIntervSet(intervSet)">Upload</button>
+            <button class="btn" @click="downloadIntervSet(intervSet)">Download</button>
             <button class="btn __red" @click="deleteSet(intervSet)">Delete</button>
           </td>
         </tr>
@@ -391,7 +393,6 @@ Last update: 2018-05-29
       },
 
       applyNameFilter(sets) {
-        console.log('CK TEST1b')
         console.log(sets)
         return sets.filter(theSet => theSet.intervset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
@@ -482,6 +483,23 @@ Last update: 2018-05-29
           .then(response => {
             // Update the intervention sets so the new set shows up on the list.
             this.updateIntervSets()
+          })
+      },
+
+      uploadIntervSet(intervSet) {
+        console.log('uploadBurdenSet() called for ' + intervSet.intervset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updateIntervSets()
+            status.succeed(this, 'Intervention set uploaded')
+          })
+      },
+
+      downloadIntervSet(intervSet) {
+        console.log('downloadIntervSet() called for ' + intervSet.intervset.name)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex])
+          .then(response => {
+            console.log('Downloaded')
           })
       },
 

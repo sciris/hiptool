@@ -43,3 +43,13 @@ class Interventions(object):
         ''' Load data from a spreadsheet '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
+    
+    def savedata(self, filename=None, folder=None):
+        ''' Export data from a spreadsheet '''
+        filepath = self.data.export(filename=filename)
+        return filepath
+    
+    def jsonify(self, cols=None, rows=None, header=None):
+        ''' Export to a JSON-friendly representation '''
+        output = self.data.jsonify(cols=cols, rows=rows, header=header)
+        return output

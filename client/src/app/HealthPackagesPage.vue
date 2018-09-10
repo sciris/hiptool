@@ -104,6 +104,8 @@ Last update: 2018-05-29
           <td style="white-space: nowrap">
             <button class="btn" @click="renamePackageSet(packageSet)">Rename</button>
             <button class="btn" @click="copyPackageSet(packageSet)">Copy</button>
+            <button class="btn" @click="uploadPackageSet(packageSet)">Upload</button>
+            <button class="btn" @click="downloadPackageSet(packageSet)">Download</button>
             <button class="btn __red" @click="deletePackageSet(packageSet)">Delete</button>
           </td>
         </tr>
@@ -443,6 +445,23 @@ Last update: 2018-05-29
           .then(response => {
             // Update the package sets so the new set shows up on the list.
             this.updatePackageSets()
+          })
+      },
+
+      uploadPackageSet(packageSet) {
+        console.log('uploadPackageSet() called for ' + packageSet.packageset.name)
+        rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex], {}, '.xlsx')
+          .then(response => {
+            this.updatePackageSets()
+            status.succeed(this, 'Intervention set uploaded')
+          })
+      },
+
+      downloadPackageSet(intervSet) {
+        console.log('downloadPackageSet() called for ' + packageSet.packageset)
+        rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex])
+          .then(response => {
+            console.log('Downloaded')
           })
       },
 
