@@ -829,11 +829,11 @@ def get_project_package_set_results(project_id, packageset_numindex):
     packageset = proj.package(key=packageset_numindex)
     
     # Return an empty list if no data is present.
-    if packageset.results is None:
+    if packageset.data is None:
         return { 'results': [] }
 
     # Gather the list for all of the diseases.
-    result_data = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted'], header=False)
+    result_data = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False)
     
     # Return success.
     return { 'results': result_data }

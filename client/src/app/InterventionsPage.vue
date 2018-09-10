@@ -487,7 +487,7 @@ Last update: 2018-05-29
       },
 
       uploadIntervSet(intervSet) {
-        console.log('uploadBurdenSet() called for ' + intervSet.intervset.name)
+        console.log('uploadIntervSet() called for ' + intervSet.intervset.name)
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex], {}, '.xlsx')
           .then(response => {
             this.updateIntervSets()
