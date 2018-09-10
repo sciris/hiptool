@@ -2,7 +2,7 @@
 Version:
 """
 
-import sciris.core as sc
+import sciris as sc
 
 class Interventions(object):
     ''' Class to hold all interventions, e.g. from DCP3. Data stored are/will be:
@@ -24,8 +24,8 @@ class Interventions(object):
         self.name = name # Name of the parameter set, e.g. 'default'
         self.uid = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
-        self.created = sc.today() # Date created
-        self.modified = sc.today() # Date modified
+        self.created = sc.now() # Date created
+        self.modified = sc.now() # Date modified
         self.data = None
         self.filename = None
     

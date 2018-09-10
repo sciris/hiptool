@@ -5,7 +5,7 @@ Version:
 import numpy as np
 import pylab as pl
 import hptool as hp
-import sciris.core as sc
+import sciris as sc
 
 
 class HealthPackage(object):
@@ -17,8 +17,8 @@ class HealthPackage(object):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
-        self.created    = sc.today() # Date created
-        self.modified   = sc.today() # Date modified
+        self.created    = sc.now() # Date created
+        self.modified   = sc.now() # Date modified
         self.results    = None
     
     def __repr__(self):

@@ -3,7 +3,7 @@
 #######################################################################################################
 
 import hptool as hp
-import sciris.core as sc
+import sciris as sc
 
 
 #######################################################################################################
@@ -28,7 +28,7 @@ class Project(object):
         3. copy -- copy a structure in the odict
         4. rename -- rename a structure in the odict
 
-    Version: 2017oct30
+    Version: 2018sep09
     """
 
 
@@ -49,12 +49,11 @@ class Project(object):
         self.name = name
         self.country = country
         self.uid = sc.uuid()
-        self.created = sc.today()
-        self.modified = sc.today()
+        self.created = sc.now()
+        self.modified = sc.now()
         self.version = hp.version
         self.gitinfo = sc.gitinfo(__file__)
         self.filename = None # File path, only present if self.save() is used
-        self.warnings = None # Place to store information about warnings (mostly used during migrations)
 
         ## Load burden spreadsheet, if available
         if burdenfile:
@@ -94,7 +93,6 @@ class Project(object):
         output += '          Git hash: %s\n'    % self.gitinfo['hash']
         output += '               UID: %s\n'    % self.uid
         output += '============================================================\n'
-#        output += self.getwarnings(doprint=False) # Don't print since print later
         return output
     
     
@@ -103,29 +101,7 @@ class Project(object):
         info = sc.odict()
         for attr in ['name', 'version', 'created', 'modified', 'gitbranch', 'gitversion', 'uid']:
             info[attr] = getattr(self, attr) # Populate the dictionary
-#        info['parsetkeys'] = self.parsets.keys()
-#        info['progsetkeys'] = self.parsets.keys()
         return info
-    
-    
-    def addwarning(self, message=None, **kwargs):
-        ''' Add a warning to the project, which is printed when migrated or loaded '''
-        if not hasattr(self, 'warnings') or type(self.warnings)!=str: # If no warnings attribute, create it
-            self.warnings = ''
-        self.warnings += '\n'*3+str(message) # # Add this warning
-        return None
-
-
-    def getwarnings(self, doprint=True):
-        ''' Tiny method to print the warnings in the project, if any '''
-        if hasattr(self, 'warnings') and self.warnings: # There are warnings
-            output = '\nWARNING: This project contains the following warnings:'
-            output += str(self.warnings)
-        else: # There are no warnings
-            output = ''
-        if output and doprint: # Print warnings if requested
-            print(output)
-        return output
     
     
     def save(self, filename=None, folder=None, verbose=2):

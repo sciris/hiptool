@@ -2,7 +2,7 @@
 Version:
 """
 
-import sciris.core as sc
+import sciris as sc
 import pylab as pl
 
 class Burden(object):
@@ -21,8 +21,8 @@ class Burden(object):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
-        self.created    = sc.today() # Date created
-        self.modified   = sc.today() # Date modified
+        self.created    = sc.now() # Date created
+        self.modified   = sc.now() # Date modified
         self.data       = None
         self.filename   = None
         self.popsize    = None
@@ -77,7 +77,7 @@ class Burden(object):
             thisxlabel = xlabels[which]
         except:
             errormsg = '"%s" not found, "which" must be one of: %s' % (which, ', '.join(titles.keys()))
-            raise HPException(errormsg)
+            raise Exception(errormsg)
         
         # Pull out data
         burdendata = sc.dcp(self.data)
