@@ -72,15 +72,9 @@ Last update: 2018-05-29
           </th>
           <th @click="updateSorting('updatedTime')" class="sortable">
             Last modified
-            <span v-show="sortColumn == 'updatedTime' && !sortReverse">
-                <i class="fas fa-caret-down"></i>
-              </span>
-            <span v-show="sortColumn == 'updatedTime' && sortReverse">
-                <i class="fas fa-caret-up"></i>
-              </span>
-            <span v-show="sortColumn != 'updatedTime'">
-                <i class="fas fa-caret-up" style="visibility: hidden"></i>
-              </span>
+            <span v-show="sortColumn == 'updatedTime' && !sortReverse"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn == 'updatedTime' && sortReverse"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn != 'updatedTime'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th>Actions</th>
         </tr>
@@ -120,19 +114,60 @@ Last update: 2018-05-29
         <thead>
         <tr>
           <th>Active</th>
-          <th style="min-width:30%">Intervention&nbsp;name</th>
-          <th style="min-width:20%">Delivery&nbsp;platform</th>
-          <th>Cause&nbsp;of&nbsp;burden</th>
-          <th>ICER</th>
-          <th>Unit&nbsp;cost</th>
-          <th>Spending</th>
-          <th>FRP</th>
+          <th @click="updateSorting2('name')" class="sortable" style="min-width:30%">
+            Intervention&nbsp;name
+            <span v-show="sortColumn2 == 'name' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('platform')" class="sortable" style="min-width:30%">
+            Delivery&nbsp;platform
+            <span v-show="sortColumn2 == 'platform' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'platform' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'platform'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('cause')" class="sortable" style="min-width:30%">
+            Cause&nbsp;of&nbsp;burden
+            <span v-show="sortColumn2 == 'cause' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('icer')" class="sortable" style="min-width:30%">
+            ICER
+            <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('unitcost')" class="sortable" style="min-width:30%">
+            Unit&nbsp;cost
+            <span v-show="sortColumn2 == 'unitcost' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'unitcost' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'unitcost'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('spending')" class="sortable" style="min-width:30%">
+            Spending
+            <span v-show="sortColumn2 == 'spending' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'spending' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'spending'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('frp')" class="sortable" style="min-width:30%">
+            FRP
+            <span v-show="sortColumn2 == 'frp' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'frp' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'frp'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('equity')" class="sortable" style="min-width:30%">
+            Equity
+            <span v-show="sortColumn2 == 'equity' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'equity' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'equity'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
           <th>Equity</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="interv in interventionList">
+        <tr v-for="interv in sortedIntervList">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="interv.active"/>
@@ -213,6 +248,8 @@ Last update: 2018-05-29
         filterText: '', // Text in the table filter box
         sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
+        sortColumn2: 'name',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
+        sortReverse2: false, // Sort in reverse order?
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
         showAllIntervs: true, // Show all of the intervention categories
@@ -241,6 +278,10 @@ Last update: 2018-05-29
 
       sortedFilteredIntervSets() {
         return this.applyNameFilter(this.applySorting(this.interventionSets))
+      },
+
+      sortedIntervList() {
+        return this.applySorting2(this.interventionList)
       },
 
       filteredInterventions() {
@@ -358,15 +399,44 @@ Last update: 2018-05-29
         return sets.sort((set1, set2) =>
           {
             let sortDir = this.sortReverse ? -1: 1
-            if (this.sortColumn === 'name') {
-              return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn === 'creationTime') {
-              return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir
-            }
-            else if (this.sortColumn === 'updatedTime') {
-              return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir
-            }
+            if      (this.sortColumn === 'name')         {return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'creationTime') {return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir}
+            else if (this.sortColumn === 'updatedTime')  {return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir}
+          }
+        )
+      },
+
+
+      updateSorting2(sortColumn) {
+        console.log('updateSorting2() called')
+
+        // If the active sorting column is clicked...
+        if (this.sortColumn2 === sortColumn) {
+          // Reverse the sort.
+          this.sortReverse2 = !this.sortReverse2
+        }
+        // Otherwise.
+        else {
+          // Select the new column for sorting.
+          this.sortColumn2 = sortColumn
+
+          // Set the sorting for non-reverse.
+          this.sortReverse2 = false
+        }
+      },
+
+      applySorting2(intervs) {
+        return intervs.sort((interv1, intervs2) =>
+          {
+            let sortDir = this.sortReverse2 ? -1: 1
+            if      (this.sortColumn2 === 'name')     { return (interv1[1] > intervs2[1] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (interv1[3] > intervs2[3] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'type')     { return (interv1[4] > intervs2[4] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (interv1[5] > intervs2[5] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (interv1[6] > intervs2[6] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (interv1[7] > intervs2[7] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (interv1[8] > intervs2[8] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (interv1[9] > intervs2[9] ? sortDir: -sortDir) }
           }
         )
       },
