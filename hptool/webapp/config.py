@@ -50,4 +50,4 @@ SERVER_PORT = 8091
 MATPLOTLIB_BACKEND = 'Agg'
 
 # Slack logging configuration
-SLACK = {'to':'webapp-logs', 'from':'hptool-bot', 'token':'~/.slackurl'}
+SLACK = None # {'to':'webapp-logs', 'from':'hptool-bot', 'token':'~/.slackurl'}
