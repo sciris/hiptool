@@ -845,7 +845,7 @@ def get_project_package_plots(project_id, packageset_numindex):
     # Gather the list for all of the diseases.
     graphs = []
     for fig in figs:
-        graph_dict = make_mpld3_graph_dict(fig)
+        graph_dict = sw.mpld3ify(fig, jsonify=False)
         graphs.append(graph_dict)
     
     # Return success -- WARNING, should not be hard-coded!
