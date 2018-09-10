@@ -15,24 +15,6 @@ Last update: 2018-05-29
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <!--<button class="btn" @click="createNewPackageSet">Create new health benefits package</button>-->
-
-      <!--<span>&nbsp;based on [FIX]</span>-->
-
-      <!--<select-->
-        <!--title="countrySelect"-->
-        <!--id="country"-->
-        <!--:required="true"-->
-        <!--v-model="country">-->
-        <!--<option-->
-          <!--v-for = "country in countryList"-->
-          <!--:value="country"-->
-        <!--&gt;-->
-          <!--{{country}}-->
-        <!--</option>-->
-      <!--</select>-->
-
-      <!--<br/><br/>-->
 
       <input type="text"
              class="txbox"
@@ -104,20 +86,21 @@ Last update: 2018-05-29
           <td style="white-space: nowrap">
             <button class="btn" @click="renamePackageSet(packageSet)">Rename</button>
             <button class="btn" @click="copyPackageSet(packageSet)">Copy</button>
-            <button class="btn" @click="uploadPackageSet(packageSet)">Upload</button>
             <button class="btn" @click="downloadPackageSet(packageSet)">Download</button>
             <button class="btn __red" @click="deletePackageSet(packageSet)">Delete</button>
           </td>
         </tr>
         </tbody>
       </table>
+      <button class="btn" @click="showPlots">Show plots</button>
+      <button class="btn" @click="hidePlots">Hide plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
 
-      <div>
-        <div id="fig01" style="float:left" ></div>
-        <div id="fig02" style="float:left" ></div>
+      <div v-show="showingPlots">
+        <div id="fig1" style="float:left" ></div>
+        <div id="fig2" style="float:left" ></div>
       </div>
 
 
@@ -194,42 +177,17 @@ Last update: 2018-05-29
 
     data() {
       return {
-        // Placeholder text for table filter box
-        filterPlaceholder: 'Type here to filter health packages',
-
-        // Text in the table filter box
-        filterText: '',
-
-        // Column of table used for sorting the health package sets
-        sortColumn: 'updatedTime',  // name, creationTime, updatedTime
-
-        // Sort in reverse order?
-        sortReverse: false,
-
-        // List of health package sets in the active project
-        packageSets: [],
-
-        // Active health package set
-        activePackageSet: {},
-
-        // List of diseases.  Each list element is a list of the ailment name
-        // and numbers associated with it.
-        resultList: [],
-
-        // Column of table used for sorting the diseases
-        sortColumn2: 'name',  // name, country, creationTime, updatedTime
-
-        // Sort diseases in reverse order?
-        sortReverse2: true,
-
-        // CK: WARNING TEMP, should come from backend
-        country: 'Afghanistan',
-        countryList: [
-          'Afghanistan',
-          'Other',
-        ],
-
+        filterPlaceholder: 'Type here to filter health packages', // Placeholder text for table filter box
+        filterText: '', // Text in the table filter box
+        sortColumn: 'updatedTime',  // Column of table used for sorting the health package sets // name, creationTime, updatedTime
+        sortReverse: false, // Sort in reverse order?
+        packageSets: [], // List of health package sets in the active project
+        activePackageSet: {}, // Active health package set
+        resultList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
+        sortColumn2: 'name',  // Column of table used for sorting the diseases // name, country, creationTime, updatedTime
+        sortReverse2: true, // Sort diseases in reverse order?
         serverresponse: 'no response',
+        showingPlots: false,
       }
     },
 
@@ -272,6 +230,16 @@ Last update: 2018-05-29
 
       notImplemented(message) {
         status.fail(this, 'Function "' + message + '" not yet implemented')
+      },
+
+      clearGraphs(numfigs) { return utils.clearGraphs(this, numfigs)},
+
+      showPlots() {
+        this.showingPlots = true
+      },
+
+      hidePlots() {
+        this.showingPlots = false
       },
 
       updatePackageSets(setLastEntryActive) {
@@ -402,6 +370,7 @@ Last update: 2018-05-29
 
         // Set the active project to the matched project.
         this.activePackageSet = packageSet
+        this.clearGraphs(2)
 
         // Go to the server to get the results from the package set.
         rpcs.rpc('get_project_package_plots',
@@ -409,8 +378,8 @@ Last update: 2018-05-29
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
             let theFig = response.data.graph1 // Extract hack info.
-            mpld3.draw_figure('fig01', response.data.graph1) // Draw the figure.
-            mpld3.draw_figure('fig02', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
+            mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.
