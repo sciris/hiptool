@@ -256,7 +256,6 @@ Last update: 2018-05-29
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
         interventionList: [],
-        sortedIntervList: [],
 
         // CK: WARNING TEMP, should come from backend
         country: 'Afghanistan',
@@ -280,10 +279,10 @@ Last update: 2018-05-29
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
 
-//      sortedIntervList() {
-//        var sortedList =  this.applySorting2(this.interventionList);
-//        return sortedList
-//      },
+      sortedIntervList() {
+        var sortedList =  this.applySorting2(this.interventionList);
+        return sortedList
+      },
 
     },
 
@@ -337,7 +336,7 @@ Last update: 2018-05-29
               // If we want to set the last entry active and we have any
               // entries, do the setting.
               if (this.interventionSets.length > 0) {
-                this.viewSet(this.interventionSets[this.interventionSets.length - 1], true)
+                this.viewSet(this.interventionSets[this.interventionSets.length - 1])
               }
             })
         }
@@ -406,8 +405,6 @@ Last update: 2018-05-29
           // Set the sorting for non-reverse.
           this.sortReverse2 = false
         }
-
-        this.sortedIntervList =  this.applySorting2(this.interventionList);
       },
 
       applySorting2(intervs) {
@@ -452,12 +449,10 @@ Last update: 2018-05-29
               this.interventionList[ind].frp = Number(this.interventionList[ind][8]).toLocaleString()
               this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
             }
-
-            if (verbose) {
-              this.sortedIntervList = this.interventionList
-              status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
-            }
           })
+        if (verbose) {
+          status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
+        }
       },
 
       copySet(intervSet) {
