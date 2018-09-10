@@ -163,5 +163,5 @@ class HealthPackage(object):
             tl.set_color(colors[t])
         
         pl.gca().set_facecolor('none')
-        pl.title('Investment cascade for Afghanistan')
+        pl.title('Investment cascade')
         return fig

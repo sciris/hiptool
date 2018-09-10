@@ -590,6 +590,7 @@ def create_burden_set(project_id, new_burden_set_name):
         
         # Put the new burden set in the dictionary.
         proj.burdensets[unique_name] = new_burden_set
+        proj.package().make_package() # Update with the latest data
         
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
@@ -654,6 +655,7 @@ def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, 
     for i,datum in enumerate(data):
         data_record[i] = datum
     
+    proj.package().make_package() # Update with the latest data
     proj.modified = sc.now()
     save_project(proj)
     print('Done updating burden set.')
@@ -748,6 +750,8 @@ def create_interv_set(project_id, new_interv_set_name):
         # Put the new intervention set in the dictionary.
         proj.intervsets[unique_name] = new_intervset
         
+        proj.package().make_package() # Update with the latest data
+        
     # Do the project update using the internal function.
     update_project_with_fn(project_id, update_project_fn)
 
@@ -759,6 +763,7 @@ def delete_interv_set(project_id, intervset_numindex):
 
     def update_project_fn(proj):
         proj.intervsets.pop(intervset_numindex)
+        proj.package().make_package() # Update with the latest data
         
     # Do the project update using the internal function.    
     update_project_with_fn(project_id, update_project_fn)   
@@ -812,6 +817,7 @@ def update_interv_set_interv(project_id, intervkey, newdata):
     if intervdata.nrows()>len(newdata):
         intervdata.rmrows(range(len(newdata), intervdata.nrows()))
         
+    proj.package().make_package() # Update with the latest data
     proj.modified = sc.now()
     save_project(proj)
     return None
