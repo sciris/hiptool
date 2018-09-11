@@ -114,10 +114,34 @@ class HealthPackage(object):
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
         plot_labels.append('Other')
-        pl.axes([0.1,0.1,0.5,0.8])
+        pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
         pl.title("Current DALYs averted by health intervention\n('000s; total: %0.2f million)" % total_averted)
+        pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
+        pl.gca().set_facecolor('none')
+        return fig
+    
+    def plot_spending(self):
+        df = self.data
+        fig = pl.figure(figsize=(10,6))
+        max_entries = 11
+        colors = sc.gridcolors(ncolors=max_entries+2)[2:]
+        df.sort(col='spend', reverse=True)
+        DA_data = df['spend']
+        plot_data = list(DA_data[:max_entries-1])
+        plot_data.append(sum(DA_data[max_entries:]))
+        plot_data = np.array(plot_data)/1e6
+#        plot_data = plot_data.round()
+        total_averted = (plot_data.sum())
+        data_labels = ['$%0.3fm'%datum for datum in plot_data]
+        DA_labels = df['shortname']
+        plot_labels = list(DA_labels[:max_entries-1])
+        plot_labels.append('Other')
+        pl.axes([0.15,0.1,0.45,0.8])
+        pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
+        pl.gca().axis('equal')
+        pl.title("Current spending by health intervention\n(total: $%0.3f million)" % total_averted)
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig

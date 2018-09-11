@@ -18,6 +18,7 @@ print('\n\nExample interventions entry:\n\n%s' % P.intervsets[0].data[37])
 
 #P.burden().plottopcauses()
 #P.package().plot_cascade()
+P.package().plot_spending()
 #P.burden().plottopcauses(which='prevalence', n=15)
 # dd = P.burden().export(cols=['cause','dalys','deaths','prevalence'])
 

@@ -102,6 +102,7 @@ Last update: 2018-05-29
       <div v-show="showingPlots">
         <div id="fig1" style="float:left" ></div>
         <div id="fig2" style="float:left" ></div>
+        <div id="fig3" style="float:left" ></div>
       </div>
 
 
@@ -317,7 +318,6 @@ Last update: 2018-05-29
       },
 
       applyNameFilter(sets) {
-        console.log('CK TEST2')
         console.log(sets)
         return sets.filter(theSet => theSet.packageset.name.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1)
       },
@@ -379,7 +379,7 @@ Last update: 2018-05-29
 
         // Set the active project to the matched project.
         this.activePackageSet = packageSet
-        this.clearGraphs(2)
+        this.clearGraphs(3)
 
         // Go to the server to get the results from the package set.
         rpcs.rpc('get_project_package_plots',
@@ -389,6 +389,7 @@ Last update: 2018-05-29
             let theFig = response.data.graph1 // Extract hack info.
             mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
             mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
+            mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
             // Pull out the error message.

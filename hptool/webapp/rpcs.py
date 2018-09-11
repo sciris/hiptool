@@ -996,10 +996,12 @@ def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     packageset.make_package()
     
     figs = []
-    fig1 = packageset.plot_dalys()
-    fig2 = packageset.plot_cascade()
+    fig1 = packageset.plot_spending()
+    fig2 = packageset.plot_dalys()
+    fig3 = packageset.plot_cascade()
     figs.append(fig1)
     figs.append(fig2)
+    figs.append(fig3)
     
     # Gather the list for all of the diseases.
     graphs = []
@@ -1014,4 +1016,5 @@ def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     
     # Return success -- WARNING, should not be hard-coded!
     return {'graph1': graphs[0],
-            'graph2': graphs[1],}
+            'graph2': graphs[1],
+            'graph3': graphs[2],}
