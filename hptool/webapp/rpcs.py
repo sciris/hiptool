@@ -908,6 +908,7 @@ def get_project_package_set_results(project_id, packageset_numindex):
     
     # Get the package set that matches packageset_numindex.
     packageset = proj.package(key=packageset_numindex)
+    packageset.make_package()
     
     # Return an empty list if no data is present.
     if packageset.data is None:
@@ -992,6 +993,7 @@ def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     
     # Get the package set that matches packageset_numindex.
     packageset = proj.package(key=packageset_numindex)
+    packageset.make_package()
     
     figs = []
     fig1 = packageset.plot_dalys()
