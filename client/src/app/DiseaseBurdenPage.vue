@@ -434,6 +434,9 @@ Last update: 2018-05-29
           // Plot graphs
           this.makeGraph(burdenSet)
         })
+          .catch(error => {
+            status.fail(this, 'Could not update burden sets', error)
+          })
         if (verbose) {
           status.succeed(this, 'Burden set "' + burdenSet.burdenset.name + '" now active')
         }
@@ -452,11 +455,7 @@ Last update: 2018-05-29
             mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
-            // Pull out the error message.
-            this.serverresponse = 'There was an error: ' + error.message
-
-            // Set the server error.
-            this.servererror = error.message
+            status.fail(this, 'Could not make graphs', error)
           })
       },
 
@@ -479,6 +478,10 @@ Last update: 2018-05-29
             this.updateBurdenSets()
             status.succeed(this, 'Burden set uploaded')
           })
+          .catch(error => {
+            status.fail(this, 'Could not upload burden set', error)
+          })
+
       },
 
       downloadBurdenSet(burdenSet) {
@@ -486,6 +489,9 @@ Last update: 2018-05-29
         rpcs.download('download_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex])
           .then(response => {
             console.log('Downloaded')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not download burden set', error)
           })
       },
 

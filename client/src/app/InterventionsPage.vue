@@ -339,6 +339,9 @@ Last update: 2018-05-29
                 this.viewSet(this.interventionSets[this.interventionSets.length - 1])
               }
             })
+            .catch(error => {
+              status.fail(this, 'Could not update interventions set', error)
+            })
         }
       },
 
@@ -450,6 +453,9 @@ Last update: 2018-05-29
               this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
+          .catch(error => {
+            status.fail(this, 'Could not view interventions set', error)
+          })
         if (verbose) {
           status.succeed(this, 'Intervention set "' + intervSet.intervset.name + '" now active')
         }
@@ -473,6 +479,9 @@ Last update: 2018-05-29
           .then(response => {
             this.updateIntervSets()
             status.succeed(this, 'Intervention set uploaded')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not upload interventions set', error)
           })
       },
 
