@@ -284,6 +284,9 @@ Last update: 2018-05-29
               if ((setLastEntryActive) && (this.packageSets.length > 0))
                 this.viewPackageSet(this.packageSets[this.packageSets.length - 1])
             })
+            .catch(error => {
+              status.fail(this, 'Could not get package sets', error)
+            })
         }
       },
 
@@ -370,6 +373,9 @@ Last update: 2018-05-29
             // Plot graphs
             this.makeGraph(packageSet)
           })
+          .catch(error => {
+            status.fail(this, 'Could not view health package sets', error)
+          })
 
         status.succeed(this, 'Health package "' + packageSet.packageset.name + '" now active')
       },
@@ -392,11 +398,7 @@ Last update: 2018-05-29
             mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
           })
           .catch(error => {
-            // Pull out the error message.
-            this.serverresponse = 'There was an error: ' + error.message
-
-            // Set the server error.
-            this.servererror = error.message
+            status.fail(this, 'Could not make graphs', error)
           })
       },
 
@@ -418,6 +420,9 @@ Last update: 2018-05-29
           .then(response => {
             this.updatePackageSets()
             status.succeed(this, 'Package set uploaded')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not upload package set', error)
           })
       },
 

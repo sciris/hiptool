@@ -520,6 +520,8 @@ def upload_set(filename, project_id, which, key=None):
     thisset.loaddata(filename)
     print('Loaded data into %s %s' % (which, thisset.name))
     proj.modified = sc.now()
+    print('Updating health package...')
+    proj.package().make_package()
     save_project(proj)
     return None
     
