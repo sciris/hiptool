@@ -22,8 +22,7 @@ rc('font', size=12)
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
 RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using call to make_RPC().
 figures_filename = 'Figures.pdf'
-datastore = None # Initialize datastore as a global variable
-find_datastore() # Run this on load
+datastore = None # Initialize datastore as a global variable -- populated by find_datastore just below
 
 
 
@@ -37,6 +36,7 @@ def find_datastore():
     if datastore is None:
         datastore = sw.get_datastore(config=config)
     return datastore # So can be used externally
+find_datastore() # Run this on load
 
 
 def get_path(filename=None, username=None):
