@@ -20,13 +20,22 @@ rc('font', size=12)
 # Globals
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
 RPC = sw.makeRPCtag(RPC_dict) # RPC registration decorator factory created using call to make_RPC().
-datastore = None
 figures_filename = 'Figures.pdf'
-
+datastore = None # Initialize datastore as a global variable
+find_datastore() # Run this on load
 
 ###############################################################
 ### Helper functions
 ##############################################################
+
+def find_datastore():
+    ''' Ensure the datastore is loaded '''
+    global datastore
+    if datastore is None:
+        datastore = sw.get_datastore(config=config)
+    return datastore # So can be used externally
+
+
 
 def get_path(filename=None, username=None):
     if filename is None: filename = ''
@@ -89,7 +98,7 @@ def get_version_info():
       
 
 def get_user(username=None):
-    ''' Ensure it's a valid Optima Nutrition user '''
+    ''' Ensure it's a valid user '''
     user = datastore.loaduser(username)
     dosave = False
     if not hasattr(user, 'projects'):
@@ -100,18 +109,8 @@ def get_user(username=None):
     return user
 
 
-def find_datastore():
-    ''' Ensure the datastore is loaded '''
-    global datastore
-    if datastore is None:
-        datastore = sw.get_datastore(config=config)
-    return datastore # So can be used externally
-
-find_datastore() # Run this on load
-
-
 ##################################################################################
-### Convenience functions -- WARNING, make these more symmetric
+### Convenience functions
 ##################################################################################
     
 def load_project(project_key, die=None):
@@ -263,17 +262,18 @@ def rename_project(project_summary):
 @RPC()
 def add_demo_project(username):
     """ Add a demo Optima Nutrition project """
-    proj = nu.demo(scens=True, optims=True)  # Create the project, loading in the desired spreadsheets.
+    proj = hp.demo()  # Create the project, loading in the desired spreadsheets.
     proj.name = 'Demo project'
     print(">> add_demo_project %s" % (proj.name)) # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
     return {'projectID': str(proj.uid)} # Return the new project UID in the return message.
 
 
+#!!!FIX
 @RPC(call_type='download')
 def create_new_project(username, proj_name, *args, **kwargs):
     """ Create a new Optima Nutrition project. """
-    proj = nu.Project(name=proj_name) # Create the project
+    proj = hp.Project() # Create the project
     print(">> create_new_project %s" % (proj.name))     # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
     file_name = '%s databook.xlsx' % proj.name # Create a filename containing the project name followed by a .prj suffix.
@@ -382,7 +382,7 @@ def download_set(project_id, which, key=None):
 
 @RPC(call_type='download')
 def download_figures():
-    filepath = getpath(figures_filename) # Must match 
+    filepath = get_path(figures_filename) # Must match 
     print('Downloading figures from %s' % filepath)
     return filepath
 

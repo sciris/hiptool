@@ -3,6 +3,7 @@
 ###########################################################################
 
 import sciris as sc
+import scirisweb as sw
 import hptool as hp
 from hptool.webapp import rpcs, main
 
@@ -48,7 +49,7 @@ heading(string, 'big')
 
 if 'project_io' in torun:
     heading('Running project_io', 'big')
-    uid = rpcs.save_project_as_new(proj, user_id=user_id)
+    uid = rpcs.save_new_project(proj, user.username)
     P = rpcs.load_project_record(uid)
     print(P)
 
