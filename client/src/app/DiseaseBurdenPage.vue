@@ -304,7 +304,7 @@ Last update: 2018sep22
       },
 
       downloadPlots() {
-        rpcs.download('download_figures', [])
+        rpcs.download('download_figures', [this.$store.state.currentUser.username])
           .then(response => {
             console.log('Downloaded figures')
           })
@@ -395,7 +395,7 @@ Last update: 2018sep22
         console.log('makeGraph() called for ' + burdenSet.burdenset.name)
         this.activeBurdenSet = burdenSet // Set the active project to the matched project.
         this.clearGraphs(3)
-        rpcs.rpc('get_project_burden_plots',  // Go to the server to get the diseases from the burden set.
+        rpcs.rpc('plot_burden',  // Go to the server to get the diseases from the burden set.
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.

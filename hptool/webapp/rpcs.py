@@ -168,6 +168,7 @@ def jsonify_package(packageset):
     }
     return json
 
+
 @RPC()
 def jsonify_projects(username, verbose=False):
     """ Return project jsons for all projects the user has to the client. """ 
@@ -179,12 +180,14 @@ def jsonify_projects(username, verbose=False):
     if verbose: sc.pp(output)
     return output
 
+
 @RPC()     
 def jsonify_burdensets(project_id=None, proj=None):
     ''' Return the JSON representation of all burden sets in the project '''
     if proj is None: proj = load_project(project_id) # Get the Project object.
     output = {'burdensets': [jsonify_burden(bs) for bs in proj.burdensets.values()]}
     return output
+
 
 @RPC()     
 def jsonify_intervsets(project_id=None, proj=None):
@@ -193,6 +196,7 @@ def jsonify_intervsets(project_id=None, proj=None):
     output = {'intervsets': [jsonify_interv(iv) for iv in proj.intervsets.values()]}
     return output
 
+
 @RPC()     
 def jsonify_packagesets(project_id=None, proj=None):
     ''' Return the JSON representation of all package sets in the project '''
@@ -200,13 +204,15 @@ def jsonify_packagesets(project_id=None, proj=None):
     output = {'packagesets': [jsonify_package(pk) for pk in proj.packagesets.values()]}
     return output
 
+
 ##################################################################################
 ### Project RPCs
 ##################################################################################
 
 def load_project(project_key, die=None):
-    output = datastore.loadblob(project_key, objtype='project', die=die)
-    return output
+    proj = datastore.loadblob(project_key, objtype='project', die=die)
+    proj.restorelinks()
+    return proj
 
 
 def save_project(project, die=None): # NB, only for saving an existing project
