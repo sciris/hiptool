@@ -64,7 +64,6 @@ function clearGraphs(vm, numfigs) {
   }
 }
 
-
 function exportGraphs(vm, project_id) {
   console.log('exportGraphs() called')
   rpcs.download('export_graphs', [project_id]) // Make the server call to download the framework to a .prj file.
