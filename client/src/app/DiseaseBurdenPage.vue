@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018-05-29
+Last update: 2018sep22
 -->
 
 <template>
@@ -14,20 +14,14 @@ Last update: 2018-05-29
     </div>
 
     <div class="PageSection" v-if="activeProjectName !== ''">
-
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
-
       <span>&nbsp;based on&nbsp;</span>
-
       <select
         title="countrySelect"
         id="country"
         :required="true"
         v-model="country">
-        <option
-          v-for = "country in countryList"
-          :value="country"
-        >
+        <option v-for = "country in countryList" :value="country">
           {{country}}
         </option>
       </select>
@@ -229,9 +223,9 @@ Last update: 2018-05-29
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
-  import status from '@/services/status-service'
-  import rpcs from '@/services/rpc-service'
-  import utils from '@/services/utils'
+  import status from '@/js/status-service'
+  import rpcs from '@/js/rpc-service'
+  import utils from '@/js/utils'
   import router from '@/router'
   import Vue from 'vue';
 
@@ -254,7 +248,6 @@ Last update: 2018-05-29
           'Afghanistan',
           'Other',
         ],
-        serverresponse: 'no response',
         showingPlots: false,
       }
     },
@@ -281,16 +274,10 @@ Last update: 2018-05-29
     },
 
     created() {
-      // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname === undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
-      }
-
-      // Otherwise...
-      else {
-        // Load the burden sets from the active project, telling the function
-        // to also set the active burden set to the last item.
-        this.updateBurdenSets(true)
+      } else { // Otherwise...
+        this.updateBurdenSets(true) // Load the burden sets from the active project, telling the function to also set the active burden set to the last item.
       }
     },
 
@@ -311,7 +298,7 @@ Last update: 2018-05-29
       },
 
       downloadPlots() {
-        rpcs.download('download_figures', [])
+        rpcs.download('download_figures', [this.$store.state.currentUser.username])
           .then(response => {
             console.log('Downloaded figures')
           })
@@ -319,66 +306,40 @@ Last update: 2018-05-29
 
       updateBurdenSets(setLastEntryActive) {
         console.log('updateBurdenSets() called')
-
-        // If there is no active project, clear the burdenSets list.
-        if (this.$store.state.activeProject.project === undefined) {
+        if (this.$store.state.activeProject.project === undefined) { // If there is no active project, clear the burdenSets list.
           this.burdenSets = []
-        }
-
-        // Otherwise...
-        else {
-          // Get the active project's burden sets.
-          rpcs.rpc('get_project_burden_sets',
-            [this.$store.state.activeProject.project.id])
+        } else { // Otherwise...
+          rpcs.rpc('jsonify_burdensets', [this.$store.state.activeProject.project.id]) // Get the active project's burden sets.
           .then(response => {
-            // Set the burden set list to what we received.
-            this.burdenSets = response.data.burdensets
-
-            // Add numindex elements to the burden sets to keep track of
-		        // which index to pull from the server.
-            for (let ind=0; ind < this.burdenSets.length; ind++)
+            this.burdenSets = response.data.burdensets // Set the burden set list to what we received.
+            for (let ind=0; ind < this.burdenSets.length; ind++) { // Add numindex elements to the burden sets to keep track of which index to pull from the server.
               this.burdenSets[ind].burdenset.numindex = ind
-
-            // Set renaming values to blank initially.
-            this.burdenSets.forEach(theSet => {
+            }
+            this.burdenSets.forEach(theSet => { // Set renaming values to blank initially.
 		          theSet.renaming = ''
 		        })
-
-            // If we want to set the last entry active and we have any
-            // entries, do the setting.
-            if ((setLastEntryActive) && (this.burdenSets.length > 0))
+            if ((setLastEntryActive) && (this.burdenSets.length > 0)) { // If we want to set the last entry active and we have any entries, do the setting.
               this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])
+            }
           })
         }
       },
 
       burdenSetIsSelected(burdenSet) {
-        // If the active burden set is undefined, it is not active.
-        if (this.activeBurdenSet.burdenset === undefined) {
+        if (this.activeBurdenSet.burdenset === undefined) { // If the active burden set is undefined, it is not active.
           return false
-        }
-
-        // Otherwise, the burden set is selected if the numindexes match.
-        else {
+        } else { // Otherwise, the burden set is selected if the numindexes match.
           return (this.activeBurdenSet.burdenset.numindex === burdenSet.burdenset.numindex)
         }
       },
 
       updateSorting(sortColumn) {
         console.log('updateSorting() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn === sortColumn) {
-            // Reverse the sort.
-            this.sortReverse = !this.sortReverse
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse = false
+        if (this.sortColumn === sortColumn) { // If the active sorting column is clicked...
+            this.sortReverse = !this.sortReverse // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn = sortColumn // Select the new column for sorting.
+          this.sortReverse = false // Set the sorting for non-reverse.
         }
       },
 
@@ -391,34 +352,20 @@ Last update: 2018-05-29
         return sets.sort((set1, set2) =>
           {
             let sortDir = this.sortReverse ? -1: 1
-            if (this.sortColumn === 'name') {
-              return (set1.burdenset.name > set2.burdenset.name ? sortDir: -sortDir)
-            }
-            else if (this.sortColumn === 'creationTime') {
-              return set1.burdenset.creationTime > set2.burdenset.creationTime ? sortDir: -sortDir
-            }
-            else if (this.sortColumn === 'updatedTime') {
-              return set1.burdenset.updateTime > set2.burdenset.updateTime ? sortDir: -sortDir
-            }
+            if      (this.sortColumn === 'name')         {return (set1.burdenset.name         > set2.burdenset.name         ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'creationTime') {return (set1.burdenset.creationTime > set2.burdenset.creationTime ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'updatedTime')  {return (set1.burdenset.updateTime   > set2.burdenset.updateTime   ? sortDir: -sortDir)}
           }
         )
       },
 
       viewBurdenSet(burdenSet, verbose) {
         console.log('viewBurdenSet() called for ' + burdenSet.burdenset.name)
-
-        // Set the active project to the burdenSet passed in.
-        this.activeBurdenSet = burdenSet
-
-        // Go to the server to get the diseases from the burden set.
-        rpcs.rpc('get_project_burden_set_diseases',
-          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
+        this.activeBurdenSet = burdenSet // Set the active project to the burdenSet passed in.
+        rpcs.rpc('jsonify_diseases', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex]) // Go to the server to get the diseases from the burden set.
         .then(response => {
-          // Set the disease list.
-          this.diseaseList = response.data.diseases
-
-          // Set the active values from the loaded in data.
-          for (let ind=0; ind < this.diseaseList.length; ind++) {
+          this.diseaseList = response.data.diseases // Set the disease list.
+          for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
 		        this.diseaseList[ind].active = (this.diseaseList[ind][0] > 0)
             this.diseaseList[ind].cause = this.diseaseList[ind][1]
@@ -426,13 +373,9 @@ Last update: 2018-05-29
             this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString()
             this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString()
 		      }
-
-          // Reset the bottom table sorting state.
-          this.sortColumn2 = 'name'
+          this.sortColumn2 = 'name' // Reset the bottom table sorting state.
           this.sortReverse2 = false
-
-          // Plot graphs
-          this.makeGraph(burdenSet)
+          this.makeGraph(burdenSet) // Plot graphs
         })
           .catch(error => {
             status.fail(this, 'Could not update burden sets', error)
@@ -446,7 +389,7 @@ Last update: 2018-05-29
         console.log('makeGraph() called for ' + burdenSet.burdenset.name)
         this.activeBurdenSet = burdenSet // Set the active project to the matched project.
         this.clearGraphs(3)
-        rpcs.rpc('get_project_burden_plots',  // Go to the server to get the diseases from the burden set.
+        rpcs.rpc('plot_burden',  // Go to the server to get the diseases from the burden set.
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.serverresponse = response.data // Pull out the response data.
@@ -461,13 +404,9 @@ Last update: 2018-05-29
 
       copyBurdenSet(burdenSet) {
         console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
-
-	      // Have the server copy the burden set, giving it a new name.
-        rpcs.rpc('copy_burden_set',
-          [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+        rpcs.rpc('copy_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex]) // Have the server copy the burden set, giving it a new name.
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.
-          this.updateBurdenSets()
+          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
         })
       },
 
@@ -497,24 +436,13 @@ Last update: 2018-05-29
 
       renameBurdenSet(burdenSet) {
         console.log('renameBurdenSet() called for ' + burdenSet.burdenset.name)
-
-	      // If the burden set is not in a mode to be renamed, make it so.
-	      if (burdenSet.renaming === '') {
+	      if (burdenSet.renaming === '') { // If the burden set is not in a mode to be renamed, make it so.
 		      burdenSet.renaming = burdenSet.burdenset.name
-        }
-
-	      // Otherwise (it is to be renamed)...
-	      else {
-          // Have the server change the name of the burden set.
-          rpcs.rpc('rename_burden_set',
-            [this.$store.state.activeProject.project.id,
-            burdenSet.burdenset.numindex, burdenSet.renaming])
+        } else { // Otherwise (it is to be renamed)...
+          rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex, burdenSet.renaming]) // Have the server change the name of the burden set.
           .then(response => {
-            // Update the burden sets so the renamed one shows up on the list.
-            this.updateBurdenSets()
-
-		        // Turn off the renaming mode.
-		        burdenSet.renaming = ''
+            this.updateBurdenSets() // Update the burden sets so the renamed one shows up on the list.
+		        burdenSet.renaming = '' // Turn off the renaming mode.
           })
         }
 
@@ -529,44 +457,28 @@ Last update: 2018-05-29
 
       deleteBurdenSet(burdenSet) {
         console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
-
-        // Go to the server to delete the burden set.
-        rpcs.rpc('delete_burden_set',
-          [this.$store.state.activeProject.project.id, burdenSet.burdenset.numindex])
+        rpcs.rpc('delete_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex]) // Go to the server to delete the burden set.
         .then(response => {
-          // Update the burden sets so the new set shows up on the list.
-          this.updateBurdenSets()
+          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
         })
       },
 
       createNewBurdenSet() {
         console.log('createNewBurdenSet() called')
-
-        // Go to the server to create the new burden set.
-        rpcs.rpc('create_burden_set',
-          [this.$store.state.activeProject.project.id, 'New burden set'])
-        .then(response => {
-          // Update the burden sets so the new set shows up on the list.
-          this.updateBurdenSets()
+        rpcs.rpc('create_burdenset', [this.$store.state.activeProject.project.id, 'New burden set']) // Go to the server to create the new burden set.
+          .then(response => {
+          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
         })
       },
 
-
       updateSorting2(sortColumn) {
         console.log('updateSorting2() called')
-
         // If the active sorting column is clicked...
         if (this.sortColumn2 === sortColumn) {
-            // Reverse the sort.
-            this.sortReverse2 = !this.sortReverse2
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn2 = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse2 = false
+            this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn2 = sortColumn // Select the new column for sorting.
+          this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
 
@@ -584,20 +496,18 @@ Last update: 2018-05-29
 
       updateDisease(disease) {
         console.log('Update to be made')
-        console.log('Index: ', disease.numindex)
-        console.log('Active?: ', disease.active)
-        console.log('Cause: ', disease.cause)
-        console.log('DALYs: ', disease.dalys)
-        console.log('Deaths: ', disease.deaths)
+        console.log('Index: ',      disease.numindex)
+        console.log('Active?: ',    disease.active)
+        console.log('Cause: ',      disease.cause)
+        console.log('DALYs: ',      disease.dalys)
+        console.log('Deaths: ',     disease.deaths)
         console.log('Prevalence: ', disease.prevalence)
 
         // Do format filtering to prepare the data to pass to the RPC.
         let filterActive = disease.active ? 1 : 0
 
-        // Go to the server to update the disease from the burden set.
-        // Note: filter out commas in the numeric fields.
-        rpcs.rpc('update_burden_set_disease',
-          [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
+        // Go to the server to update the disease from the burden set. Note: filter out commas in the numeric fields.
+        rpcs.rpc('update_disease', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
           [disease.active, disease.cause, disease.dalys, disease.deaths, disease.prevalence]])
         .then(response => {
           status.succeed(this, 'Burden set updated')
@@ -605,7 +515,7 @@ Last update: 2018-05-29
       },
 
       addBurden() {
-        console.log('Adding item')
+        console.log('Adding burden')
         rpcs.rpc('add_burden', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
@@ -637,41 +547,5 @@ Last update: 2018-05-29
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .UIPlaceholder {
-    width: 100%;
-  }
 
-  .PHText {
-    color: green;
-    text-align: center;
-  }
-
-  .ThreePanels {
-    display: flex;
-    width: 100%;
-  }
-
-  .LeftPanel {
-    height: 100%;
-    width: 33%;
-    text-align: center;
-  }
-
-  .MidPanel {
-    height: 100%;
-    width: 34%;
-    text-align: center;
-  }
-
-  .RightPanel {
-    height: 100%;
-    width: 33%;
-    text-align: center;
-  }
-
-  #test-hot {
-    width: 600px;
-    height: 400px;
-    overflow: hidden;
-  }
 </style>

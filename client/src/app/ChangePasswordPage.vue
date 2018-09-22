@@ -7,6 +7,8 @@ Last update: 2018-08-26
 <template>
   <div>
 
+    <p v-if="changeResult != ''">{{ changeResult }}</p>
+
     <form name="ChangePasswordForm" @submit.prevent="tryChangePassword" style="max-width: 300px; min-width: 100px; margin: 0 0">
 
       <div class="section form-input-validate">
@@ -31,14 +33,13 @@ Last update: 2018-08-26
 
       <br/>
 
-      <p v-if="changeResult != ''">{{ changeResult }}</p>
     </form>
   </div>
 </template>
 
 <script>
-  import userservice from '@/services/user-service'
-  import status from '@/services/status-service'
+  import userservice from '@/js/user-service'
+  import status from '@/js/status-service'
   import router from '@/router'
 
   export default {
@@ -56,9 +57,8 @@ Last update: 2018-08-26
       tryChangePassword () {
         userservice.changeUserPassword(this.oldPassword, this.newPassword)
           .then(response => {
-            if (response.data == 'success') {
+            if (response.data === 'success') {
               status.succeed(this, 'Password updated')
-
               // Read in the full current user information.
               userservice.getCurrentUserInfo()
                 .then(response2 => {
@@ -74,8 +74,7 @@ Last update: 2018-08-26
                   this.$store.commit('newUser', {})
                 })
             } else {
-              // Set a failure result to show.
-              status.fail(this, 'Password updated failed')
+              this.changeResult = response.data
             }
           })
           .catch(error => {

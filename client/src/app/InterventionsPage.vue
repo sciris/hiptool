@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018-05-29
+Last update: 2018sep22
 -->
 
 <template>
@@ -24,10 +24,7 @@ Last update: 2018-05-29
         id="country"
         :required="true"
         v-model="country">
-        <option
-          v-for = "country in countryList"
-          :value="country"
-        >
+        <option v-for = "country in countryList" :value="country">
           {{country}}
         </option>
       </select>
@@ -110,7 +107,7 @@ Last update: 2018-05-29
     </div>
 
 
-    <div class="PageSection UIPlaceholder" v-if="activeIntervSet.intervset != undefined">
+    <div class="PageSection" v-if="activeIntervSet.intervset != undefined">
 
       <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
         <thead>
@@ -238,8 +235,8 @@ Last update: 2018-05-29
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
-  import status from '@/services/status-service'
-  import rpcs from '@/services/rpc-service'
+  import status from '@/js/status-service'
+  import rpcs from '@/js/rpc-service'
   import router from '@/router'
 
   export default {
@@ -287,16 +284,10 @@ Last update: 2018-05-29
     },
 
     created() {
-      // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname === undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
-      }
-
-      // Otherwise...
-      else {
-        // Load the intervention sets from the active project, telling the function
-        // to also set the active intervention set to the last item.
-        this.updateIntervSets(true)
+      } else { // Otherwise...
+        this.updateIntervSets(true) // Load the intervention sets from the active project, telling the function to also set the active intervention set to the last item.
       }
     },
 
@@ -308,34 +299,19 @@ Last update: 2018-05-29
 
       updateIntervSets(setLastEntryActive) {
         console.log('updateIntervSets() called')
-
-        // If there is no active project, clear the interventionSets list.
-        if (this.$store.state.activeProject.project === undefined) {
+        if (this.$store.state.activeProject.project === undefined) { // If there is no active project, clear the interventionSets list.
           this.interventionSets = []
-        }
-
-        // Otherwise...
-        else {
-          // Get the active project's intervention sets.
-          rpcs.rpc('get_project_interv_sets',
-            [this.$store.state.activeProject.project.id])
+        } else { // Otherwise...
+          rpcs.rpc('jsonify_intervsets', [this.$store.state.activeProject.project.id]) // Get the active project's intervention sets.
             .then(response => {
-              // Set the intervention set list to what we received.
-              this.interventionSets = response.data.intervsets
-
-              // Add numindex elements to the intervention sets to keep track of
-              // which index to pull from the server.
-              for (let ind=0; ind < this.interventionSets.length; ind++)
+              this.interventionSets = response.data.intervsets // Set the intervention set list to what we received.
+              for (let ind=0; ind < this.interventionSets.length; ind++) { // Add numindex elements to the intervention sets to keep track of which index to pull from the server.
                 this.interventionSets[ind].intervset.numindex = ind
-
-              // Set renaming values to blank initially.
-              this.interventionSets.forEach(theSet => {
+              }
+              this.interventionSets.forEach(theSet => { // Set renaming values to blank initially.
                 theSet.renaming = ''
               })
-
-              // If we want to set the last entry active and we have any
-              // entries, do the setting.
-              if (this.interventionSets.length > 0) {
+              if (this.interventionSets.length > 0) { // If we want to set the last entry active and we have any entries, do the setting.
                 this.viewSet(this.interventionSets[this.interventionSets.length - 1])
               }
             })
@@ -346,32 +322,20 @@ Last update: 2018-05-29
       },
 
       intervSetIsSelected(intervSet) {
-        // If the active intervention set is undefined, it is not active.
-        if (this.activeIntervSet.intervset === undefined) {
+        if (this.activeIntervSet.intervset === undefined) { // If the active intervention set is undefined, it is not active.
           return false
-        }
-
-        // Otherwise, the intervention is selected if the numindexes match.
-        else {
+        } else { // Otherwise, the intervention is selected if the numindexes match.
           return (this.activeIntervSet.intervset.numindex === intervSet.intervset.numindex)
         }
       },
 
       updateSorting(sortColumn) {
         console.log('updateSorting() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn === sortColumn) {
-          // Reverse the sort.
-          this.sortReverse = !this.sortReverse
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse = false
+        if (this.sortColumn === sortColumn) { // If the active sorting column is clicked...
+          this.sortReverse = !this.sortReverse // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn = sortColumn // Select the new column for sorting.
+          this.sortReverse = false // Set the sorting for non-reverse.
         }
       },
 
@@ -384,9 +348,9 @@ Last update: 2018-05-29
         return sets.sort((set1, set2) =>
           {
             let sortDir = this.sortReverse ? -1: 1
-            if      (this.sortColumn === 'name')         {return (set1.intervset.name > set2.intervset.name ? sortDir: -sortDir)}
-            else if (this.sortColumn === 'creationTime') {return set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir}
-            else if (this.sortColumn === 'updatedTime')  {return set1.intervset.updateTime > set2.intervset.updateTime ? sortDir: -sortDir}
+            if      (this.sortColumn === 'name')         {return (set1.intervset.name         > set2.intervset.name         ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'creationTime') {return (set1.intervset.creationTime > set2.intervset.creationTime ? sortDir: -sortDir)}
+            else if (this.sortColumn === 'updatedTime')  {return (set1.intervset.updateTime   > set2.intervset.updateTime   ? sortDir: -sortDir)}
           }
         )
       },
@@ -394,19 +358,11 @@ Last update: 2018-05-29
 
       updateSorting2(sortColumn) {
         console.log('updateSorting2() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn2 === sortColumn) {
-          // Reverse the sort.
-          this.sortReverse2 = !this.sortReverse2
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn2 = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse2 = false
+        if (this.sortColumn2 === sortColumn) { // If the active sorting column is clicked...
+          this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn2 = sortColumn // Select the new column for sorting.
+          this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
 
@@ -428,29 +384,21 @@ Last update: 2018-05-29
 
       viewSet(intervSet, verbose) {
         console.log('viewSet() called for ' + intervSet.intervset.name)
-
-        // Set the active intervention set to the matched intervention set.
-        this.activeIntervSet = intervSet
-
-        // Go to the server to get the interventions from the intervention set.
-        rpcs.rpc('get_project_interv_set_intervs',
-          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
+        this.activeIntervSet = intervSet // Set the active intervention set to the matched intervention set.
+        rpcs.rpc('jsonify_interventions', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex]) // Go to the server to get the interventions from the intervention set.
           .then(response => {
-            // Set the interventions table list.
-            this.interventionList = response.data.interventions
-
-            // Set the active values from the loaded in data.
-            for (let ind=0; ind < this.interventionList.length; ind++) {
+            this.interventionList = response.data.interventions // Set the interventions table list.
+            for (let ind=0; ind < this.interventionList.length; ind++) { // Set the active values from the loaded in data.
               this.interventionList[ind].numindex = ind
-              this.interventionList[ind].active = (this.interventionList[ind][0] > 0)
-              this.interventionList[ind].name = this.interventionList[ind][1]
+              this.interventionList[ind].active   = (this.interventionList[ind][0] > 0)
+              this.interventionList[ind].name     = this.interventionList[ind][1]
               this.interventionList[ind].platform = this.interventionList[ind][3]
-              this.interventionList[ind].type = this.interventionList[ind][4]
-              this.interventionList[ind].icer = Number(this.interventionList[ind][5]).toLocaleString()
+              this.interventionList[ind].type     = this.interventionList[ind][4]
+              this.interventionList[ind].icer     = Number(this.interventionList[ind][5]).toLocaleString()
               this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].spend = Number(this.interventionList[ind][7]).toLocaleString()
-              this.interventionList[ind].frp = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].equity = Number(this.interventionList[ind][9]).toLocaleString()
+              this.interventionList[ind].spend    = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].frp      = Number(this.interventionList[ind][8]).toLocaleString()
+              this.interventionList[ind].equity   = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
           .catch(error => {
@@ -463,13 +411,9 @@ Last update: 2018-05-29
 
       copySet(intervSet) {
         console.log('copySet() called for ' + intervSet.intervset.name)
-
-        // Have the server copy the intervention set, giving it a new name.
-        rpcs.rpc('copy_interv_set',
-          [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+        rpcs.rpc('copy_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex]) // Have the server copy the intervention set, giving it a new name.
           .then(response => {
-            // Update the intervention sets so the new set shows up on the list.
-            this.updateIntervSets()
+            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
           })
       },
 
@@ -495,24 +439,13 @@ Last update: 2018-05-29
 
       renameSet(intervSet) {
         console.log('renameSet() called for ' + intervSet.intervset.name)
-
-        // If the intervention set is not in a mode to be renamed, make it so.
-        if (intervSet.renaming === '') {
+        if (intervSet.renaming === '') { // If the intervention set is not in a mode to be renamed, make it so.
           intervSet.renaming = intervSet.intervset.name
-        }
-
-        // Otherwise (it is to be renamed)...
-        else {
-          // Have the server change the name of the intervention set.
-          rpcs.rpc('rename_interv_set',
-            [this.$store.state.activeProject.project.id,
-              intervSet.intervset.numindex, intervSet.renaming])
+        } else { // Otherwise (it is to be renamed)...
+          rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex, intervSet.renaming]) // Have the server change the name of the intervention set.
             .then(response => {
-              // Update the intervention sets so the renamed one shows up on the list.
-              this.updateIntervSets()
-
-              // Turn off the renaming mode.
-              intervSet.renaming = ''
+              this.updateIntervSets() // Update the intervention sets so the renamed one shows up on the list.
+              intervSet.renaming = '' // Turn off the renaming mode.
             })
         }
 
@@ -527,49 +460,34 @@ Last update: 2018-05-29
 
       deleteSet(intervSet) {
         console.log('deleteSet() called for ' + intervSet.intervset.name)
-
-        // Go to the server to delete the intervention set.
-        rpcs.rpc('delete_interv_set',
-          [this.$store.state.activeProject.project.id, intervSet.intervset.numindex])
+        rpcs.rpc('delete_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex]) // Go to the server to delete the intervention set.
           .then(response => {
-            // Update the intervention sets so the new set shows up on the list.
-            this.updateIntervSets()
+            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
           })
       },
 
       createNewSet() {
         console.log('createNewSet() called')
-
-        // Go to the server to create the new intervention set.
-        rpcs.rpc('create_interv_set',
-          [this.$store.state.activeProject.project.id, 'New intervention set'])
+        rpcs.rpc('create_interv_set', [this.$store.state.activeProject.project.id, 'New intervention set']) // Go to the server to create the new intervention set.
           .then(response => {
-            // Update the intervention sets so the new set shows up on the list.
-            this.updateIntervSets()
+            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
           })
       },
 
       updateInterv(interv) {
         console.log('Update to be made')
-        console.log('Index: ', interv.numindex)
-        console.log('Active?: ', interv.active)
-        console.log('Name: ', interv.name)
-        console.log('Platform: ', interv.platform)
-        console.log('Type: ', interv.type)
-        console.log('ICER: ', interv.icer)
+        console.log('Index: ',     interv.numindex)
+        console.log('Active?: ',   interv.active)
+        console.log('Name: ',      interv.name)
+        console.log('Platform: ',  interv.platform)
+        console.log('Type: ',      interv.type)
+        console.log('ICER: ',      interv.icer)
         console.log('Unit cost: ', interv.unitcost)
-        console.log('FRP: ', interv.frp)
-        console.log('Equity: ', interv.equity)
-
-        // Do format filtering to prepare the data to pass to the RPC.
-        let filterActive = interv.active ? 1 : 0
-
-        // Go to the server to update the intervention from the intervention set.
-        // Note: filter out commas in the numeric fields.
-        rpcs.rpc('update_interv_set_interv',
-          [this.$store.state.activeProject.project.id,
-            this.activeIntervSet.intervset.numindex,
-            interv.numindex,
+        console.log('FRP: ',       interv.frp)
+        console.log('Equity: ',    interv.equity)
+        let filterActive = interv.active ? 1 : 0 // Do format filtering to prepare the data to pass to the RPC.
+        rpcs.rpc('update_intervention', // Go to the server to update the intervention from the intervention set. Note: filter out commas in the numeric fields.
+          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex,
             [filterActive, interv.name, interv.platform, interv.type,
               interv.icer.replace(/,/g, ''),
               interv.unitcost.replace(/,/g, ''),
@@ -583,7 +501,7 @@ Last update: 2018-05-29
 
       addInterv() {
         console.log('Adding item')
-        rpcs.rpc('add_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
+        rpcs.rpc('add_intervention', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex])
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention added')
@@ -592,7 +510,7 @@ Last update: 2018-05-29
 
       copyInterv(interv) {
         console.log('Item to copy:', interv.numindex)
-        rpcs.rpc('copy_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+        rpcs.rpc('copy_intervention', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention copied')
@@ -601,7 +519,7 @@ Last update: 2018-05-29
 
       deleteInterv(interv) {
         console.log('Item to delete:', interv.numindex)
-        rpcs.rpc('delete_interv', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
+        rpcs.rpc('delete_intervention', [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex])
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention deleted')
@@ -613,17 +531,6 @@ Last update: 2018-05-29
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .UIPlaceholder {
-    //    height: 500px;
-    width: 100%;
-    //    border: 1px solid black;
-  }
-
-  .PHText {
-    color: green;
-    text-align: center;
-  }
-
   #checkboxtable td {
     padding: 0px 5px;
   }

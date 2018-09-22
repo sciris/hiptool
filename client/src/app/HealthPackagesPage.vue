@@ -15,7 +15,6 @@ Last update: 2018-05-29
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-
       <input type="text"
              class="txbox"
              style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
@@ -143,21 +142,11 @@ Last update: 2018-05-29
             <input type="checkbox"
                    v-model="result.active"/>
           </td>
-          <td>
-            {{ result.name }}
-          </td>
-          <td>
-            {{ result.cause }}
-          </td>
-          <td>
-            {{ result.coverage }}
-          </td>
-          <td>
-            {{ result.averted }}
-          </td>
-          <td>
-            {{ result.percentage }}
-          </td>
+          <td>{{ result.name }}</td>
+          <td>{{ result.cause }}</td>
+          <td>{{ result.coverage }}</td>
+          <td>{{ result.averted }}</td>
+          <td>{{ result.percentage }}</td>
         </tr>
         </tbody>
       </table>
@@ -169,10 +158,10 @@ Last update: 2018-05-29
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
-  import rpcs from '@/services/rpc-service'
-  import status from '@/services/status-service'
+  import rpcs from '@/js/rpc-service'
+  import status from '@/js/status-service'
   import router from '@/router'
-  import utils from '@/services/utils'
+  import utils from '@/js/utils'
   import Vue from 'vue';
 
   export default {
@@ -216,24 +205,14 @@ Last update: 2018-05-29
     },
 
     created() {
-      // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
-      }
-
-      // Otherwise...
-      else {
-        // Load the health package sets from the active project, telling the function
-        // to also set the active health package set to the last item.
-        this.updatePackageSets(true)
+      } else { // Otherwise...
+        this.updatePackageSets(true) // Load the health package sets from the active project, telling the function to also set the active health package set to the last item.
       }
     },
 
     methods: {
-
-      notImplemented(message) {
-        status.fail(this, 'Function "' + message + '" not yet implemented')
-      },
 
       clearGraphs(numfigs) { return utils.clearGraphs(this, numfigs)},
 
@@ -246,7 +225,7 @@ Last update: 2018-05-29
       },
 
       downloadPlots() {
-        rpcs.download('download_figures', [])
+        rpcs.download('download_figures', [this.$store.state.currentUser.username])
           .then(response => {
             console.log('Downloaded figures')
           })
@@ -254,35 +233,21 @@ Last update: 2018-05-29
 
       updatePackageSets(setLastEntryActive) {
         console.log('updatePackageSets() called')
-
-        // If there is no active project, clear the packageSets list.
-        if (this.$store.state.activeProject.project === undefined) {
+        if (this.$store.state.activeProject.project === undefined) { // If there is no active project, clear the packageSets list.
           this.packageSets = []
-        }
-
-        // Otherwise...
-        else {
-          // Get the active project's health package sets.
-          rpcs.rpc('get_project_package_sets',
-            [this.$store.state.activeProject.project.id])
+        } else { // Otherwise...
+          rpcs.rpc('jsonify_packagesets', [this.$store.state.activeProject.project.id]) // Get the active project's health package sets.
             .then(response => {
-              // Set the package set list to what we received.
-              this.packageSets = response.data.packagesets
-
-              // Add numindex elements to the package sets to keep track of
-              // which index to pull from the server.
-              for (let ind=0; ind < this.packageSets.length; ind++)
+              this.packageSets = response.data.packagesets // Set the package set list to what we received.
+              for (let ind=0; ind < this.packageSets.length; ind++) { // Add numindex elements to the package sets to keep track of which index to pull from the server.
                 this.packageSets[ind].packageset.numindex = ind
-
-              // Set renaming values to blank initially.
-              this.packageSets.forEach(theSet => {
+              }
+              this.packageSets.forEach(theSet => { // Set renaming values to blank initially.
                 theSet.renaming = ''
               })
-
-              // If we want to set the last entry active and we have any
-              // entries, do the setting.
-              if ((setLastEntryActive) && (this.packageSets.length > 0))
+              if ((setLastEntryActive) && (this.packageSets.length > 0)) { // If we want to set the last entry active and we have any entries, do the setting.
                 this.viewPackageSet(this.packageSets[this.packageSets.length - 1])
+              }
             })
             .catch(error => {
               status.fail(this, 'Could not get package sets', error)
@@ -291,32 +256,20 @@ Last update: 2018-05-29
       },
 
       packageSetIsSelected(packageSet) {
-        // If the active package set is undefined, it is not active.
-        if (this.activePackageSet.packageset === undefined) {
+        if (this.activePackageSet.packageset === undefined) { // If the active package set is undefined, it is not active.
           return false
-        }
-
-        // Otherwise, the package set is selected if the numindexes match.
-        else {
+        } else { // Otherwise, the package set is selected if the numindexes match.
           return (this.activePackageSet.packageset.numindex === packageSet.packageset.numindex)
         }
       },
 
       updateSorting(sortColumn) {
         console.log('updateSorting() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn === sortColumn) {
-          // Reverse the sort.
-          this.sortReverse = !this.sortReverse
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse = false
+        if (this.sortColumn === sortColumn) { // If the active sorting column is clicked...
+          this.sortReverse = !this.sortReverse // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn = sortColumn // Select the new column for sorting.
+          this.sortReverse = false // Set the sorting for non-reverse.
         }
       },
 
@@ -344,55 +297,35 @@ Last update: 2018-05-29
 
       viewPackageSet(packageSet) {
         console.log('viewPackageSet() called for ' + packageSet.packageset.name)
-
-        // Set the active project to the packageSet passed in.
-        this.activePackageSet = packageSet
-
-        // Go to the server to get the diseases from the package set.
-        rpcs.rpc('get_project_package_set_results',
-          [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
+        this.activePackageSet = packageSet // Set the active project to the packageSet passed in.
+        rpcs.rpc('jsonify_packages', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex]) // Go to the server to get the diseases from the package set.
           .then(response => {
-            // Set the result list.
-            this.resultList = response.data.results
-
-            // Set the active values from the loaded in data.
-            for (let ind=0; ind < this.resultList.length; ind++) {
-              this.resultList[ind].numindex = ind
-              this.resultList[ind].active = (this.resultList[ind][0] > 0)
-              this.resultList[ind].name = this.resultList[ind][1]
-              this.resultList[ind].cause = this.resultList[ind][2]
-              this.resultList[ind].coverage = Math.round(Number(this.resultList[ind][3])).toLocaleString()
-              this.resultList[ind].averted = Math.round(Number(this.resultList[ind][4])).toLocaleString()
+            this.resultList = response.data.results // Set the result list.
+            for (let ind=0; ind < this.resultList.length; ind++) { // Set the active values from the loaded in data.
+              this.resultList[ind].numindex =   ind
+              this.resultList[ind].active =     (this.resultList[ind][0] > 0)
+              this.resultList[ind].name =       this.resultList[ind][1]
+              this.resultList[ind].cause =      this.resultList[ind][2]
+              this.resultList[ind].coverage =   Math.round(Number(this.resultList[ind][3])).toLocaleString()
+              this.resultList[ind].averted =    Math.round(Number(this.resultList[ind][4])).toLocaleString()
               this.resultList[ind].percentage = (Number(this.resultList[ind][5])*100).toLocaleString() // Convert to percentage
             }
-
-            // Reset the bottom table sorting state.
-            this.sortColumn2 = 'name'
+            this.sortColumn2 = 'name' // Reset the bottom table sorting state.
             this.sortReverse2 = false
-
-            // Plot graphs
-            this.makeGraph(packageSet)
+            this.makeGraph(packageSet) // Plot graphs
           })
           .catch(error => {
             status.fail(this, 'Could not view health package sets', error)
           })
-
         status.succeed(this, 'Health package "' + packageSet.packageset.name + '" now active')
       },
 
       makeGraph(packageSet) {
         console.log('makeGraph() called for ' + packageSet.packageset.name)
-
-        // Set the active project to the matched project.
-        this.activePackageSet = packageSet
+        this.activePackageSet = packageSet // Set the active project to the matched project.
         this.clearGraphs(3)
-
-        // Go to the server to get the results from the package set.
-        rpcs.rpc('get_project_package_plots',
-          [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
+        rpcs.rpc('plot_packages', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex]) // Go to the server to get the results from the package set.
           .then(response => {
-            this.serverresponse = response.data // Pull out the response data.
-            let theFig = response.data.graph1 // Extract hack info.
             mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
             mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
             mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
@@ -404,13 +337,9 @@ Last update: 2018-05-29
 
       copyPackageSet(packageSet) {
         console.log('copyPackageSet() called for ' + packageSet.packageset.name)
-
-        // Have the server copy the package set, giving it a new name.
-        rpcs.rpc('copy_package_set',
-          [this.$store.state.activeProject.project.id, packageSet.packageset.numindex])
+        rpcs.rpc('copy_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex]) // Have the server copy the package set, giving it a new name.
           .then(response => {
-            // Update the package sets so the new set shows up on the list.
-            this.updatePackageSets()
+            this.updatePackageSets() // Update the package sets so the new set shows up on the list.
           })
       },
 
@@ -436,24 +365,13 @@ Last update: 2018-05-29
 
       renamePackageSet(packageSet) {
         console.log('renamePackageSet() called for ' + packageSet.packageset.name)
-
-        // If the package set is not in a mode to be renamed, make it so.
-        if (packageSet.renaming === '') {
+        if (packageSet.renaming === '') { // If the package set is not in a mode to be renamed, make it so.
           packageSet.renaming = packageSet.packageset.name
-        }
-
-        // Otherwise (it is to be renamed)...
-        else {
-          // Have the server change the name of the package set.
-          rpcs.rpc('rename_package_set',
-            [this.$store.state.activeProject.project.id,
-              packageSet.packageset.numindex, packageSet.renaming])
+        } else { // Otherwise (it is to be renamed)...
+          rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex, packageSet.renaming]) // Have the server change the name of the package set.
             .then(response => {
-              // Update the package sets so the renamed one shows up on the list.
-              this.updatePackageSets()
-
-              // Turn off the renaming mode.
-              packageSet.renaming = ''
+              this.updatePackageSets() // Update the package sets so the renamed one shows up on the list.
+              packageSet.renaming = '' // Turn off the renaming mode.
             })
         }
 
@@ -468,44 +386,27 @@ Last update: 2018-05-29
 
       deletePackageSet(packageSet) {
         console.log('deletePackageSet() called for ' + packageSet.packageset.name)
-
-        // Go to the server to delete the package set.
-        rpcs.rpc('delete_package_set',
-          [this.$store.state.activeProject.project.id, packageSet.packageset.numindex])
+        rpcs.rpc('delete_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex]) // Go to the server to delete the package set.
           .then(response => {
-            // Update the package sets so the new set shows up on the list.
-            this.updatePackageSets()
+            this.updatePackageSets() // Update the package sets so the new set shows up on the list.
           })
       },
 
       createNewPackageSet() {
         console.log('createNewPackageSet() called')
-
-        // Go to the server to create the new package set.
-        rpcs.rpc('create_package_set',
-          [this.$store.state.activeProject.project.id, 'New package set'])
+        rpcs.rpc('create_packageset', [this.$store.state.activeProject.project.id, 'New package set']) // Go to the server to create the new package set.
           .then(response => {
-            // Update the package sets so the new set shows up on the list.
-            this.updatePackageSets()
+            this.updatePackageSets() // Update the package sets so the new set shows up on the list.
           })
       },
 
-
       updateSorting2(sortColumn) {
         console.log('updateSorting2() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn2 === sortColumn) {
-          // Reverse the sort.
-          this.sortReverse2 = !this.sortReverse2
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn2 = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse2 = false
+        if (this.sortColumn2 === sortColumn) { // If the active sorting column is clicked...
+          this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn2 = sortColumn // Select the new column for sorting.
+          this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
 
@@ -513,21 +414,21 @@ Last update: 2018-05-29
         return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name') {return (result1[1] > result2[1] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'cause') {return result1[2] > result2[2] ? sortDir: -sortDir}
-            else if (this.sortColumn2 === 'coverage') {return result1[3] > result2[3] ? sortDir: -sortDir}
-            else if (this.sortColumn2 === 'averted') {return result1[4] > result2[4] ? sortDir: -sortDir}
-            else if (this.sortColumn2 === 'percentage') {return result1[5] > result2[5] ? sortDir: -sortDir}
+            if      (this.sortColumn2 === 'name')       {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'cause')      {return (result1[2] > result2[2] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'coverage')   {return (result1[3] > result2[3] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'averted')    {return (result1[4] > result2[4] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'percentage') {return (result1[5] > result2[5] ? sortDir: -sortDir)}
           }
         )
       },
 
       updateResult(result) {
         console.log('Update to be made to results -- WARNING, not supported!')
-        console.log('Index: ', result.numindex)
+        console.log('Index: ',   result.numindex)
         console.log('Active?: ', result.active)
-        console.log('Cause: ', result.name)
-        console.log('DALYs: ', result.cause)
+        console.log('Cause: ',   result.name)
+        console.log('DALYs: ',   result.cause)
       }
 
     }
@@ -536,41 +437,5 @@ Last update: 2018-05-29
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .UIPlaceholder {
-    width: 100%;
-  }
 
-  .PHText {
-    color: green;
-    text-align: center;
-  }
-
-  .ThreePanels {
-    display: flex;
-    width: 100%;
-  }
-
-  .LeftPanel {
-    height: 100%;
-    width: 33%;
-    text-align: center;
-  }
-
-  .MidPanel {
-    height: 100%;
-    width: 34%;
-    text-align: center;
-  }
-
-  .RightPanel {
-    height: 100%;
-    width: 33%;
-    text-align: center;
-  }
-
-  #test-hot {
-    width: 600px;
-    height: 400px;
-    overflow: hidden;
-  }
 </style>

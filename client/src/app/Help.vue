@@ -1,17 +1,97 @@
 <!--
-Help page -- ideally will have mostly in-app help a la HIV
+Help page
 
-Last update: 2018-03-25
+Last update: 2018sep22
 -->
 
 <template>
-  <div class="SitePage">
-  	<p>We are in the process of writing a user guide.</p>
-    <p>For assistance in the mean time, please email <a href="mailto:help@hptool.org">help@hptool.org</a>.</p>
+  <div class="SitePage" style="text-align:center">
+    <div style="display:inline-block; margin:auto; text-align:left" v-model="getVersionInfo">
+      <div style="max-width:500px">
+        <p>We are in the process of writing a user guide.</p>
+        <p>For assistance in the mean time, please email <a href="mailto:help@hptool.org">help@hptool.org</a>.</p>
+        <p>Please copy and paste the information from the table below into your email.</p>
+        <br>
+      </div>
+
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+        <tr>
+          <th colspan=100>HealthPrior technical information</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td class="tlabel">Version </td>
+          <td>{{ version }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Date </td>
+          <td>{{ date }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Branch </td>
+          <td>{{ gitbranch }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Hash </td>
+          <td>{{ githash }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Time </td>
+          <td>{{ gitdate }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Server </td>
+          <td>{{ server }}</td>
+        </tr>
+        <tr>
+          <td class="tlabel">Load </td>
+          <td>{{ cpu }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
+<script>
+  import rpcs from '@/js/rpc-service'
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+  export default {
+    name: 'About',
+
+    data () {
+      return {
+        version: '',
+        date: '',
+        gitbranch: '',
+        githash: '',
+        gitdate: '',
+        server: '',
+        cpu: '',
+      }
+    },
+
+    computed: {
+      getVersionInfo() {
+        rpcs.rpc('get_version_info')
+          .then(response => {
+            this.version   = response.data['version'];
+            this.date      = response.data['date'];
+            this.gitbranch = response.data['gitbranch'];
+            this.githash   = response.data['githash'];
+            this.gitdate   = response.data['gitdate'];
+            this.server    = response.data['server'];
+            this.cpu       = response.data['cpu'];
+          })
+      },
+    },
+  }
+</script>
+
 <style scoped>
+  .tlabel {
+    font-weight:bold;
+  }
 </style>

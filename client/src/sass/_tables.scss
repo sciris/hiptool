@@ -1,4 +1,4 @@
-$line-height-base:        1.428571429; // 20/14
+$line-height-base:        0.8; // 1.428571429; // 20/14
 $line-height-computed:    floor((14px * $line-height-base)); // ~20px
 
 $table-cell-padding:                 8px;
@@ -14,6 +14,7 @@ $table-bg-active:                    $table-bg-hover;
   width: 100%;
   background-color: $table-bg;
   margin-bottom: $line-height-computed;
+  border: 2px solid #ddd;
 
   thead,
   tbody,
@@ -66,24 +67,12 @@ $table-bg-active:                    $table-bg-hover;
   > thead > tr > td,
   > tbody > tr > td,
   > tfoot > tr > td {
-    padding: 12px;
+    //padding: 12px;
     vertical-align: middle;
   }
 
   .th-description {
     max-width: 150px;
-  }
-  .td-price {
-    font-size: 26px;
-    font-weight: $font-weight-light;
-    margin-top: 5px;
-    text-align: right;
-  }
-  .td-total {
-    font-weight: $font-weight-bold;
-    font-size: $font-size-h5;
-    padding-top: 20px;
-    text-align: right;
   }
 
   .td-actions .btn {
@@ -129,19 +118,6 @@ $table-bg-active:                    $table-bg-hover;
     cursor: pointer;
   }
 
-  // // Condensed table w/ half padding
-  // .table-condensed {
-  //   > thead,
-  //   > tbody,
-  //   > tfoot {
-  //     > tr {
-  //       > th,
-  //       > td {
-  //         padding: $table-condensed-cell-padding;
-  //       }
-  //     }
-  //   }
-  // }
 
   // Bordered version
   //
@@ -191,6 +167,7 @@ $table-bg-active:                    $table-bg-hover;
       background-color: $table-bg-accent;
     }
   }
+
   tr.highlighted {
     > td {
       background-color: #80ffaa !important;
@@ -212,9 +189,21 @@ $table-bg-active:                    $table-bg-hover;
 }
 
 
+.scrolltable {
+  overflow-y: auto;
+}
+
+.scrolltable th {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  //background: #eee;
+}
+
+
+
+
 // Table cell sizing
-//
-// Reset default table behavior
 
 table col[class*="col-"] {
   position: static; // Prevent border hiding in Firefox and IE9/10 (see https://github.com/twbs/bootstrap/issues/11623)

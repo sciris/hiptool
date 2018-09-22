@@ -1,7 +1,7 @@
 <!--
 Manage projects page
 
-Last update: 2018-07-27
+Last update: 2018sep22
 -->
 
 <template>
@@ -16,9 +16,7 @@ Last update: 2018-07-27
       </div>
     </div>
 
-    <div class="PageSection"
-         v-if="projectSummaries.length > 0">
-      <!--<h2>Manage projects</h2>-->
+    <div class="PageSection" v-if="projectSummaries.length > 0">
 
       <input type="text"
              class="txbox"
@@ -45,18 +43,6 @@ Last update: 2018-07-27
               </span>
           </th>
           <th>Select</th>
-          <!--           <th @click="updateSorting('country')" class="sortable">
-                       Country
-                       <span v-show="sortColumn == 'country' && !sortReverse">
-                         <i class="fas fa-caret-down"></i>
-                       </span>
-                       <span v-show="sortColumn == 'country' && sortReverse">
-                         <i class="fas fa-caret-up"></i>
-                       </span>
-                       <span v-show="sortColumn != 'country'">
-                         <i class="fas fa-caret-up" style="visibility: hidden"></i>
-                       </span>
-                     </th> -->
           <th @click="updateSorting('creationTime')" class="sortable">
             Created on
             <span v-show="sortColumn == 'creationTime' && !sortReverse">
@@ -102,9 +88,8 @@ Last update: 2018-07-27
           <td>
             <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
           </td>
-          <!--            <td>{{ projectSummary.country }}</td> -->
-          <td>{{ projectSummary.project.creationTime.toUTCString() }}</td>
-          <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime.toUTCString():
+          <td>{{ projectSummary.project.creationTime }}</td>
+          <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime:
             'No modification' }}</td>
           <td style="white-space: nowrap">
             <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
@@ -112,39 +97,14 @@ Last update: 2018-07-27
             <button class="btn" @click="downloadProjectFile(projectSummary.project.id)">Download</button>
           </td>
         </tr>
-        <!--          <tr>
-                    <td>
-                      <button class="btn" @click="createNewProject">Create new project</button>
-                    </td>
-        <!-- comment out for now            <td>
-                      <select v-model="selectedCountry">
-                        <option>Select country...</option>
-                        <option v-for="choice in countryList">
-                          {{ choice }}
-                        </option>
-                      </select>
-                    </td>
-                  </tr> -->
         </tbody>
       </table>
 
       <div class="ControlsRow">
-        <button class="btn" @click="deleteModal()">Delete selected</button>
-        &nbsp; &nbsp;
+        <button class="btn" @click="deleteModal()">Delete selected</button>&nbsp; &nbsp;
         <button class="btn" @click="downloadSelectedProjects">Download selected</button>
       </div>
     </div>
-
-    <!-- Popup spinner -->
-    <modal name="popup-spinner"
-           height="80px"
-           width="85px"
-           style="opacity: 0.6">
-      <clip-loader color="#0000ff"
-                   size="50px"
-                   style="padding: 15px">
-      </clip-loader>
-    </modal>
 
   </div>
 </template>
@@ -152,300 +112,120 @@ Last update: 2018-07-27
 <script>
   import axios from 'axios'
   var filesaver = require('file-saver')
-  import status from '@/services/status-service'
-  import rpcs from '@/services/rpc-service'
+  import utils from '@/js/utils'
+  import rpcs from '@/js/rpc-service'
+  import status from '@/js/status-service'
   import router from '@/router'
-  import ClipLoader from 'vue-spinner/src/ClipLoader.vue'
 
   export default {
     name: 'ProjectsPage',
 
-    components: {
-      ClipLoader
-    },
-
     data() {
       return {
-        // List of projects to choose from (by project name)
-        demoProjectList: [],
-
-        // Selected demo project (by name)
-        selectedDemoProject: '',
-
-        // List of demo project summaries
-        demoProjectSummaries: [],
-
-        // Placeholder text for table filter box
-        filterPlaceholder: 'Type here to filter projects',
-
-        // Text in the table filter box
-        filterText: '',
-
-        // Are all of the projects selected?
-        allSelected: false,
-
-        // Column of table used for sorting the projects
-        sortColumn: 'name',  // name, country, creationTime, updatedTime, dataUploadTime
-
-        // Sort in reverse order?
-        sortReverse: false,
-
-        /* old project summaries stuff to get rid of
-         // List of summary objects for projects the user has
-         projectSummaries:
-         [
-         {
-         projectName: 'Afghanistan test 1',
-         country: 'Afghanistan',
-         creationTime: '2017-Jun-01 02:45 AM',
-         updateTime: '2017-Jun-02 05:41 AM',
-         uid: 1
-         },
-         {
-         projectName: 'Afghanistan HBP equity',
-         country: 'Afghanistan',
-         creationTime: '2017-Jun-03 03:12 PM',
-         updateTime: '2017-Jun-05 03:38 PM',
-         uid: 2
-         },
-         {
-         projectName: 'Final Afghanistan HBP',
-         country: 'Afghanistan',
-         creationTime: '2017-Jun-06 08:15 PM',
-         updateTime: '2017-Jun-06 08:20 PM',
-         uid: 3
-         },
-         {
-         projectName: 'Pakistan test 1',
-         country: 'Pakistan',
-         creationTime: '2017-Sep-21 08:44 AM',
-         updateTime: '2017-Sep-21 08:44 AM',
-         uid: 4
-         }
-         ], */
-
-        // List of summary objects for projects the user has
-        projectSummaries: [],
-
-        // Available countries
-        countryList: [],
-
-        // Country selected in the bottom select box
-        selectedCountry: 'Select country'
+        demoProjectList: [], // List of projects to choose from (by project name)
+        selectedDemoProject: '', // Selected demo project (by name)
+        demoProjectSummaries: [], // List of demo project summaries
+        filterPlaceholder: 'Type here to filter projects', // Placeholder text for table filter box
+        filterText: '', // Text in the table filter box
+        allSelected: false, // Are all of the projects selected?
+        sortColumn: 'name',  // Column of table used for sorting the projects // name, country, creationTime, updatedTime, dataUploadTime
+        sortReverse: false, // Sort in reverse order?
+        projectSummaries: [], // List of summary objects for projects the user has
+        countryList: [], // Available countries
+        selectedCountry: 'Select country' // Country selected in the bottom select box
       }
     },
 
     computed: {
       sortedFilteredProjectSummaries() {
         return this.applyNameFilter(this.applySorting(this.projectSummaries))
-//      return this.applyNameFilter(this.applySorting(this.applyCountryFilter(this.projectSummaries)))
       }
     },
 
     created() {
-      let projectId = null
-
-      // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname == undefined) {
+      let projectID = null
+      if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
-      }
-
-      // Otherwise...
-      else {
-        // Get the active project ID if there is an active project.
-        if (this.$store.state.activeProject.project != undefined) {
-          projectId = this.$store.state.activeProject.project.id
+      } else { // Otherwise...
+        if (this.$store.state.activeProject.project !== undefined) { // Get the active project ID if there is an active project.
+          projectID = this.$store.state.activeProject.project.id
         }
-
-        // Load the project summaries of the current user.
-        this.updateProjectSummaries(projectId)
-
-        // Initialize the countryList by picking out the (unique) country names.
-        // (First, a list is constructed pulling out the non-unique countries
-        // for each project, then this array is stuffed into a new Set (which
-        // will not duplicate array entries) and then the spread operator is
-        // used to pull the set items out into an array.)
-//      this.countryList = [...new Set(this.projectSummaries.map(theProj => theProj.country))]
-
-        // Initialize the selection of the demo project to the first element.
-//      this.selectedCountry = 'Select country...'
+        this.updateProjectSummaries(projectID) // Load the project summaries of the current user.
       }
     },
 
     methods: {
       updateProjectSummaries(setActiveID) {
         console.log('updateProjectSummaries() called')
-
-        // Get the current user's project summaries from the server.
-        rpcs.rpc('load_current_user_project_summaries')
+        status.start(this)
+        rpcs.rpc('jsonify_projects', [this.$store.state.currentUser.username]) // Get the current user's project summaries from the server.
           .then(response => {
             let lastCreationTime = null
             let lastCreatedID = null
-
-            // Set the projects to what we received.
-            this.projectSummaries = response.data.projects
-
-            // Initialize the last creation time stuff if we have a non-empty list.
-            if (this.projectSummaries.length > 0) {
+            this.projectSummaries = response.data.projects // Set the projects to what we received.
+            if (this.projectSummaries.length > 0) { // Initialize the last creation time stuff if we have a non-empty list.
               lastCreationTime = new Date(this.projectSummaries[0].project.creationTime)
               lastCreatedID = this.projectSummaries[0].project.id
             }
-
-            // Preprocess all projects.
-            this.projectSummaries.forEach(theProj => {
-              // Set to not selected.
-              theProj.selected = false
-
-              // Set to not being renamed.
-              theProj.renaming = ''
-
-              // Extract actual Date objects from the strings.
-              theProj.project.creationTime = new Date(theProj.project.creationTime)
-              theProj.project.updatedTime = new Date(theProj.project.updatedTime)
-
-              // Update the last creation time and ID if what se see is later.
-              if (theProj.project.creationTime >= lastCreationTime) {
+            this.projectSummaries.forEach(theProj => { // Preprocess all projects.
+              theProj.selected = false // Set to not selected.
+              theProj.renaming = '' // Set to not being renamed.
+              if (theProj.project.creationTime >= lastCreationTime) { // Update the last creation time and ID if what se see is later.
                 lastCreationTime = theProj.project.creationTime
                 lastCreatedID = theProj.project.id
               }
             })
-
-            // If we have a project on the list...
-            if (this.projectSummaries.length > 0) {
-              // If no ID is passed in, set the active project to the last-created
-              // project.
-              if (setActiveID == null) {
+            if (this.projectSummaries.length > 0) { // If we have a project on the list...
+              if (setActiveID === null) { // If no ID is passed in, set the active project to the last-created project.
                 this.openProject(lastCreatedID)
-              }
-
-              // Otherwise, set the active project to the one passed in.
-              else {
+              } else { // Otherwise, set the active project to the one passed in.
                 this.openProject(setActiveID)
               }
             }
+            status.succeed(this, '')  // No green popup.
           })
           .catch(error => {
-            // Failure popup.
-            status.fail(this, 'Could not load projects')
+            status.fail(this, 'Could not load projects', error)
           })
       },
 
-      /*    addDemoProject() {
-       console.log('addDemoProject() called')
-
-       // Find the object in the default project summaries that matches what's
-       // selected in the select box.
-       let foundProject = this.demoProjectSummaries.find(demoProj =>
-       demoProj.project.name == this.selectedDemoProject)
-
-       // Make a deep copy of the found object by JSON-stringifying the old
-       // object, and then parsing the result back into a new object.
-       let newProject = JSON.parse(JSON.stringify(foundProject));
-
-       // Push the deep copy to the projectSummaries list.
-       //      this.projectSummaries.push(newProject)
-
-       //      this.projectSummaries.push(this.demoProjectSummaries[0])
-       }, */
-
       createNewProject() {
         console.log('createNewProject() called')
-
-        // Bring up a spinner.
-        this.$modal.show('popup-spinner')
-
-        // Start the loading bar.
-        this.$Progress.start()
-
-        // Have the server create a new project.
-        rpcs.rpc('create_new_project', [this.$store.state.currentUser.UID])
+        status.start(this)
+        rpcs.rpc('create_new_project', [this.$store.state.currentUser.username]) // Have the server create a new project.
           .then(response => {
-            // Update the project summaries so the new project shows up on the list.
-            // Note: There's no easy way to get the new project UID to tell the
-            // project update to choose the new project because the RPC cannot pass
-            // it back.
-            this.updateProjectSummaries(null)
-
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Finish the loading bar.
-            this.$Progress.finish()
-
-            // Success popup.
-            status.succeed(this, 'New project created')
+            this.updateProjectSummaries(null); // Update the project summaries so the new project shows up on the list.
+            status.succeed(this, '') // Indicate success.
           })
           .catch(error => {
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Fail the loading bar.
-            this.$Progress.fail()
-
-            // Failure popup.
-            status.fail(this, 'Could not add new project')
+            status.fail(this, 'Could not add new project', error)    // Indicate failure.
           })
       },
 
       uploadProjectFromFile() {
         console.log('uploadProjectFromFile() called')
-
-        // Have the server upload the project.
-        rpcs.upload('create_project_from_prj_file', [this.$store.state.currentUser.UID], {}, '.prj')
+        rpcs.upload('upload_project', [this.$store.state.currentUser.username], {}, '.prj') // Have the server upload the project.
           .then(response => {
-            // Bring up a spinner.
-            this.$modal.show('popup-spinner')
-
-            // Start the loading bar.  (This is here because we don't want the
-            // progress bar running when the user is picking a file to upload.)
-            this.$Progress.start()
-
-            // Update the project summaries so the new project shows up on the list.
-            this.updateProjectSummaries(response.data.projectId)
-
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Finish the loading bar.
-            this.$Progress.finish()
-
-            // Success popup.
+            status.start(this)  // This line needs to be here to avoid the spinner being up during the user modal.
+            this.updateProjectSummaries(response.data.projectID) // Update the project summaries so the new project shows up on the list.
             status.succeed(this, 'New project uploaded')
           })
           .catch(error => {
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Fail the loading bar.
-            this.$Progress.fail()
-
-            // Failure popup.
             status.fail(this, 'Could not upload file', error)
           })
       },
 
       projectIsActive(uid) {
-        // If the project is undefined, it is not active.
-        if (this.$store.state.activeProject.project === undefined) {
+        if (this.$store.state.activeProject.project === undefined) { // If the project is undefined, it is not active.
           return false
-        }
-
-        // Otherwise, the project is active if the UIDs match.
-        else {
+        } else { // Otherwise, the project is active if the UIDs match.
           return (this.$store.state.activeProject.project.id === uid)
         }
       },
 
       selectAll() {
         console.log('selectAll() called')
-
-        // For each of the projects, set the selection of the project to the
-        // _opposite_ of the state of the all-select checkbox's state.
-        // NOTE: This function depends on it getting called before the
-        // v-model state is updated.  If there are some cases of Vue
-        // implementation where these happen in the opposite order, then
-        // this will not give the desired result.
-        this.projectSummaries.forEach(theProject => theProject.selected = !this.allSelected)
+        this.projectSummaries.forEach(theProject => theProject.selected = !this.allSelected) // For each of the projects, set the selection of the project to the _opposite_ of the state of the all-select checkbox's state.
       },
 
       uncheckSelectAll() {
@@ -454,19 +234,11 @@ Last update: 2018-07-27
 
       updateSorting(sortColumn) {
         console.log('updateSorting() called')
-
-        // If the active sorting column is clicked...
-        if (this.sortColumn === sortColumn) {
-          // Reverse the sort.
-          this.sortReverse = !this.sortReverse
-        }
-        // Otherwise.
-        else {
-          // Select the new column for sorting.
-          this.sortColumn = sortColumn
-
-          // Set the sorting for non-reverse.
-          this.sortReverse = false
+        if (this.sortColumn === sortColumn) { // If the active sorting column is clicked...
+          this.sortReverse = !this.sortReverse // Reverse the sort.
+        } else { // Otherwise.
+          this.sortColumn = sortColumn // Select the new column for sorting.
+          this.sortReverse = false // Set the sorting for non-reverse.
         }
       },
 
@@ -479,128 +251,53 @@ Last update: 2018-07-27
           {
             let sortDir = this.sortReverse ? -1: 1
             if (this.sortColumn === 'name') {
-              return (proj1.project.name > proj2.project.name ? sortDir: -sortDir)
-            }
-            /*          else if (this.sortColumn === 'country') {
-             return proj1.country > proj2.country ? sortDir: -sortDir
-             } */
-            else if (this.sortColumn === 'creationTime') {
+              return (proj1.project.name.toLowerCase() > proj2.project.name.toLowerCase() ? sortDir: -sortDir)
+            } else if (this.sortColumn === 'creationTime') {
               return proj1.project.creationTime > proj2.project.creationTime ? sortDir: -sortDir
-            }
-            else if (this.sortColumn === 'updatedTime') {
+            } else if (this.sortColumn === 'updatedTime') {
               return proj1.project.updatedTime > proj2.project.updatedTime ? sortDir: -sortDir
             }
           }
         )
       },
 
-      /*    applyCountryFilter(projects) {
-       if (this.selectedCountry === 'Select country...')
-       return projects
-       else
-       return projects.filter(theProj => theProj.country === this.selectedCountry)
-       }, */
-
       openProject(uid) {
-        // Find the project that matches the UID passed in.
-        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
+        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid) // Find the project that matches the UID passed in.
         console.log('openProject() called for ' + matchProject.project.name)
-
-        // Set the active project to the matched project.
-        this.$store.commit('newActiveProject', matchProject)
-
-        // Success popup.
-        status.succeed(this, 'Project "'+matchProject.project.name+'" loaded')
+        this.$store.commit('newActiveProject', matchProject) // Set the active project to the matched project.
+        status.succeed(this, 'Project "'+matchProject.project.name+'" loaded') // Success popup.
       },
 
       copyProject(uid) {
-        // Find the project that matches the UID passed in.
-        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
+        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid) // Find the project that matches the UID passed in.
         console.log('copyProject() called for ' + matchProject.project.name)
-
-        // Bring up a spinner.
-        this.$modal.show('popup-spinner')
-
-        // Start the loading bar.
-        this.$Progress.start()
-
-        // Have the server copy the project, giving it a new name.
-        rpcs.rpc('copy_project', [uid])
+        status.start(this) // Start indicating progress.
+        rpcs.rpc('copy_project', [uid]) // Have the server copy the project, giving it a new name.
           .then(response => {
-            // Update the project summaries so the copied program shows up on the list.
-            this.updateProjectSummaries(response.data.projectId)
-
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Finish the loading bar.
-            this.$Progress.finish()
-
-            // Success popup.
-            status.succeed(this, 'Project "'+matchProject.project.name+'" copied')
+            this.updateProjectSummaries(response.data.projectID) // Update the project summaries so the copied program shows up on the list.
+            status.succeed(this, 'Project "'+matchProject.project.name+'" copied')    // Indicate success.
           })
           .catch(error => {
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Fail the loading bar.
-            this.$Progress.fail()
-
-            // Failure popup.
-            status.fail(this, 'Could not copy project', error)
+            status.fail(this, 'Could not copy project', error) // Indicate failure.
           })
       },
 
       renameProject(projectSummary) {
         console.log('renameProject() called for ' + projectSummary.project.name)
-
-        // If the project is not in a mode to be renamed, make it so.
-        if (projectSummary.renaming === '') {
+        if (projectSummary.renaming === '') { // If the project is not in a mode to be renamed, make it so.
           projectSummary.renaming = projectSummary.project.name
-        }
-
-        // Otherwise (it is to be renamed)...
-        else {
-          // Make a deep copy of the projectSummary object by JSON-stringifying the old
-          // object, and then parsing the result back into a new object.
-          let newProjectSummary = JSON.parse(JSON.stringify(projectSummary))
-
-          // Rename the project name in the client list from what's in the textbox.
-          newProjectSummary.project.name = projectSummary.renaming
-
-          // Bring up a spinner.
-          this.$modal.show('popup-spinner')
-
-          // Start the loading bar.
-          this.$Progress.start()
-
-          // Have the server change the name of the project by passing in the new copy of the
-          // summary.
-          rpcs.rpc('update_project_from_summary', [newProjectSummary])
+        } else { // Otherwise (it is to be renamed)...
+          let newProjectSummary = _.cloneDeep(projectSummary) // Make a deep copy of the projectSummary object by JSON-stringifying the old object, and then parsing the result back into a new object.
+          newProjectSummary.project.name = projectSummary.renaming // Rename the project name in the client list from what's in the textbox.
+          status.start(this)
+          rpcs.rpc('rename_project', [newProjectSummary]) // Have the server change the name of the project by passing in the new copy of the summary.
             .then(response => {
-              // Update the project summaries so the rename shows up on the list.
-              this.updateProjectSummaries(newProjectSummary.project.id)
-
-              // Turn off the renaming mode.
-              projectSummary.renaming = ''
-
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Finish the loading bar.
-              this.$Progress.finish()
+              this.updateProjectSummaries(newProjectSummary.project.id) // Update the project summaries so the rename shows up on the list.
+              projectSummary.renaming = '' // Turn off the renaming mode.
+              status.succeed(this, '')  // No green popup message.
             })
             .catch(error => {
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Fail the loading bar.
-              this.$Progress.fail()
-
-              // Failure popup.
-              status.fail(this, 'Could not rename project', error)
+              status.fail(this, 'Could not rename project', error) // Indicate failure.
             })
         }
 
@@ -614,48 +311,24 @@ Last update: 2018-07-27
       },
 
       downloadProjectFile(uid) {
-        // Find the project that matches the UID passed in.
-        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid)
-
+        let matchProject = this.projectSummaries.find(theProj => theProj.project.id === uid) // Find the project that matches the UID passed in.
         console.log('downloadProjectFile() called for ' + matchProject.project.name)
-
-        // Bring up a spinner.
-        this.$modal.show('popup-spinner')
-
-        // Start the loading bar.
-        this.$Progress.start()
-
-        // Make the server call to download the project to a .prj file.
-        rpcs.download('download_project', [uid])
-          .then(response => {
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Finish the loading bar.
-            this.$Progress.finish()
+        status.start(this) // Start indicating progress.
+        rpcs.download('download_project', [uid]) // Make the server call to download the project to a .prj file.
+          .then(response => { // Indicate success.
+            status.succeed(this, '')  // No green popup message.
           })
-          .catch(error => {
-            // Dispel the spinner.
-            this.$modal.hide('popup-spinner')
-
-            // Fail the loading bar.
-            this.$Progress.fail()
-
-            // Failure popup.
+          .catch(error => { // Indicate failure.
             status.fail(this, 'Could not download project', error)
           })
       },
 
       // Confirmation alert
       deleteModal() {
-        // Pull out the names of the projects that are selected.
-        let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
+        let selectProjectsUIDs = this.projectSummaries.filter(theProj => // Pull out the names of the projects that are selected.
           theProj.selected).map(theProj => theProj.project.id)
-
-        // Only if something is selected...
-        if (selectProjectsUIDs.length > 0) {
-          // Alert object data
-          var obj = {
+        if (selectProjectsUIDs.length > 0) { // Only if something is selected...
+          var obj = { // Alert object data
             message: 'Are you sure you want to delete the selected projects?',
             useConfirmBtn: true,
             customConfirmBtnClass: 'btn __red',
@@ -667,92 +340,43 @@ Last update: 2018-07-27
       },
 
       deleteSelectedProjects() {
-        // Pull out the names of the projects that are selected.
-        let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
+        let selectProjectsUIDs = this.projectSummaries.filter(theProj => // Pull out the names of the projects that are selected.
           theProj.selected).map(theProj => theProj.project.id)
-
         console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
-
-        // Have the server delete the selected projects.
-        if (selectProjectsUIDs.length > 0) {
-          // Bring up a spinner.
-          this.$modal.show('popup-spinner')
-
-          // Start the loading bar.
-          this.$Progress.start()
-
+        if (selectProjectsUIDs.length > 0) { // Have the server delete the selected projects.
+          status.start(this)
           rpcs.rpc('delete_projects', [selectProjectsUIDs])
             .then(response => {
-              // Get the active project ID.
-              let activeProjectId = this.$store.state.activeProject.project.id
+              let activeProjectId = this.$store.state.activeProject.project.id // Get the active project ID.
               if (activeProjectId === undefined) {
                 activeProjectId = null
               }
-
-              // If the active project ID is one of the ones deleted...
-              if (selectProjectsUIDs.find(theId => theId === activeProjectId)) {
-                // Set the active project to an empty project.
-                this.$store.commit('newActiveProject', {})
-
-                // Null out the project.
-                activeProjectId = null
+              if (selectProjectsUIDs.find(theId => theId === activeProjectId)) { // If the active project ID is one of the ones deleted...
+                this.$store.commit('newActiveProject', {}) // Set the active project to an empty project.
+                activeProjectId = null // Null out the project.
               }
-
-              // Update the project summaries so the deletions show up on the list.
-              // Make sure it tries to set the project that was active (if any).
-              this.updateProjectSummaries(activeProjectId)
-
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Finish the loading bar.
-              this.$Progress.finish()
+              this.updateProjectSummaries(activeProjectId) // Update the project summaries so the deletions show up on the list. Make sure it tries to set the project that was active (if any).
+              status.succeed(this, '')  // No green popup message.
             })
             .catch(error => {
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Fail the loading bar.
-              this.$Progress.fail()
-
-              // Failure popup.
-              status.fail(this, 'Could not delete project/s', error)
+              status.fail(this, 'Could not delete project(s)', error)
             })
         }
       },
 
       downloadSelectedProjects() {
-        // Pull out the names of the projects that are selected.
-        let selectProjectsUIDs = this.projectSummaries.filter(theProj =>
+        let selectProjectsUIDs = this.projectSummaries.filter(theProj => // Pull out the names of the projects that are selected.
           theProj.selected).map(theProj => theProj.project.id)
-
-        console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
-
-        // Have the server download the selected projects.
-        if (selectProjectsUIDs.length > 0) {
-          // Bring up a spinner.
-          this.$modal.show('popup-spinner')
-
-          // Start the loading bar.
-          this.$Progress.start()
-
-          rpcs.download('load_zip_of_prj_files', [selectProjectsUIDs])
+        console.log('downloadSelectedProjects() called for ', selectProjectsUIDs)
+        if (selectProjectsUIDs.length > 0) { // Have the server download the selected projects.
+          status.start(this)
+          rpcs.download('download_projects', [selectProjectsUIDs, this.$store.state.currentUser.username])
             .then(response => {
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Finish the loading bar.
-              this.$Progress.finish()
+              // Indicate success.
+              status.succeed(this, '')  // No green popup message.
             })
             .catch(error => {
-              // Dispel the spinner.
-              this.$modal.hide('popup-spinner')
-
-              // Fail the loading bar.
-              this.$Progress.fail()
-
-              // Failure popup.
-              status.fail(this, 'Could not download project/s', error)
+              status.fail(this, 'Could not download project(s)', error) // Indicate failure.
             })
         }
       }

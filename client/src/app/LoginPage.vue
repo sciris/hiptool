@@ -1,7 +1,7 @@
 <!--
 Login page
 
-Last update: 2018-05-26
+Last update: 2018sep22
 -->
 
 <template>
@@ -64,8 +64,8 @@ Last update: 2018-05-26
 </template>
 
 <script>
-  import rpcs from '@/services/rpc-service'
-  import userservice from '@/services/user-service'
+  import rpcs from '@/js/rpc-service'
+  import userservice from '@/js/user-service'
   import router from '@/router'
 
   export default {
@@ -95,7 +95,7 @@ Last update: 2018-05-26
       tryLogin () {
         userservice.loginCall(this.loginUserName, this.loginPassword)
         .then(response => {
-          if (response.data == 'success') {
+          if (response.data === 'success') {
             // Set a success result to show.
             this.loginResult = 'Logging in...'
 
@@ -115,7 +115,7 @@ Last update: 2018-05-26
             })
           } else {
             // Set a failure result to show.
-            this.loginResult = 'Login failed: username or password incorrect or account not activated.'
+            this.loginResult = response.data
           }
         })
         .catch(error => {
