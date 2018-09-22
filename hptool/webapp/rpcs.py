@@ -4,6 +4,7 @@ HealthPrior remote procedure calls (RPCs)
 Last update: 2018sep22
 """
 
+
 ###############################################################
 ### Imports
 ##############################################################
@@ -24,6 +25,8 @@ figures_filename = 'Figures.pdf'
 datastore = None # Initialize datastore as a global variable
 find_datastore() # Run this on load
 
+
+
 ###############################################################
 ### Helper functions
 ##############################################################
@@ -34,7 +37,6 @@ def find_datastore():
     if datastore is None:
         datastore = sw.get_datastore(config=config)
     return datastore # So can be used externally
-
 
 
 def get_path(filename=None, username=None):
@@ -109,68 +111,20 @@ def get_user(username=None):
     return user
 
 
+
 ##################################################################################
-### Convenience functions
+### Project load/save/delete
 ##################################################################################
-    
+
 def load_project(project_key, die=None):
     output = datastore.loadblob(project_key, objtype='project', die=die)
     return output
 
+
 def save_project(project, die=None): # NB, only for saving an existing project
+    project.modified = sc.now()
     output = datastore.saveblob(obj=project, objtype='project', die=die)
     return output
-
-def del_project(project_key, die=None):
-    key = datastore.getkey(key=project_key, objtype='project')
-    project = load_project(key)
-    user = get_user(project.webapp.username)
-    output = datastore.delete(key)
-    if key in user.projects:
-        user.projects.remove(key)
-    else:
-        print('Warning: deleting project %s (%s), but not found in user "%s" projects' % (project.name, key, user.username))
-    datastore.saveuser(user)
-    return output
-
-# WARNING TEMP MOVE SOMEWHERE ELSE
-def jsonify_burden(burdenset):
-    obj_info = {
-        'burdenset': {
-            'name': burdenset.name,
-            'uid': burdenset.uid,
-            'creationTime': burdenset.created,
-            'updateTime': burdenset.modified
-        }
-    }
-    return obj_info
-
-def jsonify_interv(interv_set):
-    obj_info = {
-        'intervset': {
-            'name': interv_set.name,
-            'uid': interv_set.uid,
-            'creationTime': interv_set.created,
-            'updateTime': interv_set.modified
-        }
-    }
-    return obj_info
-
-def jsonify_package(packageset):
-    obj_info = {
-        'packageset': {
-            'name': packageset.name,
-            'uid': packageset.uid,
-            'creationTime': packageset.created,
-            'updateTime': packageset.modified
-        }
-    }
-    return obj_info
-    
-
-##################################################################################
-### Project RPCs
-##################################################################################
 
 
 def save_new_project(proj, username=None):
@@ -178,7 +132,6 @@ def save_new_project(proj, username=None):
     If we're creating a new project, we need to do some operations on it to
     make sure it's valid for the webapp.
     """ 
-    
     # Preliminaries
     new_project = sc.dcp(proj) # Copy the project, only save what we want...
     new_project.modified = sc.now()
@@ -206,6 +159,33 @@ def save_new_project(proj, username=None):
     return key,new_project
 
 
+def del_project(project_key, die=None):
+    key = datastore.getkey(key=project_key, objtype='project')
+    project = load_project(key)
+    user = get_user(project.webapp.username)
+    output = datastore.delete(key)
+    if key in user.projects:
+        user.projects.remove(key)
+    else:
+        print('Warning: deleting project %s (%s), but not found in user "%s" projects' % (project.name, key, user.username))
+    datastore.saveuser(user)
+    return output
+
+
+@RPC()
+def delete_projects(project_keys):
+    ''' Delete one or more projects '''
+    project_keys = sc.promotetolist(project_keys)
+    for project_key in project_keys:
+        del_project(project_key)
+    return None
+
+
+
+##################################################################################
+### Convert to JSON
+##################################################################################
+
 @RPC()
 def project_json(project_id, verbose=False):
     """ Return the project summary, given the Project UID. """ 
@@ -226,7 +206,6 @@ def project_json(project_id, verbose=False):
     return json
     
 
-
 @RPC()
 def project_jsons(username, verbose=False):
     """ Return project summaries for all projects the user has to the client. """ 
@@ -239,15 +218,46 @@ def project_jsons(username, verbose=False):
     return output
 
 
+def jsonify_burden(burdenset):
+    obj_info = {
+        'burdenset': {
+            'name':         burdenset.name,
+            'uid':          burdenset.uid,
+            'creationTime': burdenset.created,
+            'updateTime':   burdenset.modified
+        }
+    }
+    return obj_info
 
-@RPC()
-def delete_projects(project_keys):
-    ''' Delete one or more projects '''
-    project_keys = sc.promotetolist(project_keys)
-    for project_key in project_keys:
-        del_project(project_key)
-    return None
 
+def jsonify_interv(intervset):
+    obj_info = {
+        'intervset': {
+            'name':         intervset.name,
+            'uid':          intervset.uid,
+            'creationTime': intervset.created,
+            'updateTime':   intervset.modified
+        }
+    }
+    return obj_info
+
+
+def jsonify_package(packageset):
+    obj_info = {
+        'packageset': {
+            'name':         packageset.name,
+            'uid':          packageset.uid,
+            'creationTime': packageset.created,
+            'updateTime':   packageset.modified
+        }
+    }
+    return obj_info
+
+
+
+##################################################################################
+### Project RPCs
+##################################################################################
 
 @RPC()
 def rename_project(project_summary):
@@ -352,9 +362,10 @@ def download_projects(project_keys, username):
 
 
 def get_set(proj, which, key):
-    if   which == 'burdenset':        thisset = proj.burden(key)
-    elif which == 'interventionset':  thisset = proj.interv(key) # Full name since used in filenames
-    elif which == 'packageset':       thisset = proj.package(key)
+    ''' Helper function to pick a set '''
+    if   which == 'burdenset':       thisset = proj.burden(key)
+    elif which == 'interventionset': thisset = proj.interv(key) # Full name since used in filenames
+    elif which == 'packageset':      thisset = proj.package(key)
     else: raise Exception('Set %s not found' % which)
     return thisset
     
@@ -385,6 +396,7 @@ def download_figures():
     filepath = get_path(figures_filename) # Must match 
     print('Downloading figures from %s' % filepath)
     return filepath
+
 
 
 ###################################################################################
