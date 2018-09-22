@@ -12,20 +12,15 @@ torun = [
 ]
 
 
-# Set parameters
-user_id  = '12345678123456781234567812345678' # This is the hard-coded UID of the "demo" user
-proj_id  = sc.uuid(as_string=True) # These can all be the same
-
-
 ###########################################################################
 ### Definitions
 ###########################################################################
 
-def demoproj(online=True):
-    name = 'RPCs test %s' % proj_id[:6]
-    P = hp.demo(name=name)
-    if online:
-        rpcs.save_project_as_new(P, user_id=user_id, uid=proj_id)
+def demoproj(proj_id, username):
+    P = hp.demo()
+    P.name = 'RPCs test %s' % proj_id[:6]
+    P.uid = proj_id
+    rpcs.save_new_project(P, username)
     return P
 
 def heading(string, style=None):
@@ -36,16 +31,19 @@ def heading(string, style=None):
     return None
 
 
+T = sc.tic()
+app = main.make_app()
+user = sw.make_default_users(app)[0] # WARNING, broken!
+proj_id  = sc.uuid(as_string=True) # These can all be the same
+proj = demoproj(proj_id, user.username)
+
 
 ###########################################################################
 ### Run the tests
 ###########################################################################
 
-string = 'Starting tests for:\n  user = %s\n  proj = %s' % (user_id, proj_id)
+string = 'Starting tests for proj = %s' % proj_id
 heading(string, 'big')
-T = sc.tic()
-app = main.make_app()
-proj = demoproj()
 
 
 if 'project_io' in torun:
@@ -60,3 +58,7 @@ if 'intervset_io' in torun:
     heading('Running intervset_io', 'big')
     output = rpcs.get_project_interv_set_intervs(proj_id)
     sc.pp(output)
+
+
+sc.toc(T)
+print('Done.')
