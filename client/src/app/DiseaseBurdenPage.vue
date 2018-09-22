@@ -274,16 +274,10 @@ Last update: 2018sep22
     },
 
     created() {
-      // If we have no user logged in, automatically redirect to the login page.
-      if (this.$store.state.currentUser.displayname === undefined) {
+      if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
-      }
-
-      // Otherwise...
-      else {
-        // Load the burden sets from the active project, telling the function
-        // to also set the active burden set to the last item.
-        this.updateBurdenSets(true)
+      } else { // Otherwise...
+        this.updateBurdenSets(true) // Load the burden sets from the active project, telling the function to also set the active burden set to the last item.
       }
     },
 
