@@ -70,11 +70,11 @@ Last update: 2018-08-18
 
     data () {
       return {
-        changeUserName: this.$store.state.currentUser.username,
+        changeUserName:    this.$store.state.currentUser.username,
         changeDisplayName: this.$store.state.currentUser.displayname,
-        changeEmail: this.$store.state.currentUser.email,
-        changePassword: '',
-        changeResult: ''
+        changeEmail:       this.$store.state.currentUser.email,
+        changePassword:    '',
+        changeResult:      ''
       }
     },
 
@@ -83,31 +83,22 @@ Last update: 2018-08-18
         userservice.changeUserInfo(this.changeUserName, this.changePassword,
           this.changeDisplayName, this.changeEmail)
           .then(response => {
-            if (response.data == 'success') {
-              // Set a success result to show.
-              status.succeed(this, 'User info updated')
-
-              // Read in the full current user information.
-              userservice.getCurrentUserInfo()
+            if (response.data === 'success') {
+              status.succeed(this, 'User info updated') // Set a success result to show.
+              userservice.getCurrentUserInfo() // Read in the full current user information.
                 .then(response2 => {
-                  // Set the username to what the server indicates.
-                  this.$store.commit('newUser', response2.data.user)
-
-                  // Navigate automatically to the home page.
-                  router.push('/')
+                  this.$store.commit('newUser', response2.data.user) // Set the username to what the server indicates.
+                  router.push('/') // Navigate automatically to the home page.
                 })
                 .catch(error => {
-                  // Set the username to {}.  An error probably means the
-                  // user is not logged in.
-                  this.$store.commit('newUser', {})
+                  this.$store.commit('newUser', {}) // Set the username to {}.  An error probably means the user is not logged in.
                 })
             } else {
-              // Set a failure result to show.
-              status.fail(this, 'Failed to update user info, please check password and try again')
+              this.changeResult = response.data
             }
           })
           .catch(error => {
-            status.fail(this, 'Failed to update user info, please check password and try again')
+            status.fail(this, 'Failed to update user info, please check password and try again', error)
           })
       }
     }
