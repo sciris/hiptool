@@ -88,7 +88,6 @@ Last update: 2018sep22
           <td>
             <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
           </td>
-          <!--            <td>{{ projectSummary.country }}</td> -->
           <td>{{ projectSummary.project.creationTime.toUTCString() }}</td>
           <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime.toUTCString():
             'No modification' }}</td>
@@ -98,25 +97,11 @@ Last update: 2018sep22
             <button class="btn" @click="downloadProjectFile(projectSummary.project.id)">Download</button>
           </td>
         </tr>
-        <!--          <tr>
-                    <td>
-                      <button class="btn" @click="createNewProject">Create new project</button>
-                    </td>
-        <!-- comment out for now            <td>
-                      <select v-model="selectedCountry">
-                        <option>Select country...</option>
-                        <option v-for="choice in countryList">
-                          {{ choice }}
-                        </option>
-                      </select>
-                    </td>
-                  </tr> -->
         </tbody>
       </table>
 
       <div class="ControlsRow">
-        <button class="btn" @click="deleteModal()">Delete selected</button>
-        &nbsp; &nbsp;
+        <button class="btn" @click="deleteModal()">Delete selected</button>&nbsp; &nbsp;
         <button class="btn" @click="downloadSelectedProjects">Download selected</button>
       </div>
     </div>
@@ -173,7 +158,7 @@ Last update: 2018sep22
       updateProjectSummaries(setActiveID) {
         console.log('updateProjectSummaries() called')
         status.start(this)
-        rpcs.rpc('project_jsons', [this.$store.state.currentUser.username]) // Get the current user's project summaries from the server.
+        rpcs.rpc('jsonify_projects', [this.$store.state.currentUser.username]) // Get the current user's project summaries from the server.
           .then(response => {
             let lastCreationTime = null
             let lastCreatedID = null
