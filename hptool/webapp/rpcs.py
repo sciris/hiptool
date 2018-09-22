@@ -111,9 +111,80 @@ def get_user(username=None):
     return user
 
 
+##################################################################################
+### JSONification
+##################################################################################
+
+@RPC()
+def project_json(project_id, verbose=False):
+    """ Return the project json, given the Project UID. """ 
+    proj = load_project(project_id) # Load the project record matching the UID of the project passed in.
+    json = {
+        'project': {
+            'id':           proj.uid,
+            'name':         proj.name,
+            'username':     proj.webapp.username,
+            'hasData':      len(proj.datasets)>0,
+            'creationTime': proj.created,
+            'updatedTime':  proj.modified,
+            'n_results':    len(proj.results),
+            'n_tasks':      len(proj.webapp.tasks)
+        }
+    }
+    if verbose: sc.pp(json)
+    return json
+    
+
+@RPC()
+def project_jsons(username, verbose=False):
+    """ Return project jsons for all projects the user has to the client. """ 
+    output = {'projects':[]}
+    user = get_user(username)
+    for project_key in user.projects:
+        json = project_json(project_key)
+        output['projects'].append(json)
+    if verbose: sc.pp(output)
+    return output
+
+
+def jsonify_burden(burdenset):
+    json = {
+        'burdenset': {
+            'name':         burdenset.name,
+            'uid':          burdenset.uid,
+            'creationTime': burdenset.created,
+            'updateTime':   burdenset.modified
+        }
+    }
+    return json
+
+
+def jsonify_interv(intervset):
+    json = {
+        'intervset': {
+            'name':         intervset.name,
+            'uid':          intervset.uid,
+            'creationTime': intervset.created,
+            'updateTime':   intervset.modified
+        }
+    }
+    return json
+
+
+def jsonify_package(packageset):
+    json = {
+        'packageset': {
+            'name':         packageset.name,
+            'uid':          packageset.uid,
+            'creationTime': packageset.created,
+            'updateTime':   packageset.modified
+        }
+    }
+    return json
+
 
 ##################################################################################
-### Project load/save/delete
+### Project RPCs
 ##################################################################################
 
 def load_project(project_key, die=None):
@@ -134,7 +205,6 @@ def save_new_project(proj, username=None):
     """ 
     # Preliminaries
     new_project = sc.dcp(proj) # Copy the project, only save what we want...
-    new_project.modified = sc.now()
     new_project.uid = sc.uuid()
     
     # Get unique name
@@ -181,116 +251,22 @@ def delete_projects(project_keys):
     return None
 
 
-
-##################################################################################
-### Convert to JSON
-##################################################################################
-
 @RPC()
-def project_json(project_id, verbose=False):
-    """ Return the project summary, given the Project UID. """ 
-    proj = load_project(project_id) # Load the project record matching the UID of the project passed in.
-    json = {
-        'project': {
-            'id':           proj.uid,
-            'name':         proj.name,
-            'username':     proj.webapp.username,
-            'hasData':      len(proj.datasets)>0,
-            'creationTime': proj.created,
-            'updatedTime':  proj.modified,
-            'n_results':    len(proj.results),
-            'n_tasks':      len(proj.webapp.tasks)
-        }
-    }
-    if verbose: sc.pp(json)
-    return json
-    
-
-@RPC()
-def project_jsons(username, verbose=False):
-    """ Return project summaries for all projects the user has to the client. """ 
-    output = {'projects':[]}
-    user = get_user(username)
-    for project_key in user.projects:
-        json = project_json(project_key)
-        output['projects'].append(json)
-    if verbose: sc.pp(output)
-    return output
-
-
-def jsonify_burden(burdenset):
-    obj_info = {
-        'burdenset': {
-            'name':         burdenset.name,
-            'uid':          burdenset.uid,
-            'creationTime': burdenset.created,
-            'updateTime':   burdenset.modified
-        }
-    }
-    return obj_info
-
-
-def jsonify_interv(intervset):
-    obj_info = {
-        'intervset': {
-            'name':         intervset.name,
-            'uid':          intervset.uid,
-            'creationTime': intervset.created,
-            'updateTime':   intervset.modified
-        }
-    }
-    return obj_info
-
-
-def jsonify_package(packageset):
-    obj_info = {
-        'packageset': {
-            'name':         packageset.name,
-            'uid':          packageset.uid,
-            'creationTime': packageset.created,
-            'updateTime':   packageset.modified
-        }
-    }
-    return obj_info
-
-
-
-##################################################################################
-### Project RPCs
-##################################################################################
-
-@RPC()
-def rename_project(project_summary):
-    """ Given the passed in project summary, update the underlying project accordingly. """ 
-    proj = load_project(project_summary['project']['id']) # Load the project corresponding with this summary.
-    proj.name = project_summary['project']['name'] # Use the summary to set the actual project.
-    proj.modified = sc.now() # Set the modified time to now.
+def rename_project(project_json):
+    """ Given the passed in project json, update the underlying project accordingly. """ 
+    proj = load_project(project_json['project']['id']) # Load the project corresponding with this json.
+    proj.name = project_json['project']['name'] # Use the json to set the actual project.
     save_project(proj) # Save the changed project to the DataStore.
     return None
 
 
-@RPC()
-def add_demo_project(username):
-    """ Add a demo Optima Nutrition project """
-    proj = hp.demo()  # Create the project, loading in the desired spreadsheets.
-    proj.name = 'Demo project'
-    print(">> add_demo_project %s" % (proj.name)) # Display the call information.
-    key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
-    return {'projectID': str(proj.uid)} # Return the new project UID in the return message.
-
-
-#!!!FIX
 @RPC(call_type='download')
 def create_new_project(username, proj_name, *args, **kwargs):
     """ Create a new Optima Nutrition project. """
-    proj = hp.Project() # Create the project
+    proj = hp.demo() # Create the project
     print(">> create_new_project %s" % (proj.name))     # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
-    file_name = '%s databook.xlsx' % proj.name # Create a filename containing the project name followed by a .prj suffix.
-    full_file_name = get_path(file_name, username)
-    proj.input_sheet.save(full_file_name)
-    print(">> download_databook %s" % (full_file_name))
-    return full_file_name
+    return {'projectID': str(proj.uid)}
 
     
 @RPC()
@@ -303,15 +279,13 @@ def copy_project(project_key):
     new_project = sc.dcp(proj) # Make a copy of the project loaded in to work with.
     print(">> copy_project %s" % (new_project.name))  # Display the call information.
     key,new_project = save_new_project(new_project, proj.webapp.username) # Save a DataStore projects record for the copy project.
-    copy_project_id = new_project.uid # Remember the new project UID (created in save_project_as_new()).
-    return { 'projectId': copy_project_id } # Return the UID for the new projects record.
+    return {'projectID': str(new_project.uid)} # Return the UID for the new projects record.
 
 
 
 ##################################################################################
 ### Upload/download RPCs
 ##################################################################################
-
 
 @RPC(call_type='upload')
 def upload_project(prj_filename, username):
@@ -325,7 +299,7 @@ def upload_project(prj_filename, username):
     except Exception:
         return { 'error': 'BadFileFormatError' }
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
-    return { 'projectId': str(proj.uid) } # Return the new project UID in the return message.
+    return {'projectID': str(proj.uid)} # Return the new project UID in the return message.
 
 
 @RPC(call_type='download')   
@@ -368,7 +342,7 @@ def get_set(proj, which, key):
     elif which == 'packageset':      thisset = proj.package(key)
     else: raise Exception('Set %s not found' % which)
     return thisset
-    
+
 
 @RPC(call_type='upload')
 def upload_set(filename, project_id, which, key=None):
@@ -376,24 +350,24 @@ def upload_set(filename, project_id, which, key=None):
     thisset = get_set(proj, which, key)
     thisset.loaddata(filename)
     print('Loaded data into %s %s' % (which, thisset.name))
-    proj.modified = sc.now()
-    print('Updating health package...')
     proj.package().make_package()
     save_project(proj)
     return None
-    
+
+
 @RPC(call_type='download')
 def download_set(project_id, which, key=None):
     proj = load_project(project_id)
     thisset = get_set(proj, which, key)
-    filepath = get_path('%s_%s.xlsx' % (thisset.name, which))
+    filepath = get_path('%s_%s.xlsx' % (thisset.name, which), proj.webapp.username)
     thisset.savedata(filepath)
     print('Downloading data from %s %s' % (which, thisset.name))
     return filepath
 
+
 @RPC(call_type='download')
-def download_figures():
-    filepath = get_path(figures_filename) # Must match 
+def download_figures(username):
+    filepath = get_path(figures_filename, username) # Must match 
     print('Downloading figures from %s' % filepath)
     return filepath
 
@@ -565,7 +539,6 @@ def add_burden(project_id, intervkey):
     ['active', 'cause', 'dalys', 'deaths', 'prevalence']
     placeholder = [0, '~Cause of burden~', 0, 0, 0]
     data[data.nrows()] = placeholder
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -576,7 +549,6 @@ def copy_burden(project_id, intervkey, index):
     value = sc.dcp(data[index])
     value[1] += ' (copy)'
     data.insert(row=index, value=value)
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -585,7 +557,6 @@ def delete_burden(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.burdensets[intervkey].data
     data.pop(index)
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -712,7 +683,6 @@ def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
     print('New intervention set record:')
     print(data_record)
     proj.package().make_package() # Update with the latest data
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -722,7 +692,6 @@ def add_interv(project_id, intervkey):
     data = proj.intervsets[intervkey].data
     placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
     data[data.nrows()] = placeholder
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -733,7 +702,6 @@ def copy_interv(project_id, intervkey, index):
     value = sc.dcp(data[index])
     value[1] += ' (copy)'
     data.insert(row=index, value=value)
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
@@ -742,7 +710,6 @@ def delete_interv(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     data.pop(index)
-    proj.modified = sc.now()
     save_project(proj)
     return None
 
