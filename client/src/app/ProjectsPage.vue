@@ -88,8 +88,8 @@ Last update: 2018sep22
           <td>
             <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>
           </td>
-          <td>{{ projectSummary.project.creationTime.toUTCString() }}</td>
-          <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime.toUTCString():
+          <td>{{ projectSummary.project.creationTime }}</td>
+          <td>{{ projectSummary.project.updatedTime ? projectSummary.project.updatedTime:
             'No modification' }}</td>
           <td style="white-space: nowrap">
             <button class="btn" @click="copyProject(projectSummary.project.id)">Copy</button>
@@ -195,7 +195,7 @@ Last update: 2018sep22
         rpcs.rpc('create_new_project', [this.$store.state.currentUser.username]) // Have the server create a new project.
           .then(response => {
             this.updateProjectSummaries(null); // Update the project summaries so the new project shows up on the list.
-            status.succeed(this, 'New project "' + this.proj_name + '" created') // Indicate success.
+            status.succeed(this, '') // Indicate success.
           })
           .catch(error => {
             status.fail(this, 'Could not add new project', error)    // Indicate failure.

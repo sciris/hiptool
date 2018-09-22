@@ -123,11 +123,9 @@ def jsonify_project(project_id, verbose=False):
             'id':           proj.uid,
             'name':         proj.name,
             'username':     proj.webapp.username,
-            'hasData':      len(proj.datasets)>0,
+            'hasData':      len(proj.burdensets)>0 and len(proj.intervsets)>0,
             'creationTime': proj.created,
             'updatedTime':  proj.modified,
-            'n_results':    len(proj.results),
-            'n_tasks':      len(proj.webapp.tasks)
         }
     }
     if verbose: sc.pp(json)
@@ -238,8 +236,7 @@ def save_new_project(proj, username=None):
     # Ensure it's a valid webapp project
     if not hasattr(new_project, 'webapp'):
         new_project.webapp = sc.prettyobj()
-        new_project.webapp.username = username
-        new_project.webapp.tasks = []
+        new_project.webapp.username = username # If we ever use Celery with HealthPrior: new_project.webapp.tasks = []
     
     # Save all the things
     key = save_project(new_project)
@@ -279,10 +276,11 @@ def rename_project(project_json):
     return None
 
 
-@RPC(call_type='download')
-def create_new_project(username, proj_name, *args, **kwargs):
+@RPC()
+def create_new_project(username):
     """ Create a new Optima Nutrition project. """
     proj = hp.demo() # Create the project
+    proj.name = 'New project'
     print(">> create_new_project %s" % (proj.name))     # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
     return {'projectID': str(proj.uid)}
