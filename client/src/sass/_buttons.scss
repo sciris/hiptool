@@ -162,7 +162,13 @@ $disabled-color: #FFF;
     background: #F47D7D;
     border-color: #999;
     color: #FFF;
-
+    
+    &:disabled {
+      background: $disabled-background;
+      border-color: $disabled-border-color;
+      color: $disabled-color;      
+    }
+    
     &:hover:not(:disabled) {
       background: darken(#F47D7D, 10%);
       border-color: #999;
@@ -188,7 +194,13 @@ $disabled-color: #FFF;
     background: #008800;
     border-color: #999;
     color: #FFF;
-
+    
+    &:disabled {
+      background: $disabled-background;
+      border-color: $disabled-border-color;
+      color: $disabled-color;      
+    }
+  
     &:hover:not(:disabled) {
       background: darken(#008800, 3%);
       border-color: #999;
@@ -291,7 +303,13 @@ $disabled-color: #FFF;
 
   //@include btn-styles($default-color, $default-states-color);
   @include transition($fast-transition-time, linear);
-
+  
+  &:disabled {
+    background-color: $disabled-background;
+    border-color: $disabled-border-color;
+    color: $disabled-color;      
+  }
+    
   &:hover,
   &:focus {
     outline: 0 !important;
@@ -420,3 +438,16 @@ $disabled-color: #FFF;
   border-width: 0;
   font-size: 16px;
 }
+
+.sheetbtn {
+  font-size: 16px;
+  border: 1px solid $main-color;
+}
+
+.deselected {
+  background: transparent;
+  color: $main-dark;
+  border: 1px solid $main-dark;
+}
+
+
