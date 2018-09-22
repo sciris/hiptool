@@ -626,57 +626,34 @@ def delete_intervention(project_id, intervkey, index):
 ################################################################################### 
 
 @RPC()
-def get_project_package_set_results(project_id, packageset_numindex):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get the package set that matches packageset_numindex.
-    packageset = proj.package(key=packageset_numindex)
+def jsonify_packages(project_id, packagekey):
+    proj = load_project(project_id) # Get the Project object.
+    packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     packageset.make_package()
-    
-    # Return an empty list if no data is present.
-    if packageset.data is None:
-        return { 'results': [] }
+    if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
+    results = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
+    return {'results': results}
 
-    # Gather the list for all of the diseases.
-    result_data = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False)
-    
-    # Return success.
-    return { 'results': result_data }
 
 @RPC()    
-def create_package_set(project_id, new_package_set_name):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(new_package_set_name, 
-            other_names=list(proj.packagesets))
-        
-        # Create a new (empty) package set.
-        new_packageset = hp.HealthPackage(project=proj, name=unique_name)
-        
-        # Put the new package set in the dictionary.
-        proj.packagesets[unique_name] = new_packageset
-        
-    # Do the project update using the internal function.
-    update_project_with_fn(project_id, update_project_fn)
-
-    # Return the new package sets.
-    return get_project_package_sets(project_id)
+def create_packageset(project_id, newname):
+    proj = load_project(project_id) # Get the Project object.
+    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
+    new_packageset = hp.HealthPackage(project=proj, name=unique_name)
+    proj.packagesets[unique_name] = new_packageset # Put the new intervention set in the dictionary.
+    proj.package().make_package() # Update with the latest data
+    save_project(proj)
+    return jsonify_packagesets(proj=proj)
 
 
 @RPC()
-def get_project_package_plots(project_id, packageset_numindex, dosave=True):
+def plot_packages(project_id, packagekey, dosave=True):
     ''' Plot the health packages '''
-    
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get the package set that matches packageset_numindex.
-    packageset = proj.package(key=packageset_numindex)
+    proj = load_project(project_id) # Get the Project object.
+    packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     packageset.make_package()
     
+    # Make the plots
     figs = []
     fig1 = packageset.plot_spending()
     fig2 = packageset.plot_dalys()
@@ -684,19 +661,18 @@ def get_project_package_plots(project_id, packageset_numindex, dosave=True):
     figs.append(fig1)
     figs.append(fig2)
     figs.append(fig3)
-    
-    # Gather the list for all of the diseases.
-    graphs = []
+    figdicts = []
     for fig in figs:
-        graph_dict = sw.mpld3ify(fig, jsonify=False)
-        graphs.append(graph_dict)
+        figdict = sw.mpld3ify(fig, jsonify=False)
+        figdicts.append(figdict)
     
+    # Optionally save to PDF
     if dosave:
-        filepath = getpath(filename=figures_filename)
+        filepath = get_path(filename=figures_filename, username=proj.webapp.username)
         sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
         print('Figures saved to %s' % filepath)
     
     # Return success -- WARNING, should not be hard-coded!
-    return {'graph1': graphs[0],
-            'graph2': graphs[1],
-            'graph3': graphs[2],}
+    return {'graph1': figdicts[0],
+            'graph2': figdicts[1],
+            'graph3': figdicts[2],}
