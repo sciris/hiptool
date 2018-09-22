@@ -105,7 +105,7 @@ Last update: 2018-05-29
       </div>
 
 
-      <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
           <th style="text-align:center">Active</th>
