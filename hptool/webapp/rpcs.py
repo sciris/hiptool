@@ -115,8 +115,7 @@ def get_user(username=None):
 ### JSONification
 ##################################################################################
 
-@RPC()
-def project_json(project_id, verbose=False):
+def jsonify_project(project_id, verbose=False):
     """ Return the project json, given the Project UID. """ 
     proj = load_project(project_id) # Load the project record matching the UID of the project passed in.
     json = {
@@ -134,17 +133,6 @@ def project_json(project_id, verbose=False):
     if verbose: sc.pp(json)
     return json
     
-
-@RPC()
-def project_jsons(username, verbose=False):
-    """ Return project jsons for all projects the user has to the client. """ 
-    output = {'projects':[]}
-    user = get_user(username)
-    for project_key in user.projects:
-        json = project_json(project_key)
-        output['projects'].append(json)
-    if verbose: sc.pp(output)
-    return output
 
 
 def jsonify_burden(burdenset):
@@ -182,6 +170,37 @@ def jsonify_package(packageset):
     }
     return json
 
+@RPC()
+def jsonify_projects(username, verbose=False):
+    """ Return project jsons for all projects the user has to the client. """ 
+    output = {'projects':[]}
+    user = get_user(username)
+    for project_key in user.projects:
+        json = jsonify_project(project_key)
+        output['projects'].append(json)
+    if verbose: sc.pp(output)
+    return output
+
+@RPC()     
+def jsonify_burdensets(project_id):
+    ''' Return the JSON representation of all burden sets in the project '''
+    proj = load_project(project_id) # Get the Project object.
+    output = {'burdensets': [jsonify_burden(bs) for bs in proj.burdensets.values()]}
+    return output
+
+@RPC()     
+def jsonify_intervsets(project_id):
+    ''' Return the JSON representation of all intervention sets in the project '''
+    proj = load_project(project_id) # Get the Project object.
+    output = {'intervsets': [jsonify_interv(iv) for iv in proj.intervsets.values()]}
+    return output
+
+@RPC()     
+def jsonify_packagesets(project_id):
+    ''' Return the JSON representation of all package sets in the project '''
+    proj = load_project(project_id) # Get the Project object.
+    output = {'packagesets': [jsonify_package(pk) for pk in proj.packagesets.values()]}
+    return output
 
 ##################################################################################
 ### Project RPCs
@@ -335,13 +354,26 @@ def download_projects(project_keys, username):
     return server_zip_fname # Return the server file name.
 
 
-def get_set(proj, which, key):
+def get_set(proj, which, key=None, fulloutput=False):
     ''' Helper function to pick a set '''
-    if   which == 'burdenset':       thisset = proj.burden(key)
-    elif which == 'interventionset': thisset = proj.interv(key) # Full name since used in filenames
-    elif which == 'packageset':      thisset = proj.package(key)
-    else: raise Exception('Set %s not found' % which)
-    return thisset
+    # Loop over the 3 options
+    if which == 'burdenset':       
+        thisset   = proj.burden(key)
+        setdict   = proj.burdensets
+        jsonifier = jsonify_burdensets
+    elif which == 'interventionset':
+        thisset = proj.interv(key)
+        setdict   = proj.intervsets
+        jsonifier = jsonify_intervsets
+    elif which == 'packageset':
+        thisset = proj.package(key)
+        setdict   = proj.packagesets
+        jsonifier = jsonify_packagesets
+    else:
+        raise Exception('Set %s not found' % which)
+    
+    if fulloutput: return setdict, jsonifier
+    else:          return thisset
 
 
 @RPC(call_type='upload')
@@ -372,165 +404,115 @@ def download_figures(username):
     return filepath
 
 
+###################################################################################
+###  Rename/copy/delete all sets
+################################################################################### 
+
+@RPC()
+def delete_set(project_id, which, ind):
+    proj = load_project(project_id) # Get the Project object.
+    setdict, jsonifier = get_set(proj, which, fulloutput=True)
+    setdict.pop(ind)
+    save_project(proj)
+    return jsonifier(proj)
+
+@RPC()    
+def copy_set(project_id, which, ind):
+    proj = load_project(project_id) # Get the Project object.
+    setdict, jsonifier = get_set(proj, which, fulloutput=True)
+    newname = sc.uniquename(setdict[ind].name, namelist=setdict.keys())
+    newset = sc.dcp(setdict[ind])
+    newset.name = newname
+    setdict[newname] = newset
+    save_project(proj)
+    return jsonifier(proj)
+
+@RPC()    
+def rename_set(project_id, which, ind, newname, die=False):
+    proj = load_project(project_id) # Get the Project object.
+    setdict, jsonifier = get_set(proj, which, fulloutput=True)
+    origname = setdict.keys()[ind]
+    uniquename = sc.uniquename(newname, namelist=setdict.keys())
+    if uniquename != newname:
+        errormsg = 'Cannot rename %s from %s to %s since name already exists' % (which, origname, newname)
+        if die:  raise Exception(errormsg)
+        else:    print(errormsg)
+        return None
+    setdict.rename(origname, newname)
+    setdict[newname].name = newname
+    save_project(proj)
+    return jsonifier(proj)
+
+
 
 ###################################################################################
 ###  Burden set RPCs
 ################################################################################### 
     
-@RPC()     
-def get_project_burden_sets(project_id):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get a list of the Burden objects.
-    burdensets = [proj.burdensets[ind] for ind in range(len(proj.burdensets))] 
-    
-    # Return the JSON-friendly result.
-    return {'burdensets': map(get_burden_set_fe_repr, burdensets)}
-
 @RPC()
-def get_project_burden_set_diseases(project_id, burdenset_numindex):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get the burden set that matches burdenset_numindex.
-    burdenset = proj.burden(key=burdenset_numindex)
-    
-    # Return an empty list if no data is present.
-    if burdenset.data is None:
-        return { 'diseases': [] }
+def get_diseases(project_id, burdenset_numindex):
+    proj = load_project(project_id) # Get the Project object.
+    burdenset = proj.burden(key=burdenset_numindex) # Get the burden set that matches burdenset_numindex.
+    if burdenset.data is None: return {'diseases': []} # Return an empty list if no data is present.
+    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False) # Gather the list for all of the diseases.
+    return {'diseases': disease_data}
 
-    # Gather the list for all of the diseases.
-    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False)
-    
-    # Return success.
-    return { 'diseases': disease_data }
 
 @RPC()    
-def create_burden_set(project_id, new_burden_set_name):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(new_burden_set_name, 
-            other_names=list(proj.burdensets))
-        
-        # Create a new (empty) burden set.
-        new_burden_set = hp.Burden(project=proj, name=unique_name)
-                
-        # Load data from the Excel spreadsheet.
-        # NOTE: We may want to take this out later in favor leaving the 
-        # new sets empty to start.
-        data_path = hp.HPpath('data')
-        new_burden_set.loaddata(data_path+'ihme-gbd.xlsx')
-        
-        # Put the new burden set in the dictionary.
-        proj.burdensets[unique_name] = new_burden_set
-        proj.package().make_package() # Update with the latest data
-        
-    # Do the project update using the internal function.
-    update_project_with_fn(project_id, update_project_fn)
-
-    # Return the new burden sets.
-    return get_project_burden_sets(project_id)
-
-@RPC()
-def delete_burden_set(project_id, burdenset_numindex):
-
-    def update_project_fn(proj):
-        proj.burdensets.pop(burdenset_numindex)
-        
-    # Do the project update using the internal function.    
-    update_project_with_fn(project_id, update_project_fn)   
-
-@RPC()    
-def copy_burden_set(project_id, burdenset_numindex):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(proj.burdensets[burdenset_numindex].name, 
-            other_names=list(proj.burdensets))
-        
-        # Create a new burdenset which is a copy of the old one.
-        new_burden_set = sc.dcp(proj.burdensets[burdenset_numindex])
-        
-        # Overwrite the old name with the new.
-        new_burden_set.name = unique_name
-       
-        # Put the new burden set in the dictionary.
-        proj.burdensets[unique_name] = new_burden_set
-        
-    # Do the project update using the internal function.  
-    update_project_with_fn(project_id, update_project_fn)
-    
-    # Return the new burden sets.
-    return get_project_burden_sets(project_id) 
-
-@RPC()
-def rename_burden_set(project_id, burdenset_numindex, new_burden_set_name):
-
-    def update_project_fn(proj):
-        # Overwrite the old name with the new.
-        proj.burdensets[burdenset_numindex].name = new_burden_set_name
-        
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
-
-@RPC()
-def update_burden_set_disease(project_id, burdenset_numindex, disease_numindex, data):
-    proj = load_project(project_id)
-    data_record = proj.burdensets[burdenset_numindex].data[disease_numindex]
-    print('Modifying')
-    print(data_record)
-    print('to')
-    print(data)
-    if len(data_record) != len(data):
-        print('WARNING, lengths do not match: %s vs. %s' % (len(data_record), len(data)))
-    for i,datum in enumerate(data):
-        data_record[i] = sanitize(datum)
-    
+def create_burdenset(project_id, new_burden_set_name):
+    proj = load_project(project_id) # Get the Project object.
+    unique_name = sc.uniquename(new_burden_set_name, namelist=proj.burdensets.keys())
+    new_burden_set = hp.Burden(project=proj, name=unique_name)
+    data_path = hp.HPpath('data')
+    new_burden_set.loaddata(data_path+'ihme-gbd.xlsx')
+    print('WARNING: using hard-coded burden data')
+    proj.burdensets[unique_name] = new_burden_set # Put the new burden set in the dictionary.
     proj.package().make_package() # Update with the latest data
-    proj.modified = sc.now()
     save_project(proj)
-    print('Done updating burden set.')
+    return jsonify_burdensets(proj)
+
+
+@RPC()
+def update_disease(project_id, burdenkey, diseaseind, data, verbose=True):
+    proj = load_project(project_id)
+    data_record = proj.burdensets[burdenkey].data[diseaseind]
+    if verbose: print('Modifying\n%s\nto\n%s' % (data_record, data))
+    if len(data_record) != len(data):
+        print('WARNING, disease lengths do not match: %s vs. %s' % (len(data_record), len(data)))
+    for i,datum in enumerate(data): # Actually replace it
+        data_record[i] = sanitize(datum)
+    proj.package().make_package() # Update with the latest data
+    save_project(proj)
     return None
 
 
-
 @RPC()
-def get_project_burden_plots(project_id, burdenset_numindex, engine='matplotlib', dosave=True):
+def plot_burden(project_id, burdenkey, dosave=True):
     ''' Plot the disease burden '''
+    proj = load_project(project_id) # Get the Project object.
+    burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get the burden set that matches burdenset_numindex.
-    burdenset = proj.burden(key=burdenset_numindex)
-    
+    # Create the figures and convert to mpld3
     figs = []
+    figdicts = []
     for which in ['dalys','deaths','prevalence']:        
-        fig = burdenset.plottopcauses(which=which) # Create the figure
+        fig = burdenset.plottopcauses(which=which) 
         figs.append(fig)
-    
-    # Gather the list for all of the diseases.
-    graphs = []
     for fig in figs:
-        graph_dict = sw.mpld3ify(fig, jsonify=False)
-        graphs.append(graph_dict)
+        figdict = sw.mpld3ify(fig, jsonify=False)
+        figdicts.append(figdict)
     
+    # Optionally save the figures
     if dosave:
-        filepath = getpath(filename=figures_filename)
+        filepath = get_path(filename=figures_filename, username=proj.webapp.username)
         sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
         print('Figures saved to %s' % filepath)
     
     # Return success -- WARNING, hard-coded to 3 graphs!
-    return {'graph1': graphs[0],
-            'graph2': graphs[1],
-            'graph3': graphs[2],}
+    return {'graph1': figdicts[0], 
+            'graph2': figdicts[1],
+            'graph3': figdicts[2],}
     
-    
-
 
 @RPC()
 def add_burden(project_id, intervkey):
@@ -542,6 +524,7 @@ def add_burden(project_id, intervkey):
     save_project(proj)
     return None
 
+
 @RPC()
 def copy_burden(project_id, intervkey, index):
     proj = load_project(project_id)
@@ -552,6 +535,7 @@ def copy_burden(project_id, intervkey, index):
     save_project(proj)
     return None
 
+
 @RPC()
 def delete_burden(project_id, intervkey, index):
     proj = load_project(project_id)
@@ -560,20 +544,10 @@ def delete_burden(project_id, intervkey, index):
     save_project(proj)
     return None
 
+
 ###################################################################################
 ### Intervention set RPCs
 ###################################################################################
-
-@RPC()    
-def get_project_interv_sets(project_id):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get a list of the Interventions objects.
-    interv_sets = [proj.intervsets[ind] for ind in range(len(proj.intervsets))] 
-    
-    # Return the JSON-friendly result.
-    return {'intervsets': map(get_interv_set_fe_repr, interv_sets)}
 
 @RPC()
 def get_project_interv_set_intervs(project_id, intervset_numindex=None):
@@ -622,49 +596,6 @@ def create_interv_set(project_id, new_interv_set_name):
     # Return the new intervention sets.
     return get_project_interv_sets(project_id)
 
-@RPC()
-def delete_interv_set(project_id, intervset_numindex):
-
-    def update_project_fn(proj):
-        proj.intervsets.pop(intervset_numindex)
-        proj.package().make_package() # Update with the latest data
-        
-    # Do the project update using the internal function.    
-    update_project_with_fn(project_id, update_project_fn)   
-
-@RPC()    
-def copy_interv_set(project_id, intervset_numindex):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(proj.intervsets[intervset_numindex].name, 
-            other_names=list(proj.intervsets))
-        
-        # Create a new intervention set which is a copy of the old one.
-        new_intervset = sc.dcp(proj.intervsets[intervset_numindex])
-        
-        # Overwrite the old name with the new.
-        new_intervset.name = unique_name
-       
-        # Put the new intervention set in the dictionary.
-        proj.intervsets[unique_name] = new_intervset
-        
-    # Do the project update using the internal function.  
-    update_project_with_fn(project_id, update_project_fn)
-    
-    # Return the new intervention sets.
-    return get_project_interv_sets(project_id)
-
-@RPC()
-def rename_interv_set(project_id, intervset_numindex, new_interv_set_name):
-
-    def update_project_fn(proj):
-        # Overwrite the old name with the new.
-        proj.intervsets[intervset_numindex].name = new_interv_set_name
-        
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
 
 @RPC()    
 def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
@@ -717,17 +648,6 @@ def delete_interv(project_id, intervkey, index):
 ###  Package set RPCs
 ################################################################################### 
 
-@RPC()    
-def get_project_package_sets(project_id):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get a list of the package objects.
-    packagesets = [proj.packagesets[ind] for ind in range(len(proj.packagesets))] 
-    
-    # Return the JSON-friendly result.
-    return {'packagesets': map(get_package_set_fe_repr, packagesets)}
-
 @RPC()
 def get_project_package_set_results(project_id, packageset_numindex):
     # Get the Project object.
@@ -768,48 +688,6 @@ def create_package_set(project_id, new_package_set_name):
     # Return the new package sets.
     return get_project_package_sets(project_id)
 
-@RPC()
-def delete_package_set(project_id, packageset_numindex):
-
-    def update_project_fn(proj):
-        proj.packagesets.pop(packageset_numindex)
-        
-    # Do the project update using the internal function.    
-    update_project_with_fn(project_id, update_project_fn)   
-
-@RPC()    
-def copy_package_set(project_id, packageset_numindex):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(proj.packagesets[packageset_numindex].name, 
-            other_names=list(proj.packagesets))
-        
-        # Create a new packageset which is a copy of the old one.
-        new_packageset = sc.dcp(proj.packagesets[packageset_numindex])
-        
-        # Overwrite the old name with the new.
-        new_packageset.name = unique_name
-       
-        # Put the new package set in the dictionary.
-        proj.packagesets[unique_name] = new_packageset
-        
-    # Do the project update using the internal function.  
-    update_project_with_fn(project_id, update_project_fn)
-    
-    # Return the new package sets.
-    return get_project_package_sets(project_id) 
-
-@RPC()
-def rename_package_set(project_id, packageset_numindex, new_package_set_name):
-
-    def update_project_fn(proj):
-        # Overwrite the old name with the new.
-        proj.packagesets[packageset_numindex].name = new_package_set_name
-        
-    # Do the project update using the internal function. 
-    update_project_with_fn(project_id, update_project_fn)
 
 @RPC()
 def get_project_package_plots(project_id, packageset_numindex, dosave=True):
