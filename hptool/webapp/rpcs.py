@@ -182,23 +182,23 @@ def jsonify_projects(username, verbose=False):
     return output
 
 @RPC()     
-def jsonify_burdensets(project_id):
+def jsonify_burdensets(project_id=None, proj=None):
     ''' Return the JSON representation of all burden sets in the project '''
-    proj = load_project(project_id) # Get the Project object.
+    if proj is None: proj = load_project(project_id) # Get the Project object.
     output = {'burdensets': [jsonify_burden(bs) for bs in proj.burdensets.values()]}
     return output
 
 @RPC()     
-def jsonify_intervsets(project_id):
+def jsonify_intervsets(project_id=None, proj=None):
     ''' Return the JSON representation of all intervention sets in the project '''
-    proj = load_project(project_id) # Get the Project object.
+    if proj is None: proj = load_project(project_id) # Get the Project object.
     output = {'intervsets': [jsonify_interv(iv) for iv in proj.intervsets.values()]}
     return output
 
 @RPC()     
-def jsonify_packagesets(project_id):
+def jsonify_packagesets(project_id=None, proj=None):
     ''' Return the JSON representation of all package sets in the project '''
-    proj = load_project(project_id) # Get the Project object.
+    if proj is None: proj = load_project(project_id) # Get the Project object.
     output = {'packagesets': [jsonify_package(pk) for pk in proj.packagesets.values()]}
     return output
 
@@ -414,7 +414,7 @@ def delete_set(project_id, which, ind):
     setdict, jsonifier = get_set(proj, which, fulloutput=True)
     setdict.pop(ind)
     save_project(proj)
-    return jsonifier(proj)
+    return jsonifier(proj=proj)
 
 @RPC()    
 def copy_set(project_id, which, ind):
@@ -425,7 +425,7 @@ def copy_set(project_id, which, ind):
     newset.name = newname
     setdict[newname] = newset
     save_project(proj)
-    return jsonifier(proj)
+    return jsonifier(proj=proj)
 
 @RPC()    
 def rename_set(project_id, which, ind, newname, die=False):
@@ -441,7 +441,7 @@ def rename_set(project_id, which, ind, newname, die=False):
     setdict.rename(origname, newname)
     setdict[newname].name = newname
     save_project(proj)
-    return jsonifier(proj)
+    return jsonifier(proj=proj)
 
 
 
@@ -450,18 +450,18 @@ def rename_set(project_id, which, ind, newname, die=False):
 ################################################################################### 
     
 @RPC()
-def get_diseases(project_id, burdenset_numindex):
+def jsonify_diseases(project_id, burdenkey):
     proj = load_project(project_id) # Get the Project object.
-    burdenset = proj.burden(key=burdenset_numindex) # Get the burden set that matches burdenset_numindex.
+    burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     if burdenset.data is None: return {'diseases': []} # Return an empty list if no data is present.
     disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False) # Gather the list for all of the diseases.
     return {'diseases': disease_data}
 
 
 @RPC()    
-def create_burdenset(project_id, new_burden_set_name):
+def create_burdenset(project_id, newname):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(new_burden_set_name, namelist=proj.burdensets.keys())
+    unique_name = sc.uniquename(newname, namelist=proj.burdensets.keys())
     new_burden_set = hp.Burden(project=proj, name=unique_name)
     data_path = hp.HPpath('data')
     new_burden_set.loaddata(data_path+'ihme-gbd.xlsx')
@@ -469,7 +469,7 @@ def create_burdenset(project_id, new_burden_set_name):
     proj.burdensets[unique_name] = new_burden_set # Put the new burden set in the dictionary.
     proj.package().make_package() # Update with the latest data
     save_project(proj)
-    return jsonify_burdensets(proj)
+    return jsonify_burdensets(proj=proj)
 
 
 @RPC()
@@ -550,59 +550,33 @@ def delete_burden(project_id, intervkey, index):
 ###################################################################################
 
 @RPC()
-def get_project_interv_set_intervs(project_id, intervset_numindex=None):
-    # Get the Project object.
-    proj = load_project(project_id)
-    
-    # Get the intervention set that matches intervset_numindex.
-    intervset = proj.interv(key=intervset_numindex)
-    
-    # Return an empty list if no data is present.
-    if intervset.data is None:
-        return { 'interventions': [] } 
-    
-    # Gather the list for all of the interventions.
-    interv_data = [list(interv) for interv in intervset.data]
-    
-    # Return success.
-    return { 'interventions': interv_data }
+def jsonify_interventions(project_id, intervkey=None):
+    proj = load_project(project_id) # Get the Project object.
+    intervset = proj.interv(key=intervkey) # Get the intervention set that matches the key
+    if intervset.data is None: return {'interventions': []}  # Return an empty list if no data is present.
+    interv_data = [list(interv) for interv in intervset.data] # Gather the list for all of the interventions.
+    return {'interventions': interv_data}
+
 
 @RPC()
-def create_interv_set(project_id, new_interv_set_name):
-
-    def update_project_fn(proj):
-        # Get a unique name (just in case the one provided collides with an 
-        # existing one).
-        unique_name = get_unique_name(new_interv_set_name, 
-            other_names=list(proj.intervsets))
-        
-        # Create a new (empty) intervention set.
-        new_intervset = hp.Interventions(project=proj, name=unique_name)
-        
-        # Load data from the Excel spreadsheet.
-        # NOTE: We may want to take this out later in favor leaving the 
-        # new sets empty to start.
-        data_path = hp.HPpath('data')
-        new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
-        
-        # Put the new intervention set in the dictionary.
-        proj.intervsets[unique_name] = new_intervset
-        
-        proj.package().make_package() # Update with the latest data
-        
-    # Do the project update using the internal function.
-    update_project_with_fn(project_id, update_project_fn)
-
-    # Return the new intervention sets.
-    return get_project_interv_sets(project_id)
+def create_intervset(project_id, newname):
+    proj = load_project(project_id) # Get the Project object.
+    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
+    new_intervset = hp.Interventions(project=proj, name=unique_name)
+    data_path = hp.HPpath('data')
+    new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
+    print('WARNING, hard-coded data path')
+    proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
+    proj.package().make_package() # Update with the latest data
+    save_project(proj)
+    return jsonify_intervsets(proj=proj)
 
 
-@RPC()    
-def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
+@RPC()
+def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
-    data_record = proj.intervsets[intervkey].data[interv_numindex]
-    print('Original intervention set record:')
-    print(data_record)
+    data_record = proj.intervsets[intervkey].data[intervind]
+    if verbose: print('Original intervention set record:\n%s' % data_record)
     data_record[0] = sanitize(data[0])
     data_record[1] = data[1]
     data_record[3] = sanitize(data[2])
@@ -611,14 +585,13 @@ def update_interv_set_interv(project_id, intervkey, interv_numindex, data):
     data_record[6] = sanitize(data[5])
     data_record[7] = sanitize(data[6])
     data_record[8] = sanitize(data[7])
-    print('New intervention set record:')
-    print(data_record)
+    if verbose: print('New intervention set record:\n%s' % data_record)
     proj.package().make_package() # Update with the latest data
     save_project(proj)
     return None
 
 @RPC()
-def add_interv(project_id, intervkey):
+def add_intervention(project_id, intervkey):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
@@ -626,8 +599,9 @@ def add_interv(project_id, intervkey):
     save_project(proj)
     return None
 
+
 @RPC()
-def copy_interv(project_id, intervkey, index):
+def copy_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     value = sc.dcp(data[index])
@@ -636,13 +610,16 @@ def copy_interv(project_id, intervkey, index):
     save_project(proj)
     return None
 
+
 @RPC()
-def delete_interv(project_id, intervkey, index):
+def delete_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     data.pop(index)
     save_project(proj)
     return None
+
+
 
 ###################################################################################
 ###  Package set RPCs
