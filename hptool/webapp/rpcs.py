@@ -10,6 +10,8 @@ Last update: 2018sep22
 ##############################################################
 
 import os
+import socket
+import psutil
 import numpy as np
 import sciris as sc
 import scirisweb as sw
@@ -95,6 +97,8 @@ def get_version_info():
 	       'gitbranch': gitinfo['branch'],
 	       'githash':   gitinfo['hash'],
 	       'gitdate':   gitinfo['date'],
+            'server':    socket.gethostname(),
+            'cpu':       '%0.1f%%' % psutil.cpu_percent(),
 	}
 	return version_info
       
