@@ -34,7 +34,7 @@ Last update: 2018-09-09
 </template>
 
 <script>
-import userService from '@/services/user-service'
+import userService from '@/js/user-service'
 import Vue from 'vue'; // This needs to appear somewhere but only once
 
 export default {

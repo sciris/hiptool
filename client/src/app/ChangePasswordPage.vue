@@ -37,8 +37,8 @@ Last update: 2018-08-26
 </template>
 
 <script>
-  import userservice from '@/services/user-service'
-  import status from '@/services/status-service'
+  import userservice from '@/js/user-service'
+  import status from '@/js/status-service'
   import router from '@/router'
 
   export default {
