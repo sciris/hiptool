@@ -109,7 +109,7 @@ Last update: 2018sep22
 
     <div class="PageSection" v-if="activeIntervSet.intervset != undefined">
 
-      <table class="table table-bordered table-hover table-striped" style="width: auto; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px;">
         <thead>
         <tr>
           <th>Active</th>

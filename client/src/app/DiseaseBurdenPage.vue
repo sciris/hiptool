@@ -120,7 +120,7 @@ Last update: 2018sep22
 
 
 
-      <table class="table table-bordered table-hover table-striped" style="width: 100%; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
           <tr>
             <th style="text-align:center">
