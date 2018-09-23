@@ -6,7 +6,7 @@ services:
       args:
         PORT: '80'
         REDIS_URL: 'redis://10.0.0.19:6379/5'
-    command: python run_server.py
+    command: python start_server.py
     ports:
      - '80:80'
      - '8080:8080'
