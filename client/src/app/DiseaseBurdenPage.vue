@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018sep22
+Last update: 2018sep23
 -->
 
 <template>
@@ -118,7 +118,11 @@ Last update: 2018sep22
         <div id="fig3" style="float:left" ></div>
       </div>
 
-
+      <input type="text"
+             class="txbox"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
+             :placeholder="filterPlaceholder2"
+             v-model="filterText2"/>
 
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
@@ -234,8 +238,10 @@ Last update: 2018sep22
 
     data() {
       return {
-        filterPlaceholder: 'Type here to filter burden sets', // Placeholder text for table filter box
-        filterText: '', // Text in the table filter box
+        filterPlaceholder: 'Type here to filter burden sets', // Placeholder text for first table filter box
+        filterPlaceholder2: 'Type here to filter diseases', // Placeholder text for second table filter box
+        filterText: '', // Text in the first table filter box
+        filterText2: '', // Text in the second table filter box
         sortColumn: 'updatedTime',  // Column of table used for sorting the burden sets // name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         burdenSets: [], // List of burden sets in the active project
