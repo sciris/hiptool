@@ -1,7 +1,7 @@
 <!--
 Define health packages
 
-Last update: 2018-09-23
+Last update: 2018-09-24
 -->
 
 <template>
@@ -142,7 +142,7 @@ Last update: 2018-09-23
         </tr>
         </thead>
         <tbody>
-        <tr v-for="result in sortedResults">
+        <tr v-for="result in sortedFilteredIntervs">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="result.active"/>
@@ -202,13 +202,10 @@ Last update: 2018-09-23
       sortedFilteredPackageSets() {
         return this.applyNameFilter(this.applySorting(this.packageSets))
       },
-
-      sortedResults() {
-        var sortedResultList =  this.applySorting2(this.resultList);
-        console.log(sortedResultList);
-        return sortedResultList;
-      },
-
+      
+      sortedFilteredIntervs() {
+        return this.applyIntervFilter(this.applySorting2(this.resultList))
+      }
     },
 
     created() {
@@ -416,7 +413,12 @@ Last update: 2018-09-23
           this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
-
+      
+      applyIntervFilter(intervs) {
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+      },
+      
       applySorting2(results) {
         return results.sort((result1, result2) =>
           {
