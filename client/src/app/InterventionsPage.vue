@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018sep23
+Last update: 2018sep24
 -->
 
 <template>
@@ -172,7 +172,7 @@ Last update: 2018sep23
         </tr>
         </thead>
         <tbody>
-        <tr v-for="interv in sortedIntervList">
+        <tr v-for="interv in sortedFilteredIntervs">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="interv.active"/>
@@ -282,12 +282,10 @@ Last update: 2018sep23
       sortedFilteredIntervSets() {
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
-
-      sortedIntervList() {
-        var sortedList =  this.applySorting2(this.interventionList);
-        return sortedList
-      },
-
+      
+      sortedFilteredIntervs() {
+        return this.applyIntervFilter(this.applySorting2(this.interventionList))
+      }
     },
 
     created() {
@@ -372,7 +370,13 @@ Last update: 2018sep23
           this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
-
+      
+      applyIntervFilter(intervs) {
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.platform.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.type.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+      },
+      
       applySorting2(intervs) {
         return intervs.sort((interv1, interv2) =>
           {
