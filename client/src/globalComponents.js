@@ -1,5 +1,5 @@
-import fgInput from './components/generic/Inputs/formGroupInput.vue'
-import DropDown from './components/generic/Dropdown.vue'
+import DropDown from './app/Dropdown.vue'
+import help from './app/HelpLink.vue'
 
 /**
  * You can register global components here and use them as a plugin in your main Vue instance
@@ -7,8 +7,8 @@ import DropDown from './components/generic/Dropdown.vue'
 
 const GlobalComponents = {
   install (Vue) {
-    Vue.component('fg-input', fgInput)
     Vue.component('drop-down', DropDown)
+    Vue.component('help', help)
   }
 }
 
