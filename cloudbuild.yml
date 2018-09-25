@@ -23,6 +23,7 @@ steps:
       'hptool-app-sea',
       '--version',
       'template=hptool-app-${COMMIT_SHA}',
+      '--zone=asia-southeast1-b'
     ]
 images:
   - 'gcr.io/${PROJECT_ID}/${REPO_NAME}__app:${COMMIT_SHA}'
