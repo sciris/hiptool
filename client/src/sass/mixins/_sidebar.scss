@@ -1,8 +1,5 @@
 @mixin sidebar-background-color($background-color, $font-color) {
-  &:after,
-  &:before {
-    background-color: $background-color;
-  }
+  background-color: $background-color;
 
   #style-3::-webkit-scrollbar-track
   {

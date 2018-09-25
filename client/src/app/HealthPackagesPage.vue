@@ -1,7 +1,7 @@
 <!--
 Define health packages
 
-Last update: 2018-05-29
+Last update: 2018-09-24
 -->
 
 <template>
@@ -104,7 +104,12 @@ Last update: 2018-05-29
         <div id="fig3" style="float:left" ></div>
       </div>
 
-
+      <input type="text"
+             class="txbox"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
+             :placeholder="filterPlaceholder2"
+             v-model="filterText2"/>
+             
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
@@ -137,7 +142,7 @@ Last update: 2018-05-29
         </tr>
         </thead>
         <tbody>
-        <tr v-for="result in sortedResults">
+        <tr v-for="result in sortedFilteredIntervs">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="result.active"/>
@@ -169,8 +174,10 @@ Last update: 2018-05-29
 
     data() {
       return {
-        filterPlaceholder: 'Type here to filter health packages', // Placeholder text for table filter box
-        filterText: '', // Text in the table filter box
+        filterPlaceholder: 'Type here to filter health packages', // Placeholder text for first table filter box
+        filterPlaceholder2: 'Type here to filter interventions', // Placeholder text for second table filter box
+        filterText: '', // Text in the first table filter box
+        filterText2: '', // Text in the second table filter box
         sortColumn: 'updatedTime',  // Column of table used for sorting the health package sets // name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         packageSets: [], // List of health package sets in the active project
@@ -195,13 +202,10 @@ Last update: 2018-05-29
       sortedFilteredPackageSets() {
         return this.applyNameFilter(this.applySorting(this.packageSets))
       },
-
-      sortedResults() {
-        var sortedResultList =  this.applySorting2(this.resultList);
-        console.log(sortedResultList);
-        return sortedResultList;
-      },
-
+      
+      sortedFilteredIntervs() {
+        return this.applyIntervFilter(this.applySorting2(this.resultList))
+      }
     },
 
     created() {
@@ -409,7 +413,12 @@ Last update: 2018-05-29
           this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
-
+      
+      applyIntervFilter(intervs) {
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+      },
+      
       applySorting2(results) {
         return results.sort((result1, result2) =>
           {
