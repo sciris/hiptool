@@ -16,7 +16,7 @@ Last update: 2018sep22
             <img src="static/img/healthpriorlogo-inverse.png" width="130px" vertical-align="middle" alt>
           </span>
           <br/><br/>
-          <div style="font-size:14px; font-weight:normal">
+          <div v-if="version" style="font-size:14px; font-weight:normal">
             Health Services Prioritization Tool<br>
             Version {{ version }} ({{ date }})
           </div>
