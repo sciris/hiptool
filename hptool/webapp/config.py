@@ -23,7 +23,7 @@ import os
 
 
 # A secret key value used by Python Flask.
-SECRET_KEY = 'Pick something unique for your site here'
+SECRET_KEY = 'adeardeerfacedacab'
 
 # Directory containing the client code.
 CLIENT_DIR = '../../client/dist'
@@ -53,4 +53,4 @@ SERVER_PORT = int(os.getenv('PORT', 8091))
 MATPLOTLIB_BACKEND = 'Agg'
 
 # Slack logging configuration
-SLACK = {'to':'webapp-logs', 'from':'hptool-bot', 'token':'~/.slackurl'}
+SLACK = {'to':'webapp-logs', 'from':'hptool-bot'}
