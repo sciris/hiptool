@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018sep22
+Last update: 2018sep24
 -->
 
 <template>
@@ -108,6 +108,11 @@ Last update: 2018sep22
 
 
     <div class="PageSection" v-if="activeIntervSet.intervset != undefined">
+      <input type="text"
+             class="txbox"
+             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
+             :placeholder="filterPlaceholder2"
+             v-model="filterText2"/>
 
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px;">
         <thead>
@@ -167,7 +172,7 @@ Last update: 2018sep22
         </tr>
         </thead>
         <tbody>
-        <tr v-for="interv in sortedIntervList">
+        <tr v-for="interv in sortedFilteredIntervs">
           <td style="text-align: center">
             <input type="checkbox"
                    v-model="interv.active"/>
@@ -244,8 +249,10 @@ Last update: 2018sep22
 
     data() {
       return {
-        filterPlaceholder: 'Type here to filter intervention sets', // Placeholder text for table filter box
-        filterText: '', // Text in the table filter box
+        filterPlaceholder: 'Type here to filter intervention sets', // Placeholder text for first table filter box
+        filterPlaceholder2: 'Type here to filter interventions', // Placeholder text for second table filter box
+        filterText: '', // Text in the first table filter box
+        filterText2: '', // Text in the second table filter box
         sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         sortColumn2: 'name',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
@@ -275,12 +282,10 @@ Last update: 2018sep22
       sortedFilteredIntervSets() {
         return this.applyNameFilter(this.applySorting(this.interventionSets))
       },
-
-      sortedIntervList() {
-        var sortedList =  this.applySorting2(this.interventionList);
-        return sortedList
-      },
-
+      
+      sortedFilteredIntervs() {
+        return this.applyIntervFilter(this.applySorting2(this.interventionList))
+      }
     },
 
     created() {
@@ -365,7 +370,13 @@ Last update: 2018sep22
           this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
-
+      
+      applyIntervFilter(intervs) {
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.platform.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
+          (theInterv.type.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+      },
+      
       applySorting2(intervs) {
         return intervs.sort((interv1, interv2) =>
           {
