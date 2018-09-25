@@ -53,4 +53,4 @@ SERVER_PORT = int(os.getenv('PORT', 8091))
 MATPLOTLIB_BACKEND = 'Agg'
 
 # Slack logging configuration
-SLACK = {'to':'webapp-logs', 'from':'hptool-bot'}
+SLACK = {'webhook':'https://hooks.slack.com/services/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'}
