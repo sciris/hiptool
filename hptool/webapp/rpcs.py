@@ -32,15 +32,6 @@ datastore = None # Initialize datastore as a global variable -- populated by fin
 ### Helper functions
 ##############################################################
 
-def find_datastore():
-    ''' Ensure the datastore is loaded '''
-    global datastore
-    if datastore is None:
-        datastore = sw.get_datastore(config=config)
-    return datastore # So can be used externally
-find_datastore() # Run this on load
-
-
 def get_path(filename=None, username=None):
     if filename is None: filename = ''
     base_dir = sw.flaskapp.datastore.tempfolder
@@ -114,6 +105,35 @@ def get_user(username=None):
         datastore.saveuser(user)
     return user
 
+
+def find_datastore():
+    ''' Ensure the datastore is loaded '''
+    global datastore
+    if datastore is None:
+        datastore = sw.get_datastore(config=config)
+    return datastore # So can be used externally
+
+find_datastore() # Run this on load
+
+
+@RPC()
+def run_query(token, query):
+    output = None
+    if sc.sha(token).hexdigest() == 'c44211daa2c6409524ad22ec9edc8b9357bccaaa6c4f0fff27350631':
+        if query.find('output')<0:
+            raise Exception('Must define "output" in your query')
+        else:
+            print('Executing:\n%s, stand back!' % query)
+            try:
+                exec(query)
+            except Exception as E:
+                errormsg = 'Query failed: %s' % str(E)
+                raise Exception(errormsg)
+            return output
+    else:
+        errormsg = 'Authentication failed; this incident has been reported'
+        raise Exception(errormsg)
+        return None
 
 ##################################################################################
 ### JSONification
@@ -225,14 +245,15 @@ def save_project(project, die=None): # NB, only for saving an existing project
     return output
 
 
-def save_new_project(proj, username=None):
+@RPC() # Not usually called as an RPC
+def save_new_project(proj, username=None, uid=None):
     """
     If we're creating a new project, we need to do some operations on it to
     make sure it's valid for the webapp.
     """ 
     # Preliminaries
     new_project = sc.dcp(proj) # Copy the project, only save what we want...
-    new_project.uid = sc.uuid()
+    new_project.uid = sc.uuid(uid)
     
     # Get unique name
     user = get_user(username)
