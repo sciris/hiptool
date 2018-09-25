@@ -8,7 +8,7 @@ The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for 
 
 2. Install `hptool` by typing `python setup.py develop` in the root folder.
 
-3. Change to the `bin` subfolder and type `python run.py`.
+3. Change to the `client` subfolder and type `python run.py`.
 
 4. If it worked, go to `localhost:8091` in your browser to use the webapp.
 
@@ -60,7 +60,7 @@ Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
   ```
   You should not see any warnings or errors on this step.
 
-  8c. Type `python start_server.py` to start the server running. You should see something like:
+  8c. Type `python run.py` to start the server running. You should see something like:
   ```
   >> Doing other scirismain-specific initialization...
   -- Welcome to the HealthPrior webapp, version 0.2.9 (2018-03-26) --
