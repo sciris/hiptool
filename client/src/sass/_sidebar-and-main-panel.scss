@@ -47,7 +47,7 @@
     position: absolute;
   }
   &:not(:hover) {
-    .logotype, li a p {
+    .logotype, li a p, .moving-arrow {
       display: none;
     }
     .nav li a {
