@@ -1,7 +1,7 @@
 """
 HealthPrior remote procedure calls (RPCs)
     
-Last update: 2018sep22
+Last update: 2018sep25
 """
 
 
@@ -18,7 +18,7 @@ import scirisweb as sw
 import hptool as hp
 from . import config
 from matplotlib.pyplot import rc
-rc('font', size=14)
+rc('font', size=12)
 
 # Globals
 RPC_dict = {} # Dictionary to hold all of the registered RPCs in this module.
