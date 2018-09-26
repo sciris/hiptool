@@ -199,7 +199,8 @@ def jsonify_projects(username, verbose=False):
     output = {'projects':[]}
     user = get_user(username)
     for project_key in user.projects:
-        json = jsonify_project(project_key)
+        try:                   json = jsonify_project(project_key)
+        except Exception as E: json = {'project': {'name':'Project load failed: %s' % str(E)}}
         output['projects'].append(json)
     if verbose: sc.pp(output)
     return output
@@ -268,24 +269,31 @@ def save_new_project(proj, username=None, uid=None):
     if not hasattr(new_project, 'webapp'):
         new_project.webapp = sc.prettyobj()
         new_project.webapp.username = username # If we ever use Celery with HealthPrior: new_project.webapp.tasks = []
+    new_project.webapp.username = username # Make sure we have the current username
     
     # Save all the things
     key = save_project(new_project)
-    user.projects.append(key)
-    datastore.saveuser(user)
+    if key not in user.projects: # Let's not allow multiple copies
+        user.projects.append(key)
+        datastore.saveuser(user)
     return key,new_project
 
 
+@RPC() # Not usually called as an RPC
 def del_project(project_key, die=None):
     key = datastore.getkey(key=project_key, objtype='project')
-    project = load_project(key)
-    user = get_user(project.webapp.username)
+    try:
+        project = load_project(key)
+    except Exception:
+        print('Warning: cannot delete project %s, not found' % key)
+        return None
     output = datastore.delete(key)
-    if key in user.projects:
+    try:
+        user = get_user(project.webapp.username)
         user.projects.remove(key)
-    else:
-        print('Warning: deleting project %s (%s), but not found in user "%s" projects' % (project.name, key, user.username))
-    datastore.saveuser(user)
+        datastore.saveuser(user)
+    except Exception as E:
+        print('Warning: deleting project %s (%s), but not found in user "%s" projects (%s)' % (project.name, key,project.webapp.username, str(E)))
     return output
 
 
