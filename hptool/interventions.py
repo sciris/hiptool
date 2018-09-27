@@ -18,16 +18,21 @@ class Interventions(object):
     10.	Maximum coverage of intervention
     11.	Equity score
     12.	Financial risk protection score
+
+    Version: 2018sep27
     '''
     
-    def __init__(self, name='Default', project=None):
-        self.name = name # Name of the parameter set, e.g. 'default'
-        self.uid = sc.uuid() # ID
-        self.projectref = sc.Link(project) # Store pointer for the project, if available
-        self.created = sc.now() # Date created
-        self.modified = sc.now() # Date modified
-        self.data = None
-        self.filename = None
+    def __init__(self, name=None, project=None, filename=None, folder=None):
+        if name is None: name = 'Default'
+        self.projectref = sc.Link(project) # Store pointer for the project
+        self.name       = sc.uniquename(name, namelist=self.projectref().intervsets.keys()) # Name of the parameter set, e.g. 'default'
+        self.uid        = sc.uuid() # ID
+        self.created    = sc.now() # Date created
+        self.modified   = sc.now() # Date modified
+        self.data       = None
+        if filename is not None:
+            self.loaddata(filename=filename, folder=folder)
+        return None
     
     def __repr__(self):
         ''' Print out useful information when called'''

@@ -57,15 +57,11 @@ class Project(object):
 
         ## Load burden spreadsheet, if available
         if burdenfile:
-            burden = hp.Burden(project=self)
-            burden.loaddata(filename=burdenfile)
-            self.burdensets['Default'] = burden
+            self.loadburden(filename=burdenfile, verbose=verbose)
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
-            interventions = hp.Interventions(project=self)
-            interventions.loaddata(filename=interventionsfile)
-            self.intervsets['Default'] = interventions
+            self.loadinterventions(filename=interventionsfile, verbose=verbose)
         
         ## Combine into health package, if available
         if make_package and burdenfile and interventionsfile:
@@ -145,11 +141,17 @@ class Project(object):
     ### Utilities
     #######################################################################################################
 
-    def add_burden(self, filename=None, folder=None, name=None, verbose=2):
+    def loadburden(self, filename=None, folder=None, name=None, verbose=2):
         ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
         burden = hp.Burden(project=self, filename=filename, folder=folder, name=name)
         self.burdensets[burden.name] = burden
         return burden
+    
+    def loadinterventions(self, filename=None, folder=None, name=None, verbose=2):
+        ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
+        interventions = hp.Interventions(project=self, filename=filename, folder=folder, name=name)
+        self.burdensets[interventions.name] = interventions
+        return interventions
 
 
 
@@ -158,5 +160,5 @@ def demo(name=None):
     datadir = hp.HPpath('data')
     burdenspath = datadir + 'burdens-demo.xlsx'
     intervspath = datadir + 'interventions-demo.xlsx'
-    project = Project(name=name, burdenfile=burdenspath)   #, interventionsfile=intervspath
+    project = Project(name=name, burdenfile=burdenspath, interventionsfile=intervspath)
     return project
