@@ -11,7 +11,7 @@ import sciris as sc
 class HealthPackage(object):
     ''' Class to hold the results from the analysis. '''
     
-    def __init__(self, name='Default', project=None):
+    def __init__(self, project=None, name=None, burdenset=None, intervset=None, makepackage=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
@@ -19,6 +19,9 @@ class HealthPackage(object):
         self.modified   = sc.now() # Date modified
         self.data       = None # The data
         self.eps        = 1e-4 # A nonzero value to help with division
+        self.burdenset  = burdenset
+        self.intervset  = intervset
+        if makepackage: self.makepackage()
         return None
     
     def __repr__(self):
@@ -31,10 +34,12 @@ class HealthPackage(object):
         output += '============================================================\n'
         return output
     
-    def make_package(self, burdenset=None, intervset=None, verbose=True):
+    def makepackage(self, burdenset=None, intervset=None, verbose=True):
         ''' Make results '''
-        burdenset = self.projectref().burden(key=burdenset)
-        intervset = self.projectref().interv(key=intervset)
+        if burdenset is not None: self.burdenset = burdenset # Warning, name is used both as key and actual set!
+        if intervset is not None: self.intervset = intervset
+        burdenset = self.projectref().burden(key=self.burdenset)
+        intervset = self.projectref().interv(key=self.intervset)
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)

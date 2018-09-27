@@ -84,7 +84,7 @@ class Burden(object):
         if which   is None: which   = titles.keys()
         if n       is None: n       = 10
         if axsize  is None: axsize  = (0.65, 0.15, 0.3, 0.8)
-        if figsize is None: figsize = (10,5)
+        if figsize is None: figsize = (7,4)
         barw     = 0.8
         
         # Pull out data
@@ -135,7 +135,7 @@ class Burden(object):
             ax.set_facecolor('none')
             yaxis = pl.arange(n, 0, -1)
             for i in range(n):
-                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=colors[barinds[i]-1], edgecolor='none')
+                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=colors[int(barinds[i])-1], edgecolor='none')
             ax.set_yticks(pl.arange(10, 0, -1))    
             ax.set_yticklabels(barlabels)
             sc.SIticks(ax=ax,axis='x')

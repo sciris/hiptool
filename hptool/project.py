@@ -65,9 +65,7 @@ class Project(object):
         
         ## Combine into health package, if available
         if makepackage and burdenfile and interventionsfile:
-            package = hp.HealthPackage(project=self)
-            package.make_package()
-            self.packagesets['Default'] = package
+            self.makepackage()
 
         return None
 
@@ -152,6 +150,12 @@ class Project(object):
         interventions = hp.Interventions(project=self, filename=filename, folder=folder, name=name)
         self.intervsets[interventions.name] = interventions
         return interventions
+    
+    def makepackage(self, burdenset=None, intervset=None):
+        name = burdenset + ' + ' + intervset
+        package = hp.HealthPackage(project=self, name=name, burdenset=burdenset, intervset=intervset, makepackage=True)
+        self.packagesets[package.name] = package
+        return package
 
 
 
