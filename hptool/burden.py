@@ -62,7 +62,7 @@ class Burden(object):
         Version: 2018mar17        
         '''
         # Handle options
-        if which   is None: which   = 'dalys'
+        if which   is None: which   = 'DALYs'
         if n       is None: n       = 10
         if axsize  is None: axsize  = (0.45, 0.15, 0.5, 0.8)
         if figsize is None: figsize = (12,5)
@@ -70,12 +70,12 @@ class Burden(object):
         barcolor = (0.7,0,0.3)
         
         # Set labels
-        titles = {'dalys':'Top ten causes of DALYs',
-                  'deaths':'Top ten causes of mortality',
-                  'prevalence':'Top ten most prevalent conditions'}
-        xlabels = {'dalys':'DALYs',
-                  'deaths':'Deaths',
-                  'prevalence':'Prevalence'}
+        titles = {'DALYs':'Top ten causes of DALYs',
+                  'Deaths':'Top ten causes of mortality',
+                  'Prevalence':'Top ten most prevalent conditions'}
+        xlabels = {'DALYs':'DALYs',
+                  'Deaths':'Deaths',
+                  'Prevalence':'Prevalence'}
         try:
             thistitle = titles[which]
             thisxlabel = xlabels[which]
