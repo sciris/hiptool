@@ -429,11 +429,7 @@ def upload_set(filename, project_id, which, key=None):
     thisset = get_set(proj, which, key)
     thisset.loaddata(filename)
     print('Loaded data into %s %s' % (which, thisset.name))
-    try:
-        proj.package().make_package()
-    except Exception as E:
-        errormsg = 'Could not make package, possibly not all data uploaded: %s' % str(E)
-        print(errormsg)
+    make_package(proj, die=False)
     save_project(proj)
     return None
 
@@ -528,7 +524,7 @@ def update_disease(project_id, burdenkey, diseaseind, data, verbose=True):
         print('WARNING, disease lengths do not match: %s vs. %s' % (len(data_record), len(data)))
     for i,datum in enumerate(data): # Actually replace it
         data_record[i] = sanitize(datum)
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return None
 
@@ -597,11 +593,12 @@ def delete_burden(project_id, intervkey, index):
 ###################################################################################
 
 @RPC()
-def jsonify_interventions(project_id, intervkey=None):
+def jsonify_interventions(project_id, intervkey=None, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     intervset = proj.interv(key=intervkey) # Get the intervention set that matches the key
     if intervset.data is None: return {'interventions': []}  # Return an empty list if no data is present.
     interv_data = [list(interv) for interv in intervset.data] # Gather the list for all of the interventions.
+    if verbose: sc.pp(interv_data)
     return {'interventions': interv_data}
 
 
@@ -614,7 +611,7 @@ def create_intervset(project_id, newname):
     new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
     print('WARNING, hard-coded data path')
     proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return jsonify_intervsets(proj=proj)
 
@@ -624,16 +621,18 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervkey].data[intervind]
     if verbose: print('Original intervention set record:\n%s' % data_record)
-    data_record[0] = sanitize(data[0])
-    data_record[1] = data[1]
-    data_record[3] = sanitize(data[2])
-    data_record[4] = sanitize(data[3])
-    data_record[5] = sanitize(data[4])
-    data_record[6] = sanitize(data[5])
-    data_record[7] = sanitize(data[6])
-    data_record[8] = sanitize(data[7])
+    data_record[1] = sanitize(data[0]) # Active
+    data_record[3] = data[1]           # Name
+    data_record[4] = sanitize(data[2]) # Platform
+    data_record[5] = sanitize(data[3]) # BoD 1
+    data_record[6] = sanitize(data[4]) # BoD 1 weight
+    data_record[11] = sanitize(data[5]) # ICER
+    data_record[12] = sanitize(data[6]) # Unit cost
+    data_record[13] = sanitize(data[7]) # Spend
+    data_record[14] = sanitize(data[8]) # FRP
+    data_record[15] = sanitize(data[9]) # Equity
     if verbose: print('New intervention set record:\n%s' % data_record)
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return None
 
@@ -641,7 +640,9 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
 def add_intervention(project_id, intervkey):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
-    placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
+    placeholder = sc.dcp(proj.interv().data.cols)
+    for col in range(len(placeholder)):
+        placeholder[col] = '~'+placeholder[col]+'~'
     data[data.nrows()] = placeholder
     save_project(proj)
     return None
@@ -652,7 +653,7 @@ def copy_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     value = sc.dcp(data[index])
-    value[1] += ' (copy)'
+    value[3] += ' (copy)' # This is the name
     data.insert(row=index, value=value)
     save_project(proj)
     return None
@@ -680,6 +681,17 @@ def jsonify_packages(project_id, packagekey):
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
     results = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
     return {'results': results}
+
+
+def make_package(project=None, die=None):
+    if die is None: die = False
+    try:
+        project.package().make_package()
+    except Exception as E:
+        errormsg = 'Could not make package, possibly not all data uploaded: %s' % str(E)
+        if die: raise Exception(errormsg)
+        else: print(errormsg)
+    return None
 
 
 @RPC()    
