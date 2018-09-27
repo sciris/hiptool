@@ -5,19 +5,15 @@ Version:
 import sciris as sc
 
 class Interventions(object):
-    ''' Class to hold all interventions, e.g. from DCP3. Data stored are/will be:
+    '''
+    Class to hold all interventions, e.g. from DCP3. Data stored include:
     1.	Intervention name
     2.	Targeted disease
     3.	Delivery platform
     4.	Unit cost per person covered
-    5.	DALYs averted per person covered*
-    6.	Deaths averted per person covered**
-    7.	Cost per DALY averted*
-    8.	Cost per death averted**
-    9.	Default coverage of intervention
-    10.	Maximum coverage of intervention
-    11.	Equity score
-    12.	Financial risk protection score
+    5.	ICER
+    6.	Equity score
+    7.	Financial risk protection score
 
     Version: 2018sep27
     '''

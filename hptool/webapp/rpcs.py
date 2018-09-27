@@ -148,8 +148,8 @@ def jsonify_project(project_id, verbose=False):
             'name':         proj.name,
             'username':     proj.webapp.username,
             'hasData':      len(proj.burdensets)>0 and len(proj.intervsets)>0,
-            'creationTime': proj.created,
-            'updatedTime':  proj.modified,
+            'creationTime': sc.getdate(proj.created),
+            'updatedTime':  sc.getdate(proj.modified),
         }
     }
     if verbose: sc.pp(json)
@@ -317,9 +317,18 @@ def rename_project(project_json):
 
 
 @RPC()
-def create_new_project(username):
+def add_demo_project(username):
     """ Create a new Optima Nutrition project. """
     proj = hp.demo() # Create the project
+    print(">> create_new_project %s" % (proj.name))     # Display the call information.
+    key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
+    return {'projectID': str(proj.uid)}
+
+
+@RPC()
+def create_new_project(username):
+    """ Create a new Optima Nutrition project. """
+    proj = hp.Project() # Create the project
     proj.name = 'New project'
     print(">> create_new_project %s" % (proj.name))     # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
@@ -420,7 +429,11 @@ def upload_set(filename, project_id, which, key=None):
     thisset = get_set(proj, which, key)
     thisset.loaddata(filename)
     print('Loaded data into %s %s' % (which, thisset.name))
-    proj.package().make_package()
+    try:
+        proj.package().make_package()
+    except Exception as E:
+        errormsg = 'Could not make package, possibly not all data uploaded: %s' % str(E)
+        print(errormsg)
     save_project(proj)
     return None
 
@@ -492,7 +505,7 @@ def jsonify_diseases(project_id, burdenkey):
     proj = load_project(project_id) # Get the Project object.
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     if burdenset.data is None: return {'diseases': []} # Return an empty list if no data is present.
-    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False) # Gather the list for all of the diseases.
+    disease_data = burdenset.jsonify(cols=['Active','Cause','DALYs','Deaths','Prevalence'], header=False) # Gather the list for all of the diseases.
     return {'diseases': disease_data}
 
 
@@ -500,12 +513,8 @@ def jsonify_diseases(project_id, burdenkey):
 def create_burdenset(project_id, newname):
     proj = load_project(project_id) # Get the Project object.
     unique_name = sc.uniquename(newname, namelist=proj.burdensets.keys())
-    new_burden_set = hp.Burden(project=proj, name=unique_name)
-    data_path = hp.HPpath('data')
-    new_burden_set.loaddata(data_path+'ihme-gbd.xlsx')
-    print('WARNING: using hard-coded burden data')
-    proj.burdensets[unique_name] = new_burden_set # Put the new burden set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    newburdenset = hp.Burden(project=proj, name=unique_name)
+    proj.burdensets[unique_name] = newburdenset # Put the new burden set in the dictionary.
     save_project(proj)
     return jsonify_burdensets(proj=proj)
 
@@ -531,25 +540,25 @@ def plot_burden(project_id, burdenkey, dosave=True):
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     
     # Create the figures and convert to mpld3
-    figs = []
     figdicts = []
-    for which in ['dalys','deaths','prevalence']:        
-        fig = burdenset.plottopcauses(which=which) 
-        figs.append(fig)
-    for fig in figs:
-        figdict = sw.mpld3ify(fig, jsonify=False)
-        figdicts.append(figdict)
+    if burdenset.data:
+        figs = burdenset.plot()
+        for fig in figs:
+            figdict = sw.mpld3ify(fig, jsonify=False)
+            figdicts.append(figdict)
     
-    # Optionally save the figures
-    if dosave:
-        filepath = get_path(filename=figures_filename, username=proj.webapp.username)
-        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
-        print('Figures saved to %s' % filepath)
-    
-    # Return success -- WARNING, hard-coded to 3 graphs!
-    return {'graph1': figdicts[0], 
-            'graph2': figdicts[1],
-            'graph3': figdicts[2],}
+        # Optionally save the figures
+        if dosave:
+            filepath = get_path(filename=figures_filename, username=proj.webapp.username)
+            sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+            print('Figures saved to %s' % filepath)
+        
+        # Return success -- WARNING, hard-coded to 3 graphs!
+        return {'graph1': figdicts[0], 
+                'graph2': figdicts[1],
+                'graph3': figdicts[2],}
+    else:
+        return None # No graphs to make
     
 
 @RPC()

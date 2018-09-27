@@ -37,7 +37,7 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
+    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, makepackage=True, verbose=2):
         ''' Initialize the project '''
 
         ## Define the structure sets
@@ -64,7 +64,7 @@ class Project(object):
             self.loadinterventions(filename=interventionsfile, verbose=verbose)
         
         ## Combine into health package, if available
-        if make_package and burdenfile and interventionsfile:
+        if makepackage and burdenfile and interventionsfile:
             package = hp.HealthPackage(project=self)
             package.make_package()
             self.packagesets['Default'] = package
@@ -138,7 +138,7 @@ class Project(object):
 
 
     #######################################################################################################
-    ### Utilities
+    ### Data loading
     #######################################################################################################
 
     def loadburden(self, filename=None, folder=None, name=None, verbose=2):
@@ -150,15 +150,14 @@ class Project(object):
     def loadinterventions(self, filename=None, folder=None, name=None, verbose=2):
         ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
         interventions = hp.Interventions(project=self, filename=filename, folder=folder, name=name)
-        self.burdensets[interventions.name] = interventions
+        self.intervsets[interventions.name] = interventions
         return interventions
 
 
 
-def demo(name=None):
-    if name is None: name = 'Default'
-    datadir = hp.HPpath('data')
+def demo():
+    datadir     = hp.HPpath('data')
     burdenspath = datadir + 'burdens-demo.xlsx'
     intervspath = datadir + 'interventions-demo.xlsx'
-    project = Project(name=name, burdenfile=burdenspath, interventionsfile=intervspath)
+    project = Project(name='Demo', burdenfile=burdenspath, interventionsfile=intervspath, makepackage=False)
     return project

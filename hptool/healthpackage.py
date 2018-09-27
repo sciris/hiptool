@@ -9,9 +9,7 @@ import sciris as sc
 
 
 class HealthPackage(object):
-    ''' 
-    Class to hold the results from the analysis.
-    '''
+    ''' Class to hold the results from the analysis. '''
     
     def __init__(self, name='Default', project=None):
         self.name       = name # Name of the parameter set, e.g. 'default'
@@ -36,7 +34,7 @@ class HealthPackage(object):
     def make_package(self, burdenset=None, intervset=None, verbose=True):
         ''' Make results '''
         burdenset = self.projectref().burden(key=burdenset)
-        intervset  = self.projectref().interv(key=intervset)
+        intervset = self.projectref().interv(key=intervset)
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)

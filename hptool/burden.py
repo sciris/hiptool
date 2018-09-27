@@ -6,7 +6,8 @@ import sciris as sc
 import pylab as pl
 
 class Burden(object):
-    ''' Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
+    '''
+    Class to hold all burden data, e.g. from IHME GBD. Data stored are/will be:
     1.	Primary cause name
     2.	Total DALYs by year
     3.	Total mortality by year
@@ -24,9 +25,19 @@ class Burden(object):
         self.uid        = sc.uuid() # ID
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
+        
+        # Define hard-coded column names
+        self.colnames = sc.odict([('index',      'Index'),
+                                  ('cause',      'Cause'),
+                                  ('dalys',      'DALYs'),
+                                  ('deaths',     'Deaths'),
+                                  ('prevalence', 'Prevalence')])
+        
+        # Load data, if provided
         self.data       = None
         if filename is not None:
             self.loaddata(filename=filename, folder=folder)
+        
         return None
     
     def __repr__(self):
@@ -64,14 +75,6 @@ class Burden(object):
         Version: 2018sep27
         '''
         
-        # Define hard-coded column names
-        colnames = sc.odict([('index',      'Index'),
-                             ('cause',      'Cause of disease burden'),
-                             ('dalys',      'DALYs'),
-                             ('deaths',     'Deaths'),
-                             ('prevalence', 'Prevalence')
-                              ])
-
         # Set labels
         titles = {'dalys':     'Top causes of DALYs',
                   'deaths':    'Top causes of mortality',
@@ -100,19 +103,20 @@ class Burden(object):
         # Loop over each option (may only be one)
         figs = []
         for which in whichlist:
+            colname = self.colnames[which]
             try:
                 thistitle  = titles[which]
-                thisxlabel = colnames[which]
+                thisxlabel = colname
             except Exception as E:
                 errormsg = '"%s" not found, "which" must be one of %s (%s)' % (which, ', '.join(titles.keys()), str(E))
                 raise Exception(errormsg)
             
             # Process data
-            burdendata.sort(col=colnames[which], reverse=True)
+            burdendata.sort(col=colname, reverse=True)
             topdata   = burdendata[:n]
-            barlabels = topdata[colnames['cause']].tolist()
-            barvals   = topdata[colnames[which]]
-            barinds   = topdata[colnames['index']]
+            barvals   = topdata[colname]
+            barinds   = topdata[self.colnames['index']]
+            barlabels = topdata[self.colnames['cause']].tolist()
             
             # Figure out the units
             largestval = barvals[0]

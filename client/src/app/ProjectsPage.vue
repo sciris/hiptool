@@ -9,6 +9,8 @@ Last update: 2018sep22
     <div class="PageSection">
 
       <div class="ControlsRow">
+        <button class="btn" @click="addDemoProject">Add demo project</button>
+        &nbsp; &nbsp;
         <button class="btn" @click="createNewProject">Create new project</button>
         &nbsp; &nbsp;
         <button class="btn" @click="uploadProjectFromFile">Upload project from file</button>
@@ -186,6 +188,19 @@ Last update: 2018sep22
           })
           .catch(error => {
             status.fail(this, 'Could not load projects', error)
+          })
+      },
+
+      addDemoProject() {
+        console.log('addDemoProject() called')
+        status.start(this)
+        rpcs.rpc('add_demo_project', [this.$store.state.currentUser.username]) // Have the server create a new project.
+          .then(response => {
+            this.updateProjectSummaries(null); // Update the project summaries so the new project shows up on the list.
+            status.succeed(this, '') // Indicate success.
+          })
+          .catch(error => {
+            status.fail(this, 'Could not add new project', error)    // Indicate failure.
           })
       },
 
