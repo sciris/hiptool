@@ -139,13 +139,24 @@ class Project(object):
         if key is None: key = hp.default_key
         try:    return self.packagesets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
-        
+
+
+    #######################################################################################################
+    ### Utilities
+    #######################################################################################################
+
+    def add_burden(self, filename=None, folder=None, name=None, verbose=2):
+        ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
+        burden = hp.Burden(project=self, filename=filename, folder=folder, name=name)
+        self.burdensets[burden.name] = burden
+        return burden
+
+
 
 def demo(name=None):
     if name is None: name = 'Default'
     datadir = hp.HPpath('data')
-    burdenpath = datadir + 'ihme-gbd.xlsx'
-    datapath = datadir + 'dcp-data-afg-v1.xlsx'
-    project = Project(name=name, burdenfile=burdenpath, interventionsfile=datapath)  
-    project.burden().popsize = 34.66e6 # From UN population division 
+    burdenspath = datadir + 'burdens-demo.xlsx'
+    intervspath = datadir + 'interventions-demo.xlsx'
+    project = Project(name=name, burdenfile=burdenspath)   #, interventionsfile=intervspath
     return project
