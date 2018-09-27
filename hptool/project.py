@@ -152,6 +152,14 @@ class Project(object):
         return interventions
     
     def makepackage(self, burdenset=None, intervset=None):
+        if len(self.burdensets)==0:
+            errormsg = 'Please ensure you have uploaded burden of disease data (0 burden sets found)'
+            raise Exception(errormsg)
+        if len(self.intervsets)==0:
+            errormsg = 'Please ensure you have uploaded intervention data (0 intervention sets found)'
+            raise Exception(errormsg)
+        if burdenset is None: burdenset = self.burdensets.keys()[-1]
+        if intervset is None: intervset = self.intervsets.keys()[-1]
         name = burdenset + ' + ' + intervset
         package = hp.HealthPackage(project=self, name=name, burdenset=burdenset, intervset=intervset, makepackage=True)
         self.packagesets[package.name] = package

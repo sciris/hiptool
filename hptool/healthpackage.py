@@ -21,6 +21,18 @@ class HealthPackage(object):
         self.eps        = 1e-4 # A nonzero value to help with division
         self.burdenset  = burdenset
         self.intervset  = intervset
+        
+        # Define hard-coded column names
+        self.colnames = sc.odict([('active',   'Active'),
+                                  ('shortname','Short name'),
+                                  ('bod1',     'BoD (1)'),
+                                  ('bod1wt',   'Fraction (1)'),
+                                  ('icer',     'ICER'),
+                                  ('unitcost', 'Unit cost'),
+                                  ('spend',    'Spending'),
+                                  ('frp',      'FRP'),
+                                  ('equity',   'Equity'),])
+        
         if makepackage: self.makepackage()
         return None
     
@@ -43,46 +55,56 @@ class HealthPackage(object):
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
-        critical_cols = ['cause', 'unitcost', 'spend', 'icer']
+        print(origdata.cols)
+        critical_cols = ['active', 'bod1', 'bod1wt', 'unitcost', 'spend', 'icer']
         for col in critical_cols:
-            origdata.filter_out(key='', col=col, verbose=True)
-        origdata.replace(col='spend', old='', new=0.0)
+            origdata.filter_out(key='', col=self.colnames[col], verbose=True)
+        origdata.replace(col=self.colnames['spend'], old='', new=0.0)
         nrows = origdata.nrows()
         
         # Create new dataframe
-        df = sc.dataframe(cols=['active'], data=np.ones(nrows))
+        df = sc.dataframe(cols=[self.colnames['active']], data=np.ones(nrows))
         for col in ['shortname']+critical_cols: # Copy columns over
-            df[col] = origdata[col]
+            colname = self.colnames[col]
+            df[col] = origdata[colname]
+        
+        def arr(data):
+            try:
+                output = np.array(data, dtype=float)
+            except Exception as E:
+                errormsg = 'Data contain non-numeric values (%s):\n%s' % (str(E), data)
+                raise Exception(errormsg)
+            return output
         
         # Calculate people covered (spending/unitcost)
-        df['coverage'] = df['spend']/(self.eps+df['unitcost'])
+        df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
         df.addcol('total_dalys')
         df.addcol('total_prevalence')
         for r in range(df.nrows()):
-            key = df.get(rows=r, cols='cause')
+            key = df.get(rows=r, cols='bod1')
             try:
-                tmp_burden = burdenset.data.findrow(key=key, col='cause', asdict=True)
+                tmp_burden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True)
             except:
                 raise hp.HPException('Burden "%s" not found' % key)
-            try:    df['total_dalys',r] = tmp_burden['dalys']
+            try:    df['total_dalys',r] = tmp_burden[burdenset.colnames['dalys']]
             except: df['total_dalys',r] = 0 # Warning, will want to fix
-            try:    df['total_prevalence',r] = tmp_burden['prevalence']
+            try:    df['total_prevalence',r] = tmp_burden[burdenset.colnames['prevalence']]
             except: df['total_prevalence',r] = 0
         
         # Calculate 80% coverage
         print('Not calculating 80% coverage since denominators are wrong')
         
         # Current DALYs averted (spend/icer)
-        df['dalys_averted'] = df['spend']/(self.eps+df['icer'])
+        df['dalys_averted'] = arr(df['spend'])/(self.eps+arr(df['icer']))
         
         # Current % of DALYs averted (dalys_averted/total_dalys)
-        df['frac_averted'] = df['dalys_averted']/(self.eps+df['total_dalys']) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
+        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['total_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
         self.data = df # Store it
         if verbose:
-            print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, burdenset.name, intervset.name))
+            print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
         return None
 
     def loaddata(self, filename=None, folder=None):
