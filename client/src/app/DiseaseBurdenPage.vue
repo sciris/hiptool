@@ -15,16 +15,16 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
-      <span>&nbsp;based on&nbsp;</span>
-      <select
-        title="countrySelect"
-        id="country"
-        :required="true"
-        v-model="country">
-        <option v-for = "country in countryList" :value="country">
-          {{country}}
-        </option>
-      </select>
+      <!--<span>&nbsp;based on&nbsp;</span>-->
+      <!--<select-->
+        <!--title="countrySelect"-->
+        <!--id="country"-->
+        <!--:required="true"-->
+        <!--v-model="country">-->
+        <!--<option v-for = "country in countryList" :value="country">-->
+          <!--{{country}}-->
+        <!--</option>-->
+      <!--</select>-->
 
       <br/><br/>
 
@@ -421,6 +421,7 @@ Last update: 2018sep24
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex], {}, '.xlsx')
           .then(response => {
             this.updateBurdenSets()
+            this.viewBurdenSet(burdenSet, true)
             status.succeed(this, 'Burden set uploaded')
           })
           .catch(error => {
