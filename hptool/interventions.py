@@ -5,29 +5,30 @@ Version:
 import sciris as sc
 
 class Interventions(object):
-    ''' Class to hold all interventions, e.g. from DCP3. Data stored are/will be:
+    '''
+    Class to hold all interventions, e.g. from DCP3. Data stored include:
     1.	Intervention name
     2.	Targeted disease
     3.	Delivery platform
     4.	Unit cost per person covered
-    5.	DALYs averted per person covered*
-    6.	Deaths averted per person covered**
-    7.	Cost per DALY averted*
-    8.	Cost per death averted**
-    9.	Default coverage of intervention
-    10.	Maximum coverage of intervention
-    11.	Equity score
-    12.	Financial risk protection score
+    5.	ICER
+    6.	Equity score
+    7.	Financial risk protection score
+
+    Version: 2018sep27
     '''
     
-    def __init__(self, name='Default', project=None):
-        self.name = name # Name of the parameter set, e.g. 'default'
-        self.uid = sc.uuid() # ID
-        self.projectref = sc.Link(project) # Store pointer for the project, if available
-        self.created = sc.now() # Date created
-        self.modified = sc.now() # Date modified
-        self.data = None
-        self.filename = None
+    def __init__(self, name=None, project=None, filename=None, folder=None):
+        if name is None: name = 'Default'
+        self.projectref = sc.Link(project) # Store pointer for the project
+        self.name       = sc.uniquename(name, namelist=self.projectref().intervsets.keys()) # Name of the parameter set, e.g. 'default'
+        self.uid        = sc.uuid() # ID
+        self.created    = sc.now() # Date created
+        self.modified   = sc.now() # Date modified
+        self.data       = None
+        if filename is not None:
+            self.loaddata(filename=filename, folder=folder)
+        return None
     
     def __repr__(self):
         ''' Print out useful information when called'''

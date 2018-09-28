@@ -1,8 +1,8 @@
 $line-height-base:        1.2; // 1.428571429; // 20/14
 $line-height-computed:    floor((14px * $line-height-base)); // ~20px
 
-$table-cell-padding:                 8px;
-$table-condensed-cell-padding:       5px;
+$table-cell-padding:                 0px;
+$table-condensed-cell-padding:       0px;
 
 $table-bg:                           transparent; // overall background-color
 $table-bg-accent:                    #efeff4; // for striping
@@ -159,7 +159,7 @@ $table-bg-active:                    $table-bg-hover;
   > thead > tr > td,
   > tbody > tr > td,
   > tfoot > tr > td {
-    padding: 15px 8px;
+    padding: 3px 6px 6px 6px;
   }
   > tbody > tr:nth-child(odd) {
     > td,
@@ -197,7 +197,6 @@ $table-bg-active:                    $table-bg-hover;
   position: sticky;
   top: 0;
   z-index: 1000;
-  //background: #eee;
 }
 
 
