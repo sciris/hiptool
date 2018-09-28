@@ -137,8 +137,30 @@ class HealthPackage(object):
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
     
-    def optimize(self, maxbudget=None, frpweight=None, equityweight=None):
+    def optimize(self, budget=None, frpwt=None, equitywt=None):
+        # Handle inputs
+        if budget   is None: budget = self.budget
+        if frpwt    is None: frpwt     = self.frpwt
+        if equitywt is None: equitywt  = self.equitywt
+        self.budget   = budget
+        self.frpwt    = frpwt
+        self.equitywt = equitywt
         df = self.data
+        
+        # Do the processing
+        df.sort(col='icer')
+        remaining = sc.dcp(self.budget)
+        max_dalys = arr(df['max_dalys'])
+        icers     = arr(df['icer'])
+        for r in range(df.nrows()):
+            max_spend = max_dalys[r]*icers[r]
+            if remaining >= max_spend:
+                remaining -= max_spend
+                df['opt_spend',r] = max_spend
+                df['opt_dalys_averted',r] = max_dalys[r]
+            else:
+                break
+        
         return None
         
     def plot_dalys(self):
