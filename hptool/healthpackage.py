@@ -28,6 +28,9 @@ class HealthPackage(object):
         self.eps        = 1e-4 # A nonzero value to help with division
         self.burdenset  = burdenset
         self.intervset  = intervset
+        self.budget     = None
+        self.frpwt      = None
+        self.equitywt   = None
         self.data       = None # The data
         
         # Define hard-coded column names
@@ -54,10 +57,15 @@ class HealthPackage(object):
         output += '============================================================\n'
         return output
     
-    def makepackage(self, burdenset=None, intervset=None, verbose=True):
+    def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True):
         ''' Make results '''
+        # Handle inputs
         if burdenset is not None: self.burdenset = burdenset # Warning, name is used both as key and actual set!
         if intervset is not None: self.intervset = intervset
+        if frpwt     is None: frpwt = 0.25
+        if equitywt  is None: equitywt = 0.25
+        self.frpwt    = frpwt
+        self.equitywt = equitywt
         burdenset = self.projectref().burden(key=self.burdenset)
         intervset = self.projectref().interv(key=self.intervset)
         
@@ -103,6 +111,11 @@ class HealthPackage(object):
         # Current % of DALYs averted (dalys_averted/total_dalys)
         df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
+        # To populate with optimization results
+        self.budget = arr(df['spend']).sum()
+        df.addcol('opt_spend')
+        df.addcol('opt_dalys_averted')
+        
         self.data = df # Store it
         if verbose:
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))

@@ -162,8 +162,8 @@ def jsonify_burden(burdenset):
         'burdenset': {
             'name':         burdenset.name,
             'uid':          burdenset.uid,
-            'creationTime': burdenset.created,
-            'updateTime':   burdenset.modified
+            'creationTime': sc.getdate(burdenset.created),
+            'updateTime':   sc.getdate(burdenset.modified)
         }
     }
     return json
@@ -174,8 +174,8 @@ def jsonify_interv(intervset):
         'intervset': {
             'name':         intervset.name,
             'uid':          intervset.uid,
-            'creationTime': intervset.created,
-            'updateTime':   intervset.modified
+            'creationTime': sc.getdate(intervset.created),
+            'updateTime':   sc.getdate(intervset.modified)
         }
     }
     return json
@@ -186,8 +186,11 @@ def jsonify_package(packageset):
         'packageset': {
             'name':         packageset.name,
             'uid':          packageset.uid,
-            'creationTime': packageset.created,
-            'updateTime':   packageset.modified
+            'creationTime': sc.getdate(packageset.created),
+            'updateTime':   sc.getdate(packageset.modified),
+            'budget':       packageset.budget,
+            'frpwt':        packageset.frpwt,
+            'equitywt':     packageset.equitywt,
         }
     }
     return json
@@ -677,13 +680,15 @@ def delete_intervention(project_id, intervkey, index):
 ################################################################################### 
 
 @RPC()
-def jsonify_packages(project_id, packagekey):
+def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     packageset.makepackage()
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
     results = packageset.jsonify(cols=['active','shortname','bod1','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
-    return {'results': results}
+    output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
+    if verbose: sc.pp(output)
+    return output
 
 
 def make_package(project=None, die=None):
@@ -702,6 +707,14 @@ def create_packageset(project_id, burdenset=None, intervset=None):
     proj = load_project(project_id) # Get the Project object.
     proj.makepackage(burdenset=burdenset, intervset=intervset) # Update with the latest data
     save_project(proj)
+    return jsonify_packagesets(proj=proj)
+
+
+@RPC()
+def optimize(project_id, packagekey):
+    proj = load_project(project_id) # Get the Project object.
+    packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
+    packageset.optimize()
     return jsonify_packagesets(proj=proj)
 
 

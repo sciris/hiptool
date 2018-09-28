@@ -111,11 +111,39 @@ Last update: 2018-09-24
           </tr>
           </tbody>
         </table>
-        <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
-        <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
-        <button class="btn" @click="downloadPlots">Download plots</button>
       </div>
 
+    </div>
+
+    <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
+
+      <table>
+        <tr>
+          <td><b>Budget:</b>&nbsp;</td>
+          <td><input type="text"
+                     class="txbox"
+                     v-model="budget"/></td>
+        <!--</tr>-->
+        <!--<tr>-->
+          <td><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FRP weight:</b>&nbsp;</td>
+          <td><input type="text"
+                     class="txbox"
+                     v-model="frpwt"/></td>
+        <!--</tr>-->
+        <!--<tr>-->
+          <td><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Equity weight:</b>&nbsp;</td>
+          <td><input type="text"
+                     class="txbox"
+                     v-model="equitywt"/></td>
+        </tr>
+
+      </table>
+      <br>
+
+      <button class="btn" @click="optimize">Optimize</button>
+      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
+      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
+      <button class="btn" @click="downloadPlots">Download plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
@@ -213,6 +241,9 @@ Last update: 2018-09-24
         burdenSets: [],
         intervSet: '',
         intervSets: [],
+        budget: '',
+        frpwt: '',
+        equitywt: '',
       }
     },
 
@@ -258,6 +289,14 @@ Last update: 2018-09-24
         rpcs.download('download_figures', [this.$store.state.currentUser.username])
           .then(response => {
             console.log('Downloaded figures')
+          })
+      },
+
+      optimize() {
+        rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
+          .then(response => {
+            this.updatePackageSets(true)
+            console.log('Optimized')
           })
       },
 
@@ -337,7 +376,15 @@ Last update: 2018-09-24
         this.activePackageSet = packageSet // Set the active project to the packageSet passed in.
         rpcs.rpc('jsonify_packages', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex]) // Go to the server to get the diseases from the package set.
           .then(response => {
+            this.budget = Math.round(Number(response.data.budget)).toLocaleString()
+            this.frpwt = response.data.frpwt
+            this.equitywt = response.data.equitywt
             this.resultList = response.data.results // Set the result list.
+            console.log('hiiiiiiiiiiiiiiiilo')
+            console.log(this.budget)
+            console.log(this.frpwt)
+            console.log(this.equitywt)
+            console.log('hiiiiiiiiiiiiiiiilo')
             for (let ind=0; ind < this.resultList.length; ind++) { // Set the active values from the loaded in data.
               this.resultList[ind].numindex =   ind
               this.resultList[ind].active =     (this.resultList[ind][0] > 0)
