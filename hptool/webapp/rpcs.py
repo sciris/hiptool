@@ -713,7 +713,10 @@ def create_packageset(project_id, burdenset=None, intervset=None):
 def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.optimize(budget=sanitize(budget, forcefloat=True), frpwt=float(frpwt), equitywt=float(equitywt))
+    budget   = sanitize(budget,   forcefloat=True)
+    frpwt    = sanitize(frpwt,    forcefloat=True)
+    equitywt = sanitize(equitywt, forcefloat=True)
+    packageset.optimize(budget=budget, frpwt=frpwt, equitywt=equitywt)
     save_project(proj)
     return jsonify_packagesets(proj=proj)
 
