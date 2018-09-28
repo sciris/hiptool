@@ -72,7 +72,7 @@ class HealthPackage(object):
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
         print(origdata.cols)
-        critical_cols = ['active', 'bod1', 'bod1wt', 'unitcost', 'spend', 'icer']
+        critical_cols = ['active', 'bod1', 'bod1wt', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         for col in critical_cols:
             origdata.filter_out(key='', col=self.colnames[col], verbose=True)
         origdata.replace(col=self.colnames['spend'], old='', new=0.0)
@@ -159,6 +159,8 @@ class HealthPackage(object):
                 df['opt_spend',r] = max_spend
                 df['opt_dalys_averted',r] = max_dalys[r]
             else:
+                df['opt_spend',r] = remaining
+                df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
                 break
         
         self.data = df
