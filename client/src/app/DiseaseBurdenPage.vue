@@ -15,16 +15,16 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
-      <span>&nbsp;based on&nbsp;</span>
-      <select
-        title="countrySelect"
-        id="country"
-        :required="true"
-        v-model="country">
-        <option v-for = "country in countryList" :value="country">
-          {{country}}
-        </option>
-      </select>
+      <!--<span>&nbsp;based on&nbsp;</span>-->
+      <!--<select-->
+        <!--title="countrySelect"-->
+        <!--id="country"-->
+        <!--:required="true"-->
+        <!--v-model="country">-->
+        <!--<option v-for = "country in countryList" :value="country">-->
+          <!--{{country}}-->
+        <!--</option>-->
+      <!--</select>-->
 
       <br/><br/>
 
@@ -105,9 +105,9 @@ Last update: 2018sep24
           </tr>
         </tbody>
       </table>
-      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
-      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
-      <button class="btn" @click="downloadPlots">Download plots</button>
+      <button v-show="!showingPlots" class="btn" :disabled="!graphData" @click="showPlots">Show plots</button>
+      <button v-show="showingPlots"  class="btn" :disabled="!graphData" @click="hidePlots">Hide plots</button>
+      <button class="btn" :disabled="!graphData" @click="downloadPlots">Download plots</button>
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activeBurdenSet.burdenset != undefined">
@@ -185,31 +185,31 @@ Last update: 2018sep24
           <tr v-for="disease in sortedFilteredDiseases">
             <td style="text-align: center">
               <input type="checkbox"
-                     v-model="disease.active"/>
+                     v-model="disease['Active']"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
                      @keyup.enter="updateDisease(disease)"
-                     v-model="disease.cause"/>
+                     v-model="disease['Cause']"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
                      @keyup.enter="updateDisease(disease)"
-                     v-model="disease.dalys"/>
+                     v-model="disease['DALYs']"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
                      @keyup.enter="updateDisease(disease)"
-                     v-model="disease.deaths"/>
+                     v-model="disease['Deaths']"/>
             </td>
             <td>
               <input type="text"
                      class="txbox"
                      @keyup.enter="updateDisease(disease)"
-                     v-model="disease.prevalence"/>
+                     v-model="disease['Prevalence']"/>
             </td>
             <td style="white-space: nowrap">
               <button class="iconbtn" @click="copyBurden(disease)" data-tooltip="Copy burden"><i class="ti-layers"></i></button>
@@ -255,6 +255,7 @@ Last update: 2018sep24
           'Other',
         ],
         showingPlots: false,
+        graphData: [],
       }
     },
 
@@ -370,11 +371,11 @@ Last update: 2018sep24
           this.diseaseList = response.data.diseases // Set the disease list.
           for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
-		        this.diseaseList[ind].active = (this.diseaseList[ind][0] > 0)
-            this.diseaseList[ind].cause = this.diseaseList[ind][1]
-            this.diseaseList[ind].dalys = Number(this.diseaseList[ind][2]).toLocaleString()
-            this.diseaseList[ind].deaths = Number(this.diseaseList[ind][3]).toLocaleString()
-            this.diseaseList[ind].prevalence = Number(this.diseaseList[ind][4]).toLocaleString()
+		        this.diseaseList[ind]['Active'] = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind]['Cause'] = this.diseaseList[ind][1]
+            this.diseaseList[ind]['DALYs'] = Number(this.diseaseList[ind][2]).toLocaleString()
+            this.diseaseList[ind]['Deaths'] = Number(this.diseaseList[ind][3]).toLocaleString()
+            this.diseaseList[ind]['Prevalence'] = Number(this.diseaseList[ind][4]).toLocaleString()
 		      }
           this.sortColumn2 = 'name' // Reset the bottom table sorting state.
           this.sortReverse2 = false
@@ -395,10 +396,12 @@ Last update: 2018sep24
         rpcs.rpc('plot_burden',  // Go to the server to get the diseases from the burden set.
           [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex])
           .then(response => {
-            this.serverresponse = response.data // Pull out the response data.
-            mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
-            mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
-            mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
+            this.graphData = response.data
+            if (this.graphData) { // Check we got a response
+              mpld3.draw_figure('fig1', this.graphData.graph1) // Draw the figure.
+              mpld3.draw_figure('fig2', this.graphData.graph2) // Draw the figure.
+              mpld3.draw_figure('fig3', this.graphData.graph3) // Draw the figure.
+            }
           })
           .catch(error => {
             status.fail(this, 'Could not make graphs', error)
@@ -418,6 +421,7 @@ Last update: 2018sep24
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex], {}, '.xlsx')
           .then(response => {
             this.updateBurdenSets()
+            this.viewBurdenSet(burdenSet, true)
             status.succeed(this, 'Burden set uploaded')
           })
           .catch(error => {
@@ -486,7 +490,8 @@ Last update: 2018sep24
       },
       
       applyDiseaseFilter(diseases) {
-        return diseases.filter(theDisease => theDisease.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1)
+        console.log(diseases)
+        return diseases.filter(theDisease => theDisease['Cause'].toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1)
       },
       
       applySorting2(diseases) {
@@ -504,18 +509,18 @@ Last update: 2018sep24
       updateDisease(disease) {
         console.log('Update to be made')
         console.log('Index: ',      disease.numindex)
-        console.log('Active?: ',    disease.active)
-        console.log('Cause: ',      disease.cause)
-        console.log('DALYs: ',      disease.dalys)
-        console.log('Deaths: ',     disease.deaths)
-        console.log('Prevalence: ', disease.prevalence)
+        console.log('Active?: ',    disease['Active'])
+        console.log('Cause: ',      disease['Cause'])
+        console.log('DALYs: ',      disease['DALYs'])
+        console.log('Deaths: ',     disease['Deaths'])
+        console.log('Prevalence: ', disease['Prevalence'])
 
         // Do format filtering to prepare the data to pass to the RPC.
-        let filterActive = disease.active ? 1 : 0
+        let filterActive = disease['Active'] ? 1 : 0
 
         // Go to the server to update the disease from the burden set. Note: filter out commas in the numeric fields.
         rpcs.rpc('update_disease', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
-          [disease.active, disease.cause, disease.dalys, disease.deaths, disease.prevalence]])
+          [disease['Active'], disease['Cause'], disease['DALYs'], disease['Deaths'], disease['Prevalence']]])
         .then(response => {
           status.succeed(this, 'Burden set updated')
         })

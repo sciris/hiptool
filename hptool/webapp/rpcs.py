@@ -1,7 +1,7 @@
 """
 HealthPrior remote procedure calls (RPCs)
     
-Last update: 2018sep22
+Last update: 2018sep27
 """
 
 
@@ -148,8 +148,8 @@ def jsonify_project(project_id, verbose=False):
             'name':         proj.name,
             'username':     proj.webapp.username,
             'hasData':      len(proj.burdensets)>0 and len(proj.intervsets)>0,
-            'creationTime': proj.created,
-            'updatedTime':  proj.modified,
+            'creationTime': sc.getdate(proj.created),
+            'updatedTime':  sc.getdate(proj.modified),
         }
     }
     if verbose: sc.pp(json)
@@ -162,8 +162,8 @@ def jsonify_burden(burdenset):
         'burdenset': {
             'name':         burdenset.name,
             'uid':          burdenset.uid,
-            'creationTime': burdenset.created,
-            'updateTime':   burdenset.modified
+            'creationTime': sc.getdate(burdenset.created),
+            'updateTime':   sc.getdate(burdenset.modified)
         }
     }
     return json
@@ -174,8 +174,8 @@ def jsonify_interv(intervset):
         'intervset': {
             'name':         intervset.name,
             'uid':          intervset.uid,
-            'creationTime': intervset.created,
-            'updateTime':   intervset.modified
+            'creationTime': sc.getdate(intervset.created),
+            'updateTime':   sc.getdate(intervset.modified)
         }
     }
     return json
@@ -186,8 +186,11 @@ def jsonify_package(packageset):
         'packageset': {
             'name':         packageset.name,
             'uid':          packageset.uid,
-            'creationTime': packageset.created,
-            'updateTime':   packageset.modified
+            'creationTime': sc.getdate(packageset.created),
+            'updateTime':   sc.getdate(packageset.modified),
+            'budget':       packageset.budget,
+            'frpwt':        packageset.frpwt,
+            'equitywt':     packageset.equitywt,
         }
     }
     return json
@@ -199,7 +202,8 @@ def jsonify_projects(username, verbose=False):
     output = {'projects':[]}
     user = get_user(username)
     for project_key in user.projects:
-        json = jsonify_project(project_key)
+        try:                   json = jsonify_project(project_key)
+        except Exception as E: json = {'project': {'name':'Project load failed: %s' % str(E)}}
         output['projects'].append(json)
     if verbose: sc.pp(output)
     return output
@@ -225,7 +229,10 @@ def jsonify_intervsets(project_id=None, proj=None):
 def jsonify_packagesets(project_id=None, proj=None):
     ''' Return the JSON representation of all package sets in the project '''
     if proj is None: proj = load_project(project_id) # Get the Project object.
-    output = {'packagesets': [jsonify_package(pk) for pk in proj.packagesets.values()]}
+    output = dict()
+    output['packagesets'] = [jsonify_package(pk) for pk in proj.packagesets.values()]
+    output['burdensets'] = proj.burdensets.keys()
+    output['intervsets'] = proj.intervsets.keys()
     return output
 
 
@@ -268,33 +275,41 @@ def save_new_project(proj, username=None, uid=None):
     if not hasattr(new_project, 'webapp'):
         new_project.webapp = sc.prettyobj()
         new_project.webapp.username = username # If we ever use Celery with HealthPrior: new_project.webapp.tasks = []
+    new_project.webapp.username = username # Make sure we have the current username
     
     # Save all the things
     key = save_project(new_project)
-    user.projects.append(key)
-    datastore.saveuser(user)
+    if key not in user.projects: # Let's not allow multiple copies
+        user.projects.append(key)
+        datastore.saveuser(user)
     return key,new_project
 
 
-def del_project(project_key, die=None):
+@RPC() # Not usually called as an RPC
+def del_project(project_key, username=None, die=None):
     key = datastore.getkey(key=project_key, objtype='project')
-    project = load_project(key)
-    user = get_user(project.webapp.username)
+    try:
+        project = load_project(key)
+    except Exception as E:
+        print('Warning: cannot delete project %s, not found (%s)' % (key, str(E)))
+        return None
     output = datastore.delete(key)
-    if key in user.projects:
+    try:
+        if username is None: username = project.webapp.username
+        user = get_user(username)
         user.projects.remove(key)
-    else:
-        print('Warning: deleting project %s (%s), but not found in user "%s" projects' % (project.name, key, user.username))
-    datastore.saveuser(user)
+        datastore.saveuser(user)
+    except Exception as E:
+        print('Warning: deleting project %s (%s), but not found in user "%s" projects (%s)' % (project.name, key,project.webapp.username, str(E)))
     return output
 
 
 @RPC()
-def delete_projects(project_keys):
+def delete_projects(project_keys, username=None):
     ''' Delete one or more projects '''
     project_keys = sc.promotetolist(project_keys)
     for project_key in project_keys:
-        del_project(project_key)
+        del_project(project_key, username=username)
     return None
 
 
@@ -308,9 +323,18 @@ def rename_project(project_json):
 
 
 @RPC()
-def create_new_project(username):
+def add_demo_project(username):
     """ Create a new Optima Nutrition project. """
     proj = hp.demo() # Create the project
+    print(">> create_new_project %s" % (proj.name))     # Display the call information.
+    key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
+    return {'projectID': str(proj.uid)}
+
+
+@RPC()
+def create_new_project(username):
+    """ Create a new Optima Nutrition project. """
+    proj = hp.Project() # Create the project
     proj.name = 'New project'
     print(">> create_new_project %s" % (proj.name))     # Display the call information.
     key,proj = save_new_project(proj, username) # Save the new project in the DataStore.
@@ -411,7 +435,7 @@ def upload_set(filename, project_id, which, key=None):
     thisset = get_set(proj, which, key)
     thisset.loaddata(filename)
     print('Loaded data into %s %s' % (which, thisset.name))
-    proj.package().make_package()
+    make_package(proj, die=False)
     save_project(proj)
     return None
 
@@ -483,7 +507,7 @@ def jsonify_diseases(project_id, burdenkey):
     proj = load_project(project_id) # Get the Project object.
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     if burdenset.data is None: return {'diseases': []} # Return an empty list if no data is present.
-    disease_data = burdenset.jsonify(cols=['active','cause','dalys','deaths','prevalence'], header=False) # Gather the list for all of the diseases.
+    disease_data = burdenset.jsonify(cols=['Active','Cause','DALYs','Deaths','Prevalence'], header=False) # Gather the list for all of the diseases.
     return {'diseases': disease_data}
 
 
@@ -491,12 +515,8 @@ def jsonify_diseases(project_id, burdenkey):
 def create_burdenset(project_id, newname):
     proj = load_project(project_id) # Get the Project object.
     unique_name = sc.uniquename(newname, namelist=proj.burdensets.keys())
-    new_burden_set = hp.Burden(project=proj, name=unique_name)
-    data_path = hp.HPpath('data')
-    new_burden_set.loaddata(data_path+'ihme-gbd.xlsx')
-    print('WARNING: using hard-coded burden data')
-    proj.burdensets[unique_name] = new_burden_set # Put the new burden set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    newburdenset = hp.Burden(project=proj, name=unique_name)
+    proj.burdensets[unique_name] = newburdenset # Put the new burden set in the dictionary.
     save_project(proj)
     return jsonify_burdensets(proj=proj)
 
@@ -510,7 +530,7 @@ def update_disease(project_id, burdenkey, diseaseind, data, verbose=True):
         print('WARNING, disease lengths do not match: %s vs. %s' % (len(data_record), len(data)))
     for i,datum in enumerate(data): # Actually replace it
         data_record[i] = sanitize(datum)
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return None
 
@@ -522,25 +542,25 @@ def plot_burden(project_id, burdenkey, dosave=True):
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     
     # Create the figures and convert to mpld3
-    figs = []
     figdicts = []
-    for which in ['dalys','deaths','prevalence']:        
-        fig = burdenset.plottopcauses(which=which) 
-        figs.append(fig)
-    for fig in figs:
-        figdict = sw.mpld3ify(fig, jsonify=False)
-        figdicts.append(figdict)
+    if burdenset.data:
+        figs = burdenset.plot()
+        for fig in figs:
+            figdict = sw.mpld3ify(fig, jsonify=False)
+            figdicts.append(figdict)
     
-    # Optionally save the figures
-    if dosave:
-        filepath = get_path(filename=figures_filename, username=proj.webapp.username)
-        sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
-        print('Figures saved to %s' % filepath)
-    
-    # Return success -- WARNING, hard-coded to 3 graphs!
-    return {'graph1': figdicts[0], 
-            'graph2': figdicts[1],
-            'graph3': figdicts[2],}
+        # Optionally save the figures
+        if dosave:
+            filepath = get_path(filename=figures_filename, username=proj.webapp.username)
+            sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
+            print('Figures saved to %s' % filepath)
+        
+        # Return success -- WARNING, hard-coded to 3 graphs!
+        return {'graph1': figdicts[0], 
+                'graph2': figdicts[1],
+                'graph3': figdicts[2],}
+    else:
+        return None # No graphs to make
     
 
 @RPC()
@@ -579,11 +599,12 @@ def delete_burden(project_id, intervkey, index):
 ###################################################################################
 
 @RPC()
-def jsonify_interventions(project_id, intervkey=None):
+def jsonify_interventions(project_id, intervkey=None, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     intervset = proj.interv(key=intervkey) # Get the intervention set that matches the key
     if intervset.data is None: return {'interventions': []}  # Return an empty list if no data is present.
     interv_data = [list(interv) for interv in intervset.data] # Gather the list for all of the interventions.
+    if verbose: sc.pp(interv_data)
     return {'interventions': interv_data}
 
 
@@ -596,7 +617,7 @@ def create_intervset(project_id, newname):
     new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
     print('WARNING, hard-coded data path')
     proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return jsonify_intervsets(proj=proj)
 
@@ -606,16 +627,18 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervkey].data[intervind]
     if verbose: print('Original intervention set record:\n%s' % data_record)
-    data_record[0] = sanitize(data[0])
-    data_record[1] = data[1]
-    data_record[3] = sanitize(data[2])
-    data_record[4] = sanitize(data[3])
-    data_record[5] = sanitize(data[4])
-    data_record[6] = sanitize(data[5])
-    data_record[7] = sanitize(data[6])
-    data_record[8] = sanitize(data[7])
+    data_record[1] = sanitize(data[0]) # Active
+    data_record[3] = data[1]           # Name
+    data_record[4] = sanitize(data[2]) # Platform
+    data_record[5] = sanitize(data[3]) # BoD 1
+    data_record[6] = sanitize(data[4]) # BoD 1 weight
+    data_record[11] = sanitize(data[5]) # ICER
+    data_record[12] = sanitize(data[6]) # Unit cost
+    data_record[13] = sanitize(data[7]) # Spend
+    data_record[14] = sanitize(data[8]) # FRP
+    data_record[15] = sanitize(data[9]) # Equity
     if verbose: print('New intervention set record:\n%s' % data_record)
-    proj.package().make_package() # Update with the latest data
+    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return None
 
@@ -623,7 +646,9 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
 def add_intervention(project_id, intervkey):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
-    placeholder = ['~Intervention Number~', '~Name~', '~Full name~', '~Platform~', '~Cause~', 0, 0, 0, 0, 0, 0, 0, '<Level 1 cause>', '<Level 1 cause name>', '<Level 2 cause >', '<Level 3 cause >', '<DCP3 Packages>', '<Package Number>', '<Urgency>', '<Code>', '<Codes for  interventions that appear in multiple packages>', '<Volume(s) intervention included in>', '<Platform in Volume>', '<Platform in EUHC>']
+    placeholder = sc.dcp(proj.interv().data.cols)
+    for col in range(len(placeholder)):
+        placeholder[col] = '~'+placeholder[col]+'~'
     data[data.nrows()] = placeholder
     save_project(proj)
     return None
@@ -634,7 +659,7 @@ def copy_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     value = sc.dcp(data[index])
-    value[1] += ' (copy)'
+    value[3] += ' (copy)' # This is the name
     data.insert(row=index, value=value)
     save_project(proj)
     return None
@@ -655,23 +680,41 @@ def delete_intervention(project_id, intervkey, index):
 ################################################################################### 
 
 @RPC()
-def jsonify_packages(project_id, packagekey):
+def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.make_package()
+    packageset.makepackage()
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
-    return {'results': results}
+    results = packageset.jsonify(cols=['active','shortname','bod1','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
+    output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
+    if verbose: sc.pp(output)
+    return output
+
+
+def make_package(project=None, die=None):
+    if die is None: die = False
+    try:
+        project.package().makepackage()
+    except Exception as E:
+        errormsg = 'Could not make package, possibly not all data uploaded: %s' % str(E)
+        if die: raise Exception(errormsg)
+        else: print(errormsg)
+    return None
 
 
 @RPC()    
-def create_packageset(project_id, newname):
+def create_packageset(project_id, burdenset=None, intervset=None):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
-    new_packageset = hp.HealthPackage(project=proj, name=unique_name)
-    proj.packagesets[unique_name] = new_packageset # Put the new intervention set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    proj.makepackage(burdenset=burdenset, intervset=intervset) # Update with the latest data
     save_project(proj)
+    return jsonify_packagesets(proj=proj)
+
+
+@RPC()
+def optimize(project_id, packagekey):
+    proj = load_project(project_id) # Get the Project object.
+    packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
+    packageset.optimize()
     return jsonify_packagesets(proj=proj)
 
 
@@ -680,7 +723,7 @@ def plot_packages(project_id, packagekey, dosave=True):
     ''' Plot the health packages '''
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.make_package()
+    packageset.makepackage()
     
     # Make the plots
     figs = []

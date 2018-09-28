@@ -37,7 +37,7 @@ class Project(object):
     ### Built-in methods -- initialization, and the thing to print if you call a project
     #######################################################################################################
 
-    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, make_package=True, verbose=2, **kwargs):
+    def __init__(self, name='Default', burdenfile=None, interventionsfile=None, country=None, makepackage=True, verbose=2):
         ''' Initialize the project '''
 
         ## Define the structure sets
@@ -57,21 +57,15 @@ class Project(object):
 
         ## Load burden spreadsheet, if available
         if burdenfile:
-            burden = hp.Burden(project=self)
-            burden.loaddata(filename=burdenfile)
-            self.burdensets['Default'] = burden
+            self.loadburden(filename=burdenfile, verbose=verbose)
         
         ## Load interventions spreadsheet, if available
         if interventionsfile:
-            interventions = hp.Interventions(project=self)
-            interventions.loaddata(filename=interventionsfile)
-            self.intervsets['Default'] = interventions
+            self.loadinterventions(filename=interventionsfile, verbose=verbose)
         
         ## Combine into health package, if available
-        if make_package and burdenfile and interventionsfile:
-            package = hp.HealthPackage(project=self)
-            package.make_package()
-            self.packagesets['Default'] = package
+        if makepackage and burdenfile and interventionsfile:
+            self.makepackage()
 
         return None
 
@@ -139,13 +133,43 @@ class Project(object):
         if key is None: key = hp.default_key
         try:    return self.packagesets[key]
         except: return sc.printv('Warning, interventions set not found!', 1, verbose) # Returns None
-        
 
-def demo(name=None):
-    if name is None: name = 'Default'
-    datadir = hp.HPpath('data')
-    burdenpath = datadir + 'ihme-gbd.xlsx'
-    datapath = datadir + 'dcp-data-afg-v1.xlsx'
-    project = Project(name=name, burdenfile=burdenpath, interventionsfile=datapath)  
-    project.burden().popsize = 34.66e6 # From UN population division 
+
+    #######################################################################################################
+    ### Data loading
+    #######################################################################################################
+
+    def loadburden(self, filename=None, folder=None, name=None, verbose=2):
+        ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
+        burden = hp.Burden(project=self, filename=filename, folder=folder, name=name)
+        self.burdensets[burden.name] = burden
+        return burden
+    
+    def loadinterventions(self, filename=None, folder=None, name=None, verbose=2):
+        ''' Shortcut for getting the latest active burden set, i.e. self.burdensets[-1] '''
+        interventions = hp.Interventions(project=self, filename=filename, folder=folder, name=name)
+        self.intervsets[interventions.name] = interventions
+        return interventions
+    
+    def makepackage(self, burdenset=None, intervset=None):
+        if len(self.burdensets)==0:
+            errormsg = 'Please ensure you have uploaded burden of disease data (0 burden sets found)'
+            raise Exception(errormsg)
+        if len(self.intervsets)==0:
+            errormsg = 'Please ensure you have uploaded intervention data (0 intervention sets found)'
+            raise Exception(errormsg)
+        if burdenset is None: burdenset = self.burdensets.keys()[-1]
+        if intervset is None: intervset = self.intervsets.keys()[-1]
+        name = burdenset + ' + ' + intervset
+        package = hp.HealthPackage(project=self, name=name, burdenset=burdenset, intervset=intervset, makepackage=True)
+        self.packagesets[package.name] = package
+        return package
+
+
+
+def demo():
+    datadir     = hp.HPpath('data')
+    burdenspath = datadir + 'burdens-demo.xlsx'
+    intervspath = datadir + 'interventions-demo.xlsx'
+    project = Project(name='Demo', burdenfile=burdenspath, interventionsfile=intervspath, makepackage=True)
     return project
