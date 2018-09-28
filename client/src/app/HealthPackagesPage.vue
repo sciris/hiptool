@@ -123,18 +123,19 @@ Last update: 2018-09-24
           <td><input type="text"
                      class="txbox"
                      v-model="budget"/></td>
-        <!--</tr>-->
-        <!--<tr>-->
           <td><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FRP weight:</b>&nbsp;</td>
           <td><input type="text"
                      class="txbox"
                      v-model="frpwt"/></td>
-        <!--</tr>-->
-        <!--<tr>-->
           <td><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Equity weight:</b>&nbsp;</td>
           <td><input type="text"
                      class="txbox"
                      v-model="equitywt"/></td>
+          <td><b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DALYs weight:</b>&nbsp;</td>
+          <td><input type="text"
+                     class="txbox"
+                     :disabled="true"
+                     v-model="dalyswt"/></td>
         </tr>
 
       </table>
@@ -265,7 +266,11 @@ Last update: 2018-09-24
 
       sortedFilteredIntervs() {
         return this.applyIntervFilter(this.applySorting2(this.resultList))
-      }
+      },
+
+      dalyswt() {
+        return (1 - this.frpwt - this.equitywt)
+      },
     },
 
     created() {
