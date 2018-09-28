@@ -161,20 +161,31 @@ class HealthPackage(object):
             else:
                 break
         
+        self.data = df
         return None
         
-    def plot_dalys(self):
+    def plot_dalys(self, which=None):
+        if which is None: which = 'current'
+        if which == 'current':
+            colkey = 'dalys_averted'
+            titlekey = 'Current'
+        elif which == 'optimized':
+            colkey = 'opt_dalys_averted'
+            titlekey = 'Optimized'
+        else:
+            errormsg = '"which" not recognized: %s' % which
+            raise Exception(errormsg)
         df = self.data
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
-        df.sort(col='dalys_averted', reverse=True)
-        DA_data = arr(df['dalys_averted'])
+        df.sort(col=colkey, reverse=True)
+        DA_data = arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
         plot_data = plot_data.round()
-        total_averted = (plot_data.sum()/1e3)
+#        total_averted = (plot_data.sum()/1e3)
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
@@ -182,23 +193,34 @@ class HealthPackage(object):
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("Current DALYs averted by health intervention\n('000s; total: %0.2f million)" % total_averted)
+#        pl.title("%s DALYs averted\n('000s; total: %0.2f million)" % (titlekey, total_averted))
+        pl.title("%s DALYs averted" % (titlekey))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
     
-    def plot_spending(self):
+    def plot_spending(self, which=None):
+        if which is None: which = 'current'
+        if which == 'current':
+            colkey = 'spend'
+            titlekey = 'Current'
+        elif which == 'optimized':
+            colkey = 'opt_spend'
+            titlekey = 'Optimized'
+        else:
+            errormsg = '"which" not recognized: %s' % which
+            raise Exception(errormsg)
         df = self.data
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
-        df.sort(col='spend', reverse=True)
-        DA_data = arr(df['spend'])
+        df.sort(col=colkey, reverse=True)
+        DA_data = arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
 #        plot_data = plot_data.round()
-        total_averted = (plot_data.sum())
+#        total_averted = (plot_data.sum())
         data_labels = ['$%0.3fm'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
@@ -206,7 +228,8 @@ class HealthPackage(object):
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("Current spending by health intervention\n(total: $%0.3f million)" % total_averted)
+        pl.title("%s spending" % (titlekey))
+#        pl.title("%s spending\n(total: $%0.3f million)" % (titlekey, total_averted))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
@@ -222,7 +245,7 @@ class HealthPackage(object):
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
-        DA_data = arr(df['spend'])
+        DA_data = arr(df['opt_spend'])
         inds = sc.findinds(DA_data>cutoff)
         DA_data = DA_data[inds]
         DA_data /= 1e6
@@ -246,11 +269,11 @@ class HealthPackage(object):
                 pl.bar(loc,  height=this, bottom=start, width=prop,  color=color)
                 pl.text(x[pt], amount+1, amountstr, horizontalalignment='center', color=colors[pt])
         if vertical:
-            pl.xlabel('Spending (US$ millions)')
+            pl.xlabel('Optimized investment cascade')
             pl.gca().set_yticks(x)
             ticklabels = pl.gca().set_yticklabels(DA_labels)
         else:
-            pl.ylabel('Spending (US$ millions)')            
+            pl.ylabel('Optimized investment cascade')            
             pl.gca().set_xticks(x)
             ticklabels = pl.gca().set_xticklabels(DA_labels, rotation=90)
         for t,tl in enumerate(ticklabels):
