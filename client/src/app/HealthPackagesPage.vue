@@ -152,6 +152,8 @@ Last update: 2018-09-24
         <div id="fig1" style="float:left" ></div>
         <div id="fig2" style="float:left" ></div>
         <div id="fig3" style="float:left" ></div>
+        <div id="fig4" style="float:left" ></div>
+        <div id="fig5" style="float:left" ></div>
       </div>
 
       <input type="text"
@@ -163,45 +165,46 @@ Last update: 2018-09-24
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
-          <th style="text-align:center">Active</th>
           <th @click="updateSorting2('name')" class="sortable">Intervention
             <span v-show="sortColumn2 == 'name' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('cause')" class="sortable">Cause of burden
+          <th @click="updateSorting2('cause')" class="sortable">Cause&nbsp;of&nbsp;burden
             <span v-show="sortColumn2 == 'cause' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('coverage')" class="sortable">Number of people covered
-            <span v-show="sortColumn2 == 'coverage' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'coverage' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'coverage'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          <th @click="updateSorting2('spend')" class="sortable">Spending
+            <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('averted')" class="sortable">DALYs averted (per year)
+          <th @click="updateSorting2('opt_spend')" class="sortable">Optimized&nbsp;spending
+            <span v-show="sortColumn2 == 'opt_spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'opt_spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'opt_spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('averted')" class="sortable">DALYs&nbsp;averted
             <span v-show="sortColumn2 == 'averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('percentage')" class="sortable">DALYs averted (%)
-            <span v-show="sortColumn2 == 'percentage' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'percentage' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'percentage'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          <th @click="updateSorting2('opt_averted')" class="sortable">Optimized&nbsp;DALYs&nbsp;averted
+            <span v-show="sortColumn2 == 'opt_averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'opt_averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'opt_averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="result in sortedFilteredIntervs">
-          <td style="text-align: center">
-            <input type="checkbox"
-                   v-model="result.active"/>
-          </td>
           <td>{{ result.name }}</td>
           <td>{{ result.cause }}</td>
-          <td>{{ result.coverage }}</td>
+          <td>{{ result.spend }}</td>
+          <td>{{ result.opt_spend }}</td>
           <td>{{ result.averted }}</td>
-          <td>{{ result.percentage }}</td>
+          <td>{{ result.opt_averted }}</td>
         </tr>
         </tbody>
       </table>
@@ -293,9 +296,10 @@ Last update: 2018-09-24
       },
 
       optimize() {
-        rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex])
+        rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex, this.budget, this.frpwt, this.equitywt])
           .then(response => {
             this.updatePackageSets(true)
+            status.update(this, 'Optimized')
             console.log('Optimized')
           })
       },
@@ -307,9 +311,6 @@ Last update: 2018-09-24
         } else { // Otherwise...
           rpcs.rpc('jsonify_packagesets', [this.$store.state.activeProject.project.id]) // Get the active project's health package sets.
             .then(response => {
-              console.log('HIIIIIIIIIIIIIIIIIIIIII')
-              console.log(response.data.burdensets)
-              console.log(response.data.intervsets)
               this.packageSets = response.data.packagesets // Set the package set list to what we received.
               this.burdenSets = response.data.burdensets
               this.intervSets = response.data.intervsets
@@ -380,19 +381,14 @@ Last update: 2018-09-24
             this.frpwt = response.data.frpwt
             this.equitywt = response.data.equitywt
             this.resultList = response.data.results // Set the result list.
-            console.log('hiiiiiiiiiiiiiiiilo')
-            console.log(this.budget)
-            console.log(this.frpwt)
-            console.log(this.equitywt)
-            console.log('hiiiiiiiiiiiiiiiilo')
             for (let ind=0; ind < this.resultList.length; ind++) { // Set the active values from the loaded in data.
               this.resultList[ind].numindex =   ind
-              this.resultList[ind].active =     (this.resultList[ind][0] > 0)
-              this.resultList[ind].name =       this.resultList[ind][1]
-              this.resultList[ind].cause =      this.resultList[ind][2]
-              this.resultList[ind].coverage =   Math.round(Number(this.resultList[ind][3])).toLocaleString()
-              this.resultList[ind].averted =    Math.round(Number(this.resultList[ind][4])).toLocaleString()
-              this.resultList[ind].percentage = (Number(this.resultList[ind][5])*100).toLocaleString() // Convert to percentage
+              this.resultList[ind].name =         this.resultList[ind][0]
+              this.resultList[ind].cause =        this.resultList[ind][1]
+              this.resultList[ind].spend =     Math.round(Number(this.resultList[ind][2])).toLocaleString()
+              this.resultList[ind].opt_spend = Math.round(Number(this.resultList[ind][3])).toLocaleString()
+              this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][4])).toLocaleString()
+              this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][5])).toLocaleString()
             }
             this.sortColumn2 = 'name' // Reset the bottom table sorting state.
             this.sortReverse2 = false
@@ -407,12 +403,14 @@ Last update: 2018-09-24
       makeGraph(packageSet) {
         console.log('makeGraph() called for ' + packageSet.packageset.name)
         this.activePackageSet = packageSet // Set the active project to the matched project.
-        this.clearGraphs(3)
+        this.clearGraphs(5)
         rpcs.rpc('plot_packages', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex]) // Go to the server to get the results from the package set.
           .then(response => {
             mpld3.draw_figure('fig1', response.data.graph1) // Draw the figure.
             mpld3.draw_figure('fig2', response.data.graph2) // Draw the figure.
             mpld3.draw_figure('fig3', response.data.graph3) // Draw the figure.
+            mpld3.draw_figure('fig4', response.data.graph4) // Draw the figure.
+            mpld3.draw_figure('fig5', response.data.graph5) // Draw the figure.
           })
           .catch(error => {
             status.fail(this, 'Could not make graphs', error)
@@ -506,11 +504,12 @@ Last update: 2018-09-24
         return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')       {return (result1[1] > result2[1] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'cause')      {return (result1[2] > result2[2] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'coverage')   {return (result1[3] > result2[3] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'averted')    {return (result1[4] > result2[4] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'percentage') {return (result1[5] > result2[5] ? sortDir: -sortDir)}
+            if      (this.sortColumn2 === 'name')         {return (result1[0] > result2[0] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'cause')        {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'spend')     {return (result1[2] > result2[2] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_spend') {return (result1[3] > result2[3] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'averted')      {return (result1[4] > result2[4] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_averted')  {return (result1[5] > result2[5] ? sortDir: -sortDir)}
           }
         )
       },

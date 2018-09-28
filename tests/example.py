@@ -7,7 +7,7 @@ Version: 2018sep28
 from hptool import Project, HPpath
 from pylab import show
 
-doplot = True
+doplot = False
 
 dp = HPpath('data')
 P = Project()
@@ -17,6 +17,7 @@ print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[27])
 print('\n\nExample interventions entry:\n\n%s' % P.intervsets[0].data[27])
 
 P.makepackage()
+P.package().optimize()
 
 
 #P.package().plot_cascade()
