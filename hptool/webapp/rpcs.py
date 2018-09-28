@@ -226,7 +226,10 @@ def jsonify_intervsets(project_id=None, proj=None):
 def jsonify_packagesets(project_id=None, proj=None):
     ''' Return the JSON representation of all package sets in the project '''
     if proj is None: proj = load_project(project_id) # Get the Project object.
-    output = {'packagesets': [jsonify_package(pk) for pk in proj.packagesets.values()]}
+    output = dict()
+    output['packagesets'] = [jsonify_package(pk) for pk in proj.packagesets.values()]
+    output['burdensets'] = proj.burdensets.keys()
+    output['intervsets'] = proj.intervsets.keys()
     return output
 
 
@@ -677,16 +680,16 @@ def delete_intervention(project_id, intervkey, index):
 def jsonify_packages(project_id, packagekey):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.make_package()
+    packageset.makepackage()
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['active','shortname','cause','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['active','shortname','bod1','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
     return {'results': results}
 
 
 def make_package(project=None, die=None):
     if die is None: die = False
     try:
-        project.package().make_package()
+        project.package().makepackage()
     except Exception as E:
         errormsg = 'Could not make package, possibly not all data uploaded: %s' % str(E)
         if die: raise Exception(errormsg)
@@ -695,12 +698,9 @@ def make_package(project=None, die=None):
 
 
 @RPC()    
-def create_packageset(project_id, newname):
+def create_packageset(project_id, burdenset=None, intervset=None):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
-    new_packageset = hp.HealthPackage(project=proj, name=unique_name)
-    proj.packagesets[unique_name] = new_packageset # Put the new intervention set in the dictionary.
-    proj.package().make_package() # Update with the latest data
+    proj.makepackage(burdenset=burdenset, intervset=intervset) # Update with the latest data
     save_project(proj)
     return jsonify_packagesets(proj=proj)
 
@@ -710,7 +710,7 @@ def plot_packages(project_id, packagekey, dosave=True):
     ''' Plot the health packages '''
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.make_package()
+    packageset.makepackage()
     
     # Make the plots
     figs = []

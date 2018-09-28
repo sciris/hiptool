@@ -171,5 +171,5 @@ def demo():
     datadir     = hp.HPpath('data')
     burdenspath = datadir + 'burdens-demo.xlsx'
     intervspath = datadir + 'interventions-demo.xlsx'
-    project = Project(name='Demo', burdenfile=burdenspath, interventionsfile=intervspath, makepackage=False)
+    project = Project(name='Demo', burdenfile=burdenspath, interventionsfile=intervspath, makepackage=True)
     return project

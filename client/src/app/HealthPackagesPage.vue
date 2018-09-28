@@ -15,85 +15,107 @@ Last update: 2018-09-24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <input type="text"
-             class="txbox"
-             style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
-             :placeholder="filterPlaceholder"
-             v-model="filterText"/>
+      <div v-if="burdenSet">
+        <button class="btn" @click="createNewPackageSet">Create health package</button>
+        &nbsp;Burden set:&nbsp;
+        <select v-model="burdenSet">
+          <option v-for='set in burdenSets'>
+            {{ set }}
+          </option>
+        </select>
+        &nbsp;Intervention set:&nbsp;
+        <select v-model="intervSet">
+          <option v-for='set in intervSets'>
+            {{ set }}
+          </option>
+        </select>
+        <br><br>
+      </div>
 
-      <table class="table table-bordered table-hover table-striped" style="width: 100%">
-        <thead>
-        <tr>
-          <th @click="updateSorting('name')" class="sortable">
-            Health package
-            <span v-show="sortColumn == 'name' && !sortReverse">
+
+      <div v-if="packageSets">
+
+        <input type="text"
+               class="txbox"
+               style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
+               :placeholder="filterPlaceholder"
+               v-model="filterText"/>
+
+        <table class="table table-bordered table-hover table-striped" style="width: 100%">
+          <thead>
+          <tr>
+            <th @click="updateSorting('name')" class="sortable">
+              Health package
+              <span v-show="sortColumn == 'name' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
-            <span v-show="sortColumn == 'name' && sortReverse">
+              <span v-show="sortColumn == 'name' && sortReverse">
                 <i class="fas fa-caret-up"></i>
               </span>
-            <span v-show="sortColumn != 'name'">
+              <span v-show="sortColumn != 'name'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-          </th>
-          <th>
-            Select
-          </th>
-          <th @click="updateSorting('creationTime')" class="sortable">
-            Created on
-            <span v-show="sortColumn == 'creationTime' && !sortReverse">
+            </th>
+            <th>
+              Select
+            </th>
+            <th @click="updateSorting('creationTime')" class="sortable">
+              Created on
+              <span v-show="sortColumn == 'creationTime' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
-            <span v-show="sortColumn == 'creationTime' && sortReverse">
+              <span v-show="sortColumn == 'creationTime' && sortReverse">
                 <i class="fas fa-caret-up"></i>
               </span>
-            <span v-show="sortColumn != 'creationTime'">
+              <span v-show="sortColumn != 'creationTime'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-          </th>
-          <th @click="updateSorting('updatedTime')" class="sortable">
-            Last modified
-            <span v-show="sortColumn == 'updatedTime' && !sortReverse">
+            </th>
+            <th @click="updateSorting('updatedTime')" class="sortable">
+              Last modified
+              <span v-show="sortColumn == 'updatedTime' && !sortReverse">
                 <i class="fas fa-caret-down"></i>
               </span>
-            <span v-show="sortColumn == 'updatedTime' && sortReverse">
+              <span v-show="sortColumn == 'updatedTime' && sortReverse">
                 <i class="fas fa-caret-up"></i>
               </span>
-            <span v-show="sortColumn != 'updatedTime'">
+              <span v-show="sortColumn != 'updatedTime'">
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
-          </th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="packageSet in sortedFilteredPackageSets"
-            :class="{ highlighted: packageSetIsSelected(packageSet) }">
-          <td v-if="packageSet.renaming !== ''">
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="renamePackageSet(packageSet)"
-                   v-model="packageSet.renaming"/>
-          </td>
-          <td v-else>
-            {{ packageSet.packageset.name }}
-          </td>
-          <td><button class="btn __green" @click="viewPackageSet(packageSet)">Open</button></td>
-          <td>{{ packageSet.packageset.creationTime }}</td>
-          <td>{{ packageSet.packageset.updateTime ? packageSet.packageset.updateTime:
-            'No modification' }}</td>
-          <td style="white-space: nowrap">
-            <button class="btn" @click="renamePackageSet(packageSet)">Rename</button>
-            <button class="btn" @click="copyPackageSet(packageSet)">Copy</button>
-            <button class="btn" @click="downloadPackageSet(packageSet)">Download</button>
-            <button class="btn __red" @click="deletePackageSet(packageSet)">Delete</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
-      <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
-      <button class="btn" @click="downloadPlots">Download plots</button>
+            </th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="packageSet in sortedFilteredPackageSets"
+              :class="{ highlighted: packageSetIsSelected(packageSet) }">
+            <td v-if="packageSet.renaming !== ''">
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="renamePackageSet(packageSet)"
+                     v-model="packageSet.renaming"/>
+            </td>
+            <td v-else>
+              {{ packageSet.packageset.name }}
+            </td>
+            <td><button class="btn __green" @click="viewPackageSet(packageSet)">Open</button></td>
+            <td>{{ packageSet.packageset.creationTime }}</td>
+            <td>{{ packageSet.packageset.updateTime ? packageSet.packageset.updateTime:
+              'No modification' }}</td>
+            <td style="white-space: nowrap">
+              <button class="btn" @click="renamePackageSet(packageSet)">Rename</button>
+              <button class="btn" @click="copyPackageSet(packageSet)">Copy</button>
+              <button class="btn" @click="downloadPackageSet(packageSet)">Download</button>
+              <button class="btn __red" @click="deletePackageSet(packageSet)">Delete</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
+        <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
+        <button class="btn" @click="downloadPlots">Download plots</button>
+      </div>
+
     </div>
 
     <div class="PageSection UIPlaceholder" v-if="activePackageSet.packageset != undefined">
@@ -109,7 +131,7 @@ Last update: 2018-09-24
              style="margin-left:0px; margin-bottom:10px; display:inline-block; width:100%"
              :placeholder="filterPlaceholder2"
              v-model="filterText2"/>
-             
+
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
@@ -187,6 +209,10 @@ Last update: 2018-09-24
         sortReverse2: true, // Sort diseases in reverse order?
         serverresponse: 'no response',
         showingPlots: false,
+        burdenSet: '',
+        burdenSets: [],
+        intervSet: '',
+        intervSets: [],
       }
     },
 
@@ -202,7 +228,7 @@ Last update: 2018-09-24
       sortedFilteredPackageSets() {
         return this.applyNameFilter(this.applySorting(this.packageSets))
       },
-      
+
       sortedFilteredIntervs() {
         return this.applyIntervFilter(this.applySorting2(this.resultList))
       }
@@ -242,7 +268,14 @@ Last update: 2018-09-24
         } else { // Otherwise...
           rpcs.rpc('jsonify_packagesets', [this.$store.state.activeProject.project.id]) // Get the active project's health package sets.
             .then(response => {
+              console.log('HIIIIIIIIIIIIIIIIIIIIII')
+              console.log(response.data.burdensets)
+              console.log(response.data.intervsets)
               this.packageSets = response.data.packagesets // Set the package set list to what we received.
+              this.burdenSets = response.data.burdensets
+              this.intervSets = response.data.intervsets
+              this.burdenSet = this.burdenSets[0]
+              this.intervSet = this.intervSets[0]
               for (let ind=0; ind < this.packageSets.length; ind++) { // Add numindex elements to the package sets to keep track of which index to pull from the server.
                 this.packageSets[ind].packageset.numindex = ind
               }
@@ -398,9 +431,12 @@ Last update: 2018-09-24
 
       createNewPackageSet() {
         console.log('createNewPackageSet() called')
-        rpcs.rpc('create_packageset', [this.$store.state.activeProject.project.id, 'New package set']) // Go to the server to create the new package set.
+        rpcs.rpc('create_packageset', [this.$store.state.activeProject.project.id, this.burdenSet, this.intervSet]) // Go to the server to create the new package set.
           .then(response => {
             this.updatePackageSets() // Update the package sets so the new set shows up on the list.
+          })
+          .catch(error => {
+            status.fail(this, 'Could not create new package sets', error)
           })
       },
 
@@ -413,12 +449,12 @@ Last update: 2018-09-24
           this.sortReverse2 = false // Set the sorting for non-reverse.
         }
       },
-      
+
       applyIntervFilter(intervs) {
         return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
-          (theInterv.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+        (theInterv.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
       },
-      
+
       applySorting2(results) {
         return results.sort((result1, result2) =>
           {

@@ -7,7 +7,7 @@ Version: 2018sep28
 from hptool import Project, HPpath
 from pylab import show
 
-doplot = False
+doplot = True
 
 dp = HPpath('data')
 P = Project()
@@ -26,5 +26,8 @@ P.makepackage()
 
 # Ploting
 if doplot:
-    P.burden().plot()
+#    P.burden().plot()
+    fig1 = P.package().plot_spending()
+    fig2 = P.package().plot_dalys()
+    fig3 = P.package().plot_cascade()
     show()

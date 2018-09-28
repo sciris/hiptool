@@ -7,6 +7,14 @@ import pylab as pl
 import hptool as hp
 import sciris as sc
 
+def arr(data):
+    ''' Force float, or give helpful error '''
+    try:
+        output = np.array(data, dtype=float)
+    except Exception as E:
+        errormsg = 'Data contain non-numeric values (%s):\n%s' % (str(E), data)
+        raise Exception(errormsg)
+    return output
 
 class HealthPackage(object):
     ''' Class to hold the results from the analysis. '''
@@ -17,10 +25,10 @@ class HealthPackage(object):
         self.projectref = sc.Link(project) # Store pointer for the project, if available
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
-        self.data       = None # The data
         self.eps        = 1e-4 # A nonzero value to help with division
         self.burdenset  = burdenset
         self.intervset  = intervset
+        self.data       = None # The data
         
         # Define hard-coded column names
         self.colnames = sc.odict([('active',   'Active'),
@@ -68,19 +76,12 @@ class HealthPackage(object):
             colname = self.colnames[col]
             df[col] = origdata[colname]
         
-        def arr(data):
-            try:
-                output = np.array(data, dtype=float)
-            except Exception as E:
-                errormsg = 'Data contain non-numeric values (%s):\n%s' % (str(E), data)
-                raise Exception(errormsg)
-            return output
-        
         # Calculate people covered (spending/unitcost)
         df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
         df.addcol('total_dalys')
+        df.addcol('max_dalys')
         df.addcol('total_prevalence')
         for r in range(df.nrows()):
             key = df.get(rows=r, cols='bod1')
@@ -92,23 +93,23 @@ class HealthPackage(object):
             except: df['total_dalys',r] = 0 # Warning, will want to fix
             try:    df['total_prevalence',r] = tmp_burden[burdenset.colnames['prevalence']]
             except: df['total_prevalence',r] = 0
-        
-        # Calculate 80% coverage
-        print('Not calculating 80% coverage since denominators are wrong')
+            
+        # Calculate maximum coverage
+        df['max_dalys'] = arr(df['total_dalys']) * arr(df['bod1wt'])
         
         # Current DALYs averted (spend/icer)
         df['dalys_averted'] = arr(df['spend'])/(self.eps+arr(df['icer']))
         
         # Current % of DALYs averted (dalys_averted/total_dalys)
-        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['total_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
+        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
         self.data = df # Store it
         if verbose:
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
         return None
-
+    
     def loaddata(self, filename=None, folder=None):
-        ''' Load data from a spreadsheet '''
+        ''' Load data from a spreadsheet -- WARNING, do we need this? '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
         return None
@@ -122,6 +123,10 @@ class HealthPackage(object):
         ''' Export to a JSON-friendly representation '''
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
+    
+    def optimize(self, maxbudget=None, frpweight=None, equityweight=None):
+        df = self.data
+        return None
         
     def plot_dalys(self):
         df = self.data
@@ -129,7 +134,7 @@ class HealthPackage(object):
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col='dalys_averted', reverse=True)
-        DA_data = df['dalys_averted']
+        DA_data = arr(df['dalys_averted'])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
@@ -153,7 +158,7 @@ class HealthPackage(object):
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col='spend', reverse=True)
-        DA_data = df['spend']
+        DA_data = arr(df['spend'])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
@@ -182,7 +187,7 @@ class HealthPackage(object):
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
-        DA_data = df['spend']
+        DA_data = arr(df['spend'])
         inds = sc.findinds(DA_data>cutoff)
         DA_data = DA_data[inds]
         DA_data /= 1e6
