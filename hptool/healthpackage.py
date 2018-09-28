@@ -147,8 +147,15 @@ class HealthPackage(object):
         self.equitywt = equitywt
         df = self.data
         
+        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
+        print(budget)
+        print(frpwt)
+        print(equitywt)
+        
         # Do the processing
-        df.sort(col='icer')
+        df['icerwt'] = (1 - frpwt - equitywt) + arr(df['frp'])/6.0*frpwt + arr(df['frp'])/3.0*equitywt
+        df['weightedicer'] = arr(df['icer']) * arr(df['icerwt'])
+        df.sort(col='weightedicer')
         remaining = sc.dcp(self.budget)
         max_dalys = arr(df['max_dalys'])
         icers     = arr(df['icer'])
@@ -162,8 +169,8 @@ class HealthPackage(object):
                 df['opt_spend',r] = remaining
                 df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
                 break
-        
-        self.data = df
+        df['dalys_averted'] = arr(df['dalys_averted']) * df['icerwt']
+        self.data = df # Shouldn't be necessar, but to be explicit...
         return None
         
     def plot_dalys(self, which=None):
