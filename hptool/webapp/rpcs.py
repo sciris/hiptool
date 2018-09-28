@@ -683,9 +683,8 @@ def delete_intervention(project_id, intervkey, index):
 def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.makepackage()
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['active','shortname','bod1','coverage','dalys_averted', 'frac_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['shortname','bod1','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
     output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
     if verbose: sc.pp(output)
     return output
@@ -711,10 +710,11 @@ def create_packageset(project_id, burdenset=None, intervset=None):
 
 
 @RPC()
-def optimize(project_id, packagekey):
+def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.optimize()
+    packageset.optimize(budget=sanitize(budget, forcefloat=True), frpwt=float(frpwt), equitywt=float(equitywt))
+    save_project(proj)
     return jsonify_packagesets(proj=proj)
 
 
@@ -723,16 +723,19 @@ def plot_packages(project_id, packagekey, dosave=True):
     ''' Plot the health packages '''
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
-    packageset.makepackage()
     
     # Make the plots
     figs = []
-    fig1 = packageset.plot_spending()
-    fig2 = packageset.plot_dalys()
-    fig3 = packageset.plot_cascade()
+    fig1 = packageset.plot_spending(which='current')
+    fig2 = packageset.plot_spending(which='optimized')
+    fig3 = packageset.plot_dalys(which='current')
+    fig4 = packageset.plot_dalys(which='optimized')
+    fig5 = packageset.plot_cascade()
     figs.append(fig1)
     figs.append(fig2)
     figs.append(fig3)
+    figs.append(fig4)
+    figs.append(fig5)
     figdicts = []
     for fig in figs:
         figdict = sw.mpld3ify(fig, jsonify=False)
@@ -747,4 +750,6 @@ def plot_packages(project_id, packagekey, dosave=True):
     # Return success -- WARNING, should not be hard-coded!
     return {'graph1': figdicts[0],
             'graph2': figdicts[1],
-            'graph3': figdicts[2],}
+            'graph3': figdicts[2],
+            'graph4': figdicts[3],
+            'graph5': figdicts[4],}
