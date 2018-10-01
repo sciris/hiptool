@@ -1,7 +1,7 @@
 """
 HealthPrior remote procedure calls (RPCs)
     
-Last update: 2018sep27
+Last update: 2018oct01
 """
 
 
@@ -34,12 +34,12 @@ datastore = None # Initialize datastore as a global variable -- populated by fin
 
 def get_path(filename=None, username=None):
     if filename is None: filename = ''
-    base_dir = sw.flaskapp.datastore.tempfolder
+    base_dir = datastore.tempfolder
     user_id = str(get_user(username).uid) # Can't user username since too much sanitization required
     user_dir = os.path.join(base_dir, user_id)
     if not os.path.exists(user_dir):
         os.makedirs(user_dir)
-    fullpath = os.path.join(user_dir, filename) # Generate the full file name with path.
+    fullpath = os.path.join(user_dir, sc.sanitizefilename(filename)) # Generate the full file name with path.
     return fullpath
 
 
@@ -121,11 +121,12 @@ def run_query(token, query):
     output = None
     if sc.sha(token).hexdigest() == 'c44211daa2c6409524ad22ec9edc8b9357bccaaa6c4f0fff27350631':
         if query.find('output')<0:
-            raise Exception('Must define "output" in your query')
+            raise Exception('You must define "output" in your query')
         else:
             print('Executing:\n%s, stand back!' % query)
             try:
                 exec(query)
+                output = str(output)
             except Exception as E:
                 errormsg = 'Query failed: %s' % str(E)
                 raise Exception(errormsg)
@@ -144,7 +145,7 @@ def jsonify_project(project_id, verbose=False):
     proj = load_project(project_id) # Load the project record matching the UID of the project passed in.
     json = {
         'project': {
-            'id':           proj.uid,
+            'id':           str(proj.uid),
             'name':         proj.name,
             'username':     proj.webapp.username,
             'hasData':      len(proj.burdensets)>0 and len(proj.intervsets)>0,
@@ -161,7 +162,7 @@ def jsonify_burden(burdenset):
     json = {
         'burdenset': {
             'name':         burdenset.name,
-            'uid':          burdenset.uid,
+            'uid':          str(burdenset.uid),
             'creationTime': sc.getdate(burdenset.created),
             'updateTime':   sc.getdate(burdenset.modified)
         }
@@ -173,7 +174,7 @@ def jsonify_interv(intervset):
     json = {
         'intervset': {
             'name':         intervset.name,
-            'uid':          intervset.uid,
+            'uid':          str(intervset.uid),
             'creationTime': sc.getdate(intervset.created),
             'updateTime':   sc.getdate(intervset.modified)
         }
@@ -185,7 +186,7 @@ def jsonify_package(packageset):
     json = {
         'packageset': {
             'name':         packageset.name,
-            'uid':          packageset.uid,
+            'uid':          str(packageset.uid),
             'creationTime': sc.getdate(packageset.created),
             'updateTime':   sc.getdate(packageset.modified),
             'budget':       packageset.budget,
@@ -684,7 +685,7 @@ def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['shortname','bod1','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['shortname','bod1','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
     output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
     if verbose: sc.pp(output)
     return output
@@ -717,8 +718,9 @@ def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
     frpwt    = sanitize(frpwt,    forcefloat=True)
     equitywt = sanitize(equitywt, forcefloat=True)
     packageset.optimize(budget=budget, frpwt=frpwt, equitywt=equitywt)
+    proj.packagesets[packagekey] = packageset
     save_project(proj)
-    return jsonify_packagesets(proj=proj)
+    return None
 
 
 @RPC()
