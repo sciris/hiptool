@@ -5,7 +5,8 @@ services:
       context: .
       args:
         PORT: '80'
-        REDIS_URL: 'redis://10.0.0.19:6379/5'
+        # REDIS_URL: 'redis://10.0.0.19:6379/5' # asia-southeast1-a
+        REDIS_URL: 'redis://10.0.0.3:6379/5' # europe-west1-b
     command: python run.py
     ports:
      - '80:80'
