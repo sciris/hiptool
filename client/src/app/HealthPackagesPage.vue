@@ -176,6 +176,11 @@ Last update: 2018-09-24
             <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
+          <th @click="updateSorting2('icer')" class="sortable">ICER
+            <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
           <th @click="updateSorting2('spend')" class="sortable">Spending
             <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
@@ -202,6 +207,7 @@ Last update: 2018-09-24
         <tr v-for="result in sortedFilteredIntervs">
           <td>{{ result.name }}</td>
           <td>{{ result.cause }}</td>
+          <td>{{ result.icer }}</td>
           <td>{{ result.spend }}</td>
           <td>{{ result.opt_spend }}</td>
           <td>{{ result.averted }}</td>
@@ -303,9 +309,9 @@ Last update: 2018-09-24
       optimize() {
         rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex, this.budget, this.frpwt, this.equitywt])
           .then(response => {
-            this.updatePackageSets(true)
-            status.update(this, 'Optimized')
             console.log('Optimized')
+            status.succeed(this, 'Optimized')
+            this.updatePackageSets(true)
           })
       },
 
@@ -390,10 +396,11 @@ Last update: 2018-09-24
               this.resultList[ind].numindex =   ind
               this.resultList[ind].name =         this.resultList[ind][0]
               this.resultList[ind].cause =        this.resultList[ind][1]
-              this.resultList[ind].spend =     Math.round(Number(this.resultList[ind][2])).toLocaleString()
-              this.resultList[ind].opt_spend = Math.round(Number(this.resultList[ind][3])).toLocaleString()
-              this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][4])).toLocaleString()
-              this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][5])).toLocaleString()
+              this.resultList[ind].icer =         Math.round(Number(this.resultList[ind][2])).toLocaleString()
+              this.resultList[ind].spend =        Math.round(Number(this.resultList[ind][3])).toLocaleString()
+              this.resultList[ind].opt_spend =    Math.round(Number(this.resultList[ind][4])).toLocaleString()
+              this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][5])).toLocaleString()
+              this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][6])).toLocaleString()
             }
             this.sortColumn2 = 'name' // Reset the bottom table sorting state.
             this.sortReverse2 = false
@@ -509,12 +516,13 @@ Last update: 2018-09-24
         return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')         {return (result1[0] > result2[0] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'cause')        {return (result1[1] > result2[1] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'spend')     {return (result1[2] > result2[2] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'opt_spend') {return (result1[3] > result2[3] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'averted')      {return (result1[4] > result2[4] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'opt_averted')  {return (result1[5] > result2[5] ? sortDir: -sortDir)}
+            if      (this.sortColumn2 === 'name')        {return (result1[0] > result2[0] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'cause')       {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'icer')        {return (result1[2] > result2[2] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'spend')       {return (result1[3] > result2[3] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_spend')   {return (result1[4] > result2[4] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'averted')     {return (result1[5] > result2[5] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_averted') {return (result1[6] > result2[6] ? sortDir: -sortDir)}
           }
         )
       },
