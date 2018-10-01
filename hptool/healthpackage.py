@@ -193,8 +193,8 @@ class HealthPackage(object):
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
-        plot_data = plot_data.round()
-#        total_averted = (plot_data.sum()/1e3)
+#        plot_data = plot_data.round()
+        total_averted = (plot_data.sum()*1e3)
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
@@ -202,8 +202,7 @@ class HealthPackage(object):
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-#        pl.title("%s DALYs averted\n('000s; total: %0.2f million)" % (titlekey, total_averted))
-        pl.title("%s DALYs averted" % (titlekey))
+        pl.title("%s DALYs averted ('000s; total: %0.0f)" % (titlekey, total_averted))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
@@ -229,16 +228,15 @@ class HealthPackage(object):
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
 #        plot_data = plot_data.round()
-#        total_averted = (plot_data.sum())
-        data_labels = ['$%0.3fm'%datum for datum in plot_data]
+        total_averted = (plot_data.sum())
+        data_labels = ['%0.1fm'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
         plot_labels.append('Other')
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("%s spending" % (titlekey))
-#        pl.title("%s spending\n(total: $%0.3f million)" % (titlekey, total_averted))
+        pl.title("%s spending (total: %0.3f million)" % (titlekey, total_averted))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
