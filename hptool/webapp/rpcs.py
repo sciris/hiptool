@@ -685,7 +685,7 @@ def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['shortname','bod1','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['shortname','bod1','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
     output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
     if verbose: sc.pp(output)
     return output
@@ -718,8 +718,9 @@ def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
     frpwt    = sanitize(frpwt,    forcefloat=True)
     equitywt = sanitize(equitywt, forcefloat=True)
     packageset.optimize(budget=budget, frpwt=frpwt, equitywt=equitywt)
+    proj.packagesets[packagekey] = packageset
     save_project(proj)
-    return jsonify_packagesets(proj=proj)
+    return None
 
 
 @RPC()

@@ -109,7 +109,7 @@ class HealthPackage(object):
         df['dalys_averted'] = arr(df['spend'])/(self.eps+arr(df['icer']))
         
         # Current % of DALYs averted (dalys_averted/total_dalys)
-        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
+#        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
 
         # To populate with optimization results
         self.budget = arr(df['spend']).sum()
@@ -137,7 +137,7 @@ class HealthPackage(object):
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
     
-    def optimize(self, budget=None, frpwt=None, equitywt=None):
+    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
         # Handle inputs
         if budget   is None: budget = self.budget
         if frpwt    is None: frpwt     = self.frpwt
@@ -145,22 +145,32 @@ class HealthPackage(object):
         self.budget   = budget
         self.frpwt    = frpwt
         self.equitywt = equitywt
-        df = self.data
+        df = sc.dcp(self.data)
         
-        print('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
-        print(budget)
-        print(frpwt)
-        print(equitywt)
+        if verbose:
+            print('Optimization inputs:')
+            print('         Budget: %s' % self.budget)
+            print('     FRP weight: %s' % self.frpwt)
+            print('  Equity weight: %s' % self.equitywt)
         
         # Do the processing
-        df['icerwt'] = (1 - frpwt - equitywt) + arr(df['frp'])/6.0*frpwt + arr(df['frp'])/3.0*equitywt
-        df['weightedicer'] = arr(df['icer']) * arr(df['icerwt'])
-        df.sort(col='weightedicer')
+        frpdata = sc.dcp(arr(df['frp']))
+        frpdata += 1.0 - frpdata.min()
+        frpdata /= frpdata.max()
+        equitydata = sc.dcp(arr(df['equity']))
+        equitydata += 1 - equitydata.min()
+        equitydata /= equitydata.max()
+        equitydata = 1.0 - equitydata
+        df['icerwt'] = (1-frpwt-equitywt) + frpdata*frpwt + equitydata*equitywt
+        df['benefit'] = (1.0/(arr(df['icer'])+self.eps)) * arr(df['icerwt'])
+        df.sort(col='benefit', reverse=True)
         remaining = sc.dcp(self.budget)
         max_dalys = arr(df['max_dalys'])
         icers     = arr(df['icer'])
+        if verbose: print('Optimizing...')
         for r in range(df.nrows()):
             max_spend = max_dalys[r]*icers[r]
+            if verbose: print('  row %s | remaining %s | name %s | icer %s | icerwt %s | benefit %s | max_dalys %s | max_spend %s' % (r, remaining, df['shortname',r], df['icer',r], df['icerwt',r], df['benefit',r], max_dalys[r], max_spend))
             if remaining >= max_spend:
                 remaining -= max_spend
                 df['opt_spend',r] = max_spend
@@ -168,10 +178,14 @@ class HealthPackage(object):
             else:
                 df['opt_spend',r] = remaining
                 df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
-                break
-        df['dalys_averted'] = arr(df['dalys_averted']) * df['icerwt']
-        self.data = df # Shouldn't be necessar, but to be explicit...
-        return None
+                remaining = 0
+#        df['dalys_averted'] = arr(df['dalys_averted']) * df['icerwt']
+        df.sort(col='shortname')
+        self.data = df
+        if verbose:
+            print('Optimization output:')
+            print(self.data)
+        return self.data
         
     def plot_dalys(self, which=None):
         if which is None: which = 'current'
