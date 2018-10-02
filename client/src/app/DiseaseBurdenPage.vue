@@ -250,10 +250,13 @@ Last update: 2018sep24
         diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
         sortColumn2: 'name',  // Column of table used for sorting the diseases
         sortReverse2: false, // Sort diseases in reverse order?
-        country: 'Afghanistan', // CK: WARNING TEMP, should come from backend
+        country: 'Afghanistan',
         countryList: [
           'Afghanistan',
-          'Other',
+          'Argentina',
+          'Cambodia',
+          "Cote d'Ivoire",
+          'Zimbabwe',
         ],
         showingPlots: false,
         graphData: [],
@@ -473,7 +476,7 @@ Last update: 2018sep24
 
       createNewBurdenSet() {
         console.log('createNewBurdenSet() called')
-        rpcs.rpc('create_burdenset', [this.$store.state.activeProject.project.id, 'New burden set']) // Go to the server to create the new burden set.
+        rpcs.rpc('create_burdenset', [this.$store.state.activeProject.project.id, this.country]) // Go to the server to create the new burden set.
           .then(response => {
           this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
         })

@@ -513,10 +513,11 @@ def jsonify_diseases(project_id, burdenkey):
 
 
 @RPC()    
-def create_burdenset(project_id, newname):
+def create_burdenset(project_id, country):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.burdensets.keys())
-    newburdenset = hp.Burden(project=proj, name=unique_name)
+    unique_name = sc.uniquename(country, namelist=proj.burdensets.keys())
+    filename = hp.HPpath('data')+country+' BoD.xlsx'
+    newburdenset = hp.Burden(project=proj, name=unique_name, filename=filename)
     proj.burdensets[unique_name] = newburdenset # Put the new burden set in the dictionary.
     save_project(proj)
     return jsonify_burdensets(proj=proj)

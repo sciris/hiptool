@@ -2,8 +2,9 @@
 Version:
 """
 
-import sciris as sc
 import pylab as pl
+import sciris as sc
+import hptool as hp
 
 class Burden(object):
     '''
@@ -15,7 +16,7 @@ class Burden(object):
     
     From http://ghdx.healthdata.org/gbd-results-tool
     
-    Version: 2018sep27
+    Version: 2018oct02
     '''
     
     def __init__(self, name=None, project=None, filename=None, folder=None):
@@ -114,7 +115,20 @@ class Burden(object):
             # Process data
             df.sort(col=colname, reverse=True)
             topdata   = df[:n]
-            barvals   = topdata[colname]
+            try:
+                barvals   = hp.arr(topdata[colname])
+            except Exception as E:
+                for r in range(topdata.nrows()):
+                    try:
+                        float(topdata[colname,r])
+                    except Exception as E2:
+                        if topdata[colname,r] in ['', None]:
+                            errormsg = 'For cause "%s", the "%s" value is missing or empty' % (topdata[self.colnames['cause'],r], colname)
+                        else:
+                            errormsg = 'For cause "%s", could not convert "%s" value "%s" to number: %s' % (topdata[self.colnames['cause'],r], colname, topdata[colname,r], str(E2))
+                        raise Exception(errormsg)
+                errormsg = 'An exception was encountered, but could not be reproduced: %s' % str(E)
+                raise Exception(errormsg)
             barinds   = topdata[self.colnames['index']]
             barlabels = topdata[self.colnames['cause']].tolist()
             
