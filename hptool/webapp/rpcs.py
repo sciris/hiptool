@@ -628,16 +628,15 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervkey].data[intervind]
     if verbose: print('Original intervention set record:\n%s' % data_record)
-    data_record[1] = sanitize(data[0]) # Active
-    data_record[3] = data[1]           # Name
-    data_record[4] = sanitize(data[2]) # Platform
-    data_record[5] = sanitize(data[3]) # BoD 1
-    data_record[6] = sanitize(data[4]) # BoD 1 weight
-    data_record[11] = sanitize(data[5]) # ICER
-    data_record[12] = sanitize(data[6]) # Unit cost
-    data_record[13] = sanitize(data[7]) # Spend
-    data_record[14] = sanitize(data[8]) # FRP
-    data_record[15] = sanitize(data[9]) # Equity
+    data_record[1]  = sanitize(data[0]) # Active
+    data_record[3]  = data[1]           # Name
+    data_record[4]  = data[2]           # Platform
+    data_record[5]  = data[3]           # Burdencov
+    data_record[6]  = sanitize(data[5]) # ICER
+    data_record[7]  = sanitize(data[6]) # Unit cost
+    data_record[8]  = sanitize(data[7]) # Spend
+    data_record[9]  = sanitize(data[8]) # FRP
+    data_record[10] = sanitize(data[9]) # Equity
     if verbose: print('New intervention set record:\n%s' % data_record)
     make_package(proj, die=False) # Update with the latest data
     save_project(proj)
@@ -685,7 +684,7 @@ def jsonify_packages(project_id, packagekey, verbose=True):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['shortname','bod1','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['shortname','burdencov','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
     output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
     if verbose: sc.pp(output)
     return output

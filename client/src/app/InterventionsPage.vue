@@ -130,13 +130,12 @@ Last update: 2018sep24
             <span v-show="sortColumn2 == 'platform' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'platform'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('bod1')" class="sortable" style="min-width:30%">
-            Cause&nbsp;of&nbsp;burden
-            <span v-show="sortColumn2 == 'bod1' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'bod1' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'bod1'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          <th @click="updateSorting2('burdencov')" class="sortable" style="min-width:30%">
+            Cause&nbsp;of&nbsp;burden (max coverage)
+            <span v-show="sortColumn2 == 'burdencov' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'burdencov' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'burdencov'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th>Max&nbsp;coverage</th>
           <th @click="updateSorting2('icer')" class="sortable" style="min-width:30%">
             ICER
             <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
@@ -194,13 +193,7 @@ Last update: 2018sep24
             <input type="text"
                    class="txbox"
                    @keyup.enter="updateInterv(interv)"
-                   v-model="interv.bod1"/>
-          </td>
-          <td>
-            <input type="text"
-                   class="txbox"
-                   @keyup.enter="updateInterv(interv)"
-                   v-model="interv.bod1wt"/>
+                   v-model="interv.burdencov"/>
           </td>
           <td>
             <input type="text"
@@ -379,9 +372,9 @@ Last update: 2018sep24
       },
       
       applyIntervFilter(intervs) {
-        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
-                                           (theInterv.platform.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
-                                           (theInterv.bod1.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase())      !== -1) ||
+                                           (theInterv.platform.toLowerCase().indexOf(this.filterText2.toLowerCase())  !== -1) ||
+                                           (theInterv.burdencov.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
       },
       
       applySorting2(intervs) {
@@ -390,7 +383,7 @@ Last update: 2018sep24
             let sortDir = this.sortReverse2 ? -1: 1
             if      (this.sortColumn2 === 'name')     { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'platform') { return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'bod1')     { return (String(interv1[5]).toLowerCase() > String(interv2[5]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[5]).toLowerCase() > String(interv2[5]).toLowerCase() ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'icer')     { return (String(interv1[11]) > String(interv2[11]) ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'unitcost') { return (String(interv1[12]) > String(interv2[12]) ? sortDir: -sortDir) }
             else if (this.sortColumn2 === 'spend')    { return (String(interv1[13]) > String(interv2[13]) ? sortDir: -sortDir) }
@@ -411,17 +404,12 @@ Last update: 2018sep24
               this.interventionList[ind].active   = (this.interventionList[ind][1] > 0)
               this.interventionList[ind].name     = this.interventionList[ind][3]
               this.interventionList[ind].platform = this.interventionList[ind][4]
-              this.interventionList[ind].bod1     = this.interventionList[ind][5]
-              this.interventionList[ind].bod1wt   = this.interventionList[ind][6]
-              this.interventionList[ind].bod2     = this.interventionList[ind][7] // CK: Warning, these aer much too wide for the table...
-              this.interventionList[ind].bod2wt   = this.interventionList[ind][8]
-              this.interventionList[ind].bod3     = this.interventionList[ind][9]
-              this.interventionList[ind].bod3wt   = this.interventionList[ind][10]
-              this.interventionList[ind].icer     = Number(this.interventionList[ind][11]).toLocaleString()
-              this.interventionList[ind].unitcost = Number(this.interventionList[ind][12]).toLocaleString()
-              this.interventionList[ind].spend    = Number(this.interventionList[ind][13]).toLocaleString()
-              this.interventionList[ind].frp      = Number(this.interventionList[ind][14]).toLocaleString()
-              this.interventionList[ind].equity   = Number(this.interventionList[ind][15]).toLocaleString()
+              this.interventionList[ind].burdencov= this.interventionList[ind][5]
+              this.interventionList[ind].icer     = Number(this.interventionList[ind][6]).toLocaleString()
+              this.interventionList[ind].unitcost = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].spend    = Number(this.interventionList[ind][8]).toLocaleString()
+              this.interventionList[ind].frp      = Number(this.interventionList[ind][9]).toLocaleString()
+              this.interventionList[ind].equity   = Number(this.interventionList[ind][10]).toLocaleString()
             }
           })
           .catch(error => {
@@ -503,7 +491,7 @@ Last update: 2018sep24
         console.log('Active?: ',   interv.active)
         console.log('Name: ',      interv.name)
         console.log('Platform: ',  interv.platform)
-        console.log('BoD1: ',      interv.bod1)
+        console.log('Burden-cov: ',interv.burdencov)
         console.log('ICER: ',      interv.icer)
         console.log('Unit cost: ', interv.unitcost)
         console.log('FRP: ',       interv.frp)
@@ -511,7 +499,7 @@ Last update: 2018sep24
         let filterActive = interv.active ? 1 : 0 // Do format filtering to prepare the data to pass to the RPC.
         rpcs.rpc('update_intervention', // Go to the server to update the intervention from the intervention set. Note: filter out commas in the numeric fields.
           [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex,
-            [filterActive, interv.name, interv.platform, interv.bod1, interv.bod1wt,
+            [filterActive, interv.name, interv.platform, interv.burdencov,
               interv.icer.replace(/,/g, ''),
               interv.unitcost.replace(/,/g, ''),
               interv.spend.replace(/,/g, ''),

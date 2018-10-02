@@ -78,7 +78,7 @@ class HealthPackage(object):
         df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
-        df.addcol('total_dalys',      value=0)
+        df.addcol('total_dalys',      value=0) # Value=0 by default, but just to be explicit
         df.addcol('max_dalys',        value=0)
         df.addcol('total_prevalence', value=0)
         df.addcol('dalys_averted',    value=0)
@@ -93,7 +93,6 @@ class HealthPackage(object):
                     df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
                     df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
                     df['max_dalys',r]        += df['total_dalys',r] * val
-                    print('HIIIIIIIIII %s %s' % (key, thisburden[burdenset.colnames['dalys']]))
                 except Exception as E:
                     notfound.append(key)
         
