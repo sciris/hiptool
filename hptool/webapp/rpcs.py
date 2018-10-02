@@ -611,10 +611,11 @@ def jsonify_interventions(project_id, intervkey=None, verbose=True):
 
 
 @RPC()
-def create_intervset(project_id, newname):
+def create_intervset(project_id, country):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
-    new_intervset = hp.Interventions(project=proj, name=unique_name)
+    unique_name = sc.uniquename(country, namelist=proj.intervsets.keys())
+    filename = hp.HPpath('data')+country+' interventions.xlsx'
+    new_intervset = hp.Interventions(project=proj, name=unique_name, filename=filename)
     proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
     save_project(proj)
     return jsonify_intervsets(proj=proj)
@@ -666,7 +667,7 @@ def copy_intervention(project_id, intervkey, index):
 def delete_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
-    data.pop(index)
+    data.rmrow(key=index)
     save_project(proj)
     return None
 

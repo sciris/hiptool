@@ -16,18 +16,16 @@ Last update: 2018sep24
     <div class="PageSection" v-if="activeProjectName !== ''">
 
       <button class="btn" @click="createNewSet">Create new intervention set</button>
-
-      <!--<span>&nbsp;based on&nbsp;</span>-->
-
-      <!--<select-->
-        <!--title="countrySelect"-->
-        <!--id="country"-->
-        <!--:required="true"-->
-        <!--v-model="country">-->
-        <!--<option v-for = "country in countryList" :value="country">-->
-          <!--{{country}}-->
-        <!--</option>-->
-      <!--</select>-->
+      <span>&nbsp;based on&nbsp;</span>
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option v-for = "country in countryList" :value="country">
+          {{country}}
+        </option>
+      </select>
 
       <br/><br/>
 
@@ -260,12 +258,9 @@ Last update: 2018sep24
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
         interventionList: [],
-
-        // CK: WARNING TEMP, should come from backend
-        country: 'Afghanistan',
+        country: 'DCP3',
         countryList: [
-          'Afghanistan',
-          'Other',
+          'DCP3',
         ]
       }
     },
@@ -424,7 +419,10 @@ Last update: 2018sep24
         console.log('copySet() called for ' + intervSet.intervset.name)
         rpcs.rpc('copy_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex]) // Have the server copy the intervention set, giving it a new name.
           .then(response => {
-            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
+            this.updateIntervSets(true) // Update the intervention sets so the new set shows up on the list.
+          })
+          .catch(error => {
+            status.fail(this, 'Could not copy interventions set', error)
           })
       },
 
@@ -432,7 +430,7 @@ Last update: 2018sep24
         console.log('uploadIntervSet() called for ' + intervSet.intervset.name)
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex], {}, '.xlsx')
           .then(response => {
-            this.updateIntervSets()
+            this.updateIntervSets(true)
             status.succeed(this, 'Intervention set uploaded')
           })
           .catch(error => {
@@ -446,6 +444,9 @@ Last update: 2018sep24
           .then(response => {
             console.log('Downloaded')
           })
+          .catch(error => {
+            status.fail(this, 'Could not download interventions set', error)
+          })
       },
 
       renameSet(intervSet) {
@@ -457,6 +458,9 @@ Last update: 2018sep24
             .then(response => {
               this.updateIntervSets() // Update the intervention sets so the renamed one shows up on the list.
               intervSet.renaming = '' // Turn off the renaming mode.
+            })
+            .catch(error => {
+              status.fail(this, 'Could not rename interventions set', error)
             })
         }
 
@@ -473,15 +477,21 @@ Last update: 2018sep24
         console.log('deleteSet() called for ' + intervSet.intervset.name)
         rpcs.rpc('delete_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex]) // Go to the server to delete the intervention set.
           .then(response => {
-            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
+            this.updateIntervSets(true) // Update the intervention sets so the new set shows up on the list.
+          })
+          .catch(error => {
+            status.fail(this, 'Could not delete interventions set', error)
           })
       },
 
       createNewSet() {
         console.log('createNewSet() called')
-        rpcs.rpc('create_intervset', [this.$store.state.activeProject.project.id, 'New intervention set']) // Go to the server to create the new intervention set.
+        rpcs.rpc('create_intervset', [this.$store.state.activeProject.project.id, this.country]) // Go to the server to create the new intervention set.
           .then(response => {
-            this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
+            this.updateIntervSets(true) // Update the intervention sets so the new set shows up on the list.
+          })
+          .catch(error => {
+            status.fail(this, 'Could not create new interventions set', error)
           })
       },
 
@@ -509,6 +519,9 @@ Last update: 2018sep24
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention set updated')
           })
+          .catch(error => {
+            status.fail(this, 'Could not update interventions set', error)
+          })
       },
 
       addInterv() {
@@ -517,6 +530,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention added')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not add intervention', error)
           })
       },
 
@@ -527,6 +543,9 @@ Last update: 2018sep24
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention copied')
           })
+          .catch(error => {
+            status.fail(this, 'Could not copy intervention', error)
+          })
       },
 
       deleteInterv(interv) {
@@ -535,6 +554,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewSet(this.activeIntervSet) // Update the display of the intervention list by rerunning the active intervention set.
             status.succeed(this, 'Intervention deleted')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not delete intervention', error)
           })
       },
     }

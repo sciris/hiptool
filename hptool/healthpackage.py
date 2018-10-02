@@ -39,7 +39,7 @@ class HealthPackage(object):
         return output
     
     
-    def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True):
+    def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True, die=False):
         ''' Make results '''
         # Handle inputs
         if burdenset is not None: self.burdenset = burdenset # Warning, name is used both as key and actual set!
@@ -99,10 +99,12 @@ class HealthPackage(object):
             df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
             if df['dalys_averted',r]>df['max_dalys',r]:
                 errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
+                df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
                 invalid.append(errormsg)
         if len(invalid):
             errors = '\n\n'.join(invalid)
-            raise Exception(errors)
+            if die: raise Exception(errors)
+            else:   print(errors)
             
         # To populate with optimization results
         self.budget = hp.arr(df['spend']).sum()
@@ -134,7 +136,7 @@ class HealthPackage(object):
         return output
     
     
-    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
+    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=True):
         # Handle inputs
         if budget   is None: budget = self.budget
         if frpwt    is None: frpwt     = self.frpwt
