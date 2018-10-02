@@ -131,7 +131,7 @@ Last update: 2018sep24
             <span v-show="sortColumn2 != 'platform'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
           <th @click="updateSorting2('burdencov')" class="sortable" style="min-width:30%">
-            Cause&nbsp;of&nbsp;burden (max coverage)
+            Cause&nbsp;of&nbsp;burden&nbsp;(max&nbsp;coverage)
             <span v-show="sortColumn2 == 'burdencov' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'burdencov' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'burdencov'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>

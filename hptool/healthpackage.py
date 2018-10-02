@@ -36,6 +36,7 @@ class HealthPackage(object):
         if makepackage: self.makepackage()
         return None
     
+    
     def __repr__(self):
         ''' Print out useful information when called'''
         output  = sc.prepr(self)
@@ -45,6 +46,7 @@ class HealthPackage(object):
         output += '                 UID: %s\n'    % self.uid
         output += '============================================================\n'
         return output
+    
     
     def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True):
         ''' Make results '''
@@ -63,7 +65,7 @@ class HealthPackage(object):
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
         print(origdata.cols)
-        critical_cols = ['active', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        critical_cols = ['active', 'burdencov', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         for col in critical_cols:
             origdata.filter_out(key='', col=colnames[col], verbose=True)
         origdata.replace(col=colnames['spend'], old='', new=0.0)
@@ -121,21 +123,25 @@ class HealthPackage(object):
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
         return None
     
+    
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet -- WARNING, do we need this? '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
         return None
     
+    
     def savedata(self, filename=None, folder=None):
         ''' Export data from a spreadsheet '''
         filepath = self.data.export(filename=filename)
         return filepath
         
+        
     def jsonify(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
+    
     
     def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
         # Handle inputs
@@ -179,13 +185,13 @@ class HealthPackage(object):
                 df['opt_spend',r] = remaining
                 df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
                 remaining = 0
-#        df['dalys_averted'] = arr(df['dalys_averted']) * df['icerwt']
         df.sort(col='shortname')
         self.data = df
         if verbose:
             print('Optimization output:')
             print(self.data)
         return self.data
+        
         
     def plot_dalys(self, which=None):
         if which is None: which = 'current'
@@ -220,6 +226,7 @@ class HealthPackage(object):
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
+    
     
     def plot_spending(self, which=None):
         if which is None: which = 'current'
