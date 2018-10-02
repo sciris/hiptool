@@ -57,12 +57,13 @@ class HealthPackage(object):
         self.equitywt = equitywt
         burdenset = self.projectref().burden(key=self.burdenset)
         intervset = self.projectref().interv(key=self.intervset)
+        intervset.parse() # Ensure it's parsed
         colnames = intervset.colnames
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
         print(origdata.cols)
-        critical_cols = ['active', 'burdencov', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        critical_cols = ['active', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         for col in critical_cols:
             origdata.filter_out(key='', col=colnames[col], verbose=True)
         origdata.replace(col=colnames['spend'], old='', new=0.0)
@@ -84,7 +85,7 @@ class HealthPackage(object):
         df.addcol('dalys_averted',    value=0)
         notfound = []
         for r in range(df.nrows()):
-            theseburdencovs = df['burdencov', r]
+            theseburdencovs = df['parsedbc', r]
             for burdencov in theseburdencovs:
                 key = burdencov[0]
                 val = burdencov[1]

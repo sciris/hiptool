@@ -30,6 +30,7 @@ class Interventions(object):
         self.colnames = sc.odict([('active',   'Active'),
                                   ('shortname','Short name'),
                                   ('burdencov','Causes of burden (max coverage)'),
+                                  ('parsedbc', 'parsedbc'),
                                   ('icer',     'ICER'),
                                   ('unitcost', 'Unit cost'),
                                   ('spend',    'Spending'),
@@ -51,15 +52,19 @@ class Interventions(object):
         output += '============================================================\n'
         return output
     
-    def loaddata(self, filename=None, folder=None, verbose=True):
-        ''' Load data from a spreadsheet '''
-        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
-        self.filename = filename
+    
+    def parse(self, rows=None, verbose=False):
+        if verbose: print('Parsing data...')
+        burdencov = sc.dcp(self.data[self.colnames['burdencov']])
         
-        # Do validation
-        if verbose: print('Validating data...')
-        burdencov = self.data[self.colnames['burdencov']]
-        for r,thisburdencov in enumerate(burdencov):
+        # Validation
+        if 'parsedbc' not in self.data.cols: self.data.addcol('parsedbc')
+        if rows is None: rows = range(len(burdencov))
+        else:            rows = sc.promotetolist(rows)
+            
+        # Iterate
+        for r in rows:
+            thisburdencov = burdencov[r]
             if verbose: print('Working on "%s"' % thisburdencov)
             try:
                 burdencovsplit = thisburdencov.split(';') # Try to split into causes
@@ -83,7 +88,15 @@ class Interventions(object):
                         errormsg = 'Maximum coverage must be between 0 and 1, not %s (from "%s")' % (thisbcsplit[1], thisburdencov)
                         raise Exception(errormsg)
             
-            self.data[self.colnames['burdencov'], r] = burdencovsplit # Save back to the data structure
+            self.data['parsedbc', r] = burdencovsplit # Save back to the data structure
+        return None
+        
+    
+    def loaddata(self, filename=None, folder=None):
+        ''' Load data from a spreadsheet '''
+        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.filename = filename
+        self.parse()
         return None
     
     def savedata(self, filename=None, folder=None):

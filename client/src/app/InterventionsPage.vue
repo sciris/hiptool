@@ -380,15 +380,15 @@ Last update: 2018sep24
       applySorting2(intervs) {
         return intervs.sort((interv1, interv2) =>
           {
-            let sortDir = this.sortReverse2 ? -1: 1
-            if      (this.sortColumn2 === 'name')     { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[5]).toLowerCase() > String(interv2[5]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'icer')     { return (String(interv1[11]) > String(interv2[11]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[12]) > String(interv2[12]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'spend')    { return (String(interv1[13]) > String(interv2[13]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'frp')      { return (String(interv1[14]) > String(interv2[14]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'equity')   { return (String(interv1[15]) > String(interv2[15]) ? sortDir: -sortDir) }
+            let sortDir = this.sortReverse2 ? -1: 1 // Warning: hard-coded to spreadsheet
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[2]).toLowerCase() > String(interv2[2]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
           }
         )
       },
@@ -400,16 +400,16 @@ Last update: 2018sep24
           .then(response => {
             this.interventionList = response.data.interventions // Set the interventions table list.
             for (let ind=0; ind < this.interventionList.length; ind++) { // Set the active values from the loaded in data.
-              this.interventionList[ind].numindex = ind
+              this.interventionList[ind].numindex = this.interventionList[ind][0] // Warning: hard-coded to spreadsheet
               this.interventionList[ind].active   = (this.interventionList[ind][1] > 0)
-              this.interventionList[ind].name     = this.interventionList[ind][3]
-              this.interventionList[ind].platform = this.interventionList[ind][4]
-              this.interventionList[ind].burdencov= this.interventionList[ind][5]
-              this.interventionList[ind].icer     = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].unitcost = Number(this.interventionList[ind][7]).toLocaleString()
-              this.interventionList[ind].spend    = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].frp      = Number(this.interventionList[ind][9]).toLocaleString()
-              this.interventionList[ind].equity   = Number(this.interventionList[ind][10]).toLocaleString()
+              this.interventionList[ind].name     = this.interventionList[ind][2]
+              this.interventionList[ind].platform = this.interventionList[ind][3]
+              this.interventionList[ind].burdencov= this.interventionList[ind][4]
+              this.interventionList[ind].icer     = Number(this.interventionList[ind][5]).toLocaleString()
+              this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
+              this.interventionList[ind].spend    = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].frp      = Number(this.interventionList[ind][8]).toLocaleString()
+              this.interventionList[ind].equity   = Number(this.interventionList[ind][9]).toLocaleString()
             }
           })
           .catch(error => {
@@ -498,7 +498,7 @@ Last update: 2018sep24
         console.log('Equity: ',    interv.equity)
         let filterActive = interv.active ? 1 : 0 // Do format filtering to prepare the data to pass to the RPC.
         rpcs.rpc('update_intervention', // Go to the server to update the intervention from the intervention set. Note: filter out commas in the numeric fields.
-          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex,
+          [this.$store.state.activeProject.project.id, this.activeIntervSet.intervset.numindex, interv.numindex, // Warning: hard-coded to spreadsheet
             [filterActive, interv.name, interv.platform, interv.burdencov,
               interv.icer.replace(/,/g, ''),
               interv.unitcost.replace(/,/g, ''),

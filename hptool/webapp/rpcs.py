@@ -623,12 +623,12 @@ def create_intervset(project_id, newname):
     return jsonify_intervsets(proj=proj)
 
 
-@RPC()
+@RPC() # Warning: hard-coded to spreadsheet
 def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervkey].data[intervind]
     if verbose: print('Original intervention set record:\n%s' % data_record)
-    data_record[1]  = sanitize(data[0]) # Active
+    data_record[1]  = sanitize(data[0]) # Active 
     data_record[3]  = data[1]           # Name
     data_record[4]  = data[2]           # Platform
     data_record[5]  = data[3]           # Burdencov
