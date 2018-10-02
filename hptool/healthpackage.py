@@ -78,29 +78,35 @@ class HealthPackage(object):
         df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
-        df.addcol('total_dalys')
-        df.addcol('max_dalys')
-        df.addcol('total_prevalence')
+        df.addcol('total_dalys',      value=0)
+        df.addcol('max_dalys',        value=0)
+        df.addcol('total_prevalence', value=0)
+        df.addcol('dalys_averted',    value=0)
+        notfound = []
         for r in range(df.nrows()):
-            key = df.get(rows=r, cols='bod1')
-            try:
-                tmp_burden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True)
-            except:
-                raise hp.HPException('Burden "%s" not found' % key)
-            try:    df['total_dalys',r] = tmp_burden[burdenset.colnames['dalys']]
-            except: df['total_dalys',r] = 0 # Warning, will want to fix
-            try:    df['total_prevalence',r] = tmp_burden[burdenset.colnames['prevalence']]
-            except: df['total_prevalence',r] = 0
+            theseburdencovs = df['burdencov', r]
+            for burdencov in theseburdencovs:
+                key = burdencov[0]
+                val = burdencov[1]
+                try:
+                    thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
+                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
+                    df['max_dalys',r]        += df['total_dalys',r] * val
+                    print('HIIIIIIIIII %s %s' % (key, thisburden[burdenset.colnames['dalys']]))
+                except Exception as E:
+                    notfound.append(key)
+        
+        # Validation
+        if len(notfound):
+            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(E))
+            raise hp.HPException(errormsg)
+        for r in range(df.nrows()):
+            df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
+            if df['dalys_averted',r]>df['total_dalys',r]:
+                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%s vs. %s); please reduce total spending, increase ICER, or increase DALYs' % (theseburdencovs, df['dalys_averted',r], df['total_dalys',r])
+                raise Exception(errormsg)
             
-        # Calculate maximum coverage
-        df['max_dalys'] = arr(df['total_dalys']) * arr(df['bod1wt'])
-        
-        # Current DALYs averted (spend/icer)
-        df['dalys_averted'] = arr(df['spend'])/(self.eps+arr(df['icer']))
-        
-        # Current % of DALYs averted (dalys_averted/total_dalys)
-#        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
-
         # To populate with optimization results
         self.budget = arr(df['spend']).sum()
         df.addcol('opt_spend')
