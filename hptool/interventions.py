@@ -58,34 +58,30 @@ class Interventions(object):
         
         # Do validation
         if verbose: print('Validating data...')
-        burdencov = self.data(col=self.colnames['burdencov'])
-        for r in range(burdencov.nrows()):
-            thisburdencov = burdencov[r]
+        burdencov = self.data[self.colnames['burdencov']]
+        for r,thisburdencov in enumerate(burdencov):
             if verbose: print('Working on "%s"' % thisburdencov)
             try:
                 burdencovsplit = thisburdencov.split(';') # Try to split into causes
             except Exception as E:
                 errormsg = 'Could not split "%s" into separate burdens: %s' % (thisburdencov, str(E))
                 raise Exception(errormsg)
-            try:
-                for b,bs in enumerate(burdencovsplit):
-                    burdencovsplit[b] = bs.split(':') # Split into burden and coverage
-                    if len(burdencovsplit[b]) != 2:
-                        errormsg = 'Could not split "%s" into burden and coverage: %s' % (burdencovsplit[b], str(E))
+            for b,bs in enumerate(burdencovsplit):
+                burdencovsplit[b] = bs.split(':') # Split into burden and coverage
+                thisbcsplit = burdencovsplit[b]
+                if len(thisbcsplit) != 2:
+                    errormsg = 'Could not split "%s" into burden and coverage, perhaps coverage is missing?' % (thisbcsplit)
+                    raise Exception(errormsg)
+                else:
+                    thisbcsplit[0] = thisbcsplit[0].lstrip().rstrip() # Strip leading and trailing spaces
+                    try:
+                        thisbcsplit[1] = float(thisbcsplit[1])
+                    except Exception as E:
+                        errormsg = 'Could not convert "%s" from "%s" to a number: %s' % (thisbcsplit[1], thisburdencov, str(E))
                         raise Exception(errormsg)
-                    else:
-                        burdencovsplit[0] = burdencovsplit[0].lstrip().rstrip() # Strip leading and trailing spaces
-                        try:
-                            burdencovsplit[1] = float(burdencovsplit[1])
-                        except Exception as E:
-                            errormsg = 'Could not convert "%s" from "%s" to a number: %s' % (burdencovsplit[1], thisburdencov, str(E))
-                            raise Exception(errormsg)
-                        if burdencovsplit[1]<0 or burdencovsplit[1]>1:
-                            errormsg = 'Maximum coverage must be between 0 and 1, not %s (from "%s")' % (burdencovsplit[1], thisburdencov)
-                            raise Exception(errormsg)
-            except Exception as E:
-                errormsg = 'Could not split "%s" into burden and coverage: %s' % (thisburdencov, str(E))
-                raise Exception(errormsg)
+                    if thisbcsplit[1]<0 or thisbcsplit[1]>1:
+                        errormsg = 'Maximum coverage must be between 0 and 1, not %s (from "%s")' % (thisbcsplit[1], thisburdencov)
+                        raise Exception(errormsg)
             
             self.data[self.colnames['burdencov'], r] = burdencovsplit # Save back to the data structure
         return None
