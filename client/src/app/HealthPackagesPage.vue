@@ -98,7 +98,7 @@ Last update: 2018-09-24
             <td v-else>
               {{ packageSet.packageset.name }}
             </td>
-            <td><button class="btn __green" @click="viewPackageSet(packageSet)">Open</button></td>
+            <td><button class="btn __green" @click="viewPackageSet(packageSet, true)">Open</button></td>
             <td>{{ packageSet.packageset.creationTime }}</td>
             <td>{{ packageSet.packageset.updateTime ? packageSet.packageset.updateTime:
               'No modification' }}</td>
@@ -383,7 +383,7 @@ Last update: 2018-09-24
         )
       },
 
-      viewPackageSet(packageSet) {
+      viewPackageSet(packageSet, verbose) {
         console.log('viewPackageSet() called for ' + packageSet.packageset.name)
         this.activePackageSet = packageSet // Set the active project to the packageSet passed in.
         rpcs.rpc('jsonify_packages', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex]) // Go to the server to get the diseases from the package set.
@@ -409,7 +409,9 @@ Last update: 2018-09-24
           .catch(error => {
             status.fail(this, 'Could not view health package sets', error)
           })
-        status.succeed(this, 'Health package "' + packageSet.packageset.name + '" now active')
+        if (verbose) {
+          status.succeed(this, 'Health package "' + packageSet.packageset.name + '" now active')
+        }
       },
 
       makeGraph(packageSet) {

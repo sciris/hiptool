@@ -33,19 +33,9 @@ class HealthPackage(object):
         self.equitywt   = None
         self.data       = None # The data
         
-        # Define hard-coded column names
-        self.colnames = sc.odict([('active',   'Active'),
-                                  ('shortname','Short name'),
-                                  ('bod1',     'BoD (1)'),
-                                  ('bod1wt',   'Fraction (1)'),
-                                  ('icer',     'ICER'),
-                                  ('unitcost', 'Unit cost'),
-                                  ('spend',    'Spending'),
-                                  ('frp',      'FRP'),
-                                  ('equity',   'Equity'),])
-        
         if makepackage: self.makepackage()
         return None
+    
     
     def __repr__(self):
         ''' Print out useful information when called'''
@@ -56,6 +46,7 @@ class HealthPackage(object):
         output += '                 UID: %s\n'    % self.uid
         output += '============================================================\n'
         return output
+    
     
     def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True):
         ''' Make results '''
@@ -68,49 +59,60 @@ class HealthPackage(object):
         self.equitywt = equitywt
         burdenset = self.projectref().burden(key=self.burdenset)
         intervset = self.projectref().interv(key=self.intervset)
+        intervset.parse() # Ensure it's parsed
+        colnames = intervset.colnames
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
         print(origdata.cols)
-        critical_cols = ['active', 'bod1', 'bod1wt', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        critical_cols = ['active', 'burdencov', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         for col in critical_cols:
-            origdata.filter_out(key='', col=self.colnames[col], verbose=True)
-        origdata.replace(col=self.colnames['spend'], old='', new=0.0)
+            origdata.filter_out(key='', col=colnames[col], verbose=True)
+        origdata.replace(col=colnames['spend'], old='', new=0.0)
         nrows = origdata.nrows()
         
         # Create new dataframe
-        df = sc.dataframe(cols=[self.colnames['active']], data=np.ones(nrows))
+        df = sc.dataframe(cols=[colnames['active']], data=np.ones(nrows))
         for col in ['shortname']+critical_cols: # Copy columns over
-            colname = self.colnames[col]
+            colname = colnames[col]
             df[col] = origdata[colname]
         
         # Calculate people covered (spending/unitcost)
         df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
-        df.addcol('total_dalys')
-        df.addcol('max_dalys')
-        df.addcol('total_prevalence')
+        df.addcol('total_dalys',      value=0) # Value=0 by default, but just to be explicit
+        df.addcol('max_dalys',        value=0)
+        df.addcol('total_prevalence', value=0)
+        df.addcol('dalys_averted',    value=0)
+        notfound = []
         for r in range(df.nrows()):
-            key = df.get(rows=r, cols='bod1')
-            try:
-                tmp_burden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True)
-            except:
-                raise hp.HPException('Burden "%s" not found' % key)
-            try:    df['total_dalys',r] = tmp_burden[burdenset.colnames['dalys']]
-            except: df['total_dalys',r] = 0 # Warning, will want to fix
-            try:    df['total_prevalence',r] = tmp_burden[burdenset.colnames['prevalence']]
-            except: df['total_prevalence',r] = 0
+            theseburdencovs = df['parsedbc', r]
+            for burdencov in theseburdencovs:
+                key = burdencov[0]
+                val = burdencov[1]
+                try:
+                    thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
+                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
+                    df['max_dalys',r]        += df['total_dalys',r] * val
+                except Exception as E:
+                    notfound.append(key)
+        
+        # Validation
+        if len(notfound):
+            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(E))
+            raise hp.HPException(errormsg)
+        invalid = []
+        for r in range(df.nrows()):
+            df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
+            if df['dalys_averted',r]>df['max_dalys',r]:
+                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
+                invalid.append(errormsg)
+        if len(invalid):
+            errors = '\n\n'.join(invalid)
+            raise Exception(errors)
             
-        # Calculate maximum coverage
-        df['max_dalys'] = arr(df['total_dalys']) * arr(df['bod1wt'])
-        
-        # Current DALYs averted (spend/icer)
-        df['dalys_averted'] = arr(df['spend'])/(self.eps+arr(df['icer']))
-        
-        # Current % of DALYs averted (dalys_averted/total_dalys)
-#        df['frac_averted'] = arr(df['dalys_averted'])/(self.eps+arr(df['max_dalys'])) # To list large fractions: df['shortname'][ut.findinds(df['frac_averted']>0.2)]
-
         # To populate with optimization results
         self.budget = arr(df['spend']).sum()
         df.addcol('opt_spend')
@@ -121,21 +123,25 @@ class HealthPackage(object):
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
         return None
     
+    
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet -- WARNING, do we need this? '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
         return None
     
+    
     def savedata(self, filename=None, folder=None):
         ''' Export data from a spreadsheet '''
         filepath = self.data.export(filename=filename)
         return filepath
         
+        
     def jsonify(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output
+    
     
     def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
         # Handle inputs
@@ -179,13 +185,13 @@ class HealthPackage(object):
                 df['opt_spend',r] = remaining
                 df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
                 remaining = 0
-#        df['dalys_averted'] = arr(df['dalys_averted']) * df['icerwt']
         df.sort(col='shortname')
         self.data = df
         if verbose:
             print('Optimization output:')
             print(self.data)
         return self.data
+        
         
     def plot_dalys(self, which=None):
         if which is None: which = 'current'
@@ -198,7 +204,7 @@ class HealthPackage(object):
         else:
             errormsg = '"which" not recognized: %s' % which
             raise Exception(errormsg)
-        df = self.data
+        df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -221,6 +227,7 @@ class HealthPackage(object):
         pl.gca().set_facecolor('none')
         return fig
     
+    
     def plot_spending(self, which=None):
         if which is None: which = 'current'
         if which == 'current':
@@ -232,7 +239,7 @@ class HealthPackage(object):
         else:
             errormsg = '"which" not recognized: %s' % which
             raise Exception(errormsg)
-        df = self.data
+        df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -262,7 +269,7 @@ class HealthPackage(object):
         else:
             fig_size = (16,8)
             ax_size = [0.05,0.45,0.9,0.5]
-        df = self.data
+        df = sc.dcp(self.data)
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
