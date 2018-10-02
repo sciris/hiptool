@@ -15,7 +15,7 @@ class Interventions(object):
     6.	Equity score
     7.	Financial risk protection score
 
-    Version: 2018sep27
+    Version: 2018oct02
     '''
     
     def __init__(self, name=None, project=None, filename=None, folder=None):
@@ -25,6 +25,18 @@ class Interventions(object):
         self.uid        = sc.uuid() # ID
         self.created    = sc.now() # Date created
         self.modified   = sc.now() # Date modified
+        
+        # Define hard-coded column names
+        self.colnames = sc.odict([('active',   'Active'),
+                                  ('shortname','Short name'),
+                                  ('burdencov','Causes of burden (max coverage)'),
+                                  ('parsedbc', 'parsedbc'),
+                                  ('icer',     'ICER'),
+                                  ('unitcost', 'Unit cost'),
+                                  ('spend',    'Spending'),
+                                  ('frp',      'FRP'),
+                                  ('equity',   'Equity'),])
+        
         self.data       = None
         if filename is not None:
             self.loaddata(filename=filename, folder=folder)
@@ -40,10 +52,51 @@ class Interventions(object):
         output += '============================================================\n'
         return output
     
+    
+    def parse(self, rows=None, verbose=False):
+        if verbose: print('Parsing data...')
+        burdencov = sc.dcp(self.data[self.colnames['burdencov']])
+        
+        # Validation
+        if 'parsedbc' not in self.data.cols: self.data.addcol('parsedbc')
+        if rows is None: rows = range(len(burdencov))
+        else:            rows = sc.promotetolist(rows)
+            
+        # Iterate
+        for r in rows:
+            thisburdencov = burdencov[r]
+            if verbose: print('Working on "%s"' % thisburdencov)
+            try:
+                burdencovsplit = thisburdencov.split(';') # Try to split into causes
+            except Exception as E:
+                errormsg = 'Could not split "%s" into separate burdens: %s' % (thisburdencov, str(E))
+                raise Exception(errormsg)
+            for b,bs in enumerate(burdencovsplit):
+                burdencovsplit[b] = bs.split(':') # Split into burden and coverage
+                thisbcsplit = burdencovsplit[b]
+                if len(thisbcsplit) != 2:
+                    errormsg = 'Could not split "%s" into burden and coverage, perhaps coverage is missing?' % (thisbcsplit)
+                    raise Exception(errormsg)
+                else:
+                    thisbcsplit[0] = thisbcsplit[0].lstrip().rstrip() # Strip leading and trailing spaces
+                    try:
+                        thisbcsplit[1] = float(thisbcsplit[1])
+                    except Exception as E:
+                        errormsg = 'Could not convert "%s" from "%s" to a number: %s' % (thisbcsplit[1], thisburdencov, str(E))
+                        raise Exception(errormsg)
+                    if thisbcsplit[1]<0 or thisbcsplit[1]>1:
+                        errormsg = 'Maximum coverage must be between 0 and 1, not %s (from "%s")' % (thisbcsplit[1], thisburdencov)
+                        raise Exception(errormsg)
+            
+            self.data['parsedbc', r] = burdencovsplit # Save back to the data structure
+        return None
+        
+    
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
         self.filename = filename
+        self.parse()
         return None
     
     def savedata(self, filename=None, folder=None):

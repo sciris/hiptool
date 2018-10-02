@@ -88,8 +88,8 @@ class Burden(object):
         barw     = 0.8
         
         # Pull out data
-        burdendata = sc.dcp(self.data)
-        nburdens = burdendata.nrows()
+        df = sc.dcp(self.data)
+        nburdens = df.nrows()
         colors = sc.gridcolors(nburdens, asarray=True)
         
         # Convert to list
@@ -112,8 +112,8 @@ class Burden(object):
                 raise Exception(errormsg)
             
             # Process data
-            burdendata.sort(col=colname, reverse=True)
-            topdata   = burdendata[:n]
+            df.sort(col=colname, reverse=True)
+            topdata   = df[:n]
             barvals   = topdata[colname]
             barinds   = topdata[self.colnames['index']]
             barlabels = topdata[self.colnames['cause']].tolist()
