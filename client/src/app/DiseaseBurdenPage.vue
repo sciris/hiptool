@@ -15,16 +15,17 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
-      <!--<span>&nbsp;based on&nbsp;</span>-->
-      <!--<select-->
-        <!--title="countrySelect"-->
-        <!--id="country"-->
-        <!--:required="true"-->
-        <!--v-model="country">-->
-        <!--<option v-for = "country in countryList" :value="country">-->
-          <!--{{country}}-->
-        <!--</option>-->
-      <!--</select>-->
+
+      <span>&nbsp;based on&nbsp;</span>
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option v-for = "country in countryList" :value="country">
+          {{country}}
+        </option>
+      </select>
 
       <br/><br/>
 
