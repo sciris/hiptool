@@ -101,11 +101,15 @@ class HealthPackage(object):
         if len(notfound):
             errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(E))
             raise hp.HPException(errormsg)
+        invalid = []
         for r in range(df.nrows()):
             df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
-            if df['dalys_averted',r]>df['total_dalys',r]:
-                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%s vs. %s); please reduce total spending, increase ICER, or increase DALYs' % (theseburdencovs, df['dalys_averted',r], df['total_dalys',r])
-                raise Exception(errormsg)
+            if df['dalys_averted',r]>df['max_dalys',r]:
+                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
+                invalid.append(errormsg)
+        if len(invalid):
+            errors = '\n\n'.join(invalid)
+            raise Exception(errors)
             
         # To populate with optimization results
         self.budget = arr(df['spend']).sum()
