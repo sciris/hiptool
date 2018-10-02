@@ -33,17 +33,6 @@ class HealthPackage(object):
         self.equitywt   = None
         self.data       = None # The data
         
-        # Define hard-coded column names
-        self.colnames = sc.odict([('active',   'Active'),
-                                  ('shortname','Short name'),
-                                  ('bod1',     'BoD (1)'),
-                                  ('bod1wt',   'Fraction (1)'),
-                                  ('icer',     'ICER'),
-                                  ('unitcost', 'Unit cost'),
-                                  ('spend',    'Spending'),
-                                  ('frp',      'FRP'),
-                                  ('equity',   'Equity'),])
-        
         if makepackage: self.makepackage()
         return None
     
@@ -68,20 +57,21 @@ class HealthPackage(object):
         self.equitywt = equitywt
         burdenset = self.projectref().burden(key=self.burdenset)
         intervset = self.projectref().interv(key=self.intervset)
+        colnames = intervset.colnames
         
         # Data cleaning: remove if missing: cause, icer, unitcost, spending
         origdata = sc.dcp(intervset.data)
         print(origdata.cols)
-        critical_cols = ['active', 'bod1', 'bod1wt', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        critical_cols = ['active', 'burdencov', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         for col in critical_cols:
-            origdata.filter_out(key='', col=self.colnames[col], verbose=True)
-        origdata.replace(col=self.colnames['spend'], old='', new=0.0)
+            origdata.filter_out(key='', col=colnames[col], verbose=True)
+        origdata.replace(col=colnames['spend'], old='', new=0.0)
         nrows = origdata.nrows()
         
         # Create new dataframe
-        df = sc.dataframe(cols=[self.colnames['active']], data=np.ones(nrows))
+        df = sc.dataframe(cols=[colnames['active']], data=np.ones(nrows))
         for col in ['shortname']+critical_cols: # Copy columns over
-            colname = self.colnames[col]
+            colname = colnames[col]
             df[col] = origdata[colname]
         
         # Calculate people covered (spending/unitcost)

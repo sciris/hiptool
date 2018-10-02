@@ -16,8 +16,8 @@ P.loadinterventions(filename=dp+'interventions-demo.xlsx')
 print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[27])
 print('\n\nExample interventions entry:\n\n%s' % P.intervsets[0].data[27])
 
-P.makepackage()
-df = P.package().optimize()
+#P.makepackage()
+#df = P.package().optimize()
 
 
 #P.package().plot_cascade()
