@@ -513,10 +513,11 @@ def jsonify_diseases(project_id, burdenkey):
 
 
 @RPC()    
-def create_burdenset(project_id, newname):
+def create_burdenset(project_id, country):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.burdensets.keys())
-    newburdenset = hp.Burden(project=proj, name=unique_name)
+    unique_name = sc.uniquename(country, namelist=proj.burdensets.keys())
+    filename = hp.HPpath('data')+country+' BoD.xlsx'
+    newburdenset = hp.Burden(project=proj, name=unique_name, filename=filename)
     proj.burdensets[unique_name] = newburdenset # Put the new burden set in the dictionary.
     save_project(proj)
     return jsonify_burdensets(proj=proj)
@@ -610,15 +611,12 @@ def jsonify_interventions(project_id, intervkey=None, verbose=True):
 
 
 @RPC()
-def create_intervset(project_id, newname):
+def create_intervset(project_id, country):
     proj = load_project(project_id) # Get the Project object.
-    unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
-    new_intervset = hp.Interventions(project=proj, name=unique_name)
-    data_path = hp.HPpath('data')
-    new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
-    print('WARNING, hard-coded data path')
+    unique_name = sc.uniquename(country, namelist=proj.intervsets.keys())
+    filename = hp.HPpath('data')+country+' interventions.xlsx'
+    new_intervset = hp.Interventions(project=proj, name=unique_name, filename=filename)
     proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
-    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return jsonify_intervsets(proj=proj)
 
@@ -669,7 +667,7 @@ def copy_intervention(project_id, intervkey, index):
 def delete_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
-    data.pop(index)
+    data.rmrow(key=index)
     save_project(proj)
     return None
 

@@ -69,6 +69,15 @@ class HPException(Exception):
         Exception.__init__(self, errormsg, *args, **kwargs)
 
 
+def arr(data):
+    ''' Force float, or give helpful error '''
+    import numpy as np
+    try:
+        output = np.array(data, dtype=float)
+    except Exception as E:
+        errormsg = 'Data contain non-numeric values (%s):\n%s' % (str(E), data)
+        raise Exception(errormsg)
+    return output
 
 #####################################################################################################################
 ### Load HealthPrior functions and classes

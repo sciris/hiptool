@@ -7,15 +7,6 @@ import pylab as pl
 import hptool as hp
 import sciris as sc
 
-def arr(data):
-    ''' Force float, or give helpful error '''
-    try:
-        output = np.array(data, dtype=float)
-    except Exception as E:
-        errormsg = 'Data contain non-numeric values (%s):\n%s' % (str(E), data)
-        raise Exception(errormsg)
-    return output
-
 class HealthPackage(object):
     ''' Class to hold the results from the analysis. '''
     
@@ -48,7 +39,7 @@ class HealthPackage(object):
         return output
     
     
-    def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True):
+    def makepackage(self, burdenset=None, intervset=None, frpwt=None, equitywt=None, verbose=True, die=False):
         ''' Make results '''
         # Handle inputs
         if burdenset is not None: self.burdenset = burdenset # Warning, name is used both as key and actual set!
@@ -78,7 +69,7 @@ class HealthPackage(object):
             df[col] = origdata[colname]
         
         # Calculate people covered (spending/unitcost)
-        df['coverage'] = arr(df['spend'])/(self.eps+arr(df['unitcost']))
+        df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
         df.addcol('total_dalys',      value=0) # Value=0 by default, but just to be explicit
@@ -108,13 +99,15 @@ class HealthPackage(object):
             df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
             if df['dalys_averted',r]>df['max_dalys',r]:
                 errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
+                df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
                 invalid.append(errormsg)
         if len(invalid):
             errors = '\n\n'.join(invalid)
-            raise Exception(errors)
+            if die: raise Exception(errors)
+            else:   print(errors)
             
         # To populate with optimization results
-        self.budget = arr(df['spend']).sum()
+        self.budget = hp.arr(df['spend']).sum()
         df.addcol('opt_spend')
         df.addcol('opt_dalys_averted')
         
@@ -143,7 +136,7 @@ class HealthPackage(object):
         return output
     
     
-    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
+    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=True):
         # Handle inputs
         if budget   is None: budget = self.budget
         if frpwt    is None: frpwt     = self.frpwt
@@ -160,19 +153,19 @@ class HealthPackage(object):
             print('  Equity weight: %s' % self.equitywt)
         
         # Do the processing
-        frpdata = sc.dcp(arr(df['frp']))
+        frpdata = sc.dcp(hp.arr(df['frp']))
         frpdata += 1.0 - frpdata.min()
         frpdata /= frpdata.max()
-        equitydata = sc.dcp(arr(df['equity']))
+        equitydata = sc.dcp(hp.arr(df['equity']))
         equitydata += 1 - equitydata.min()
         equitydata /= equitydata.max()
         equitydata = 1.0 - equitydata
         df['icerwt'] = (1-frpwt-equitywt) + frpdata*frpwt + equitydata*equitywt
-        df['benefit'] = (1.0/(arr(df['icer'])+self.eps)) * arr(df['icerwt'])
+        df['benefit'] = (1.0/(hp.arr(df['icer'])+self.eps)) * hp.arr(df['icerwt'])
         df.sort(col='benefit', reverse=True)
         remaining = sc.dcp(self.budget)
-        max_dalys = arr(df['max_dalys'])
-        icers     = arr(df['icer'])
+        max_dalys = hp.arr(df['max_dalys'])
+        icers     = hp.arr(df['icer'])
         if verbose: print('Optimizing...')
         for r in range(df.nrows()):
             max_spend = max_dalys[r]*icers[r]
@@ -209,7 +202,7 @@ class HealthPackage(object):
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col=colkey, reverse=True)
-        DA_data = arr(df[colkey])
+        DA_data = hp.arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
@@ -244,7 +237,7 @@ class HealthPackage(object):
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col=colkey, reverse=True)
-        DA_data = arr(df[colkey])
+        DA_data = hp.arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
@@ -273,7 +266,7 @@ class HealthPackage(object):
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
-        DA_data = arr(df['opt_spend'])
+        DA_data = hp.arr(df['opt_spend'])
         inds = sc.findinds(DA_data>cutoff)
         DA_data = DA_data[inds]
         DA_data /= 1e6
