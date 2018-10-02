@@ -402,8 +402,6 @@ Last update: 2018-09-24
               this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][5])).toLocaleString()
               this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][6])).toLocaleString()
             }
-            this.sortColumn2 = 'name' // Reset the bottom table sorting state.
-            this.sortReverse2 = true
             this.makeGraph(packageSet) // Plot graphs
           })
           .catch(error => {
