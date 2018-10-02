@@ -17,17 +17,17 @@ Last update: 2018sep24
 
       <button class="btn" @click="createNewSet">Create new intervention set</button>
 
-      <span>&nbsp;based on&nbsp;</span>
+      <!--<span>&nbsp;based on&nbsp;</span>-->
 
-      <select
-        title="countrySelect"
-        id="country"
-        :required="true"
-        v-model="country">
-        <option v-for = "country in countryList" :value="country">
-          {{country}}
-        </option>
-      </select>
+      <!--<select-->
+        <!--title="countrySelect"-->
+        <!--id="country"-->
+        <!--:required="true"-->
+        <!--v-model="country">-->
+        <!--<option v-for = "country in countryList" :value="country">-->
+          <!--{{country}}-->
+        <!--</option>-->
+      <!--</select>-->
 
       <br/><br/>
 
@@ -479,7 +479,7 @@ Last update: 2018sep24
 
       createNewSet() {
         console.log('createNewSet() called')
-        rpcs.rpc('create_interv_set', [this.$store.state.activeProject.project.id, 'New intervention set']) // Go to the server to create the new intervention set.
+        rpcs.rpc('create_intervset', [this.$store.state.activeProject.project.id, 'New intervention set']) // Go to the server to create the new intervention set.
           .then(response => {
             this.updateIntervSets() // Update the intervention sets so the new set shows up on the list.
           })

@@ -614,11 +614,7 @@ def create_intervset(project_id, newname):
     proj = load_project(project_id) # Get the Project object.
     unique_name = sc.uniquename(newname, namelist=proj.intervsets.keys())
     new_intervset = hp.Interventions(project=proj, name=unique_name)
-    data_path = hp.HPpath('data')
-    new_intervset.loaddata(data_path+'dcp-data-afg-v1.xlsx')
-    print('WARNING, hard-coded data path')
     proj.intervsets[unique_name] = new_intervset # Put the new intervention set in the dictionary.
-    make_package(proj, die=False) # Update with the latest data
     save_project(proj)
     return jsonify_intervsets(proj=proj)
 
