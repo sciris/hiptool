@@ -198,7 +198,7 @@ class HealthPackage(object):
         else:
             errormsg = '"which" not recognized: %s' % which
             raise Exception(errormsg)
-        df = self.data
+        df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -232,7 +232,7 @@ class HealthPackage(object):
         else:
             errormsg = '"which" not recognized: %s' % which
             raise Exception(errormsg)
-        df = self.data
+        df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
@@ -262,7 +262,7 @@ class HealthPackage(object):
         else:
             fig_size = (16,8)
             ax_size = [0.05,0.45,0.9,0.5]
-        df = self.data
+        df = sc.dcp(self.data)
         cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
