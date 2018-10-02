@@ -311,7 +311,7 @@ Last update: 2018-09-24
           .then(response => {
             console.log('Optimized')
             status.succeed(this, 'Optimized')
-            this.updatePackageSets(true)
+            this.updatePackageSets(false)
           })
       },
 
@@ -402,8 +402,6 @@ Last update: 2018-09-24
               this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][5])).toLocaleString()
               this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][6])).toLocaleString()
             }
-            this.sortColumn2 = 'name' // Reset the bottom table sorting state.
-            this.sortReverse2 = false
             this.makeGraph(packageSet) // Plot graphs
           })
           .catch(error => {
@@ -443,7 +441,7 @@ Last update: 2018-09-24
         console.log('uploadPackageSet() called for ' + packageSet.packageset.name)
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex], {}, '.xlsx')
           .then(response => {
-            this.updatePackageSets()
+            this.updatePackageSets(true)
             status.succeed(this, 'Package set uploaded')
           })
           .catch(error => {
@@ -492,7 +490,7 @@ Last update: 2018-09-24
         console.log('createNewPackageSet() called')
         rpcs.rpc('create_packageset', [this.$store.state.activeProject.project.id, this.burdenSet, this.intervSet]) // Go to the server to create the new package set.
           .then(response => {
-            this.updatePackageSets() // Update the package sets so the new set shows up on the list.
+            this.updatePackageSets(true) // Update the package sets so the new set shows up on the list.
           })
           .catch(error => {
             status.fail(this, 'Could not create new package sets', error)
@@ -505,7 +503,7 @@ Last update: 2018-09-24
           this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
         } else { // Otherwise.
           this.sortColumn2 = sortColumn // Select the new column for sorting.
-          this.sortReverse2 = false // Set the sorting for non-reverse.
+          this.sortReverse2 = true // Set the sorting for non-reverse.
         }
       },
 
@@ -518,6 +516,7 @@ Last update: 2018-09-24
         return results.sort((result1, result2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
+            if (this.sortColumn2 === 'name') { sortDir = -sortDir } // So things sort the way you'd expect
             if      (this.sortColumn2 === 'name')        {return (result1[0] > result2[0] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'cause')       {return (result1[1] > result2[1] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'icer')        {return (result1[2] > result2[2] ? sortDir: -sortDir)}

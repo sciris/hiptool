@@ -99,12 +99,22 @@ class Interventions(object):
         self.parse()
         return None
     
-    def savedata(self, filename=None, folder=None):
+    def _exportcols(self, cols=None):
+        if cols is None:
+            cols = sc.dcp(self.data.cols)
+        cols = sc.promotetolist(cols)
+        if 'parsedbc' in cols:
+            cols.remove('parsedbc') # This can't be jsonified
+        return cols
+    
+    def savedata(self, filename=None, folder=None, cols=None):
         ''' Export data from a spreadsheet '''
-        filepath = self.data.export(filename=filename)
+        cols = self._exportcols(cols)
+        filepath = self.data.export(filename=filename, cols=cols)
         return filepath
     
     def jsonify(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
+        cols = self._exportcols(cols)
         output = self.data.jsonify(cols=cols, rows=rows, header=header)
         return output

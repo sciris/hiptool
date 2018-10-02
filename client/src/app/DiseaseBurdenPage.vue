@@ -15,16 +15,17 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
       <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
-      <!--<span>&nbsp;based on&nbsp;</span>-->
-      <!--<select-->
-        <!--title="countrySelect"-->
-        <!--id="country"-->
-        <!--:required="true"-->
-        <!--v-model="country">-->
-        <!--<option v-for = "country in countryList" :value="country">-->
-          <!--{{country}}-->
-        <!--</option>-->
-      <!--</select>-->
+
+      <span>&nbsp;based on&nbsp;</span>
+      <select
+        title="countrySelect"
+        id="country"
+        :required="true"
+        v-model="country">
+        <option v-for = "country in countryList" :value="country">
+          {{country}}
+        </option>
+      </select>
 
       <br/><br/>
 
@@ -249,10 +250,13 @@ Last update: 2018sep24
         diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
         sortColumn2: 'name',  // Column of table used for sorting the diseases
         sortReverse2: false, // Sort diseases in reverse order?
-        country: 'Afghanistan', // CK: WARNING TEMP, should come from backend
+        country: 'Afghanistan',
         countryList: [
           'Afghanistan',
-          'Other',
+          'Argentina',
+          'Cambodia',
+          "Cote d'Ivoire",
+          'Zimbabwe',
         ],
         showingPlots: false,
         graphData: [],
@@ -412,7 +416,7 @@ Last update: 2018sep24
         console.log('copyBurdenSet() called for ' + burdenSet.burdenset.name)
         rpcs.rpc('copy_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex]) // Have the server copy the burden set, giving it a new name.
         .then(response => {
-          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
+          this.updateBurdenSets(true) // Update the burden sets so the new set shows up on the list.
         })
       },
 
@@ -420,7 +424,7 @@ Last update: 2018sep24
         console.log('uploadBurdenSet() called for ' + burdenSet.burdenset.name)
         rpcs.upload('upload_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex], {}, '.xlsx')
           .then(response => {
-            this.updateBurdenSets()
+            this.updateBurdenSets(true)
             this.viewBurdenSet(burdenSet, true)
             status.succeed(this, 'Burden set uploaded')
           })
@@ -466,15 +470,15 @@ Last update: 2018sep24
         console.log('deleteBurdenSet() called for ' + burdenSet.burdenset.name)
         rpcs.rpc('delete_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex]) // Go to the server to delete the burden set.
         .then(response => {
-          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
+          this.updateBurdenSets(true) // Update the burden sets so the new set shows up on the list.
         })
       },
 
       createNewBurdenSet() {
         console.log('createNewBurdenSet() called')
-        rpcs.rpc('create_burdenset', [this.$store.state.activeProject.project.id, 'New burden set']) // Go to the server to create the new burden set.
+        rpcs.rpc('create_burdenset', [this.$store.state.activeProject.project.id, this.country]) // Go to the server to create the new burden set.
           .then(response => {
-          this.updateBurdenSets() // Update the burden sets so the new set shows up on the list.
+          this.updateBurdenSets(true) // Update the burden sets so the new set shows up on the list.
         })
       },
 
