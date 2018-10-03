@@ -28,7 +28,7 @@ class Burden(object):
         self.modified   = sc.now() # Date modified
         
         # Define hard-coded column names
-        self.colnames = sc.odict([('index',      'Index'),
+        self.colnames = sc.odict([('active',     'Active'),
                                   ('cause',      'Cause'),
                                   ('dalys',      'DALYs'),
                                   ('deaths',     'Deaths'),
@@ -54,6 +54,7 @@ class Burden(object):
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.data.filtercols(self.colnames.values(), die=True)
         self.filename = filename
         return None
     
@@ -113,7 +114,7 @@ class Burden(object):
                 raise Exception(errormsg)
             
             # Process data
-            df.sort(col=colname, reverse=True)
+            sortorder = df.sort(col=colname, reverse=True)
             topdata   = df[:n]
             try:
                 barvals   = hp.arr(topdata[colname])
@@ -129,7 +130,7 @@ class Burden(object):
                         raise Exception(errormsg)
                 errormsg = 'An exception was encountered, but could not be reproduced: %s' % str(E)
                 raise Exception(errormsg)
-            barinds   = topdata[self.colnames['index']]
+            barinds   = sortorder[:n]
             barlabels = topdata[self.colnames['cause']].tolist()
             
             # Figure out the units
@@ -149,7 +150,7 @@ class Burden(object):
             ax.set_facecolor('none')
             yaxis = pl.arange(n, 0, -1)
             for i in range(n):
-                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=colors[int(barinds[i])-1], edgecolor='none')
+                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=colors[barinds[i]], edgecolor='none')
             ax.set_yticks(pl.arange(10, 0, -1))    
             ax.set_yticklabels(barlabels)
             sc.SIticks(ax=ax,axis='x')

@@ -30,12 +30,13 @@ class Interventions(object):
         self.colnames = sc.odict([('active',   'Active'),
                                   ('shortname','Short name'),
                                   ('burdencov','Causes of burden (max coverage)'),
-                                  ('parsedbc', 'parsedbc'),
                                   ('icer',     'ICER'),
                                   ('unitcost', 'Unit cost'),
                                   ('spend',    'Spending'),
                                   ('frp',      'FRP'),
-                                  ('equity',   'Equity'),])
+                                  ('equity',   'Equity'),
+                                  ('parsedbc', 'parsedbc'),
+                                  ])
         
         self.data       = None
         if filename is not None:
