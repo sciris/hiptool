@@ -53,20 +53,13 @@ class HealthPackage(object):
         intervset.parse() # Ensure it's parsed
         colnames = intervset.colnames
         
-        # Data cleaning: remove if missing: cause, icer, unitcost, spending
-        origdata = sc.dcp(intervset.data)
-        print(origdata.cols)
-        critical_cols = ['active', 'burdencov', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
-        for col in critical_cols:
-            origdata.filter_out(key='', col=colnames[col], verbose=True)
-        origdata.replace(col=colnames['spend'], old='', new=0.0)
-        nrows = origdata.nrows()
-        
         # Create new dataframe
-        df = sc.dataframe(cols=[colnames['active']], data=np.ones(nrows))
-        for col in ['shortname']+critical_cols: # Copy columns over
-            colname = colnames[col]
-            df[col] = origdata[colname]
+        origdata = sc.dcp(intervset.data)
+        critical_cols = ['active', 'shortname', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        df = sc.dataframe()
+        for col in critical_cols: # Copy columns over
+            df[col] = origdata[colnames[col]]
+        df['parsedbc'] = origdata['parsedbc']
         
         # Calculate people covered (spending/unitcost)
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
@@ -114,13 +107,6 @@ class HealthPackage(object):
         self.data = df # Store it
         if verbose:
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
-        return None
-    
-    
-    def loaddata(self, filename=None, folder=None):
-        ''' Load data from a spreadsheet -- WARNING, do we need this? '''
-        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
-        self.filename = filename
         return None
     
     
@@ -189,10 +175,10 @@ class HealthPackage(object):
     def plot_dalys(self, which=None):
         if which is None: which = 'current'
         if which == 'current':
-            colkey = 'dalys_averted'
+            colkey   = 'dalys_averted'
             titlekey = 'Current'
         elif which == 'optimized':
-            colkey = 'opt_dalys_averted'
+            colkey   = 'opt_dalys_averted'
             titlekey = 'Optimized'
         else:
             errormsg = '"which" not recognized: %s' % which
