@@ -258,9 +258,10 @@ Last update: 2018sep24
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
         interventionList: [],
-        country: 'DCP3',
+        country: 'Afghanistan',
         countryList: [
-          'DCP3',
+          'Afghanistan',
+          'Zimbabwe',
         ]
       }
     },
