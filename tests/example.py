@@ -11,8 +11,8 @@ doplot = True
 
 dp = HPpath('data')
 P = Project()
-P.loadburden(filename=dp+'burdens-demo.xlsx')
-P.loadinterventions(filename=dp+'interventions-demo.xlsx')
+P.loadburden(filename=dp+'Afghanistan BoD.xlsx')
+P.loadinterventions(filename=dp+'DCP3 interventions.xlsx')
 print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[27])
 print('\n\nExample interventions entry:\n\n%s' % P.intervsets[0].data[27])
 
