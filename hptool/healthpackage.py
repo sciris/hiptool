@@ -78,8 +78,8 @@ class HealthPackage(object):
                 try:
                     thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
                     df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
                     df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
-                    df['max_dalys',r]        += df['total_dalys',r] * val
                 except Exception as E:
                     notfound.append(key)
         
@@ -193,7 +193,7 @@ class HealthPackage(object):
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
 #        plot_data = plot_data.round()
-        total_averted = (plot_data.sum()*1e3)
+        total_averted = (DA_data.sum()*1e3)
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
@@ -201,7 +201,7 @@ class HealthPackage(object):
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("%s DALYs averted ('000s; total: %0.0f)" % (titlekey, total_averted))
+        pl.title("%s DALYs averted ('000s; total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
@@ -220,6 +220,7 @@ class HealthPackage(object):
             raise Exception(errormsg)
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
+        print('WARNING, number of entries is hard-coded')
         max_entries = 11
         colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col=colkey, reverse=True)
@@ -228,7 +229,7 @@ class HealthPackage(object):
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
 #        plot_data = plot_data.round()
-        total_averted = (plot_data.sum())
+        total_averted = (DA_data.sum())
         data_labels = ['%0.1fm'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
@@ -236,7 +237,7 @@ class HealthPackage(object):
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("%s spending (total: %0.3f million)" % (titlekey, total_averted))
+        pl.title("%s spending (total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig

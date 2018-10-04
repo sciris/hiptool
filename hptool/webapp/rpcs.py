@@ -601,7 +601,7 @@ def delete_burden(project_id, intervkey, index):
 ###################################################################################
 
 @RPC()
-def jsonify_interventions(project_id, intervkey=None, verbose=True):
+def jsonify_interventions(project_id, intervkey=None, verbose=False):
     proj = load_project(project_id) # Get the Project object.
     intervset = proj.interv(key=intervkey) # Get the intervention set that matches the key
     if intervset.data is None: return {'interventions': []}  # Return an empty list if no data is present.
@@ -677,7 +677,7 @@ def delete_intervention(project_id, intervkey, index):
 ################################################################################### 
 
 @RPC()
-def jsonify_packages(project_id, packagekey, verbose=True):
+def jsonify_packages(project_id, packagekey, verbose=False):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
@@ -707,7 +707,8 @@ def create_packageset(project_id, burdenset=None, intervset=None):
 
 
 @RPC()
-def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
+def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None, verbose=True):
+    if verbose: print('Running optimization for budget=%s, frpwt=%s, equitywt=%s' % (budget, frpwt, equitywt))
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     budget   = sanitize(budget,   forcefloat=True)

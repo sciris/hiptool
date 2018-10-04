@@ -310,8 +310,9 @@ Last update: 2018-09-24
         rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex, this.budget, this.frpwt, this.equitywt])
           .then(response => {
             console.log('Optimized')
-            status.succeed(this, 'Optimized')
             this.updatePackageSets(false)
+            this.viewPackageSet(this.activePackageSet)
+            status.succeed(this, 'Optimized')
           })
       },
 
