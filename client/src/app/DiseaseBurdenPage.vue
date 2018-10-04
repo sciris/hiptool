@@ -14,7 +14,7 @@ Last update: 2018sep24
     </div>
 
     <div class="PageSection" v-if="activeProjectName !== ''">
-      <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
+      <button class="btn __green" @click="createNewBurdenSet">Create new burden set</button>
 
       <span>&nbsp;based on&nbsp;</span>
       <select
@@ -92,7 +92,7 @@ Last update: 2018sep24
 			      <td v-else>
 			        {{ burdenSet.burdenset.name }}
 			      </td>
-            <td><button class="btn __green" @click="viewBurdenSet(burdenSet, true)">Open</button></td>
+            <td><button class="btn" @click="viewBurdenSet(burdenSet, true)">Open</button></td>
             <td>{{ burdenSet.burdenset.creationTime }}</td>
             <td>{{ burdenSet.burdenset.updateTime ? burdenSet.burdenset.updateTime:
               'No modification' }}</td>
@@ -143,7 +143,7 @@ Last update: 2018sep24
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting2('DALYs')" class="sortable">
+            <th @click="updateSorting2('DALYs')" class="sortable rightalign">
               DALYs
               <span v-show="sortColumn2 == 'DALYs' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
@@ -155,7 +155,7 @@ Last update: 2018sep24
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting2('deaths')" class="sortable">
+            <th @click="updateSorting2('deaths')" class="sortable rightalign">
               Deaths
               <span v-show="sortColumn2 == 'deaths' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
@@ -167,7 +167,7 @@ Last update: 2018sep24
                 <i class="fas fa-caret-up" style="visibility: hidden"></i>
               </span>
             </th>
-            <th @click="updateSorting2('prevalence')" class="sortable">
+            <th @click="updateSorting2('prevalence')" class="sortable rightalign">
               Prevalence
               <span v-show="sortColumn2 == 'prevalence' && !sortReverse2">
                 <i class="fas fa-caret-down"></i>
@@ -196,19 +196,19 @@ Last update: 2018sep24
             </td>
             <td>
               <input type="text"
-                     class="txbox"
+                     class="txbox rightalign"
                      @keyup.enter="updateDisease(disease)"
                      v-model="disease['DALYs']"/>
             </td>
             <td>
               <input type="text"
-                     class="txbox"
+                     class="txbox rightalign"
                      @keyup.enter="updateDisease(disease)"
                      v-model="disease['Deaths']"/>
             </td>
             <td>
               <input type="text"
-                     class="txbox"
+                     class="txbox rightalign"
                      @keyup.enter="updateDisease(disease)"
                      v-model="disease['Prevalence']"/>
             </td>
@@ -219,7 +219,7 @@ Last update: 2018sep24
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="addBurden">Add new burden</button>
+      <!--<button class="btn" @click="addBurden">Add new burden</button>--> <!-- Disabled for possible future removal -->
 
     </div>
   </div>
@@ -249,7 +249,7 @@ Last update: 2018sep24
         activeBurdenSet: {}, // Active burden set
         diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
         sortColumn2: 'name',  // Column of table used for sorting the diseases
-        sortReverse2: false, // Sort diseases in reverse order?
+        sortReverse2: true, // Sort diseases in reverse order?
         country: 'Afghanistan',
         countryList: [
           'Afghanistan',
@@ -375,14 +375,13 @@ Last update: 2018sep24
           this.diseaseList = response.data.diseases // Set the disease list.
           for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
-		        this.diseaseList[ind]['Active'] = (this.diseaseList[ind][0] > 0)
-            this.diseaseList[ind]['Cause'] = this.diseaseList[ind][1]
-            this.diseaseList[ind]['DALYs'] = Number(this.diseaseList[ind][2]).toLocaleString()
-            this.diseaseList[ind]['Deaths'] = Number(this.diseaseList[ind][3]).toLocaleString()
-            this.diseaseList[ind]['Prevalence'] = Number(this.diseaseList[ind][4]).toLocaleString()
+		        this.diseaseList[ind]['Active']     = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind]['Cause']      = this.diseaseList[ind][1]
+            this.diseaseList[ind]['DALYs']      = Math.round(Number(this.diseaseList[ind][2])).toLocaleString()
+            this.diseaseList[ind]['Deaths']     = Math.round(Number(this.diseaseList[ind][3])).toLocaleString()
+            this.diseaseList[ind]['Prevalence'] = Math.round(Number(this.diseaseList[ind][4])).toLocaleString()
 		      }
           this.sortColumn2 = 'name' // Reset the bottom table sorting state.
-          this.sortReverse2 = false
           this.makeGraph(burdenSet) // Plot graphs
         })
           .catch(error => {
@@ -489,7 +488,7 @@ Last update: 2018sep24
             this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
         } else { // Otherwise.
           this.sortColumn2 = sortColumn // Select the new column for sorting.
-          this.sortReverse2 = false // Set the sorting for non-reverse.
+          this.sortReverse2 = true // Set the sorting for non-reverse.
         }
       },
       
@@ -502,6 +501,7 @@ Last update: 2018sep24
         return diseases.sort((disease1, disease2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1
+            if (this.sortColumn2 === 'name') { sortDir = -sortDir } // So things sort the way you'd expect
             if      (this.sortColumn2 === 'name')       {return (disease1[1] > disease2[1] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'DALYs')      {return disease1[2] > disease2[2] ? sortDir: -sortDir}
             else if (this.sortColumn2 === 'deaths')     {return disease1[3] > disease2[3] ? sortDir: -sortDir}
@@ -528,6 +528,9 @@ Last update: 2018sep24
         .then(response => {
           status.succeed(this, 'Burden set updated')
         })
+          .catch(error => {
+            status.fail(this, 'Could not update burden set', error)
+          })
       },
 
       addBurden() {
@@ -536,6 +539,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden added')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not add burden', error)
           })
       },
 
@@ -546,6 +552,9 @@ Last update: 2018sep24
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden copied')
           })
+          .catch(error => {
+            status.fail(this, 'Could not copy burden', error)
+          })
       },
 
       deleteBurden(burden) {
@@ -554,6 +563,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden deleted')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not delete burden', error)
           })
       },
 

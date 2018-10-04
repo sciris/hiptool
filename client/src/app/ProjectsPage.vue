@@ -9,10 +9,11 @@ Last update: 2018sep22
     <div class="PageSection">
 
       <div class="ControlsRow">
-        <button class="btn" @click="addDemoProject">Add demo project</button>
-        &nbsp; &nbsp;
         <button class="btn" @click="createNewProject">Create new project</button>
         &nbsp; &nbsp;
+        <button class="btn" @click="addDemoProject">Add demo project</button>
+        &nbsp; &nbsp;
+
         <button class="btn" @click="uploadProjectFromFile">Upload project from file</button>
         &nbsp; &nbsp;
       </div>
@@ -85,7 +86,7 @@ Last update: 2018sep22
                    v-model="projectSummary.renaming"/>
           </td>
           <td v-else>
-            {{ projectSummary.project.name }}
+            <b>{{ projectSummary.project.name }}</b>
           </td>
           <td>
             <button class="btn __green" @click="openProject(projectSummary.project.id)">Open</button>

@@ -15,7 +15,7 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <button class="btn" @click="createNewSet">Create new intervention set</button>
+      <button class="btn __green" @click="createNewSet">Create new intervention set</button>
       <span>&nbsp;based on&nbsp;</span>
       <select
         title="countrySelect"
@@ -87,7 +87,7 @@ Last update: 2018sep24
             {{ intervSet.intervset.name }}
           </td>
           <td>
-            <button class="btn __green" @click="viewSet(intervSet, true)">Open</button>
+            <button class="btn" @click="viewSet(intervSet, true)">Open</button>
           </td>
           <td>{{ intervSet.intervset.creationTime }}</td>
           <td>{{ intervSet.intervset.updateTime ? intervSet.intervset.updateTime:
@@ -112,7 +112,7 @@ Last update: 2018sep24
              :placeholder="filterPlaceholder2"
              v-model="filterText2"/>
 
-      <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px">
         <thead>
         <tr>
           <th>Active</th>
@@ -134,31 +134,31 @@ Last update: 2018sep24
             <span v-show="sortColumn2 == 'burdencov' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'burdencov'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('icer')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('icer')" class="sortable rightalign" style="min-width:30%">
             ICER
             <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('unitcost')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('unitcost')" class="sortable rightalign" style="min-width:30%">
             Unit&nbsp;cost
             <span v-show="sortColumn2 == 'unitcost' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'unitcost' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'unitcost'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('spend')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('spend')" class="sortable rightalign" style="min-width:30%">
             Spending
             <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('frp')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('frp')" class="sortable rightalign" style="min-width:30%">
             FRP
             <span v-show="sortColumn2 == 'frp' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'frp' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'frp'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('equity')" class="sortable" style="min-width:30%">
+          <th @click="updateSorting2('equity')" class="sortable rightalign" style="min-width:30%">
             Equity
             <span v-show="sortColumn2 == 'equity' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'equity' && sortReverse2"><i class="fas fa-caret-up"></i></span>
@@ -195,31 +195,31 @@ Last update: 2018sep24
           </td>
           <td>
             <input type="text"
-                   class="txbox"
+                   class="txbox rightalign"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.icer"/>
           </td>
           <td>
             <input type="text"
-                   class="txbox"
+                   class="txbox rightalign"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.unitcost"/>
           </td>
           <td>
             <input type="text"
-                   class="txbox"
+                   class="txbox rightalign"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.spend"/>
           </td>
           <td>
             <input type="text"
-                   class="txbox"
+                   class="txbox rightalign"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.frp"/>
           </td>
           <td>
             <input type="text"
-                   class="txbox"
+                   class="txbox rightalign"
                    @keyup.enter="updateInterv(interv)"
                    v-model="interv.equity"/>
           </td>
@@ -230,7 +230,7 @@ Last update: 2018sep24
         </tr>
         </tbody>
       </table>
-      <button class="btn" @click="addInterv">Add new intervention</button>
+      <!--<button class="btn" @click="addInterv">Add new intervention</button>--> <!-- Disabled for possible future removal -->
     </div>
   </div>
 </template>
@@ -254,7 +254,7 @@ Last update: 2018sep24
         sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         sortColumn2: 'name',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
-        sortReverse2: false, // Sort in reverse order?
+        sortReverse2: true, // Sort in reverse order?
         interventionSets: [], // List of objects for intervention sets the project has
         activeIntervSet: {}, // Active intervention set
         interventionList: [],
@@ -363,7 +363,7 @@ Last update: 2018sep24
           this.sortReverse2 = !this.sortReverse2 // Reverse the sort.
         } else { // Otherwise.
           this.sortColumn2 = sortColumn // Select the new column for sorting.
-          this.sortReverse2 = false // Set the sorting for non-reverse.
+          this.sortReverse2 = true // Set the sorting for non-reverse.
         }
       },
       
@@ -377,14 +377,17 @@ Last update: 2018sep24
         return intervs.sort((interv1, interv2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1 // Warning: hard-coded to spreadsheet
-            if      (this.sortColumn2 === 'name')     { return (String(interv1[2]).toLowerCase() > String(interv2[2]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
+            if (this.sortColumn2 === 'name')      { sortDir = -sortDir } // So things sort the way you'd expect
+            if (this.sortColumn2 === 'platform')  { sortDir = -sortDir } // So things sort the way you'd expect
+            if (this.sortColumn2 === 'burdencov') { sortDir = -sortDir } // So things sort the way you'd expect
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]).toLowerCase() > String(interv2[1]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[2]).toLowerCase() > String(interv2[2]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (interv1[4] > interv2[4] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (interv1[5] > interv2[5] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (interv1[6] > interv2[6] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (interv1[7] > interv2[7] ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (interv1[8] > interv2[8] ? sortDir: -sortDir) }
           }
         )
       },
@@ -396,16 +399,16 @@ Last update: 2018sep24
           .then(response => {
             this.interventionList = response.data.interventions // Set the interventions table list.
             for (let ind=0; ind < this.interventionList.length; ind++) { // Set the active values from the loaded in data.
-              this.interventionList[ind].numindex = this.interventionList[ind][0] // Warning: hard-coded to spreadsheet
-              this.interventionList[ind].active   = (this.interventionList[ind][1] > 0)
-              this.interventionList[ind].name     = this.interventionList[ind][2]
-              this.interventionList[ind].platform = this.interventionList[ind][3]
-              this.interventionList[ind].burdencov= this.interventionList[ind][4]
-              this.interventionList[ind].icer     = Number(this.interventionList[ind][5]).toLocaleString()
-              this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].spend    = Number(this.interventionList[ind][7]).toLocaleString()
-              this.interventionList[ind].frp      = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].equity   = Number(this.interventionList[ind][9]).toLocaleString()
+              this.interventionList[ind].numindex = ind
+              this.interventionList[ind].active   = (this.interventionList[ind][0] > 0)
+              this.interventionList[ind].name     = this.interventionList[ind][1]
+              this.interventionList[ind].platform = this.interventionList[ind][2]
+              this.interventionList[ind].burdencov= this.interventionList[ind][3]
+              this.interventionList[ind].icer     = Number(this.interventionList[ind][4]).toLocaleString()
+              this.interventionList[ind].unitcost = Number(this.interventionList[ind][5]).toLocaleString()
+              this.interventionList[ind].spend    = Math.round(Number(this.interventionList[ind][6])).toLocaleString()
+              this.interventionList[ind].frp      = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].equity   = Number(this.interventionList[ind][8]).toLocaleString()
             }
           })
           .catch(error => {

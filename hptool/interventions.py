@@ -29,13 +29,14 @@ class Interventions(object):
         # Define hard-coded column names
         self.colnames = sc.odict([('active',   'Active'),
                                   ('shortname','Short name'),
+                                  ('platform', 'Platform'),
                                   ('burdencov','Causes of burden (max coverage)'),
-                                  ('parsedbc', 'parsedbc'),
                                   ('icer',     'ICER'),
                                   ('unitcost', 'Unit cost'),
                                   ('spend',    'Spending'),
                                   ('frp',      'FRP'),
-                                  ('equity',   'Equity'),])
+                                  ('equity',   'Equity'),
+                                  ])
         
         self.data       = None
         if filename is not None:
@@ -95,26 +96,17 @@ class Interventions(object):
     def loaddata(self, filename=None, folder=None):
         ''' Load data from a spreadsheet '''
         self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+        self.data.filtercols(self.colnames.values(), die=True)
         self.filename = filename
         self.parse()
         return None
     
-    def _exportcols(self, cols=None):
-        if cols is None:
-            cols = sc.dcp(self.data.cols)
-        cols = sc.promotetolist(cols)
-        if 'parsedbc' in cols:
-            cols.remove('parsedbc') # This can't be jsonified
-        return cols
-    
     def savedata(self, filename=None, folder=None, cols=None):
         ''' Export data from a spreadsheet '''
-        cols = self._exportcols(cols)
-        filepath = self.data.export(filename=filename, cols=cols)
+        filepath = self.data.export(filename=filename, cols=self.colnames.values())
         return filepath
     
     def jsonify(self, cols=None, rows=None, header=None):
         ''' Export to a JSON-friendly representation '''
-        cols = self._exportcols(cols)
-        output = self.data.jsonify(cols=cols, rows=rows, header=header)
+        output = self.data.jsonify(cols=self.colnames.values(), rows=rows, header=header)
         return output
