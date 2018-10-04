@@ -1,7 +1,7 @@
 <!--
 Define disease burden
 
-Last update: 2018sep24
+Last update: 2018oct04
 -->
 
 <template>
@@ -85,7 +85,7 @@ Last update: 2018sep24
               :class="{ highlighted: burdenSetIsSelected(burdenSet) }">
             <td v-if="burdenSet.renaming !== ''">
 			        <input type="text"
-                     class="txbox"
+                     class="txbox renamebox"
                      @keyup.enter="renameBurdenSet(burdenSet)"
                      v-model="burdenSet.renaming"/>
 			      </td>
@@ -243,6 +243,7 @@ Last update: 2018sep24
         filterPlaceholder2: 'Type here to filter diseases (cause names)', // Placeholder text for second table filter box
         filterText: '', // Text in the first table filter box
         filterText2: '', // Text in the second table filter box
+        burdenSetToRename: null, // What burden set is being renamed?
         sortColumn: 'updatedTime',  // Column of table used for sorting the burden sets // name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         burdenSets: [], // List of burden sets in the active project
@@ -323,6 +324,7 @@ Last update: 2018sep24
             for (let ind=0; ind < this.burdenSets.length; ind++) { // Add numindex elements to the burden sets to keep track of which index to pull from the server.
               this.burdenSets[ind].burdenset.numindex = ind
             }
+            this.burdenSetToRename = null  // Unset the link to a burden set being renamed.
             this.burdenSets.forEach(theSet => { // Set renaming values to blank initially.
 		          theSet.renaming = ''
 		        })
@@ -444,11 +446,29 @@ Last update: 2018sep24
           })
       },
 
+      finishRename(event) {
+        // Grab the element of the open textbox for the project name to be renamed.
+        let renameboxElem = document.querySelector('.renamebox')
+
+        // If the click is outside the textbox, renamed the remembered project.
+        if (!renameboxElem.contains(event.target)) {
+          this.renameBurdenSet(this.burdenSetToRename)
+        }
+      },
+
       renameBurdenSet(burdenSet) {
         console.log('renameBurdenSet() called for ' + burdenSet.burdenset.name)
 	      if (burdenSet.renaming === '') { // If the burden set is not in a mode to be renamed, make it so.
 		      burdenSet.renaming = burdenSet.burdenset.name
+          // Add a click listener to run the rename when outside the input box is click, and remember
+          // which burden set needs to be renamed.
+          window.addEventListener('click', this.finishRename)
+          this.burdenSetToRename = burdenSet
         } else { // Otherwise (it is to be renamed)...
+          // Remove the listener for reading the clicks outside the input box, and null out the burden set
+          // to be renamed.
+          window.removeEventListener('click', this.finishRename)
+          this.burdenSetToRename = null
           rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'burdenset', burdenSet.burdenset.numindex, burdenSet.renaming]) // Have the server change the name of the burden set.
           .then(response => {
             this.updateBurdenSets() // Update the burden sets so the renamed one shows up on the list.
