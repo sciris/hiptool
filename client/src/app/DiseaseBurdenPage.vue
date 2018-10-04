@@ -447,10 +447,10 @@ Last update: 2018oct04
       },
 
       finishRename(event) {
-        // Grab the element of the open textbox for the project name to be renamed.
+        // Grab the element of the open textbox for the burden set name to be renamed.
         let renameboxElem = document.querySelector('.renamebox')
 
-        // If the click is outside the textbox, renamed the remembered project.
+        // If the click is outside the textbox, rename the remembered burden set.
         if (!renameboxElem.contains(event.target)) {
           this.renameBurdenSet(this.burdenSetToRename)
         }
