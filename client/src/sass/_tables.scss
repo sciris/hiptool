@@ -118,6 +118,10 @@ $table-bg-active:                    $table-bg-hover;
     cursor: pointer;
   }
 
+  th.rightalign {
+    text-align: right;
+  }
+
 
   // Bordered version
   //
@@ -313,4 +317,3 @@ table {
 .divTableBody {
   display: table-row-group;
 }
-

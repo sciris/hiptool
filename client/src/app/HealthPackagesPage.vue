@@ -16,7 +16,7 @@ Last update: 2018-09-24
     <div class="PageSection" v-if="activeProjectName !== ''">
 
       <div v-if="burdenSet">
-        <button class="btn" @click="createNewPackageSet">Create health package</button>
+        <button class="btn __green" @click="createNewPackageSet">Create health package</button>
         &nbsp;Burden set:&nbsp;
         <select v-model="burdenSet">
           <option v-for='set in burdenSets'>
@@ -98,7 +98,7 @@ Last update: 2018-09-24
             <td v-else>
               {{ packageSet.packageset.name }}
             </td>
-            <td><button class="btn __green" @click="viewPackageSet(packageSet, true)">Open</button></td>
+            <td><button class="btn" @click="viewPackageSet(packageSet, true)">Open</button></td>
             <td>{{ packageSet.packageset.creationTime }}</td>
             <td>{{ packageSet.packageset.updateTime ? packageSet.packageset.updateTime:
               'No modification' }}</td>
@@ -141,7 +141,7 @@ Last update: 2018-09-24
       </table>
       <br>
 
-      <button class="btn" @click="optimize">Optimize</button>
+      <button class="btn __green" @click="optimize">Optimize</button>
       <button v-show="!showingPlots" class="btn" @click="showPlots">Show plots</button>
       <button v-show="showingPlots" class="btn" @click="hidePlots">Hide plots</button>
       <button class="btn" @click="downloadPlots">Download plots</button>
@@ -171,32 +171,32 @@ Last update: 2018-09-24
             <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('icer')" class="sortable">ICER
+          <th @click="updateSorting2('icer')" class="sortable rightalign">ICER
             <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('spend')" class="sortable">Current spending
+          <th @click="updateSorting2('spend')" class="sortable rightalign">Current spending
             <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('opt_spend')" class="sortable">Optimized spending
+          <th @click="updateSorting2('opt_spend')" class="sortable rightalign">Optimized spending
             <span v-show="sortColumn2 == 'opt_spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'opt_spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'opt_spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('targeted')" class="sortable">Targeted DALYs
+          <th @click="updateSorting2('targeted')" class="sortable rightalign">Targeted DALYs
             <span v-show="sortColumn2 == 'targeted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'targeted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'targeted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('averted')" class="sortable">Current DALYs averted
+          <th @click="updateSorting2('averted')" class="sortable rightalign">Current DALYs averted
             <span v-show="sortColumn2 == 'averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('opt_averted')" class="sortable">Optimized DALYs averted
+          <th @click="updateSorting2('opt_averted')" class="sortable rightalign">Optimized DALYs averted
             <span v-show="sortColumn2 == 'opt_averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'opt_averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'opt_averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
@@ -206,12 +206,12 @@ Last update: 2018-09-24
         <tbody>
         <tr v-for="result in sortedFilteredIntervs">
           <td>{{ result.name }}</td>
-          <td>{{ result.icer }}</td>
-          <td>{{ result.spend }}</td>
-          <td>{{ result.opt_spend }}</td>
-          <td>{{ result.targeted }}</td>
-          <td>{{ result.averted }}</td>
-          <td>{{ result.opt_averted }}</td>
+          <td class="rightalign">{{ result.icer }}</td>
+          <td class="rightalign">{{ result.spend }}</td>
+          <td class="rightalign">{{ result.opt_spend }}</td>
+          <td class="rightalign">{{ result.targeted }}</td>
+          <td class="rightalign">{{ result.averted }}</td>
+          <td class="rightalign">{{ result.opt_averted }}</td>
         </tr>
         </tbody>
       </table>
@@ -312,7 +312,7 @@ Last update: 2018-09-24
             console.log('Optimized')
             this.updatePackageSets(false)
             this.viewPackageSet(this.activePackageSet)
-            status.succeed(this, 'Optimized')
+            status.succeed(this, 'Optimizing...')
           })
       },
 

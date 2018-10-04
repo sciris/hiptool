@@ -92,7 +92,10 @@ class Burden(object):
         # Pull out data
         df = sc.dcp(self.data)
         nburdens = df.nrows()
-        colors = sc.gridcolors(nburdens, asarray=True)
+        colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
+        colordict = sc.odict()
+        for c,cause in enumerate(df[self.colnames['cause']]):
+            colordict[cause] = colors[c]
         
         # Convert to list
         if not isinstance(which, list):
@@ -114,7 +117,7 @@ class Burden(object):
                 raise Exception(errormsg)
             
             # Process data
-            sortorder = df.sort(col=colname, reverse=True)
+            df.sort(col=colname, reverse=True)
             topdata   = df[:n]
             try:
                 barvals   = hp.arr(topdata[colname])
@@ -130,7 +133,6 @@ class Burden(object):
                         raise Exception(errormsg)
                 errormsg = 'An exception was encountered, but could not be reproduced: %s' % str(E)
                 raise Exception(errormsg)
-            barinds   = sortorder[:n]
             barlabels = topdata[self.colnames['cause']].tolist()
             
             # Figure out the units
@@ -150,7 +152,9 @@ class Burden(object):
             ax.set_facecolor('none')
             yaxis = pl.arange(n, 0, -1)
             for i in range(n):
-                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=colors[barinds[i]], edgecolor='none')
+                thiscause = topdata[self.colnames['cause'],i]
+                color = colordict[thiscause]
+                pl.barh(yaxis[i], barvals[i], height=barw, facecolor=color, edgecolor='none')
             ax.set_yticks(pl.arange(10, 0, -1))    
             ax.set_yticklabels(barlabels)
             sc.SIticks(ax=ax,axis='x')

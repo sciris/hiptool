@@ -9,7 +9,7 @@ Last update: 2018sep22
     <div class="PageSection">
 
       <div class="ControlsRow">
-        <button class="btn __green" @click="createNewProject">Create new project</button>
+        <button class="btn" @click="createNewProject">Create new project</button>
         &nbsp; &nbsp;
         <button class="btn" @click="addDemoProject">Add demo project</button>
         &nbsp; &nbsp;

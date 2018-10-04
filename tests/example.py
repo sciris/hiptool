@@ -29,10 +29,10 @@ df.sort(col='shortname')
 
 # Ploting
 if doplot:
-#    P.burden().plot()
-    fig1 = P.package().plot_spending(which='current')
-    fig2 = P.package().plot_spending(which='optimized')
-    fig3 = P.package().plot_dalys(which='current')
-    fig4 = P.package().plot_dalys(which='optimized')
+    P.burden().plot()
+#    fig1 = P.package().plot_spending(which='current')
+#    fig2 = P.package().plot_spending(which='optimized')
+#    fig3 = P.package().plot_dalys(which='current')
+#    fig4 = P.package().plot_dalys(which='optimized')
 #    fig5 = P.package().plot_cascade()
     show()
