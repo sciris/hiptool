@@ -74,7 +74,7 @@ class HealthPackage(object):
             theseburdencovs = df['parsedbc', r]
             for burdencov in theseburdencovs:
                 key = burdencov[0]
-                val = burdencov[1]
+                val = burdencov[1] # WARNING, add validation here
                 try:
                     thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
                     df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
