@@ -1,7 +1,7 @@
 """
 This script demonstrates example usage of HealthPrior.
 
-Version: 2018sep28
+Version: 2018oct04
 """
 
 from hptool import Project, HPpath
@@ -11,13 +11,14 @@ doplot = True
 
 dp = HPpath('data')
 P = Project()
-P.loadburden(filename=dp+'Afghanistan BoD.xlsx')
-P.loadinterventions(filename=dp+'DCP3 interventions.xlsx')
+P.loadburden(filename=dp+'Zimbabwe BoD.xlsx')
+P.loadinterventions(filename=dp+'Zimbabwe interventions.xlsx')
 print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[27])
 print('\n\nExample interventions entry:\n\n%s' % P.intervsets[0].data[27])
 
 P.makepackage()
-df = P.package().optimize()
+P.package().optimize()
+df = P.package().data
 df.sort(col='shortname')
 
 
@@ -28,8 +29,10 @@ df.sort(col='shortname')
 
 # Ploting
 if doplot:
-#    P.burden().plot()
-    fig1 = P.package().plot_spending()
-    fig2 = P.package().plot_dalys()
-    fig3 = P.package().plot_cascade()
+    P.burden().plot()
+#    fig1 = P.package().plot_spending(which='current')
+#    fig2 = P.package().plot_spending(which='optimized')
+#    fig3 = P.package().plot_dalys(which='current')
+#    fig4 = P.package().plot_dalys(which='optimized')
+#    fig5 = P.package().plot_cascade()
     show()

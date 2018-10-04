@@ -53,20 +53,14 @@ class HealthPackage(object):
         intervset.parse() # Ensure it's parsed
         colnames = intervset.colnames
         
-        # Data cleaning: remove if missing: cause, icer, unitcost, spending
-        origdata = sc.dcp(intervset.data)
-        print(origdata.cols)
-        critical_cols = ['active', 'burdencov', 'parsedbc', 'unitcost', 'spend', 'icer', 'frp', 'equity']
-        for col in critical_cols:
-            origdata.filter_out(key='', col=colnames[col], verbose=True)
-        origdata.replace(col=colnames['spend'], old='', new=0.0)
-        nrows = origdata.nrows()
-        
         # Create new dataframe
-        df = sc.dataframe(cols=[colnames['active']], data=np.ones(nrows))
-        for col in ['shortname']+critical_cols: # Copy columns over
-            colname = colnames[col]
-            df[col] = origdata[colname]
+        origdata = sc.dcp(intervset.data)
+        critical_cols = ['active', 'shortname', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        df = sc.dataframe()
+        for col in critical_cols: # Copy columns over
+            df[col] = sc.dcp(origdata[colnames[col]])
+        df['parsedbc'] = sc.dcp(origdata['parsedbc']) # Since not named
+        df.filter_out(key=0, col='active', verbose=True)
         
         # Calculate people covered (spending/unitcost)
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
@@ -81,12 +75,12 @@ class HealthPackage(object):
             theseburdencovs = df['parsedbc', r]
             for burdencov in theseburdencovs:
                 key = burdencov[0]
-                val = burdencov[1]
+                val = burdencov[1] # WARNING, add validation here
                 try:
                     thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
                     df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
                     df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
-                    df['max_dalys',r]        += df['total_dalys',r] * val
                 except Exception as E:
                     notfound.append(key)
         
@@ -111,16 +105,17 @@ class HealthPackage(object):
         df.addcol('opt_spend')
         df.addcol('opt_dalys_averted')
         
+        # Store colors
+        nintervs = df.nrows()
+        colors = sc.gridcolors(nintervs+2, asarray=True)[2:] # Skip black and white
+        colordict = sc.odict()
+        for c,name in enumerate(df['shortname']):
+            colordict[name] = colors[c]
+        self.colordict = colordict
+        
         self.data = df # Store it
         if verbose:
             print('Health package %s recalculated from burdenset=%s and intervset=%s' % (self.name, self.burdenset, self.intervset))
-        return None
-    
-    
-    def loaddata(self, filename=None, folder=None):
-        ''' Load data from a spreadsheet -- WARNING, do we need this? '''
-        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
-        self.filename = filename
         return None
     
     
@@ -136,7 +131,7 @@ class HealthPackage(object):
         return output
     
     
-    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=True):
+    def optimize(self, budget=None, frpwt=None, equitywt=None, verbose=False):
         # Handle inputs
         if budget   is None: budget = self.budget
         if frpwt    is None: frpwt     = self.frpwt
@@ -183,16 +178,22 @@ class HealthPackage(object):
         if verbose:
             print('Optimization output:')
             print(self.data)
-        return self.data
+        return None
         
+    def _getcolors(self, labels):
+        colors = []
+        for label in labels:
+            if label in self.colordict: colors.append(self.colordict[label])
+            else:                       colors.append(0.7+np.zeros(3)) # Set to gray for "Other"
+        return colors
         
     def plot_dalys(self, which=None):
         if which is None: which = 'current'
         if which == 'current':
-            colkey = 'dalys_averted'
+            colkey   = 'dalys_averted'
             titlekey = 'Current'
         elif which == 'optimized':
-            colkey = 'opt_dalys_averted'
+            colkey   = 'opt_dalys_averted'
             titlekey = 'Optimized'
         else:
             errormsg = '"which" not recognized: %s' % which
@@ -200,22 +201,21 @@ class HealthPackage(object):
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         max_entries = 11
-        colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
-#        plot_data = plot_data.round()
-        total_averted = (plot_data.sum()*1e3)
+        total_averted = (DA_data.sum()*1e3)
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
         plot_labels.append('Other')
+        colors = self._getcolors(plot_labels)
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("%s DALYs averted ('000s; total: %0.0f)" % (titlekey, total_averted))
+        pl.title("%s DALYs averted ('000s; total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
@@ -234,23 +234,23 @@ class HealthPackage(object):
             raise Exception(errormsg)
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
+        print('WARNING, number of entries is hard-coded')
         max_entries = 11
-        colors = sc.gridcolors(ncolors=max_entries+2)[2:]
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
-#        plot_data = plot_data.round()
-        total_averted = (plot_data.sum())
+        total_averted = (DA_data.sum())
         data_labels = ['%0.1fm'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
         plot_labels.append('Other')
+        colors = self._getcolors(plot_labels)
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
         pl.gca().axis('equal')
-        pl.title("%s spending (total: %0.3f million)" % (titlekey, total_averted))
+        pl.title("%s spending (total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
@@ -290,7 +290,7 @@ class HealthPackage(object):
                 pl.bar(loc,  height=this, bottom=start, width=prop,  color=color)
                 pl.text(x[pt], amount+1, amountstr, horizontalalignment='center', color=colors[pt])
         if vertical:
-            pl.xlabel('Optimized investment cascade')
+            pl.xlabel('Spending for optimized investment cascade')
             pl.gca().set_yticks(x)
             ticklabels = pl.gca().set_yticklabels(DA_labels)
         else:

@@ -601,14 +601,13 @@ def delete_burden(project_id, intervkey, index):
 ###################################################################################
 
 @RPC()
-def jsonify_interventions(project_id, intervkey=None, verbose=True):
+def jsonify_interventions(project_id, intervkey=None, verbose=False):
     proj = load_project(project_id) # Get the Project object.
     intervset = proj.interv(key=intervkey) # Get the intervention set that matches the key
     if intervset.data is None: return {'interventions': []}  # Return an empty list if no data is present.
-    interv_data = [list(interv) for interv in intervset.data] # Gather the list for all of the interventions.
+    interv_data = intervset.jsonify(cols=intervset.colnames.values(), header=False) # Gather the list for all of the diseases, but only those with defined names (leaving out parsedbc)
     if verbose: sc.pp(interv_data)
     return {'interventions': interv_data}
-
 
 @RPC()
 def create_intervset(project_id, country):
@@ -626,15 +625,15 @@ def update_intervention(project_id, intervkey, intervind, data, verbose=True):
     proj = load_project(project_id)
     data_record = proj.intervsets[intervkey].data[intervind]
     if verbose: print('Original intervention set record:\n%s' % data_record)
-    data_record[1]  = sanitize(data[0]) # Active 
-    data_record[3]  = data[1]           # Name
-    data_record[4]  = data[2]           # Platform
-    data_record[5]  = data[3]           # Burdencov
-    data_record[6]  = sanitize(data[5]) # ICER
-    data_record[7]  = sanitize(data[6]) # Unit cost
-    data_record[8]  = sanitize(data[7]) # Spend
-    data_record[9]  = sanitize(data[8]) # FRP
-    data_record[10] = sanitize(data[9]) # Equity
+    data_record[0] = sanitize(data[0]) # Active 
+    data_record[1] = data[1]           # Name
+    data_record[2] = data[2]           # Platform
+    data_record[3] = data[3]           # Burdencov
+    data_record[4] = sanitize(data[4]) # ICER
+    data_record[5] = sanitize(data[5]) # Unit cost
+    data_record[6] = sanitize(data[6]) # Spend
+    data_record[7] = sanitize(data[7]) # FRP
+    data_record[8] = sanitize(data[8]) # Equity
     if verbose: print('New intervention set record:\n%s' % data_record)
     make_package(proj, die=False) # Update with the latest data
     save_project(proj)
@@ -657,7 +656,7 @@ def copy_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
     value = sc.dcp(data[index])
-    value[3] += ' (copy)' # This is the name
+    value[1] += ' (copy)' # This is the name -- warning, hard-coded!
     data.insert(row=index, value=value)
     save_project(proj)
     return None
@@ -667,7 +666,7 @@ def copy_intervention(project_id, intervkey, index):
 def delete_intervention(project_id, intervkey, index):
     proj = load_project(project_id)
     data = proj.intervsets[intervkey].data
-    data.rmrow(key=index)
+    data.pop(index)
     save_project(proj)
     return None
 
@@ -678,11 +677,11 @@ def delete_intervention(project_id, intervkey, index):
 ################################################################################### 
 
 @RPC()
-def jsonify_packages(project_id, packagekey, verbose=True):
+def jsonify_packages(project_id, packagekey, verbose=False):
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     if packageset.data is None: return {'results': []} # Return an empty list if no data is present.
-    results = packageset.jsonify(cols=['shortname','burdencov','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
+    results = packageset.jsonify(cols=['shortname','total_dalys','icer','spend','opt_spend','dalys_averted','opt_dalys_averted'], header=False) # Gather the list for all of the diseases.
     output = {'results': results, 'budget':packageset.budget, 'frpwt':packageset.frpwt, 'equitywt':packageset.equitywt}
     if verbose: sc.pp(output)
     return output
@@ -708,7 +707,8 @@ def create_packageset(project_id, burdenset=None, intervset=None):
 
 
 @RPC()
-def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None):
+def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None, verbose=True):
+    if verbose: print('Running optimization for budget=%s, frpwt=%s, equitywt=%s' % (budget, frpwt, equitywt))
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
     budget   = sanitize(budget,   forcefloat=True)
