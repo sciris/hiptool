@@ -15,7 +15,7 @@ Last update: 2018sep24
 
     <div class="PageSection" v-if="activeProjectName !== ''">
 
-      <button class="btn" @click="createNewSet">Create new intervention set</button>
+      <button class="btn __green" @click="createNewSet">Create new intervention set</button>
       <span>&nbsp;based on&nbsp;</span>
       <select
         title="countrySelect"
@@ -112,7 +112,7 @@ Last update: 2018sep24
              :placeholder="filterPlaceholder2"
              v-model="filterText2"/>
 
-      <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px;">
+      <table class="table table-bordered table-hover table-striped scrolltable" style="width: auto; margin-top: 10px">
         <thead>
         <tr>
           <th>Active</th>
@@ -230,7 +230,7 @@ Last update: 2018sep24
         </tr>
         </tbody>
       </table>
-      <button class="btn" @click="addInterv">Add new intervention</button>
+      <!--<button class="btn" @click="addInterv">Add new intervention</button>--> <!-- Disabled for possible future removal -->
     </div>
   </div>
 </template>
@@ -377,14 +377,14 @@ Last update: 2018sep24
         return intervs.sort((interv1, interv2) =>
           {
             let sortDir = this.sortReverse2 ? -1: 1 // Warning: hard-coded to spreadsheet
-            if      (this.sortColumn2 === 'name')     { return (String(interv1[2]).toLowerCase() > String(interv2[2]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'platform') { return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[4]).toLowerCase() > String(interv2[4]).toLowerCase() ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'icer')     { return (String(interv1[5]) > String(interv2[5]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[6]) > String(interv2[6]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'spend')    { return (String(interv1[7]) > String(interv2[7]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'frp')      { return (String(interv1[8]) > String(interv2[8]) ? sortDir: -sortDir) }
-            else if (this.sortColumn2 === 'equity')   { return (String(interv1[9]) > String(interv2[9]) ? sortDir: -sortDir) }
+            if      (this.sortColumn2 === 'name')     { return (String(interv1[1]).toLowerCase() > String(interv2[1]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'platform') { return (String(interv1[2]).toLowerCase() > String(interv2[2]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'burdencov'){ return (String(interv1[3]).toLowerCase() > String(interv2[3]).toLowerCase() ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'icer')     { return (String(interv1[4])               > String(interv2[4]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'unitcost') { return (String(interv1[5])               > String(interv2[5]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'spend')    { return (String(interv1[6])               > String(interv2[5]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'frp')      { return (String(interv1[7])               > String(interv2[6]) ? sortDir: -sortDir) }
+            else if (this.sortColumn2 === 'equity')   { return (String(interv1[8])               > String(interv2[7]) ? sortDir: -sortDir) }
           }
         )
       },
@@ -396,16 +396,16 @@ Last update: 2018sep24
           .then(response => {
             this.interventionList = response.data.interventions // Set the interventions table list.
             for (let ind=0; ind < this.interventionList.length; ind++) { // Set the active values from the loaded in data.
-              this.interventionList[ind].numindex = this.interventionList[ind][0] // Warning: hard-coded to spreadsheet
-              this.interventionList[ind].active   = (this.interventionList[ind][1] > 0)
-              this.interventionList[ind].name     = this.interventionList[ind][2]
-              this.interventionList[ind].platform = this.interventionList[ind][3]
-              this.interventionList[ind].burdencov= this.interventionList[ind][4]
-              this.interventionList[ind].icer     = Number(this.interventionList[ind][5]).toLocaleString()
-              this.interventionList[ind].unitcost = Number(this.interventionList[ind][6]).toLocaleString()
-              this.interventionList[ind].spend    = Number(this.interventionList[ind][7]).toLocaleString()
-              this.interventionList[ind].frp      = Number(this.interventionList[ind][8]).toLocaleString()
-              this.interventionList[ind].equity   = Number(this.interventionList[ind][9]).toLocaleString()
+              this.interventionList[ind].numindex = ind
+              this.interventionList[ind].active   = (this.interventionList[ind][0] > 0)
+              this.interventionList[ind].name     = this.interventionList[ind][1]
+              this.interventionList[ind].platform = this.interventionList[ind][2]
+              this.interventionList[ind].burdencov= this.interventionList[ind][3]
+              this.interventionList[ind].icer     = Number(this.interventionList[ind][4]).toLocaleString()
+              this.interventionList[ind].unitcost = Number(this.interventionList[ind][5]).toLocaleString()
+              this.interventionList[ind].spend    = Number(this.interventionList[ind][6]).toLocaleString()
+              this.interventionList[ind].frp      = Number(this.interventionList[ind][7]).toLocaleString()
+              this.interventionList[ind].equity   = Number(this.interventionList[ind][8]).toLocaleString()
             }
           })
           .catch(error => {

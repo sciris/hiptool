@@ -58,8 +58,8 @@ class HealthPackage(object):
         critical_cols = ['active', 'shortname', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         df = sc.dataframe()
         for col in critical_cols: # Copy columns over
-            df[col] = origdata[colnames[col]]
-        df['parsedbc'] = origdata['parsedbc']
+            df[col] = sc.dcp(origdata[colnames[col]])
+        df['parsedbc'] = sc.dcp(origdata['parsedbc'])
         
         # Calculate people covered (spending/unitcost)
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
@@ -169,7 +169,7 @@ class HealthPackage(object):
         if verbose:
             print('Optimization output:')
             print(self.data)
-        return self.data
+        return None
         
         
     def plot_dalys(self, which=None):

@@ -14,7 +14,7 @@ Last update: 2018sep24
     </div>
 
     <div class="PageSection" v-if="activeProjectName !== ''">
-      <button class="btn" @click="createNewBurdenSet">Create new burden set</button>
+      <button class="btn __green" @click="createNewBurdenSet">Create new burden set</button>
 
       <span>&nbsp;based on&nbsp;</span>
       <select
@@ -219,7 +219,7 @@ Last update: 2018sep24
           </tr>
         </tbody>
       </table>
-      <button class="btn" @click="addBurden">Add new burden</button>
+      <!--<button class="btn" @click="addBurden">Add new burden</button>--> <!-- Disabled for possible future removal -->
 
     </div>
   </div>
@@ -375,10 +375,10 @@ Last update: 2018sep24
           this.diseaseList = response.data.diseases // Set the disease list.
           for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
-		        this.diseaseList[ind]['Active'] = (this.diseaseList[ind][0] > 0)
-            this.diseaseList[ind]['Cause'] = this.diseaseList[ind][1]
-            this.diseaseList[ind]['DALYs'] = Number(this.diseaseList[ind][2]).toLocaleString()
-            this.diseaseList[ind]['Deaths'] = Number(this.diseaseList[ind][3]).toLocaleString()
+		        this.diseaseList[ind]['Active']     = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind]['Cause']      = this.diseaseList[ind][1]
+            this.diseaseList[ind]['DALYs']      = Number(this.diseaseList[ind][2]).toLocaleString()
+            this.diseaseList[ind]['Deaths']     = Number(this.diseaseList[ind][3]).toLocaleString()
             this.diseaseList[ind]['Prevalence'] = Number(this.diseaseList[ind][4]).toLocaleString()
 		      }
           this.sortColumn2 = 'name' // Reset the bottom table sorting state.
@@ -528,6 +528,9 @@ Last update: 2018sep24
         .then(response => {
           status.succeed(this, 'Burden set updated')
         })
+          .catch(error => {
+            status.fail(this, 'Could not update burden set', error)
+          })
       },
 
       addBurden() {
@@ -536,6 +539,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden added')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not add burden', error)
           })
       },
 
@@ -546,6 +552,9 @@ Last update: 2018sep24
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden copied')
           })
+          .catch(error => {
+            status.fail(this, 'Could not copy burden', error)
+          })
       },
 
       deleteBurden(burden) {
@@ -554,6 +563,9 @@ Last update: 2018sep24
           .then(response => {
             this.viewBurdenSet(this.activeBurdenSet) // Update the display of the burden list by rerunning the active burden set.
             status.succeed(this, 'Burden deleted')
+          })
+          .catch(error => {
+            status.fail(this, 'Could not delete burden', error)
           })
       },
 

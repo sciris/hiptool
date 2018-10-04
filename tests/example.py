@@ -1,7 +1,7 @@
 """
 This script demonstrates example usage of HealthPrior.
 
-Version: 2018sep28
+Version: 2018oct04
 """
 
 from hptool import Project, HPpath

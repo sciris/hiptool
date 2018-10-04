@@ -29,6 +29,7 @@ class Interventions(object):
         # Define hard-coded column names
         self.colnames = sc.odict([('active',   'Active'),
                                   ('shortname','Short name'),
+                                  ('platform', 'Platform'),
                                   ('burdencov','Causes of burden (max coverage)'),
                                   ('icer',     'ICER'),
                                   ('unitcost', 'Unit cost'),
