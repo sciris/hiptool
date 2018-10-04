@@ -1,7 +1,7 @@
 <!--
 Define health packages
 
-Last update: 2018-09-24
+Last update: 2018-10-04
 -->
 
 <template>
@@ -91,7 +91,7 @@ Last update: 2018-09-24
               :class="{ highlighted: packageSetIsSelected(packageSet) }">
             <td v-if="packageSet.renaming !== ''">
               <input type="text"
-                     class="txbox"
+                     class="txbox renamebox"
                      @keyup.enter="renamePackageSet(packageSet)"
                      v-model="packageSet.renaming"/>
             </td>
@@ -238,6 +238,7 @@ Last update: 2018-09-24
         filterPlaceholder2: 'Type here to filter interventions', // Placeholder text for second table filter box
         filterText: '', // Text in the first table filter box
         filterText2: '', // Text in the second table filter box
+        packageToRename: null, // What health package is being renamed?
         sortColumn: 'updatedTime',  // Column of table used for sorting the health package sets // name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         packageSets: [], // List of health package sets in the active project
@@ -331,6 +332,7 @@ Last update: 2018-09-24
               for (let ind=0; ind < this.packageSets.length; ind++) { // Add numindex elements to the package sets to keep track of which index to pull from the server.
                 this.packageSets[ind].packageset.numindex = ind
               }
+              this.packageToRename = null  // Unset the link to a health package being renamed.
               this.packageSets.forEach(theSet => { // Set renaming values to blank initially.
                 theSet.renaming = ''
               })
@@ -458,11 +460,29 @@ Last update: 2018-09-24
           })
       },
 
+      finishRename(event) {
+        // Grab the element of the open textbox for the health package name to be renamed.
+        let renameboxElem = document.querySelector('.renamebox')
+
+        // If the click is outside the textbox, rename the remembered health package.
+        if (!renameboxElem.contains(event.target)) {
+          this.renamePackageSet(this.packageToRename)
+        }
+      },
+
       renamePackageSet(packageSet) {
         console.log('renamePackageSet() called for ' + packageSet.packageset.name)
         if (packageSet.renaming === '') { // If the package set is not in a mode to be renamed, make it so.
           packageSet.renaming = packageSet.packageset.name
+          // Add a click listener to run the rename when outside the input box is click, and remember
+          // which health package needs to be renamed.
+          window.addEventListener('click', this.finishRename)
+          this.packageToRename = packageSet
         } else { // Otherwise (it is to be renamed)...
+          // Remove the listener for reading the clicks outside the input box, and null out the health package
+          // to be renamed.
+          window.removeEventListener('click', this.finishRename)
+          this.packageToRename = null
           rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'packageset', packageSet.packageset.numindex, packageSet.renaming]) // Have the server change the name of the package set.
             .then(response => {
               this.updatePackageSets() // Update the package sets so the renamed one shows up on the list.
