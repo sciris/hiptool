@@ -171,32 +171,32 @@ Last update: 2018-09-24
             <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'name'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('cause')" class="sortable">Cause&nbsp;of&nbsp;burden
-            <span v-show="sortColumn2 == 'cause' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
-            <span v-show="sortColumn2 == 'cause' && sortReverse2"><i class="fas fa-caret-up"></i></span>
-            <span v-show="sortColumn2 != 'cause'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
-          </th>
           <th @click="updateSorting2('icer')" class="sortable">ICER
             <span v-show="sortColumn2 == 'icer' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'icer' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'icer'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('spend')" class="sortable">Spending
+          <th @click="updateSorting2('spend')" class="sortable">Current spending
             <span v-show="sortColumn2 == 'spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('opt_spend')" class="sortable">Optimized&nbsp;spending
+          <th @click="updateSorting2('opt_spend')" class="sortable">Optimized spending
             <span v-show="sortColumn2 == 'opt_spend' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'opt_spend' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'opt_spend'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('averted')" class="sortable">DALYs&nbsp;averted
+          <th @click="updateSorting2('targeted')" class="sortable">Targeted DALYs
+            <span v-show="sortColumn2 == 'targeted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
+            <span v-show="sortColumn2 == 'targeted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
+            <span v-show="sortColumn2 != 'targeted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
+          </th>
+          <th @click="updateSorting2('averted')" class="sortable">Current DALYs averted
             <span v-show="sortColumn2 == 'averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
           </th>
-          <th @click="updateSorting2('opt_averted')" class="sortable">Optimized&nbsp;DALYs&nbsp;averted
+          <th @click="updateSorting2('opt_averted')" class="sortable">Optimized DALYs averted
             <span v-show="sortColumn2 == 'opt_averted' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'opt_averted' && sortReverse2"><i class="fas fa-caret-up"></i></span>
             <span v-show="sortColumn2 != 'opt_averted'"><i class="fas fa-caret-up" style="visibility: hidden"></i></span>
@@ -206,10 +206,10 @@ Last update: 2018-09-24
         <tbody>
         <tr v-for="result in sortedFilteredIntervs">
           <td>{{ result.name }}</td>
-          <td>{{ result.cause }}</td>
           <td>{{ result.icer }}</td>
           <td>{{ result.spend }}</td>
           <td>{{ result.opt_spend }}</td>
+          <td>{{ result.targeted }}</td>
           <td>{{ result.averted }}</td>
           <td>{{ result.opt_averted }}</td>
         </tr>
@@ -393,9 +393,9 @@ Last update: 2018-09-24
             this.equitywt = response.data.equitywt
             this.resultList = response.data.results // Set the result list.
             for (let ind=0; ind < this.resultList.length; ind++) { // Set the active values from the loaded in data.
-              this.resultList[ind].numindex =   ind
+              this.resultList[ind].numindex =     ind
               this.resultList[ind].name =         this.resultList[ind][0]
-              this.resultList[ind].cause =        this.resultList[ind][1]
+              this.resultList[ind].targeted =     Math.round(Number(this.resultList[ind][1])).toLocaleString()
               this.resultList[ind].icer =         Math.round(Number(this.resultList[ind][2])).toLocaleString()
               this.resultList[ind].spend =        Math.round(Number(this.resultList[ind][3])).toLocaleString()
               this.resultList[ind].opt_spend =    Math.round(Number(this.resultList[ind][4])).toLocaleString()
@@ -508,8 +508,7 @@ Last update: 2018-09-24
       },
 
       applyIntervFilter(intervs) {
-        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1) ||
-        (theInterv.cause.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
+        return intervs.filter(theInterv => (theInterv.name.toLowerCase().indexOf(this.filterText2.toLowerCase()) !== -1))
       },
 
       applySorting2(results) {
@@ -518,7 +517,7 @@ Last update: 2018-09-24
             let sortDir = this.sortReverse2 ? -1: 1
             if (this.sortColumn2 === 'name') { sortDir = -sortDir } // So things sort the way you'd expect
             if      (this.sortColumn2 === 'name')        {return (result1[0] > result2[0] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'cause')       {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'targeted')    {return (result1[1] > result2[1] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'icer')        {return (result1[2] > result2[2] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'spend')       {return (result1[3] > result2[3] ? sortDir: -sortDir)}
             else if (this.sortColumn2 === 'opt_spend')   {return (result1[4] > result2[4] ? sortDir: -sortDir)}
@@ -527,14 +526,6 @@ Last update: 2018-09-24
           }
         )
       },
-
-      updateResult(result) {
-        console.log('Update to be made to results -- WARNING, not supported!')
-        console.log('Index: ',   result.numindex)
-        console.log('Active?: ', result.active)
-        console.log('Cause: ',   result.name)
-        console.log('DALYs: ',   result.cause)
-      }
 
     }
   }
