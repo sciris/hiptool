@@ -1,7 +1,7 @@
 <!--
 Define interventions
 
-Last update: 2018sep24
+Last update: 2018oct04
 -->
 
 <template>
@@ -79,7 +79,7 @@ Last update: 2018sep24
             :class="{ highlighted: intervSetIsSelected(intervSet) }">
           <td v-if="intervSet.renaming !== ''">
             <input type="text"
-                   class="txbox"
+                   class="txbox renamebox"
                    @keyup.enter="renameSet(intervSet)"
                    v-model="intervSet.renaming"/>
           </td>
@@ -251,6 +251,7 @@ Last update: 2018sep24
         filterPlaceholder2: 'Type here to filter interventions', // Placeholder text for second table filter box
         filterText: '', // Text in the first table filter box
         filterText2: '', // Text in the second table filter box
+        intervSetToRename: null, // What intervention set is being renamed?
         sortColumn: 'updatedTime',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
         sortReverse: false, // Sort in reverse order?
         sortColumn2: 'name',  // Column of table used for sorting the intervention sets -- name, creationTime, updatedTime
@@ -309,6 +310,7 @@ Last update: 2018sep24
               for (let ind=0; ind < this.interventionSets.length; ind++) { // Add numindex elements to the intervention sets to keep track of which index to pull from the server.
                 this.interventionSets[ind].intervset.numindex = ind
               }
+              this.intervSetToRename = null  // Unset the link to a intervention set being renamed.
               this.interventionSets.forEach(theSet => { // Set renaming values to blank initially.
                 theSet.renaming = ''
               })
@@ -453,11 +455,29 @@ Last update: 2018sep24
           })
       },
 
+      finishRename(event) {
+        // Grab the element of the open textbox for the intervention set name to be renamed.
+        let renameboxElem = document.querySelector('.renamebox')
+
+        // If the click is outside the textbox, renamed the remembered intervention set.
+        if (!renameboxElem.contains(event.target)) {
+          this.renameSet(this.intervSetToRename)
+        }
+      },
+
       renameSet(intervSet) {
         console.log('renameSet() called for ' + intervSet.intervset.name)
         if (intervSet.renaming === '') { // If the intervention set is not in a mode to be renamed, make it so.
           intervSet.renaming = intervSet.intervset.name
+          // Add a click listener to run the rename when outside the input box is click, and remember
+          // which intervention set needs to be renamed.
+          window.addEventListener('click', this.finishRename)
+          this.intervSetToRename = intervSet
         } else { // Otherwise (it is to be renamed)...
+          // Remove the listener for reading the clicks outside the input box, and null out the intervention set
+          // to be renamed.
+          window.removeEventListener('click', this.finishRename)
+          this.intervSetToRename = null
           rpcs.rpc('rename_set', [this.$store.state.activeProject.project.id, 'interventionset', intervSet.intervset.numindex, intervSet.renaming]) // Have the server change the name of the intervention set.
             .then(response => {
               this.updateIntervSets() // Update the intervention sets so the renamed one shows up on the list.
