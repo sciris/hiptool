@@ -206,7 +206,7 @@ class HealthPackage(object):
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
-        total_averted = (DA_data.sum()*1e3)
+        total_averted = DA_data.sum()
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
