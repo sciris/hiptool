@@ -121,7 +121,8 @@ class HealthPackage(object):
     
     def savedata(self, filename=None, folder=None):
         ''' Export data from a spreadsheet '''
-        filepath = self.data.export(filename=filename)
+        cols = ['shortname','total_dalys','icer','spend','opt_spend','dalys_averted','opt_dalys_averted']
+        filepath = self.data.export(filename=filename, cols=cols)
         return filepath
         
         

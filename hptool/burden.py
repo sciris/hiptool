@@ -60,7 +60,7 @@ class Burden(object):
     
     def savedata(self, filename=None, folder=None):
         ''' Export data from a spreadsheet '''
-        filepath = self.data.export(filename=filename)
+        filepath = self.data.export(filename=filename, cols=self.colnames.values())
         return filepath
     
     def jsonify(self, cols=None, rows=None, header=None):
