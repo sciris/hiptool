@@ -7,7 +7,7 @@ Version: 2018oct04
 from hptool import Project, HPpath
 from pylab import show
 
-doplot = True
+doplot = False
 
 dp = HPpath('data')
 P = Project()
@@ -21,6 +21,9 @@ P.package().optimize()
 df = P.package().data
 df.sort(col='shortname')
 
+
+
+P.burden().savedata('temp.xlsx')
 
 #P.package().plot_cascade()
 #P.package().plot_spending()
