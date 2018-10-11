@@ -100,10 +100,11 @@ class HealthPackage(object):
             if die: raise Exception(errors)
             else:   print(errors)
             
-        # To populate with optimization results
+        # To populate with optimization results and fixed spending
         self.budget = hp.arr(df['spend']).sum()
         df.addcol('opt_spend')
         df.addcol('opt_dalys_averted')
+        df.addcol('fixed')
         
         # Store colors
         nintervs = df.nrows()
@@ -158,22 +159,32 @@ class HealthPackage(object):
         equitydata = 1.0 - equitydata
         df['icerwt'] = (1-frpwt-equitywt) + frpdata*frpwt + equitydata*equitywt
         df['benefit'] = (1.0/(hp.arr(df['icer'])+self.eps)) * hp.arr(df['icerwt'])
-        df.sort(col='benefit', reverse=True)
+        
+        # Handle fixed budgets
         remaining = sc.dcp(self.budget)
+        for r in range(df.nrows()):
+            if df['fixed']:
+                remaining -= df['spend',r]
+                df['opt_spend',r]         = df['spend',r]
+                df['opt_dalys_averted',r] = df['dalys_averted',r]
+        
+        # Do the "optimization"
+        df.sort(col='benefit', reverse=True)
         max_dalys = hp.arr(df['max_dalys'])
         icers     = hp.arr(df['icer'])
         if verbose: print('Optimizing...')
         for r in range(df.nrows()):
-            max_spend = max_dalys[r]*icers[r]
-            if verbose: print('  row %s | remaining %s | name %s | icer %s | icerwt %s | benefit %s | max_dalys %s | max_spend %s' % (r, remaining, df['shortname',r], df['icer',r], df['icerwt',r], df['benefit',r], max_dalys[r], max_spend))
-            if remaining >= max_spend:
-                remaining -= max_spend
-                df['opt_spend',r] = max_spend
-                df['opt_dalys_averted',r] = max_dalys[r]
-            else:
-                df['opt_spend',r] = remaining
-                df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
-                remaining = 0
+            if not df['fixed',r]:
+                max_spend = max_dalys[r]*icers[r]
+                if verbose: print('  row %s | remaining %s | name %s | icer %s | icerwt %s | benefit %s | max_dalys %s | max_spend %s' % (r, remaining, df['shortname',r], df['icer',r], df['icerwt',r], df['benefit',r], max_dalys[r], max_spend))
+                if remaining >= max_spend:
+                    remaining -= max_spend
+                    df['opt_spend',r] = max_spend
+                    df['opt_dalys_averted',r] = max_dalys[r]
+                else:
+                    df['opt_spend',r] = remaining
+                    df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
+                    remaining = 0
         df.sort(col='shortname')
         self.data = df
         if verbose:
