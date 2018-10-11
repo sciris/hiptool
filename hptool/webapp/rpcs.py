@@ -707,10 +707,11 @@ def create_packageset(project_id, burdenset=None, intervset=None):
 
 
 @RPC()
-def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None, verbose=True):
+def optimize(project_id, packagekey, budget=None, frpwt=None, equitywt=None, fixed=None, verbose=True):
     if verbose: print('Running optimization for budget=%s, frpwt=%s, equitywt=%s' % (budget, frpwt, equitywt))
     proj = load_project(project_id) # Get the Project object.
     packageset = proj.package(key=packagekey) # Get the package set that matches packageset_numindex.
+    packageset.data['fixed'] = fixed
     budget   = sanitize(budget,   forcefloat=True)
     frpwt    = sanitize(frpwt,    forcefloat=True)
     equitywt = sanitize(equitywt, forcefloat=True)

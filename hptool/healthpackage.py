@@ -163,7 +163,7 @@ class HealthPackage(object):
         # Handle fixed budgets
         remaining = sc.dcp(self.budget)
         for r in range(df.nrows()):
-            if df['fixed']:
+            if df['fixed',r]:
                 remaining -= df['spend',r]
                 df['opt_spend',r]         = df['spend',r]
                 df['opt_dalys_averted',r] = df['dalys_averted',r]
