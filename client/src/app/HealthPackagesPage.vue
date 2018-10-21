@@ -166,6 +166,7 @@ Last update: 2018-10-04
       <table class="table table-bordered table-hover table-striped scrolltable" style="width: 100%; margin-top: 10px;">
         <thead>
         <tr>
+          <th style="text-align:center">Fixed</th>
           <th @click="updateSorting2('name')" class="sortable">Intervention
             <span v-show="sortColumn2 == 'name' && !sortReverse2"><i class="fas fa-caret-down"></i></span>
             <span v-show="sortColumn2 == 'name' && sortReverse2"><i class="fas fa-caret-up"></i></span>
@@ -205,6 +206,7 @@ Last update: 2018-10-04
         </thead>
         <tbody>
         <tr v-for="result in sortedFilteredIntervs">
+          <td style="text-align: center"><input type="checkbox" v-model="result['fixed']"/></td>
           <td>{{ result.name }}</td>
           <td class="rightalign">{{ result.icer }}</td>
           <td class="rightalign">{{ result.spend }}</td>
@@ -308,7 +310,11 @@ Last update: 2018-10-04
       },
 
       optimize() {
-        rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex, this.budget, this.frpwt, this.equitywt])
+        let fixedList = []
+        for (let ind=0; ind < this.resultList.length; ind++) {
+          fixedList.push(this.resultList[ind].fixed)
+        }
+        rpcs.rpc('optimize', [this.$store.state.activeProject.project.id, this.activePackageSet.packageset.numindex, this.budget, this.frpwt, this.equitywt, fixedList])
           .then(response => {
             console.log('Optimized')
             this.updatePackageSets(false)
@@ -397,13 +403,14 @@ Last update: 2018-10-04
             this.resultList = response.data.results // Set the result list.
             for (let ind=0; ind < this.resultList.length; ind++) { // Set the active values from the loaded in data.
               this.resultList[ind].numindex =     ind
-              this.resultList[ind].name =         this.resultList[ind][0]
-              this.resultList[ind].targeted =     Math.round(Number(this.resultList[ind][1])).toLocaleString()
-              this.resultList[ind].icer =         Math.round(Number(this.resultList[ind][2])).toLocaleString()
-              this.resultList[ind].spend =        Math.round(Number(this.resultList[ind][3])).toLocaleString()
-              this.resultList[ind].opt_spend =    Math.round(Number(this.resultList[ind][4])).toLocaleString()
-              this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][5])).toLocaleString()
-              this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][6])).toLocaleString()
+              this.resultList[ind].fixed =        (this.resultList[ind][0] > 0)
+              this.resultList[ind].name =         this.resultList[ind][1]
+              this.resultList[ind].targeted =     Math.round(Number(this.resultList[ind][2])).toLocaleString()
+              this.resultList[ind].icer =         Math.round(Number(this.resultList[ind][3])).toLocaleString()
+              this.resultList[ind].spend =        Math.round(Number(this.resultList[ind][4])).toLocaleString()
+              this.resultList[ind].opt_spend =    Math.round(Number(this.resultList[ind][5])).toLocaleString()
+              this.resultList[ind].averted =      Math.round(Number(this.resultList[ind][6])).toLocaleString()
+              this.resultList[ind].opt_averted =  Math.round(Number(this.resultList[ind][7])).toLocaleString()
             }
             this.makeGraph(packageSet) // Plot graphs
           })
@@ -537,13 +544,13 @@ Last update: 2018-10-04
           {
             let sortDir = this.sortReverse2 ? -1: 1
             if (this.sortColumn2 === 'name') { sortDir = -sortDir } // So things sort the way you'd expect
-            if      (this.sortColumn2 === 'name')        {return (result1[0] > result2[0] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'targeted')    {return (result1[1] > result2[1] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'icer')        {return (result1[2] > result2[2] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'spend')       {return (result1[3] > result2[3] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'opt_spend')   {return (result1[4] > result2[4] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'averted')     {return (result1[5] > result2[5] ? sortDir: -sortDir)}
-            else if (this.sortColumn2 === 'opt_averted') {return (result1[6] > result2[6] ? sortDir: -sortDir)}
+            if      (this.sortColumn2 === 'name')        {return (result1[1] > result2[1] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'targeted')    {return (result1[2] > result2[2] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'icer')        {return (result1[3] > result2[3] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'spend')       {return (result1[4] > result2[4] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_spend')   {return (result1[5] > result2[5] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'averted')     {return (result1[6] > result2[6] ? sortDir: -sortDir)}
+            else if (this.sortColumn2 === 'opt_averted') {return (result1[7] > result2[7] ? sortDir: -sortDir)}
           }
         )
       },
