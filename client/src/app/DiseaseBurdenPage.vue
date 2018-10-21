@@ -251,8 +251,9 @@ Last update: 2018oct04
         diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
         sortColumn2: 'name',  // Column of table used for sorting the diseases
         sortReverse2: true, // Sort diseases in reverse order?
-        country: 'Afghanistan',
+        country: 'Demo',
         countryList: [
+          'Demo',
           'Afghanistan',
           'Argentina',
           'Cambodia',
