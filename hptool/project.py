@@ -169,7 +169,7 @@ class Project(object):
 
 def demo():
     datadir     = hp.HPpath('data')
-    burdenspath = datadir + 'Afghanistan BoD.xlsx'
-    intervspath = datadir + 'Afghanistan interventions.xlsx'
+    burdenspath = datadir + 'Demo BoD.xlsx'
+    intervspath = datadir + 'Demo interventions.xlsx'
     project = Project(name='Demo', burdenfile=burdenspath, interventionsfile=intervspath, makepackage=True)
     return project
