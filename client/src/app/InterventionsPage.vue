@@ -262,8 +262,8 @@ Last update: 2018oct04
         country: 'Demo',
         countryList: [
           'Demo',
-          'Afghanistan',
-          'Zimbabwe',
+          // 'Afghanistan',
+          // 'Zimbabwe',
         ]
       }
     },
