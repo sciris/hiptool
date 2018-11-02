@@ -71,7 +71,7 @@ class HealthPackage(object):
         df.addcol('total_prevalence', value=0)
         df.addcol('dalys_averted',    value=0)
         notfound = []
-        for r in range(df.nrows()):
+        for r in range(df.nrows):
             theseburdencovs = df['parsedbc', r]
             for burdencov in theseburdencovs:
                 key = burdencov[0]
@@ -89,7 +89,7 @@ class HealthPackage(object):
             errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(E))
             raise hp.HPException(errormsg)
         invalid = []
-        for r in range(df.nrows()):
+        for r in range(df.nrows):
             df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
             if df['dalys_averted',r]>df['max_dalys',r]:
                 errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
@@ -107,7 +107,7 @@ class HealthPackage(object):
         df.addcol('fixed')
         
         # Store colors
-        nintervs = df.nrows()
+        nintervs = df.nrows
         colors = sc.gridcolors(nintervs+2, asarray=True)[2:] # Skip black and white
         colordict = sc.odict()
         for c,name in enumerate(df['shortname']):
@@ -162,7 +162,7 @@ class HealthPackage(object):
         
         # Handle fixed budgets
         remaining = sc.dcp(self.budget)
-        for r in range(df.nrows()):
+        for r in range(df.nrows):
             if df['fixed',r]:
                 remaining -= df['spend',r]
                 df['opt_spend',r]         = df['spend',r]
@@ -173,7 +173,7 @@ class HealthPackage(object):
         max_dalys = hp.arr(df['max_dalys'])
         icers     = hp.arr(df['icer'])
         if verbose: print('Optimizing...')
-        for r in range(df.nrows()):
+        for r in range(df.nrows):
             if not df['fixed',r]:
                 max_spend = max_dalys[r]*icers[r]
                 if verbose: print('  row %s | remaining %s | name %s | icer %s | icerwt %s | benefit %s | max_dalys %s | max_spend %s' % (r, remaining, df['shortname',r], df['icer',r], df['icerwt',r], df['benefit',r], max_dalys[r], max_spend))

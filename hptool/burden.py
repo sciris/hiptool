@@ -91,7 +91,7 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
-        nburdens = df.nrows()
+        nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
         colordict = sc.odict()
         for c,cause in enumerate(df[self.colnames['cause']]):
@@ -122,7 +122,7 @@ class Burden(object):
             try:
                 barvals   = hp.arr(topdata[colname])
             except Exception as E:
-                for r in range(topdata.nrows()):
+                for r in range(topdata.nrows):
                     try:
                         float(topdata[colname,r])
                     except Exception as E2:
