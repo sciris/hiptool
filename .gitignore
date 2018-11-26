@@ -100,3 +100,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# VIM
+*.sw*
+.DS_Store
+/static/debug/
+node_modules/

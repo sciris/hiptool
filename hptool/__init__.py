@@ -91,8 +91,7 @@ from .interventions import Interventions
 from .healthpackage import HealthPackage
 from .project import Project, demo
 
-# Import webapp
-import webapp
+from . import webapp
 
 # Print the license
 HPlicense = 'HealthPrior %s (%s)' % (version, versiondate)

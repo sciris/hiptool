@@ -107,7 +107,7 @@ class Burden(object):
         
         # Loop over each option (may only be one)
         figs = []
-        for which in whichlist:
+        for which in whichlist[0]:
             colname = self.colnames[which]
             try:
                 thistitle  = titles[which]

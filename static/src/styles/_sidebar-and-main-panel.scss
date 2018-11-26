@@ -1,0 +1,229 @@
+.wrapper {
+  display: flex;
+}
+
+.sidebar {
+  max-height: 100%;
+  height: 100%;
+  z-index: 3;
+  background-size: cover;
+  background-position: center center;
+  .sidebar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    z-index: 4;
+    box-shadow: inset -1px 0px 0px 0px $medium-gray;
+    background: #212120;
+    .sidebar-content {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .sidebar-background {
+    position: absolute;
+    z-index: 3;
+    height: 100%;
+    width: 100%;
+    display: block;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center center;
+  }
+}
+
+.sidebar:not(.off-canvas-sidebar) {
+  width: 80px;
+  flex: 0 0 80px;
+  overflow-x: visible;
+  .nav li a {
+    // This is a hack to get the icon in a nicer position in the minimised state.
+    margin-left: 3px;
+  }
+  .sidebar-wrapper {
+    transition: width .1s ease-in-out, flex-basis .1s ease-in-out;
+    position: absolute;
+  }
+  &:not(:hover) {
+    .logotype, li a p, .moving-arrow {
+      display: none;
+    }
+    .nav li a {
+      i {
+        margin-right: 0;
+      }
+    }
+    .sidebar-wrapper, .sidebar-content {
+      width: 80px;
+      flex: 0 0 80px;
+    }
+  }
+  &:hover {
+    .sidebar-wrapper, .sidebar-content {
+      width: 260px;
+      flex: 0 0 260px;
+    }
+  }
+}
+
+.off-canvas-sidebar {
+  width: 260px;
+  flex: 0 0 260px;
+}
+
+.sidebar,
+.off-canvas-sidebar {
+  display: block;
+  font-weight: 200;
+
+  .logo {
+    padding: 13px 0;
+    margin: 0 20px;
+
+    p {
+      float: left;
+      font-size: 20px;
+      margin: 10px 10px;
+      line-height: 20px;
+    }
+
+    .simple-text {
+      padding: $padding-small-vertical $padding-zero;
+      display: block;
+      font-size: $font-size-base;
+      text-align: center;
+      font-weight: $font-weight-bold;
+      line-height: 40px;
+      text-align: left;
+
+      .logo-img{
+          width: 40px;
+          display: inline-block;
+          height: 40px;
+          margin-left: 0px;
+          margin-right: 10px;
+          background: white;
+          border-radius: 40px;
+          text-align: center;
+
+        img{
+            max-width: 21px;
+        }
+      }
+    }
+  }
+
+  .nav {
+    //margin-top: 20px;
+
+    li {
+      > a {
+        margin: 10px 0px;
+        padding-left: 20px;
+        padding-right: 20px;
+
+        opacity: .7;
+
+        // clearfix
+        &:after {
+          content: '';
+          display: table;
+          clear: both;
+        }
+      }
+
+      &:hover > a {
+        opacity: 1;
+      }
+
+      &.active,
+      &.router-link-exact-active,
+      &.router-link-active {
+        a {
+          color: $primary-color;
+          opacity: 1;
+        }
+      }
+    }
+
+    p {
+      margin: 0;
+      line-height: 30px;
+      font-size: 14px; // CK: font size for side panel
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    i {
+      font-size: 24px;
+      float: left;
+      margin-right: 15px;
+      line-height: 30px;
+      width: 30px;
+      text-align: center;
+    }
+  }
+
+  &,
+  &[data-background-color="white"] {
+    @include sidebar-background-color($white-background-color, $default-color);
+  }
+  &[data-background-color="black"] {
+    @include sidebar-background-color($black-background-color, $white-color);
+  }
+  &[data-background-color="darkblue"] {
+    @include sidebar-background-color($darkblue-background-color, $white-color);
+  }
+
+  &[data-active-color="primary"] {
+    @include sidebar-active-color($primary-color);
+  }
+  &[data-active-color="info"] {
+    @include sidebar-active-color($info-color);
+  }
+  &[data-active-color="success"] {
+    @include sidebar-active-color($success-color);
+  }
+  &[data-active-color="warning"] {
+    @include sidebar-active-color($warning-color);
+  }
+  &[data-active-color="danger"] {
+    @include sidebar-active-color($danger-color);
+  }
+
+}
+
+.sidebar,
+.main-panel {
+  -webkit-transition-property: top, bottom;
+  transition-property: top, bottom;
+  -webkit-transition-duration: .2s, .2s;
+  transition-duration: .2s, .2s;
+  -webkit-transition-timing-function: linear, linear;
+  transition-timing-function: linear, linear;
+  -webkit-overflow-scrolling: touch;
+}
+
+.main-panel {
+  flex: 1 0;
+  overflow-y: scroll;
+  background-color: $bg-nude;
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+
+  > .content {
+    padding: 30px 15px;
+    min-height: calc(100% - 123px);
+  }
+
+  > .footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar {
+    margin-bottom: 0;
+  }
+}

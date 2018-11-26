@@ -1,0 +1,85 @@
+@import url("~bootstrap/dist/css/bootstrap.css");
+@import "~normalize-scss/sass/normalize/import-now";
+@import "~vue-paper-dashboard/src/assets/sass/paper-dashboard.scss";
+
+$main-color: #a5d5e9;
+$main-dark: #66615b;
+
+@import "~sciris-uikit/dist/scss/variables";
+
+$padding-base-horizontal: 18px !default;
+$padding-simple-vertical: 10px !default;
+$padding-simple-horizontal: 18px !default;
+
+$padding-simple-vertical: 10px !default;
+$padding-simple-horizontal: 18px !default; 
+$padding-xs-vertical: 2px !default;
+$padding-xs-horizontal: 5px !default; 
+$padding-label-vertical: 2px !default;  
+$padding-label-horizontal: 12px !default;
+$margin-large-vertical: 30px !default;
+$border-radius-btn-small: 26px !default;
+$border-radius-btn-base: 20px !default;
+$border-radius-btn-large: 50px !default;
+
+@import "~sciris-uikit/dist/scss/functions";
+@import "~sciris-uikit/dist/scss/typography";
+
+@import "~sciris-uikit/dist/scss/mixins";
+@import "~sciris-uikit/dist/scss/misc";
+@import "~sciris-uikit/dist/scss/navbars";
+@import "~sciris-uikit/dist/scss/buttons"; // check
+@import "~sciris-uikit/dist/scss/dropdown";
+@import "~sciris-uikit/dist/scss/modal";
+
+@import "~sciris-uikit/dist/scss/cards"; 
+@import "~sciris-uikit/dist/scss/sidebar-and-main-panel";
+@import "~sciris-uikit/dist/scss/responsive";
+@import "~sciris-uikit/dist/scss/textbox";
+@import "~sciris-uikit/dist/scss/tooltips";
+@import "~sciris-uikit/dist/scss/graphs";
+@import "~sciris-uikit/dist/scss/tables";
+@import "~sciris-uikit/dist/scss/footers";
+@import "~sciris-uikit/dist/scss/overrides";
+
+@import "sidebar-and-main-panel.scss";
+
+.navbar {
+  .navbar-header {
+    margin-left: 10px;
+  }
+}
+
+.wrapper div.sidebar {
+  z-index: 3;
+  width: 80px;
+  position: fixed;
+}
+
+div.sidebar:hover {
+  width: 260px;
+}
+
+.sidebar .nav li.nav-item a {
+  display: block;
+  width: 260px;
+}  
+
+.main-panel {
+  margin-left: 80px;
+}
+
+.btn {
+  border-radius: $border-radius-btn-base !important;
+  color: black; 
+}
+
+@media (max-width: 991px){
+  .main-panel {
+    margin-left: 0;
+  }
+  .wrapper div.sidebar {
+    display: none;
+    width: 0;
+  }
+}

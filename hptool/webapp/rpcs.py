@@ -547,6 +547,9 @@ def plot_burden(project_id, burdenkey, dosave=True):
     figdicts = []
     if burdenset.data:
         figs = burdenset.plot()
+        if type(figs) != list:
+            figs = [figs]
+
         for fig in figs:
             figdict = sw.mpld3ify(fig, jsonify=False)
             figdicts.append(figdict)
@@ -557,10 +560,13 @@ def plot_burden(project_id, burdenkey, dosave=True):
             sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
             print('Figures saved to %s' % filepath)
         
-        # Return success -- WARNING, hard-coded to 3 graphs!
-        return {'graph1': figdicts[0], 
-                'graph2': figdicts[1],
-                'graph3': figdicts[2],}
+        graphs = {}
+        i = 1
+        for figdict in figdicts:
+            key = "graph{i}".format(i=i)
+            graphs[key] = figdicts[i-1] 
+
+        return graphs 
     else:
         return None # No graphs to make
     
@@ -750,9 +756,9 @@ def plot_packages(project_id, packagekey, dosave=True):
         sc.savefigs(figs=figs, filetype='singlepdf', filename=filepath)
         print('Figures saved to %s' % filepath)
     
-    # Return success -- WARNING, should not be hard-coded!
-    return {'graph1': figdicts[0],
-            'graph2': figdicts[1],
-            'graph3': figdicts[2],
-            'graph4': figdicts[3],
-            'graph5': figdicts[4],}
+    graphs = {}
+    i = 1
+    for figdict in figdicts:
+        key = "graph{i}".format(i=i)
+        graphs[key] = figdicts[i-1] 
+    return graphs
