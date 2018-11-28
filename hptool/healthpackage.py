@@ -76,20 +76,22 @@ class HealthPackage(object):
             for burdencov in theseburdencovs:
                 key = burdencov[0]
                 val = burdencov[1] # WARNING, add validation here
-                thisburden = burdenset.data.findrow(
-                    key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
-                df['total_dalys',r]      += float(thisburden[burdenset.colnames['dalys']])
-                df['max_dalys',r]        += float(thisburden[burdenset.colnames['dalys']]) * val
-                df['total_prevalence',r] += float(thisburden[burdenset.colnames['prevalence']])
+                try:
+                    thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
+                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
+                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
+                except Exception as E:
+                    notfound.append(key)
         
         # Validation
         if len(notfound):
-            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(""))
+            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(E))
             raise hp.HPException(errormsg)
         invalid = []
         for r in range(df.nrows):
-            df['dalys_averted',r] = float(df['spend',r]) / ( self.eps + float(df['icer',r]) )
-            if df['dalys_averted',r] > df['max_dalys',r]:
+            df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
+            if df['dalys_averted',r]>df['max_dalys',r]:
                 errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
                 df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
                 invalid.append(errormsg)
@@ -287,7 +289,7 @@ class HealthPackage(object):
         pl.axes(ax_size)
         for pt in range(npts):
             loc = x[pt:]
-            this = len(DA_data[pt])
+            this = DA_data[pt]
             start = sum(DA_data[:pt])
             prop = 0.9
             color  = colors[pt]
