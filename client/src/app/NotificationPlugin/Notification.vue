@@ -1,27 +1,43 @@
 <template>
   <div
-    data-notify="container"
-    class="alert open alert-with-icon"
     role="alert"
+    class="alert open alert-with-icon"
+    data-notify="container"
+    data-notify-position="top-center"
     :class="[verticalAlign, horizontalAlign, alertType]"
-    :style="customPosition"
-    data-notify-position="top-center">
+    :style="customPosition">
 
-    <div id = "flex">
-      <div style="padding-top:10px; padding-right:10px"><span class="alert-icon" data-notify="message" :class="icon" style="font-size:25px;"></span></div>
-      <div style="max-width:400px; font-size:15px; align-content:center"><div data-notify="message" v-html="message"></div></div>
-      <div style="padding-left:10px">
+    <div class="notification-box">
+      <div>
+        <span 
+          class="alert-icon" 
+          data-notify="message" 
+          :class="icon">
+        </span>
+      </div>
+
+      <div class="message-box" >
+        <div 
+          class="message" 
+          data-notify="message" 
+          v-html="message">
+        </div>
+      </div>
+
+      <div>
         <button
-          class="btn __trans"
+          class="btn__trans close-button"
           aria-hidden="true"
           data-notify="dismiss"
-          @click="close"><span style="font-size:18px; color:#fff; background-color: transparent; background: transparent"><i class="ti-close"></i></span>
+          @click="close">
+          <i class="ti-close"></i>
         </button>
       </div>
     </div>
 
   </div>
 </template>
+
 <script>
   export default {
     name: 'notification',
@@ -37,7 +53,7 @@
       },
       horizontalAlign: {
         type: String,
-        default: 'center'
+        default: 'right'
       },
       type: {
         type: String,
@@ -80,7 +96,6 @@
     },
     methods: {
       close () {
-//        console.log('Trying to close: ', this.timestamp)
         this.$parent.$emit('on-close', this.timestamp)  
       }
     },
@@ -92,102 +107,11 @@
   }
 
 </script>
+
+<style> 
+@import "https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css";
+</style>
+
 <style lang="scss" scoped>
-  @import "../../sass/variables";
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity .3s
-  }
-
-  .fade-enter,
-  .fade-leave-to
-  /* .fade-leave-active in <2.1.8 */
-
-  {
-    opacity: 0
-  }
-
-  .alert {
-    border: 0;
-    border-radius: 0;
-    color: #FFFFFF;
-    padding: 20px 15px;
-    font-size: 14px;
-    z-index: 100;
-    display: inline-block;
-    position: fixed;
-    transition: all 0.5s ease-in-out;
-
-    &.center {
-      left: 0px;
-      right: 0px;
-      margin: 0 auto;
-    }
-    &.left {
-      left: 20px;
-    }
-    &.right {
-      right: 20px;
-    }
-    .container & {
-      border-radius: 0px;
-    }
-    .navbar & {
-      border-radius: 0;
-      left: 0;
-      position: absolute;
-      right: 0;
-      top: 85px;
-      width: 100%;
-      z-index: 3;
-    }
-    .navbar:not(.navbar-transparent) & {
-      top: 70px;
-    }
-
-    .alert-icon {
-      font-size: 30px;
-      margin-right: 5px;
-    }
-
-    .close~span {
-      display: inline-block;
-      max-width: 89%;
-    }
-
-    &[data-notify="container"] {
-      /*max-width: 400px;*/
-      padding: 10px 5px 5px 10px; // CK: This actually affects the padding!
-      border-radius: $border-radius-base;
-    }
-
-    &.alert-with-icon {
-      /*padding-left: 15px; // CK: actual left padding*/
-    }
-  }
-
-  .alert-info {
-    background-color: $bg-info;
-    color: $info-states-color;
-  }
-
-  .alert-success {
-    background-color: $bg-success;
-    color: #fff; // $success-states-color;
-  }
-
-  .alert-warning {
-    background-color: $bg-warning;
-    color: #fff; // $warning-states-color;
-  }
-
-  .alert-danger {
-    background-color: $bg-danger;
-    color: $danger-states-color;
-  }
-
-  #flex {display: flex; justify-content: space-between;}
-  #flex div { padding: 4px; }
-
+@import "../styles/notification.scss"
 </style>
