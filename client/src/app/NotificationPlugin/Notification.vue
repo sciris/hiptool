@@ -113,5 +113,5 @@
 </style>
 
 <style lang="scss" scoped>
-@import "notification.scss"
+@import "../styles/notification.scss"
 </style>

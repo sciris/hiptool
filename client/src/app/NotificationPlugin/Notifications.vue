@@ -52,5 +52,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "notifications.scss"
+@import "../styles/notifications.scss"
 </style>
