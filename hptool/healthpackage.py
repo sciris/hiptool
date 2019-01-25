@@ -71,6 +71,7 @@ class HealthPackage(object):
         df.addcol('total_prevalence', value=0)
         df.addcol('dalys_averted',    value=0)
         notfound = []
+        E = None
         for r in range(df.nrows):
             theseburdencovs = df['parsedbc', r]
             for burdencov in theseburdencovs:
@@ -82,6 +83,12 @@ class HealthPackage(object):
                     df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
                     df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
                 except Exception as E:
+                    print('HIIII %s' % str(E))
+                    print(type(df['total_dalys',r]))
+                    print(type(df['max_dalys',r]))
+                    print(type(df['total_prevalence',r]))
+                    print(type(thisburden[burdenset.colnames['dalys']]))
+                    print(type(thisburden[burdenset.colnames['prevalence']]))
                     notfound.append(key)
         
         # Validation

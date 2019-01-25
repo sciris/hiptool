@@ -29,7 +29,7 @@ class Burden(object):
         
         # Define hard-coded column names
         self.colnames = sc.odict([('active',     'Active'),
-                                  ('code',       'Code'),
+                                  #('code',       'Code'),
                                   ('cause',      'Cause'),
                                   ('dalys',      'DALYs'),
                                   ('deaths',     'Deaths'),
