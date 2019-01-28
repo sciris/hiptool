@@ -1,93 +1,56 @@
-# HealthPrior Tool
+# hptool
 
-The HealthPrior tool, a.k.a. Health Services Prioritization Tool, is a tool for helping optimize health services.
+## Installation 
 
-## Quick start guide
+**Step 1:**  Clone the repo
 
-1. Install [Sciris](http://github.com/sciris/sciris).
-
-2. Install `hptool` by typing `python setup.py develop` in the root folder.
-
-3. Change to the `client` subfolder and type `python run.py`.
-
-4. If it worked, go to `localhost:8091` in your browser to use the webapp.
-
-## Slow start guide
-
-1. Install [Sciris](http://github.com/sciris/sciris) and follow all installation instructions there.
-
-2. Clone the `hptool` repository (yes, this one!).
-
-3. Install `hptool` by typing `python setup.py develop` in the root folder.
-
-4. Test that you can import it by typing `import hptool`, e.g.
-```
->>> import hptool
-HealthPrior 0.2.9 (2018-03-26)
-Sciris v0.3 (2018-03-23) loaded for local use (display=:0)
->>>
+``` bash
+git clone git@github.com:sciris/hptool.git
 ```
 
-5. Test that plotting works with `python -i scripts/example.py`, which should bring up a graph.
+**Step 3:** Install `docker-machine` and `docker-compose`
 
-6. To build and start the webapp, change to the `bin` folder, and type `python run.py`. Note: this will take a lot of time (up to 15 min), especially on a first run!
+Instructions for `docker-machine` installation can be found here: [Install Docker Machine | Docker Documentation](https://docs.docker.com/machine/install-machine/). For MacOS you can use homebrew if you have it installed using `brew install docker-machine`
 
-7. If it worked, you can go to `localhost:8091` in your browser and see the HealthPrior webapp.
+Instruction for docker-compose installation can be found here: [Install Docker Compose | Docker Documentation](https://docs.docker.com/compose/install/#master-builds) . For MacOS you can use homebrew if you have it installed using `brew install docker-compose`
 
-8. If it didn't work, try each of the steps separately:
+**Step 4:**  Build the images locally
 
-  8a. Type `python install_client.py` to install the JavaScript modules. You should see output like this:
-  ```
-  your_computer:~/hptool/bin> python install_client.py
-  npm WARN optional Skipping failed optional dependency /karma/chokidar/fsevents:
-  npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.1.3
-  npm WARN optional Skipping failed optional dependency /chokidar/fsevents:
-  npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.1.3
-  ```
+Change to the root of the `hptool` dir:
 
-  Don't worry about `WARN`, but _do_ worry about `ERR`! If you see `ERR`, that means that installation failed.
+```
+cd hptool
+```
 
-  8b. Type `python build_client.py` to build the JavaScript app. You should see output like:
-  ```
-  static/img/ucl-logo-transparent.png    35.5 kB          [emitted]         
-     static/img/world-bank-logo.png    30.7 kB          [emitted]         
-    static/mpld3.v0.3.1.dev1.min.js    37.6 kB          [emitted]         
+To build and run:
 
-  Build complete.
+```
+docker-compose -f docker/docker-compose.local.yml build
+docker-compose -f docker/docker-compose.local.yml up
+```
 
-  Tip: built files are meant to be served over an HTTP server.
-  Opening index.html over file:// won't work.
-  ```
-  You should not see any warnings or errors on this step.
+**Step 5:** follow the instructions on the next section ("Developing the front end") to build the front end.
 
-  8c. Type `python run.py` to start the server running. You should see something like:
-  ```
-  >> Doing other scirismain-specific initialization...
-  -- Welcome to the HealthPrior webapp, version 0.2.9 (2018-03-26) --
-  Site starting on 8091
-  Starting factory <twisted.web.server.Site instance at 0x7fedcb347dd0>
-  ```
+## Developing the front end
 
-9. If that all worked, happy health-prioritizing!
+The front end code is inside the `src/` folder.
 
-**Please see the README in the `bin` folder for more options for how to run HealthPrior.**
+To install the dependencies required for front end development:
 
+**Step 1:** Install Node.js on your local machine https://nodejs.org/en/download/
 
-## Detailed installation instructions for Windows
+**Step 2:** Install the npm dependencies
 
-No known issues; please use the quick start guide above.
+Go to the the root of the project and then:
 
-## Detailed installation instructions for Linux
+```
+npm install 
+```  
 
-No known issues; please use the quick start guide above.
+**Step 3:** Build or Watch
 
-## Detailed installation instructions for Mac
-1. Follow the Mac installation instructions for [Sciris](http://github.com/sciris/sciris).
+Once that’s done you can run `npm run watch` in order to track changes and rebuild the specific app in `debug/`. 
 
-2. In the root `pyenv` folder (see Sciris instructions), clone [HPTool](https://github.com/sciris/hptool.git)
+## Building the frontend for distribution
 
-3. Install `hptool` by typing `python setup.py develop` in the `pyenv/hptool` folder.
-
-4. Change to the `bin` subfolder and type `pythonw run.py`.
-
-5. If it worked, go to `localhost:8091` in your browser to use the webapp.
+In order to build production copy of the code you will need to go to the static folder and run `npm run build`. This will create minified copies of the app and place them in `dist/`
