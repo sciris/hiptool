@@ -1,8 +1,8 @@
 {
   "name": "HealthPrior",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "HealthPrior GUI",
-  "author": "HealthPrior Working Group <info@hptool.com>",
+  "author": "HealthPrior Working Group <info@hptool.org>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
