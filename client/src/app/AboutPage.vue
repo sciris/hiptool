@@ -11,7 +11,7 @@ Last update: 2018sep22
         <img src="static/img/hiptool-logo-light.png" width="250px">
       </div>
       <br/><br/>
-      <p>The Health Services Prioritization Tool is currently under development. Development is supported through a partnership
+      <p>The Health Interventions Prioritization Tool is currently under development. Development is supported through a partnership
         between <a href="http://www.ucl.ac.uk">University College London</a> and the <a href="http://www.burnet.edu.au">Burnet Institute</a>,
         under the auspices of the <a href="http://www.gatesfoundation.org">Bill and Melinda Gates Foundation</a> and the <a href="http://www.worldbank.org">World Bank</a>.</p>
       <br/>
