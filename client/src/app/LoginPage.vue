@@ -13,7 +13,7 @@ Last update: 2018sep22
             <img src="static/favicon-96x96.png" width="21px" vertical-align="middle" alt>
           </div>
           <span style="padding-left:10px">
-            <img src="static/img/healthpriorlogo-inverse.png" width="130px" vertical-align="middle" alt>
+            <img src="static/img/hiptool-logo-dark-small.png" width="130px" vertical-align="middle" alt>
           </span>
           <br/><br/>
           <div v-if="version" style="font-size:14px; font-weight:normal">

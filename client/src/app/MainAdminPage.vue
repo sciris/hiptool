@@ -6,7 +6,7 @@ Last update: 2018-05-28
 
 <template>
   <div class="SitePage">
-    <h2>HealthPrior Users</h2>
+    <h2>HIPtool Users</h2>
     <table v-if="usersList[0] != undefined">
       <tr>
         <th>Username</th>

@@ -15,7 +15,7 @@
               <div class="logo-img">
                   <img src="static/favicon-96x96.png" alt="">
               </div>
-              <img class="logotype" src="static/img/healthpriorlogo-inverse.png" width="130px" vertical-align="middle" alt>
+              <img class="logotype" src="static/img/hiptool-logo-dark-small.png" width="130px" vertical-align="middle" alt>
           </a>
         </div>
         <slot>
