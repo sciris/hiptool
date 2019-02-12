@@ -1,8 +1,8 @@
 {
-  "name": "HealthPrior",
-  "version": "1.4.0",
-  "description": "HealthPrior GUI",
-  "author": "HealthPrior Working Group <info@hptool.com>",
+  "name": "HIPtool",
+  "version": "2.0.0",
+  "description": "HIPtool GUI",
+  "author": "Health Interventions Prioritization Working Group <info@hiptool.org>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",

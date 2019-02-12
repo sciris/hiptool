@@ -29,6 +29,7 @@ class Burden(object):
         
         # Define hard-coded column names
         self.colnames = sc.odict([('active',     'Active'),
+                                  #('code',       'Code'),
                                   ('cause',      'Cause'),
                                   ('dalys',      'DALYs'),
                                   ('deaths',     'Deaths'),
@@ -83,7 +84,7 @@ class Burden(object):
                   'prevalence':'Most prevalent conditions'}
         
         # Handle options
-        if which   is None: which   = titles.keys()
+        if which   is None: which   = list(titles.keys())
         if n       is None: n       = 10
         if axsize  is None: axsize  = (0.65, 0.15, 0.3, 0.8)
         if figsize is None: figsize = (7,4)
@@ -113,7 +114,7 @@ class Burden(object):
                 thistitle  = titles[which]
                 thisxlabel = colname
             except Exception as E:
-                errormsg = '"%s" not found, "which" must be one of %s (%s)' % (which, ', '.join(titles.keys()), str(E))
+                errormsg = '"%s" not found, "which" must be one of %s (%s)' % (which, ', '.join(list(titles.keys())), str(E))
                 raise Exception(errormsg)
             
             # Process data
