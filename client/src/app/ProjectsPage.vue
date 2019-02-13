@@ -175,7 +175,6 @@ Last update: 2018oct04
             this.projectSummaries.forEach(theProj => { // Preprocess all projects.
               theProj.selected = false // Set to not selected.
               theProj.renaming = '' // Set to not being renamed.
-              console.log('hiiii!!!', 'id: ', theProj.project.id, 'new: ', theProj.project.creationTime, 'old: ', lastCreationTime, 'tf: ', theProj.project.creationTime >= lastCreationTime)
               if (theProj.project.creationTime >= lastCreationTime) { // Update the last creation time and ID if what se see is later.
                 lastCreationTime = theProj.project.creationTime
                 lastCreatedID = theProj.project.id
@@ -183,10 +182,8 @@ Last update: 2018oct04
             })
             if (this.projectSummaries.length > 0) { // If we have a project on the list...
               if (setActiveID === null) { // If no ID is passed in, set the active project to the last-created project.
-                console.log('Opening last project', lastCreatedID)
                 this.openProject(lastCreatedID)
               } else { // Otherwise, set the active project to the one passed in.
-                console.log('Opening active project', setActiveID)
                 this.openProject(setActiveID)
               }
             }
