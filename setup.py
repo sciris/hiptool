@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from setuptools import setup, find_packages
 
-with open("hptool/version.py", "r") as f:
+with open("hiptool/version.py", "r") as f:
     version_file = {}
     exec(f.read(), version_file)
     version = version_file["version"]
@@ -29,18 +29,19 @@ CLASSIFIERS = [
 ]
 
 setup(
-    name='hptool',
+    name='hiptool',
     version=version,
     author='Cliff Kerr, George Chadderdon',
-    author_email='info@hptool.org',
-    description='Health Package Prioritization Tool',
-    url='http://github.com/optimamodel/hptool',
-    keywords=['optima','UHC'],
+    author_email='info@hiptool.org',
+    description='Health Interventions Prioritization Tool',
+    url='http://github.com/sciris/hiptool',
+    keywords=['prioritization', 'health services', 'UHC'],
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
+        'scirisweb',
         'matplotlib>=1.4.2',
         'numpy>=1.10.1',
     ],
