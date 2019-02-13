@@ -168,7 +168,7 @@ Last update: 2018oct04
             let lastCreatedID = null
             this.projectSummaries = response.data.projects // Set the projects to what we received.
             if (this.projectSummaries.length > 0) { // Initialize the last creation time stuff if we have a non-empty list.
-              lastCreationTime = new Date(this.projectSummaries[0].project.creationTime)
+              lastCreationTime = this.projectSummaries[0].project.creationTime
               lastCreatedID = this.projectSummaries[0].project.id
             }
             this.projectToRename = null  // Unset the link to a project being renamed.
