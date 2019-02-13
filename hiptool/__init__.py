@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This file performs all necessary imports, so HealthPrior (HP) can be used either as
+This file performs all necessary imports, so HIPtool (HP) can be used either as
 
 from hptool import Project
 or
@@ -36,7 +36,7 @@ from .version import version, versiondate
 
 # Tool path
 def HPpath(subdir=None, trailingsep=True):
-    ''' Returns the parent path of the HealthPrior module. If subdir is not None, include it in the path '''
+    ''' Returns the parent path of the HIPtool module. If subdir is not None, include it in the path '''
     import os
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     if subdir is not None:
@@ -49,7 +49,7 @@ def HPpath(subdir=None, trailingsep=True):
 # Debugging information
 def debuginfo(output=False):
     import sciris as sc
-    outstr = '\nHealthPrior debugging info:\n'
+    outstr = '\nHIPtool debugging info:\n'
     outstr += '   Version: %s\n' % version
     outstr += '   Branch:  %s\n' % sc.gitinfo()['branch']
     outstr += '   SHA:     %s\n' % sc.gitinfo()['hash']
@@ -80,7 +80,7 @@ def arr(data):
     return output
 
 #####################################################################################################################
-### Load HealthPrior functions and classes
+### Load HIPtool functions and classes
 #####################################################################################################################
 
 # Core functions
@@ -96,6 +96,6 @@ from .project import Project, demo
 from . import webapp
 
 # Print the license
-HPlicense = 'HealthPrior %s (%s)' % (version, versiondate)
+HPlicense = 'HIPtool %s (%s)' % (version, versiondate)
 print(HPlicense)
 

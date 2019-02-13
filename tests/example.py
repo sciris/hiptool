@@ -1,5 +1,5 @@
 """
-This script demonstrates example usage of HealthPrior.
+This script demonstrates example usage of HIPtool.
 
 Version: 2018oct04
 """
