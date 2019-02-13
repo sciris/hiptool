@@ -1,5 +1,5 @@
 """
-Version:
+Version: 2019feb13
 """
 
 import numpy as np
@@ -94,7 +94,7 @@ class HealthPackage(object):
         
         # Validation
         if len(notfound):
-            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(lasterror))
+            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (set(notfound), str(lasterror))
             raise hp.HPException(errormsg)
         invalid = []
         for r in range(df.nrows):
@@ -220,9 +220,10 @@ class HealthPackage(object):
             raise Exception(errormsg)
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
-        max_entries = 11
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
+        max_entries = 11
+        nremaining = len(DA_data)-max_entries
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e3
@@ -230,7 +231,7 @@ class HealthPackage(object):
         data_labels = ['%i'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
-        plot_labels.append('Other')
+        plot_labels.append('All other %s interventions' % nremaining)
         colors = self._getcolors(plot_labels)
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)
@@ -255,9 +256,10 @@ class HealthPackage(object):
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
         print('WARNING, number of entries is hard-coded')
-        max_entries = 11
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
+        max_entries = 11
+        nremaining = len(DA_data)-max_entries
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
         plot_data = np.array(plot_data)/1e6
@@ -265,7 +267,7 @@ class HealthPackage(object):
         data_labels = ['%0.1fm'%datum for datum in plot_data]
         DA_labels = df['shortname']
         plot_labels = list(DA_labels[:max_entries-1])
-        plot_labels.append('Other')
+        plot_labels.append('All other %s interventions' % nremaining)
         colors = self._getcolors(plot_labels)
         pl.axes([0.15,0.1,0.45,0.8])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.5, labeldistance=1.03)

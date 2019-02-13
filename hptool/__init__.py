@@ -86,6 +86,7 @@ def arr(data):
 # Core functions
 default_key = -1 # Define what the default key is -- WARNING, move
 
+from .utils import getcountryburden, countrylist, causedict
 from .burden import Burden
 from .interventions import Interventions
 from .healthpackage import HealthPackage

@@ -2,6 +2,7 @@
 Version:
 """
 
+import os
 import pylab as pl
 import sciris as sc
 import hptool as hp
@@ -16,7 +17,7 @@ class Burden(object):
     
     From http://ghdx.healthdata.org/gbd-results-tool
     
-    Version: 2018oct02
+    Version: 2019feb13
     '''
     
     def __init__(self, name=None, project=None, filename=None, folder=None):
@@ -53,9 +54,22 @@ class Burden(object):
         return output
     
     def loaddata(self, filename=None, folder=None):
-        ''' Load data from a spreadsheet '''
-        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
-        self.data.filtercols(self.colnames.values(), die=True)
+        ''' Load data from a spreadsheet or from the database '''
+        if os.path.exists(filename):
+            self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+            self.data.filtercols(self.colnames.values(), die=True)
+        else:
+            countryburden = hp.getcountryburden(filename)
+            ncols = len(self.colnames)
+            ncauses = len(countryburden[0])
+            rawdata = pl.zeros((ncauses,ncols), dtype=object)
+            rawdata[:,0] = 1 # Set Active to True
+            rawdata[:,1] = countryburden[0].keys() # Set the causes
+            rawdata[:,2] = countryburden[0][:] # Set DALYs
+            rawdata[:,3] = countryburden[1][:] # Set deaths
+            rawdata[:,4] = countryburden[2][:] # Set prevalence
+            data = sc.dataframe(cols=self.colnames.values(), data=rawdata)
+            self.data = data
         self.filename = filename
         return None
     

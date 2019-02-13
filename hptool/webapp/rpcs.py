@@ -504,6 +504,10 @@ def rename_set(project_id, which, ind, newname, die=False):
 ################################################################################### 
     
 @RPC()
+def get_countries():
+    return hp.countrylist
+    
+@RPC()
 def jsonify_diseases(project_id, burdenkey):
     proj = load_project(project_id) # Get the Project object.
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
@@ -516,7 +520,8 @@ def jsonify_diseases(project_id, burdenkey):
 def create_burdenset(project_id, country):
     proj = load_project(project_id) # Get the Project object.
     unique_name = sc.uniquename(country, namelist=proj.burdensets.keys())
-    filename = hp.HPpath('data')+country+' BoD.xlsx'
+#    filename = hp.HPpath('data')+country+' BoD.xlsx'
+    filename = country # Load from database
     newburdenset = hp.Burden(project=proj, name=unique_name, filename=filename)
     proj.burdensets[unique_name] = newburdenset # Put the new burden set in the dictionary.
     save_project(proj)
