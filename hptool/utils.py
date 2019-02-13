@@ -592,3 +592,10 @@ causedict = sc.odict([
 ("Yellow fever", "A.4.12"),
 ("Zika virus", "A.4.18"),
         ])
+
+codes = causedict.values()
+sorco = sorted(codes)
+codestring = '\n'.join(sorco)
+twigcausedict = sc.odict()
+for co in sorco:
+    twigcausedict[co] = codestring.count(co)==1 and co!='T'

@@ -30,7 +30,7 @@ class Burden(object):
         
         # Define hard-coded column names
         self.colnames = sc.odict([('active',     'Active'),
-                                  #('code',       'Code'),
+                                  ('code',       'Code'),
                                   ('cause',      'Cause'),
                                   ('dalys',      'DALYs'),
                                   ('deaths',     'Deaths'),
@@ -58,12 +58,13 @@ class Burden(object):
         if os.path.exists(filename):
             self.data = sc.loadspreadsheet(filename=filename, folder=folder)
             self.data.filtercols(self.colnames.values(), die=True)
+            self.data['Active'] = hp.twigcausedict[:] # WARNING, assumes same order!
         else:
             countryburden = hp.getcountryburden(filename)
             ncols = len(self.colnames)
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
-            rawdata[:,0] = 1 # Set Active to True
+            rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
             rawdata[:,1] = countryburden[0].keys() # Set the causes
             rawdata[:,2] = countryburden[0][:] # Set DALYs
             rawdata[:,3] = countryburden[1][:] # Set deaths
@@ -106,6 +107,7 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
+        df.filter_out(col='Active')
         nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
         colordict = sc.odict()

@@ -131,6 +131,18 @@ Last update: 2018oct04
             <th style="text-align:center">
               Active ({{numactive}}/{{numtotal}})
             </th>
+            <th @click="updateSorting2('code')" class="sortable">
+              Code
+              <span v-show="sortColumn2 == 'code' && !sortReverse2">
+                <i class="fas fa-caret-down"></i>
+              </span>
+              <span v-show="sortColumn2 == 'code' && sortReverse2">
+                <i class="fas fa-caret-up"></i>
+              </span>
+              <span v-show="sortColumn2 != 'code'">
+                <i class="fas fa-caret-up" style="visibility: hidden"></i>
+              </span>
+            </th>
             <th @click="updateSorting2('name')" class="sortable">
               Cause name
               <span v-show="sortColumn2 == 'name' && !sortReverse2">
@@ -188,6 +200,12 @@ Last update: 2018oct04
               <input type="checkbox"
                      v-model="disease['Active']"
                      v-on:change="updateDisease(disease)"/>
+            </td>
+            <td>
+              <input type="text"
+                     class="txbox"
+                     @keyup.enter="updateDisease(disease)"
+                     v-model="disease['Code']"/>
             </td>
             <td>
               <input type="text"
@@ -408,10 +426,11 @@ Last update: 2018oct04
           for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
             this.diseaseList[ind]['Active']     = (this.diseaseList[ind][0] > 0)
-            this.diseaseList[ind]['Cause']      = this.diseaseList[ind][1]
-            this.diseaseList[ind]['DALYs']      = Math.round(Number(this.diseaseList[ind][2])).toLocaleString()
-            this.diseaseList[ind]['Deaths']     = Math.round(Number(this.diseaseList[ind][3])).toLocaleString()
-            this.diseaseList[ind]['Prevalence'] = Math.round(Number(this.diseaseList[ind][4])).toLocaleString()
+            this.diseaseList[ind]['Code']       = this.diseaseList[ind][1]
+            this.diseaseList[ind]['Cause']      = this.diseaseList[ind][2]
+            this.diseaseList[ind]['DALYs']      = Math.round(Number(this.diseaseList[ind][3])).toLocaleString()
+            this.diseaseList[ind]['Deaths']     = Math.round(Number(this.diseaseList[ind][4])).toLocaleString()
+            this.diseaseList[ind]['Prevalence'] = Math.round(Number(this.diseaseList[ind][5])).toLocaleString()
 		      }
           this.sortColumn2 = 'name' // Reset the bottom table sorting state.
           this.makeGraph(burdenSet) // Plot graphs
@@ -565,6 +584,7 @@ Last update: 2018oct04
         console.log('Update to be made')
         console.log('Index: ',      disease.numindex)
         console.log('Active?: ',    disease['Active'])
+        console.log('Code: ',       disease['Code'])
         console.log('Cause: ',      disease['Cause'])
         console.log('DALYs: ',      disease['DALYs'])
         console.log('Deaths: ',     disease['Deaths'])
@@ -577,7 +597,7 @@ Last update: 2018oct04
 
         // Go to the server to update the disease from the burden set. Note: filter out commas in the numeric fields.
         rpcs.rpc('update_disease', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
-          [disease['Active'], disease['Cause'], disease['DALYs'], disease['Deaths'], disease['Prevalence']]])
+          [disease['Active'], disease['Code'], disease['Cause'], disease['DALYs'], disease['Deaths'], disease['Prevalence']]])
         .then(response => {
           console.log('DFKJDFKJDKFDJKFD')
           this.updateCounts()
