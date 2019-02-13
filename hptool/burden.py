@@ -16,7 +16,7 @@ class Burden(object):
     
     From http://ghdx.healthdata.org/gbd-results-tool
     
-    Version: 2018oct02
+    Version: 2019feb13
     '''
     
     def __init__(self, name=None, project=None, filename=None, folder=None):
