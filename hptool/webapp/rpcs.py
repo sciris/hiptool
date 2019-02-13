@@ -512,7 +512,7 @@ def jsonify_diseases(project_id, burdenkey):
     proj = load_project(project_id) # Get the Project object.
     burdenset = proj.burden(key=burdenkey) # Get the burden set that matches burdenset_numindex.
     if burdenset.data is None: return {'diseases': []} # Return an empty list if no data is present.
-    disease_data = burdenset.jsonify(cols=['Active','Cause','DALYs','Deaths','Prevalence'], header=False) # Gather the list for all of the diseases.
+    disease_data = burdenset.jsonify(cols=['Active','Code','Cause','DALYs','Deaths','Prevalence'], header=False) # Gather the list for all of the diseases.
     return {'diseases': disease_data}
 
 
@@ -574,8 +574,8 @@ def plot_burden(project_id, burdenkey, dosave=True):
 def add_burden(project_id, intervkey):
     proj = load_project(project_id)
     data = proj.burdensets[intervkey].data
-    ['active', 'cause', 'dalys', 'deaths', 'prevalence']
-    placeholder = [0, '~Cause of burden~', 0, 0, 0]
+    ['active', 'code', 'cause', 'dalys', 'deaths', 'prevalence']
+    placeholder = [0, '~Code~', '~Cause of burden~', 0, 0, 0]
     data[data.nrows()] = placeholder
     save_project(proj)
     return None

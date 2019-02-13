@@ -30,7 +30,7 @@ class Burden(object):
         
         # Define hard-coded column names
         self.colnames = sc.odict([('active',     'Active'),
-                                  #('code',       'Code'),
+                                  ('code',       'Code'),
                                   ('cause',      'Cause'),
                                   ('dalys',      'DALYs'),
                                   ('deaths',     'Deaths'),
@@ -63,11 +63,19 @@ class Burden(object):
             ncols = len(self.colnames)
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
-            rawdata[:,0] = 1 # Set Active to True
-            rawdata[:,1] = countryburden[0].keys() # Set the causes
-            rawdata[:,2] = countryburden[0][:] # Set DALYs
-            rawdata[:,3] = countryburden[1][:] # Set deaths
-            rawdata[:,4] = countryburden[2][:] # Set prevalence
+#            rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
+#            rawdata[:,1] = hp.twigcausedict.keys() # Set the codes -- WARNING
+            rawdata[:,2] = countryburden[0].keys() # Set the causes
+            rawdata[:,3] = countryburden[0][:] # Set DALYs
+            rawdata[:,4] = countryburden[1][:] # Set deaths
+            rawdata[:,5] = countryburden[2][:] # Set prevalence
+            for r in range(len(rawdata)):
+                cause = rawdata[r,2]
+                code = hp.causedict[cause]
+                isactive = hp.twigcausedict[code]
+                print(r, cause, code, isactive)
+                rawdata[r,0] = isactive # Set active
+                rawdata[r,1] = code # Set the codes
             data = sc.dataframe(cols=self.colnames.values(), data=rawdata)
             self.data = data
         self.filename = filename
@@ -106,6 +114,7 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
+        df.filter_out(key=0, col='Active')
         nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
         colordict = sc.odict()
