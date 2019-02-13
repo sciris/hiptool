@@ -107,7 +107,8 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
-        df.filter_out(col='Active')
+        import traceback; traceback.print_exc(); import pdb; pdb.set_trace()
+        df.filter_out(key=0, col='Active')
         nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
         colordict = sc.odict()
