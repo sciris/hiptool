@@ -2,9 +2,12 @@
 Version:
 """
 
+import os
 import pylab as pl
 import sciris as sc
 import hptool as hp
+
+gbddatafile = 'gbd-data.dat'
 
 class Burden(object):
     '''
@@ -53,10 +56,46 @@ class Burden(object):
         return output
     
     def loaddata(self, filename=None, folder=None):
-        ''' Load data from a spreadsheet '''
-        self.data = sc.loadspreadsheet(filename=filename, folder=folder)
-        self.data.filtercols(self.colnames.values(), die=True)
+        ''' Load data from a spreadsheet or from the database '''
+        if os.path.exists(filename):
+            self.data = sc.loadspreadsheet(filename=filename, folder=folder)
+            self.data.filtercols(self.colnames.values(), die=True)
+        else:
+            self.getcountryburden(filename)
         self.filename = filename
+        return None
+
+    def getcountryburden(self, country):
+        try:
+            datadir = hp.HPpath('data')
+            datafile = sc.loadobj(datadir+gbddatafile)
+            countryburden = datafile[country]
+        except Exception as E:
+            errormsg = 'Could not load data for "%s"; not found as a file or country: %s' % str(E)
+            raise Exception(errormsg)
+        
+        # Error checking -- WARNING, could be improved!
+        try:
+            burdenkeys = countryburden.keys()
+            assert 'DALY'       in burdenkeys[0]
+            assert 'Death'      in burdenkeys[1]
+            assert 'Prevalence' in burdenkeys[2]
+        except Exception as E:
+            errormsg = 'Keys DALYs, deaths, and prevalence not in right order: %s (%s)' % (burdenkeys, str(E))
+            raise Exception(errormsg)
+        
+        # Parse data
+        ncols = len(self.colnames)
+        ncauses = len(countryburden[0])
+        rawdata = pl.zeros((ncauses,ncols), dtype=object)
+        rawdata[:,0] = 1 # Set Active to True
+        rawdata[:,1] = countryburden[0].keys() # Set the causes
+        rawdata[:,2] = countryburden[0][:] # Set DALYs
+        rawdata[:,3] = countryburden[1][:] # Set deaths
+        rawdata[:,4] = countryburden[2][:] # Set prevalence
+        data = sc.dataframe(cols=self.colnames.values(), data=rawdata)
+        self.data = data
+        import traceback; traceback.print_exc(); import pdb; pdb.set_trace()
         return None
     
     def savedata(self, filename=None, folder=None):
