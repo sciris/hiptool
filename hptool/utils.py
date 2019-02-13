@@ -18,7 +18,7 @@ def getcountryburden(country):
         datafile = sc.loadobj(datadir+gbddatafile)
         countryburden = datafile[country]
     except Exception as E:
-        errormsg = 'Could not load data for "%s"; not found as a file or country: %s' % str(E)
+        errormsg = 'Could not load data for "%s"; not found as a file or country: %s' % (country, str(E))
         raise Exception(errormsg)
     
     # Error checking -- WARNING, could be improved!

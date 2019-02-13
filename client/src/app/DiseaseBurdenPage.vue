@@ -252,15 +252,8 @@ Last update: 2018oct04
         diseaseList: [], // List of diseases.  Each list element is a list of the ailment name and numbers associated with it.
         sortColumn2: 'name',  // Column of table used for sorting the diseases
         sortReverse2: true, // Sort diseases in reverse order?
-        country: 'Demo',
-        countryList: [
-          'Demo',
-          'Afghanistan',
-          'Argentina',
-          'Cambodia',
-          "Cote d'Ivoire",
-          'Zimbabwe',
-        ],
+        country: 'Afghanistan',
+        countryList: [],
         showingPlots: false,
         graphData: [],
         numtotal: 0,
@@ -285,23 +278,6 @@ Last update: 2018oct04
         return this.applyDiseaseFilter(this.applySorting2(this.diseaseList))
       },
 
-      // numtotal () {
-      //  return this.diseaseList.length
-      // },
-
-      // numactive () {
-      //   let activesum = 0;
-      //   for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
-      //     console.log('THIS IS', this.diseaseList[ind][0])
-      //     if (this.diseaseList[ind][0]) {
-      //       activesum += 1;
-      //       console.log('ACTIVE')
-      //     } else {
-      //       console.log('NOT ACTIVE')
-      //     }
-      //   }
-      //   return activesum
-      // }
     },
 
     watch: {
@@ -315,6 +291,7 @@ Last update: 2018oct04
       if (this.$store.state.currentUser.displayname === undefined) { // If we have no user logged in, automatically redirect to the login page.
         router.push('/login')
       } else { // Otherwise...
+        this.getCountryList();
         this.updateBurdenSets(true) // Load the burden sets from the active project, telling the function to also set the active burden set to the last item.
       }
     },
@@ -353,6 +330,16 @@ Last update: 2018oct04
           }
         }
         this.numactive = activesum
+      },
+
+      getCountryList() {
+        console.log('Getting countries')
+        rpcs.rpc('get_countries') // Get the active project's burden sets.
+                .then(response => {
+                  console.log('Countries got')
+                  console.log(response)
+                  this.countryList = response.data
+                })
       },
 
       updateBurdenSets(setLastEntryActive) {
