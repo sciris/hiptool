@@ -29,7 +29,7 @@ HIPtool 2.0.0 (2019-02-13)
 
 5. To build and start the webapp, change to the `bin` folder, and type `python run.py`. Note: this will take a lot of time (up to 15 min), especially on a first run!
 
-6. If it worked, you can go to `localhost:8091` in your browser and see the HealthPrior webapp.
+6. If it worked, you can go to `localhost:8091` in your browser and see the HIPtool webapp.
 
 7. If it didn't work, try each of the steps separately:
 
@@ -64,7 +64,7 @@ Matplotlib backend switched to "Agg"
 
       ___  ___                                                            
      / __|/ __|   ===================================================     
-     \__ \ |__    ScirisApp "HealthPrior" is now running on port 8091     
+     \__ \ |__    ScirisApp "HIPtool" is now running on port 8091     
      |___/\___|   ===================================================     
                                                                           
 
@@ -72,7 +72,7 @@ Matplotlib backend switched to "Agg"
 
 9. If that all worked, happy health-prioritizing!
 
-**Please see the README in the `bin` folder for more options for how to run HealthPrior.**
+**Please see the README in the `bin` folder for more options for how to run HIPtool.**
 
 
 ## Detailed installation instructions for Windows
