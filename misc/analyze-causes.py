@@ -6,6 +6,6 @@ Created on Wed Feb 13 18:51:43 2019
 @author: cliffk
 """
 
-import hptool as hp
+import hiptool as hp
 import sciris as sc
 

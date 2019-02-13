@@ -2,7 +2,7 @@
 ## Imports and setup
 #######################################################################################################
 
-import hptool as hp
+import hiptool as hp
 import sciris as sc
 
 

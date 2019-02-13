@@ -3,7 +3,7 @@
 #%% Setup
 
 # Create project
-import hptool as hp
+import hiptool as hp
 import sciris.core as sc
 import pylab as pl
 import numpy as np
@@ -73,7 +73,7 @@ if plot_dalys:
     pl.gca().axis('equal')
     pl.title("Current DALYs averted by health intervention\n('000s; total: %0.2f million)" % total_averted)
     pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
-    pl.savefig('hptool_afghanistan_DALYS_averted_2018-05-14.png')
+    pl.savefig('hiptool_afghanistan_DALYS_averted_2018-05-14.png')
 
 
 # Investment cascade
@@ -101,9 +101,9 @@ if plot_cascade:
         tl.set_color(colors[t])
     pl.ylabel('Spending (US$ millions)')
     pl.title('Investment cascade for Afghanistan')
-    pl.savefig('hptool_afghanistan_investment_cascade_2018-05-14.png')
+    pl.savefig('hiptool_afghanistan_investment_cascade_2018-05-14.png')
 
 if export:
-    df.export(filename='hptool_afghanistan_data_2018-05-14.xlsx')
+    df.export(filename='hiptool_afghanistan_data_2018-05-14.xlsx')
 
 print('Done.')

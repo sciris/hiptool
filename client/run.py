@@ -1,5 +1,5 @@
 #!/usr/bin/env python
 
 # Run the server
-import hptool as hp
+import hiptool as hp
 hp.webapp.main.run()

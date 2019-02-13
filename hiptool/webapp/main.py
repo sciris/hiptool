@@ -6,7 +6,7 @@ Last update: 2018sep25
 
 import sciris as sc
 import scirisweb as sw
-import hptool as hp
+import hiptool as hp
 
 def make_app(**kwargs):
     T = sc.tic()

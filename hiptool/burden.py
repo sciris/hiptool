@@ -5,7 +5,7 @@ Version:
 import os
 import pylab as pl
 import sciris as sc
-import hptool as hp
+import hiptool as hp
 
 class Burden(object):
     '''

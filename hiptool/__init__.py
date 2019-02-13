@@ -2,11 +2,11 @@
 """
 This file performs all necessary imports, so HIPtool (HP) can be used either as
 
-from hptool import Project
+from hiptool import Project
 or
-import hptool as hp
+import hiptool as hp
 or
-from hptool import *
+from hiptool import *
 
 Now, the legal part:
 

@@ -7,7 +7,7 @@ Version: 2018sep22
 '''
 
 import scirisweb as sw
-import hptool as hp
+import hiptool as hp
 import os
 
 webapp_dir = os.path.abspath(hp.webapp.config.CLIENT_DIR)

@@ -7,7 +7,7 @@ Created on Wed Feb 13 17:09:28 2019
 """
 
 import sciris as sc
-import hptool as hp
+import hiptool as hp
 
 gbddatafile = 'gbd-data.dat'
 
