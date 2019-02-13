@@ -65,10 +65,11 @@ class Burden(object):
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
             rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
-            rawdata[:,1] = countryburden[0].keys() # Set the causes
-            rawdata[:,2] = countryburden[0][:] # Set DALYs
-            rawdata[:,3] = countryburden[1][:] # Set deaths
-            rawdata[:,4] = countryburden[2][:] # Set prevalence
+            rawdata[:,1] = hp.twigcausedict.keys() # Set the codes -- WARNING
+            rawdata[:,2] = countryburden[0].keys() # Set the causes
+            rawdata[:,3] = countryburden[0][:] # Set DALYs
+            rawdata[:,4] = countryburden[1][:] # Set deaths
+            rawdata[:,5] = countryburden[2][:] # Set prevalence
             data = sc.dataframe(cols=self.colnames.values(), data=rawdata)
             self.data = data
         self.filename = filename
@@ -107,7 +108,6 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
-        import traceback; traceback.print_exc(); import pdb; pdb.set_trace()
         df.filter_out(key=0, col='Active')
         nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]

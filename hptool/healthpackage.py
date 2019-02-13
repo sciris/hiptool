@@ -88,8 +88,8 @@ class HealthPackage(object):
                     print(type(df['total_dalys',r]))
                     print(type(df['max_dalys',r]))
                     print(type(df['total_prevalence',r]))
-                    print(type(thisburden[burdenset.colnames['dalys']]))
-                    print(type(thisburden[burdenset.colnames['prevalence']]))
+#                    print(type(thisburden[burdenset.colnames['dalys']]))
+#                    print(type(thisburden[burdenset.colnames['prevalence']]))
                     notfound.append(key)
         
         # Validation
