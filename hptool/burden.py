@@ -63,7 +63,7 @@ class Burden(object):
             ncols = len(self.colnames)
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
-            rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
+#            rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
 #            rawdata[:,1] = hp.twigcausedict.keys() # Set the codes -- WARNING
             rawdata[:,2] = countryburden[0].keys() # Set the causes
             rawdata[:,3] = countryburden[0][:] # Set DALYs
