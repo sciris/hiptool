@@ -94,7 +94,7 @@ class HealthPackage(object):
         
         # Validation
         if len(notfound):
-            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (notfound, str(lasterror))
+            errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (set(notfound), str(lasterror))
             raise hp.HPException(errormsg)
         invalid = []
         for r in range(df.nrows):

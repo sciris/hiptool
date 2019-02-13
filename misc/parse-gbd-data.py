@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 13 14:19:28 2019
-
-@author: cliffk
+To create the download file:
+    
+    1. Go to GBD Results Tool
+    2. Select national countries, number only, DALYs/deaths/prevalence
+    3. All else should be defaults
 """
 
 import sciris as sc
