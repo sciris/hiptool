@@ -129,7 +129,7 @@ Last update: 2018oct04
         <thead>
           <tr>
             <th style="text-align:center">
-              Active
+              Active ({{numactive}}/{{numtotal}})
             </th>
             <th @click="updateSorting2('name')" class="sortable">
               Cause name
@@ -186,7 +186,8 @@ Last update: 2018oct04
           <tr v-for="disease in sortedFilteredDiseases">
             <td style="text-align: center">
               <input type="checkbox"
-                     v-model="disease['Active']"/>
+                     v-model="disease['Active']"
+                     v-on:change="updateDisease(disease)"/>
             </td>
             <td>
               <input type="text"
@@ -262,6 +263,8 @@ Last update: 2018oct04
         ],
         showingPlots: false,
         graphData: [],
+        numtotal: 0,
+        numactive: 0,
       }
     },
 
@@ -280,7 +283,32 @@ Last update: 2018oct04
 
       sortedFilteredDiseases() {
         return this.applyDiseaseFilter(this.applySorting2(this.diseaseList))
-      }     
+      },
+
+      // numtotal () {
+      //  return this.diseaseList.length
+      // },
+
+      // numactive () {
+      //   let activesum = 0;
+      //   for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
+      //     console.log('THIS IS', this.diseaseList[ind][0])
+      //     if (this.diseaseList[ind][0]) {
+      //       activesum += 1;
+      //       console.log('ACTIVE')
+      //     } else {
+      //       console.log('NOT ACTIVE')
+      //     }
+      //   }
+      //   return activesum
+      // }
+    },
+
+    watch: {
+      diseaseList: function() {
+        this.updateCounts()
+      }
+
     },
 
     created() {
@@ -314,6 +342,19 @@ Last update: 2018oct04
           })
       },
 
+      updateCounts() {
+        this.numtotal = this.diseaseList.length
+
+        let activesum = 0;
+        for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
+          if (this.diseaseList[ind]['Active']) {
+            activesum += 1;
+          } else {
+          }
+        }
+        this.numactive = activesum
+      },
+
       updateBurdenSets(setLastEntryActive) {
         console.log('updateBurdenSets() called')
         if (this.$store.state.activeProject.project === undefined) { // If there is no active project, clear the burdenSets list.
@@ -332,6 +373,7 @@ Last update: 2018oct04
             if ((setLastEntryActive) && (this.burdenSets.length > 0)) { // If we want to set the last entry active and we have any entries, do the setting.
               this.viewBurdenSet(this.burdenSets[this.burdenSets.length - 1])
             }
+            this.updateCounts()
           })
         }
       },
@@ -378,7 +420,7 @@ Last update: 2018oct04
           this.diseaseList = response.data.diseases // Set the disease list.
           for (let ind=0; ind < this.diseaseList.length; ind++) { // Set the active values from the loaded in data.
             this.diseaseList[ind].numindex = ind
-		        this.diseaseList[ind]['Active']     = (this.diseaseList[ind][0] > 0)
+            this.diseaseList[ind]['Active']     = (this.diseaseList[ind][0] > 0)
             this.diseaseList[ind]['Cause']      = this.diseaseList[ind][1]
             this.diseaseList[ind]['DALYs']      = Math.round(Number(this.diseaseList[ind][2])).toLocaleString()
             this.diseaseList[ind]['Deaths']     = Math.round(Number(this.diseaseList[ind][3])).toLocaleString()
@@ -532,6 +574,7 @@ Last update: 2018oct04
       },
 
       updateDisease(disease) {
+        status.succeed(this, 'Updating burden set...')
         console.log('Update to be made')
         console.log('Index: ',      disease.numindex)
         console.log('Active?: ',    disease['Active'])
@@ -540,6 +583,8 @@ Last update: 2018oct04
         console.log('Deaths: ',     disease['Deaths'])
         console.log('Prevalence: ', disease['Prevalence'])
 
+
+
         // Do format filtering to prepare the data to pass to the RPC.
         let filterActive = disease['Active'] ? 1 : 0
 
@@ -547,11 +592,14 @@ Last update: 2018oct04
         rpcs.rpc('update_disease', [this.$store.state.activeProject.project.id, this.activeBurdenSet.burdenset.numindex, disease.numindex,
           [disease['Active'], disease['Cause'], disease['DALYs'], disease['Deaths'], disease['Prevalence']]])
         .then(response => {
+          console.log('DFKJDFKJDKFDJKFD')
+          this.updateCounts()
           status.succeed(this, 'Burden set updated')
         })
           .catch(error => {
             status.fail(this, 'Could not update burden set', error)
           })
+
       },
 
       addBurden() {
