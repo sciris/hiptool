@@ -1,4 +1,4 @@
-from hptool import Project, HPpath
+from hiptool import Project, HPpath
 
 dp = HPpath('data')
 P = Project(burdenfile=dp+'ihme-gbd.xlsx', interventionsfile=dp+'dcp-data.xlsx')

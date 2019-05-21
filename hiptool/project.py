@@ -2,7 +2,7 @@
 ## Imports and setup
 #######################################################################################################
 
-import hptool as hp
+import hiptool as hp
 import sciris as sc
 
 
@@ -14,7 +14,7 @@ class Project(object):
     """
     PROJECT
 
-    The main HealthPrior project class. Almost all functionality is provided by this class.
+    The main HIPtool project class. Almost all functionality is provided by this class.
 
     An HP project is based around 4 major lists:
         1. burdensets  -- an odict of burden data

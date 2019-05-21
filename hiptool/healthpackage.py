@@ -4,7 +4,7 @@ Version: 2019feb13
 
 import numpy as np
 import pylab as pl
-import hptool as hp
+import hiptool as hp
 import sciris as sc
 
 class HealthPackage(object):

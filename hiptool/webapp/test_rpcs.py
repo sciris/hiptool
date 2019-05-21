@@ -4,8 +4,8 @@
 
 import sciris as sc
 import scirisweb as sw
-import hptool as hp
-from hptool.webapp import rpcs, main
+import hiptool as hp
+from hiptool.webapp import rpcs, main
 
 torun = [
 #'project_io',

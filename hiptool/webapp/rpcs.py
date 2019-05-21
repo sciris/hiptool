@@ -15,7 +15,7 @@ import psutil
 import numpy as np
 import sciris as sc
 import scirisweb as sw
-import hptool as hp
+import hiptool as hp
 from . import config
 from matplotlib.pyplot import rc
 rc('font', size=12)
@@ -275,7 +275,7 @@ def save_new_project(proj, username=None, uid=None):
     # Ensure it's a valid webapp project
     if not hasattr(new_project, 'webapp'):
         new_project.webapp = sc.prettyobj()
-        new_project.webapp.username = username # If we ever use Celery with HealthPrior: new_project.webapp.tasks = []
+        new_project.webapp.username = username # If we ever use Celery with HIPtool: new_project.webapp.tasks = []
     new_project.webapp.username = username # Make sure we have the current username
     
     # Save all the things

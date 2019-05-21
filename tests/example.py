@@ -1,10 +1,10 @@
 """
-This script demonstrates example usage of HealthPrior.
+This script demonstrates example usage of HIPtool.
 
 Version: 2018oct04
 """
 
-from hptool import Project, HPpath
+from hiptool import Project, HPpath
 from pylab import show
 
 doplot = True
