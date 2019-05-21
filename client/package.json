@@ -1,6 +1,6 @@
 {
   "name": "HIPtool",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "HIPtool GUI",
   "author": "Health Interventions Prioritization Working Group <info@hiptool.org>",
   "private": true,
