@@ -6,9 +6,11 @@ The HIPtool, a.k.a. Health Interventions Prioritization Tool, is a tool for help
 
 1. Install `hiptool` by typing `python setup.py develop` in the root folder.
 
-2. Change to the `client` subfolder and type `fullrun`.
+2. (Optional) If you want to test, run `python3 -i tests/example.py`. This should bring up several plots.
 
-3. If it worked, go to `localhost:8091` in your browser to use the webapp.
+3. Change to the `client` subfolder and type `fullrun`.
+
+4. If it worked, go to `localhost:8091` in your browser to use the webapp. You can log in with username `demo`, password `demo`.
 
 ## Slow start guide
 
