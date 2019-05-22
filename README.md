@@ -21,13 +21,13 @@ The HIPtool, a.k.a. Health Interventions Prioritization Tool, is a tool for help
 3. Test that you can import it by typing `import hiptool`, e.g.
 ```
 >>> import hiptool
-ScirisWeb 0.12.2 (2019-02-11) -- (c) Sciris.org
-DataStore loaded at redis://127.0.0.1:6379/5 with temp folder /tmp/tmpwonYy_
-HIPtool 2.0.0 (2019-02-13)
+ScirisWeb 0.12.7 (2019-05-23) -- (c) Sciris.org
+DataStore loaded at redis://127.0.0.1:6379/5 with temp folder /tmp/tmpheuwzdt0
+HIPtool 2.0.1 (2019-05-21)
 >>>
 ```
 
-4. Test that plotting works with `python -i scripts/example.py`, which should bring up a graph.
+4. Test that plotting works with `python3 -i scripts/example.py`, which should bring up several graphs.
 
 5. To build and start the webapp, change to the `bin` folder, and type `python run.py`. Note: this will take a lot of time (up to 15 min), especially on a first run!
 
