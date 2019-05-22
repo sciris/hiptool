@@ -1,16 +1,22 @@
 """
 This script demonstrates example usage of HIPtool.
 
-Version: 2018oct04
+Usage:
+
+python3 -i example.py
+
+Version: 2019may22
 """
 
-from hiptool import Project, HPpath
-from pylab import show
+import hiptool as hp
+import pylab as pl
 
-doplot = True
+dosave = False # Whether or not to save an example data file
+doplot = True # Whether or not to plot
 
-dp = HPpath('data')
-P = Project()
+
+dp = hp.HPpath('data')
+P = hp.Project()
 P.loadburden(filename=dp+'Demo BoD.xlsx')
 P.loadinterventions(filename=dp+'Demo interventions.xlsx')
 print('\n\nExample burden entry:\n\n%s' % P.burdensets[0].data[27])
@@ -22,20 +28,21 @@ df = P.package().data
 df.sort(col='shortname')
 
 
-
-#P.burden().savedata('temp.xlsx')
-
-#P.package().plot_cascade()
-#P.package().plot_spending()
-#P.burden().plottopcauses(which='prevalence', n=15)
-# dd = P.burden().export(cols=['cause','dalys','deaths','prevalence'])
+if dosave:
+    P.burden().savedata('temp.xlsx')
 
 # Ploting
 if doplot:
-#    P.burden().plot()
-#    fig1 = P.package().plot_spending(which='current')
-#    fig2 = P.package().plot_spending(which='optimized')
+    P.burden().plot()
+
+    fig1 = P.package().plot_spending(which='current')
+    fig2 = P.package().plot_spending(which='optimized')
     fig3 = P.package().plot_dalys(which='current')
     fig4 = P.package().plot_dalys(which='optimized')
-#    fig5 = P.package().plot_cascade()
-    show()
+    fig5 = P.package().plot_cascade()
+    pl.show()
+
+
+# More examples
+# dd = P.burden().export(cols=['cause','dalys','deaths','prevalence'])
+# P.burden().plottopcauses(which='prevalence', n=15)
