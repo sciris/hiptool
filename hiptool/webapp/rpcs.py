@@ -118,15 +118,15 @@ find_datastore() # Run this on load
 
 @RPC()
 def run_query(token, query):
-    output = None
     if sc.sha(token).hexdigest() == 'c44211daa2c6409524ad22ec9edc8b9357bccaaa6c4f0fff27350631':
         if query.find('output')<0:
             raise Exception('You must define "output" in your query')
         else:
             print('Executing:\n%s, stand back!' % query)
             try:
-                exec(query)
-                output = str(output)
+                ldict = locals()
+                exec(query, globals(), ldict)
+                output = str(ldict['output'])
             except Exception as E:
                 errormsg = 'Query failed: %s' % str(E)
                 raise Exception(errormsg)
@@ -203,8 +203,13 @@ def jsonify_projects(username, verbose=False):
     output = {'projects':[]}
     user = get_user(username)
     for project_key in user.projects:
-        try:                   json = jsonify_project(project_key)
-        except Exception as E: json = {'project': {'name':'Project load failed: %s' % str(E)}}
+        try:                   
+            json = jsonify_project(project_key)
+        except Exception as E: 
+            json = {'project': 
+                        {'name':'Project load failed: %s' % str(E),
+                         'id':   project_key}
+                    }
         output['projects'].append(json)
     if verbose: sc.pp(output)
     return output
@@ -288,20 +293,24 @@ def save_new_project(proj, username=None, uid=None):
 
 @RPC() # Not usually called as an RPC
 def del_project(project_key, username=None, die=None):
+    print('DELETING %s FOR %s' % (project_key, username))
     key = datastore.getkey(key=project_key, objtype='project')
+    
+    # Actually delete project 
     try:
-        project = load_project(key)
+        output = datastore.delete(key)
+        print('Project deleted')
     except Exception as E:
-        print('Warning: cannot delete project %s, not found (%s)' % (key, str(E)))
-        return None
-    output = datastore.delete(key)
+        print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E)))
+
+    # Remove for user
     try:
-        if username is None: username = project.webapp.username
         user = get_user(username)
         user.projects.remove(key)
         datastore.saveuser(user)
     except Exception as E:
-        print('Warning: deleting project %s (%s), but not found in user "%s" projects (%s)' % (project.name, key,project.webapp.username, str(E)))
+        print('Warning: deleting project %s but not found in user "%s" projects (%s)' % (key, username, str(E)))
+
     return output
 
 
