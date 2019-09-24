@@ -301,12 +301,11 @@ def del_project(project_key, username=None, die=None):
         project = load_project(key)
     except Exception as E1:
         print('Warning: key "%s" not found (%s)' % (key, str(E1)))
-        try:
-            output = datastore.delete(key)
-            print('Project deleted')
-        except Exception as E2:
-            print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E2)))
-        return None
+    try:
+        output = datastore.delete(key)
+        print('Project deleted')
+    except Exception as E2:
+        print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E2)))
 
     # Remove for user
     try:
