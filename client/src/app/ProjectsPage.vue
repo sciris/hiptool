@@ -381,7 +381,7 @@ Last update: 2018oct04
         console.log('deleteSelectedProjects() called for ', selectProjectsUIDs)
         if (selectProjectsUIDs.length > 0) { // Have the server delete the selected projects.
           status.start(this)
-          rpcs.rpc('delete_projects', [selectProjectsUIDs])
+          rpcs.rpc('delete_projects', [selectProjectsUIDs, this.$store.state.currentUser.username])
             .then(response => {
               let activeProjectId = this.$store.state.activeProject.project.id // Get the active project ID.
               if (activeProjectId === undefined) {

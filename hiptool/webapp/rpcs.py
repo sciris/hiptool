@@ -298,18 +298,13 @@ def del_project(project_key, username=None, die=None):
     
     # Actually delete project 
     try:
-        project = load_project(key)
-    except Exception as E1:
-        print('Warning: key "%s" not found (%s)' % (key, str(E1)))
-    try:
         output = datastore.delete(key)
         print('Project deleted')
-    except Exception as E2:
-        print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E2)))
+    except Exception as E:
+        print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E)))
 
     # Remove for user
     try:
-        if username is None: username = project.webapp.username
         user = get_user(username)
         user.projects.remove(key)
         datastore.saveuser(user)
