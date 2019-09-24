@@ -203,8 +203,13 @@ def jsonify_projects(username, verbose=False):
     output = {'projects':[]}
     user = get_user(username)
     for project_key in user.projects:
-        try:                   json = jsonify_project(project_key)
-        except Exception as E: json = {'project': {'name':'Project load failed: %s' % str(E)}}
+        try:                   
+            json = jsonify_project(project_key)
+        except Exception as E: 
+            json = {'project': 
+                        {'name':'Project load failed: %s' % str(E),
+                         'id':   project_key}
+                    }
         output['projects'].append(json)
     if verbose: sc.pp(output)
     return output
@@ -288,7 +293,10 @@ def save_new_project(proj, username=None, uid=None):
 
 @RPC() # Not usually called as an RPC
 def del_project(project_key, username=None, die=None):
+    print('DELETING %s FOR %s' % (project_key, username))
     key = datastore.getkey(key=project_key, objtype='project')
+    
+    # Actually delete project 
     try:
         project = load_project(key)
     except Exception as E1:
@@ -299,13 +307,16 @@ def del_project(project_key, username=None, die=None):
         except Exception as E2:
             print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E2)))
         return None
+
+    # Remove for user
     try:
         if username is None: username = project.webapp.username
         user = get_user(username)
         user.projects.remove(key)
         datastore.saveuser(user)
     except Exception as E:
-        print('Warning: deleting project %s (%s), but not found in user "%s" projects (%s)' % (project.name, key,project.webapp.username, str(E)))
+        print('Warning: deleting project %s but not found in user "%s" projects (%s)' % (key, username, str(E)))
+
     return output
 
 
