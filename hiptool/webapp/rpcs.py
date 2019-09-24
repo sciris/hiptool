@@ -118,15 +118,15 @@ find_datastore() # Run this on load
 
 @RPC()
 def run_query(token, query):
-    output = None
     if sc.sha(token).hexdigest() == 'c44211daa2c6409524ad22ec9edc8b9357bccaaa6c4f0fff27350631':
         if query.find('output')<0:
             raise Exception('You must define "output" in your query')
         else:
             print('Executing:\n%s, stand back!' % query)
             try:
-                exec(query)
-                output = str(output)
+                ldict = locals()
+                exec(query, globals(), ldict)
+                output = str(ldict['output'])
             except Exception as E:
                 errormsg = 'Query failed: %s' % str(E)
                 raise Exception(errormsg)
@@ -291,10 +291,14 @@ def del_project(project_key, username=None, die=None):
     key = datastore.getkey(key=project_key, objtype='project')
     try:
         project = load_project(key)
-    except Exception as E:
-        print('Warning: cannot delete project %s, not found (%s)' % (key, str(E)))
+    except Exception as E1:
+        print('Warning: key "%s" not found (%s)' % (key, str(E1)))
+        try:
+            output = datastore.delete(key)
+            print('Project deleted')
+        except Exception as E2:
+            print('Warning: cannot cannot delete project "%s" (%s)' % (key, str(E2)))
         return None
-    output = datastore.delete(key)
     try:
         if username is None: username = project.webapp.username
         user = get_user(username)
