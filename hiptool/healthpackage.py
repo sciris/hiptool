@@ -55,7 +55,7 @@ class HealthPackage(object):
         
         # Create new dataframe
         origdata = sc.dcp(intervset.data)
-        critical_cols = ['active', 'shortname', 'unitcost', 'spend', 'icer', 'frp', 'equity']
+        critical_cols = ['active', 'shortname', 'platform', 'unitcost', 'spend', 'icer', 'frp', 'equity']
         df = sc.dataframe()
         for col in critical_cols: # Copy columns over
             df[col] = sc.dcp(origdata[colnames[col]])
