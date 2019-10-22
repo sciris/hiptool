@@ -93,9 +93,9 @@ from .healthpackage import HealthPackage
 from .project import Project, demo
 
 # Import webapp
-from . import webapp
+#from . import webapp
 
 # Print the license
 HPlicense = 'HIPtool %s (%s)' % (version, versiondate)
-print(HPlicense)
+#print(HPlicense)
 
