@@ -5,9 +5,9 @@ import hiptool as hp
 sc.heading('Initializing...')
 sc.tic()
 
-doplot = False
+dosave = True
 missing_data = ['remove', 'assumption'][1] # Choose how to handle missing data
-spendings = [0.1, 0.5, 1, 5, 10, 50, 100, 500, 1000, 5000]
+spendings = [0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
 nspendings = len(spendings)
 colors = sc.vectocolor(len(spendings))
 
@@ -53,25 +53,33 @@ for c,country in enumerate(country_data['name'].tolist()):
 
 # Analysis
 sc.heading('Analyzing...')
-def optimize(P, country_data, c):
+def optimize(D, country_data, c):
     country = country_data['name'][c]
     print(f'  Working on {country} ({c+1}/{len(country_data)})...')
-    P.makepackage(verbose=False)
-    
+    D[country].makepackage(verbose=False)
     meta = country_data.findrow(country, asdict=True)
+    alloc = []
+    dalys = []
     
-    results = []
     for spend in spendings:
-        P.package().optimize(budget=spend*meta['population'])
-        df = P.package().data
-        results.append(sc.dcp(df['opt_spend'][:]))
-    
-    result = sc.odict({'meta':meta, 'results':pl.array(results)})
+        D[country].package().optimize(budget=spend*meta['population'])
+        df = D[country].package().data
+        alloc.append(sc.dcp(df['opt_spend'][:]))
+        dalys.append(sc.dcp(df['opt_dalys_averted'][:]))
+    result = sc.odict({'meta':meta, 'alloc':pl.array(alloc), 'dalys':pl.array(dalys), 'package':D[country].package()})
     return result
 
-results = sc.parallelize(optimize, iterkwargs={'P':D.values(), 'c':list(range(len(country_data)))}, kwargs={'country_data':country_data})
+results = sc.parallelize(optimize, iterkwargs={'c':list(range(len(country_data)))}, kwargs={'D':D, 'country_data':country_data})
 for r,result in enumerate(results):
     R[country_data['name'][r]] = result
+
+
+
+# Saving
+if dosave:
+    sc.heading('Saving...')
+    sc.saveobj('results/rapid_data.obj', D)
+    sc.saveobj('results/rapid_results.obj', R)
 
 
 sc.toc()
