@@ -1,6 +1,6 @@
 import sciris as sc
 
-bod = sc.loadobj('/home/cliffk/unsw/hiptool/data/gbd-data.dat')
+bod = sc.loadobj('gbd-data.dat')
 
 countrydata = sc.loadspreadsheet('country-data.xlsx')
 
