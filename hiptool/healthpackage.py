@@ -10,7 +10,7 @@ import sciris as sc
 class HealthPackage(object):
     ''' Class to hold the results from the analysis. '''
     
-    def __init__(self, project=None, name=None, burdenset=None, intervset=None, makepackage=None):
+    def __init__(self, project=None, name=None, burdenset=None, intervset=None, makepackage=None, **kwargs):
         self.name       = name # Name of the parameter set, e.g. 'default'
         self.uid        = sc.uuid() # ID
         self.projectref = sc.Link(project) # Store pointer for the project, if available
@@ -24,7 +24,7 @@ class HealthPackage(object):
         self.equitywt   = None
         self.data       = None # The data
         
-        if makepackage: self.makepackage()
+        if makepackage: self.makepackage(**kwargs)
         return None
     
     
@@ -60,7 +60,7 @@ class HealthPackage(object):
         for col in critical_cols: # Copy columns over
             df[col] = sc.dcp(origdata[colnames[col]])
         df['parsedbc'] = sc.dcp(origdata['parsedbc']) # Since not named
-        df.filter_out(key=0, col='active', verbose=True)
+        df.filter_out(key=0, col='active', verbose=verbose)
         
         # Calculate people covered (spending/unitcost)
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))

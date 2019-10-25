@@ -3,6 +3,7 @@ import sciris as sc
 import hiptool as hp
 
 sc.heading('Initializing...')
+sc.tic()
 
 doplot = False
 missing_data = ['remove', 'assumption'][1] # Choose how to handle missing data
@@ -49,24 +50,29 @@ for c,country in enumerate(country_data['name'].tolist()):
         
         D[country].interv().data[key] *= this_factor/baseline_factor
 
-      
+
 # Analysis
 sc.heading('Analyzing...')
-for c,country in enumerate(country_data['name'].tolist()):
+def optimize(P, country_data, c):
+    country = country_data['name'][c]
     print(f'  Working on {country} ({c+1}/{len(country_data)})...')
-    D[country].makepackage()
+    P.makepackage(verbose=False)
     
     meta = country_data.findrow(country, asdict=True)
     
-    def optimize(P, spend, pop):
-        print(f'hi! {spend} {pop}')
-        P.package().optimize(budget=spend*pop)
-        result = sc.dcp(P.package().data['opt_spend'][:])
-        return result
+    results = []
+    for spend in spendings:
+        P.package().optimize(budget=spend*meta['population'])
+        df = P.package().data
+        results.append(sc.dcp(df['opt_spend'][:]))
     
-    results = sc.parallelize(optimize, iterkwargs={'spend':spendings}, kwargs={'P':D[country], 'pop':meta['population']})
-    
-    R[country] = sc.odict({'meta':meta, 'results':pl.array(results)})
+    result = sc.odict({'meta':meta, 'results':pl.array(results)})
+    return result
+
+results = sc.parallelize(optimize, iterkwargs={'P':D.values(), 'c':list(range(len(country_data)))}, kwargs={'country_data':country_data})
+for r,result in enumerate(results):
+    R[country_data['name'][r]] = result
 
 
+sc.toc()
 print('Done.')
