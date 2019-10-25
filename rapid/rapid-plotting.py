@@ -127,10 +127,10 @@ if fig2:
     count = 50
     ticklocs = []
     ticklabels = []
-    darkest = [pl.array([0.6, 0.1, 0.0]),
-               pl.array([0.1, 0.6, 0.0]),
-               pl.array([0.0, 0.1, 0.6]),
-               pl.array([0.6, 0.0, 0.6]),
+    darkest = [pl.array([0.5, 0.1, 0.0]),
+               pl.array([0.0, 0.1, 0.5]),
+               pl.array([0.5, 0.0, 0.5]),
+               pl.array([0.1, 0.5, 0.0]),
                ]
     for k,key,vals in sc.odict(data).enumitems():
         count -= 2
@@ -139,7 +139,7 @@ if fig2:
         for row in vals:
             count -= 1
             count2 += 1
-            thiscolor = (1-count2/10)*darkest[k] + (count2/15)*pl.array([1,1,1])
+            thiscolor = darkest[k] + (count2/20)*pl.array([1,1,1])
             ticklocs.append(count)
             ticklabels.append(row[0])
             pl.barh(count, float(row[-1].rstrip('%')), facecolor=thiscolor, edgecolor='none')
