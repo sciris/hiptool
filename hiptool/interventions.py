@@ -76,7 +76,7 @@ class Interventions(object):
                 burdencovsplit[b] = bs.split(':') # Split into burden and coverage
                 thisbcsplit = burdencovsplit[b]
                 if len(thisbcsplit) != 2:
-                    errormsg = 'Could not split "%s" into burden and coverage, perhaps coverage is missing?' % (thisbcsplit)
+                    errormsg = 'Could not split "%s" into burden and coverage for row %i, perhaps coverage is missing?' % (thisbcsplit, r)
                     raise Exception(errormsg)
                 else:
                     thisbcsplit[0] = thisbcsplit[0].lstrip().rstrip() # Strip leading and trailing spaces
