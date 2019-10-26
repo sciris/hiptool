@@ -44,7 +44,7 @@ def burdenhierarchy(key1, key2):
     nk1 = len(k1parts)
     nk2 = len(k2parts)
     
-    # Handle 'T'
+    # Handle all causes -- 'T'
     if key1 == 'T':
         k1parts = []
         nk1 = 0
@@ -52,6 +52,7 @@ def burdenhierarchy(key1, key2):
         k2parts = []
         nk2 = 0
     
+    # Handle everything else
     if key1 == key2:
         output = 'same'
     elif nk1 == nk2:
@@ -634,7 +635,7 @@ burdeninfo.dict = sc.odict([
 ])
 
 # Parse into categories
-keys = ['children', 'allchildren', 'parent', 'allparents']
+keys = ['children', 'allchildren', 'parent', 'allparents', 'istwig']
 for key in keys:
     burdeninfo[key] = sc.odict()
 for code in burdeninfo.dict.keys():
@@ -654,3 +655,9 @@ for code in burdeninfo.dict.keys():
         
         if 'parent' in relationship:
             burdeninfo.allparents[code].append(code2)
+    
+    if not burdeninfo.children[code]:
+        burdeninfo.istwig[code] = True
+    else:
+        burdeninfo.istwig[code] = False
+    

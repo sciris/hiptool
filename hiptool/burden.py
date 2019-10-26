@@ -90,7 +90,7 @@ class Burden(object):
         return output
         
     
-    def plot(self, which=None, n=None, axsize=None, figsize=None):
+    def plot(self, which=None, n=None, axsize=None, figsize=None, onlytwigs=True):
         '''
         Create a bar plot of the top causes of burden. By default, plots the top
         10 causes of DALYs.
@@ -112,6 +112,14 @@ class Burden(object):
         
         # Pull out data
         df = sc.dcp(self.data)
+        
+        # Set twigs
+        if onlytwigs:
+            for code,twig in hp.burdeninfo.istwig.items():
+                rowind = df.rowindex('C.3.1','Code')[0]
+                df['Active', rowind] = int(twig)
+        
+        # Perform filtering
         df.filter_out(key=0, col='Active')
         nburdens = df.nrows
         colors = sc.gridcolors(nburdens+2, asarray=True)[2:]
