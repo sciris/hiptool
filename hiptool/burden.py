@@ -69,8 +69,9 @@ class Burden(object):
             rawdata[:,5] = countryburden[2][:] # Set prevalence
             for r in range(len(rawdata)):
                 cause = rawdata[r,2]
-                code = hp.causedict[cause]
-                if onlytwigs: isactive = hp.twigcausedict[code] # Automatically disable non-twig burdens
+                code = hp.burdeninfo.rdict[cause]
+                assert code == hp.burdeninfo.keys()[r]
+                if onlytwigs: isactive = hp.burdeninfo.istwig[code] # Automatically disable non-twig burdens
                 else:         isactive = True
                 rawdata[r,0] = isactive # Set active
                 rawdata[r,1] = code # Set the codes

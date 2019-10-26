@@ -634,6 +634,8 @@ burdeninfo.dict = sc.odict([
 ('T', 'All causes')
 ])
 
+burdeninfo.rdict = sc.odict([(key,val) for key,val in zip(burdeninfo.dict.values(), burdeninfo.dict.keys())]) # Reverse order of keys and values
+
 # Parse into categories
 keys = ['children', 'allchildren', 'parent', 'allparents', 'istwig']
 for key in keys:
