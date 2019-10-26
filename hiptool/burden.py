@@ -53,18 +53,16 @@ class Burden(object):
         output += '============================================================\n'
         return output
     
-    def loaddata(self, filename=None, folder=None):
+    def loaddata(self, filename=None, folder=None, onlytwigs=False):
         ''' Load data from a spreadsheet or from the database '''
-        if os.path.exists(filename):
+        if os.path.exists(filename): # Load from spreadsheet
             self.data = sc.loadspreadsheet(filename=filename, folder=folder)
             self.data.filtercols(self.colnames.values(), die=True)
-        else:
+        else: # Load from the database
             countryburden = hp.getcountryburden(filename)
             ncols = len(self.colnames)
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
-#            rawdata[:,0] = hp.twigcausedict[:] # WARNING, assumes same order!
-#            rawdata[:,1] = hp.twigcausedict.keys() # Set the codes -- WARNING
             rawdata[:,2] = countryburden[0].keys() # Set the causes
             rawdata[:,3] = countryburden[0][:] # Set DALYs
             rawdata[:,4] = countryburden[1][:] # Set deaths
@@ -72,8 +70,8 @@ class Burden(object):
             for r in range(len(rawdata)):
                 cause = rawdata[r,2]
                 code = hp.causedict[cause]
-                isactive = hp.twigcausedict[code]
-                print(r, cause, code, isactive)
+                if onlytwigs: isactive = hp.twigcausedict[code] # Automatically disable non-twig burdens
+                else:         isactive = True
                 rawdata[r,0] = isactive # Set active
                 rawdata[r,1] = code # Set the codes
             data = sc.dataframe(cols=self.colnames.values(), data=rawdata)
