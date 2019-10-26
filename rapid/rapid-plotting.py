@@ -46,7 +46,7 @@ if fig1:
     pl.ylabel('DALYs averted (billions)')
     pl.title('Global DALYs averted annually by funding level and disease area')
     pl.xticks(x, xticks)
-    pl.xlabel('Additional EUHC expenditure per person per year globally')
+    pl.xlabel('EUHC expenditure per person per year globally')
     pl.legend([ax[0] for ax in axlist], categories)
     
     pl.show()
