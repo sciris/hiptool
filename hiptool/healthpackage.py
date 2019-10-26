@@ -66,11 +66,9 @@ class HealthPackage(object):
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
+        df.addcol('total_prevalence',   value=0)
         df.addcol('total_dalys',        value=0) # Value=0 by default, but just to be explicit
         df.addcol('max_dalys',          value=0)
-        df.addcol('total_prevalence',   value=0)
-        df.addcol('dalys_averted',      value=0)
-        df.addcol('prevalence_averted', value=0)
         notfound = []
         lasterror = None
         for r in range(df.nrows):
@@ -80,10 +78,9 @@ class HealthPackage(object):
                 val = burdencov[1] # WARNING, add validation here
                 try:
                     thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
-                    df['total_dalys',r]          += thisburden[burdenset.colnames['dalys']]
-                    df['remaining_dalys',r]      += thisburden[burdenset.colnames['dalys']] * val
-                    df['total_prevalence',r]     += thisburden[burdenset.colnames['prevalence']]
-                    df['remaining_prevalence',r] += thisburden[burdenset.colnames['prevalence']] * val
+                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
+                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
+                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
                 except Exception as E:
                     lasterror = E # Annoying Python 3
                     notfound.append(key)
@@ -92,17 +89,19 @@ class HealthPackage(object):
         if len(notfound):
             errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (set(notfound), str(lasterror))
             raise hp.HPException(errormsg)
-        invalid = []
-        for r in range(df.nrows):
-            df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
-            if df['dalys_averted',r]>df['max_dalys',r]:
-                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
-                df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
-                invalid.append(errormsg)
-        if len(invalid):
-            errors = '\n\n'.join(invalid)
-            if die: raise Exception(errors)
-            else:   print(errors)
+        
+        # WARNING, the previous invalid checks didn't consider that disease burden already included the impact of interventions!
+#        invalid = []
+#        for r in range(df.nrows):
+#            df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
+#            if df['dalys_averted',r]>df['max_dalys',r]:
+#                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
+#                df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
+#                invalid.append(errormsg)
+#        if len(invalid):
+#            errors = '\n\n'.join(invalid)
+#            if die: raise Exception(errors)
+#            else:   print(errors)
             
         # To populate with optimization results and fixed spending
         self.budget = hp.arr(df['spend']).sum()
