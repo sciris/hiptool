@@ -66,10 +66,11 @@ class HealthPackage(object):
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
-        df.addcol('total_dalys',      value=0) # Value=0 by default, but just to be explicit
-        df.addcol('max_dalys',        value=0)
-        df.addcol('total_prevalence', value=0)
-        df.addcol('dalys_averted',    value=0)
+        df.addcol('total_dalys',        value=0) # Value=0 by default, but just to be explicit
+        df.addcol('max_dalys',          value=0)
+        df.addcol('total_prevalence',   value=0)
+        df.addcol('dalys_averted',      value=0)
+        df.addcol('prevalence_averted', value=0)
         notfound = []
         lasterror = None
         for r in range(df.nrows):
@@ -79,17 +80,12 @@ class HealthPackage(object):
                 val = burdencov[1] # WARNING, add validation here
                 try:
                     thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
-                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
-                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
-                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
+                    df['total_dalys',r]          += thisburden[burdenset.colnames['dalys']]
+                    df['remaining_dalys',r]      += thisburden[burdenset.colnames['dalys']] * val
+                    df['total_prevalence',r]     += thisburden[burdenset.colnames['prevalence']]
+                    df['remaining_prevalence',r] += thisburden[burdenset.colnames['prevalence']] * val
                 except Exception as E:
-                    lasterror = E # Stupid Python 3
-                    print('HIIII %s' % str(E))
-                    print(type(df['total_dalys',r]))
-                    print(type(df['max_dalys',r]))
-                    print(type(df['total_prevalence',r]))
-#                    print(type(thisburden[burdenset.colnames['dalys']]))
-#                    print(type(thisburden[burdenset.colnames['prevalence']]))
+                    lasterror = E # Annoying Python 3
                     notfound.append(key)
         
         # Validation
@@ -177,21 +173,23 @@ class HealthPackage(object):
                 df['opt_dalys_averted',r] = df['dalys_averted',r]
         
         # Do the "optimization"
-        df.sort(col='benefit', reverse=True)
-        max_dalys = hp.arr(df['max_dalys'])
+        df.sort(col='benefit', reverse=True) # Sort from most to least cost-effective
+        remaining_dalys      = hp.arr(df['remaining_dalys'])
+        remaining_prevalence = hp.arr(df['remaining_prevalence'])
         icers     = hp.arr(df['icer'])
+        unitcosts = hp.arr(df['unitcost'])
         if verbose: print('Optimizing...')
         for r in range(df.nrows):
             if not df['fixed',r]:
-                max_spend = max_dalys[r]*icers[r]
-                if verbose: print('  row %s | remaining %s | name %s | icer %s | icerwt %s | benefit %s | max_dalys %s | max_spend %s' % (r, remaining, df['shortname',r], df['icer',r], df['icerwt',r], df['benefit',r], max_dalys[r], max_spend))
+                max_spend = remaining_dalys[r]*icers[r]
+                if verbose: print(f"  row {r} | remaining {remaining} | name {df['shortname',r]} | icer {df['icer',r]} | icerwt {df['icerwt',r]} | benefit {df['benefit',r]} | remaining_dalys {remaining_dalys[r]} | max_spend {max_spend}")
                 if remaining >= max_spend:
                     remaining -= max_spend
                     df['opt_spend',r] = max_spend
                     df['opt_dalys_averted',r] = max_dalys[r]
                 else:
                     df['opt_spend',r] = remaining
-                    df['opt_dalys_averted',r] = max_dalys[r]*remaining/max_spend
+                    df['opt_dalys_averted',r] = remaining_dalys[r]*remaining/max_spend
                     remaining = 0
         df.sort(col='shortname')
         self.data = df
@@ -200,6 +198,7 @@ class HealthPackage(object):
             print(self.data)
         return None
         
+    
     def _getcolors(self, labels):
         colors = []
         for label in labels:
@@ -207,7 +206,8 @@ class HealthPackage(object):
             else:                       colors.append(0.7+np.zeros(3)) # Set to gray for "Other"
         return colors
         
-    def plot_dalys(self, which=None):
+    
+    def plot_dalys(self, which=None, max_entries=11):
         if which is None: which = 'current'
         if which == 'current':
             colkey   = 'dalys_averted'
@@ -222,7 +222,6 @@ class HealthPackage(object):
         fig = pl.figure(figsize=(10,6))
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
-        max_entries = 11
         nremaining = len(DA_data)-max_entries
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
@@ -233,17 +232,15 @@ class HealthPackage(object):
         plot_labels = list(DA_labels[:max_entries-1])
         plot_labels.append('All other %s interventions' % nremaining)
         colors = self._getcolors(plot_labels)
-#        pl.axes([0.15,0.1,0.45,0.8])
         pl.axes([0.18,0.13,0.42,0.77])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.95, labeldistance=1.03)
-#        pl.gca().axis('equal')
         pl.title("%s DALYs averted ('000s; total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
     
     
-    def plot_spending(self, which=None):
+    def plot_spending(self, which=None, max_entries=11):
         if which is None: which = 'current'
         if which == 'current':
             colkey = 'spend'
@@ -256,10 +253,8 @@ class HealthPackage(object):
             raise Exception(errormsg)
         df = sc.dcp(self.data)
         fig = pl.figure(figsize=(10,6))
-        print('WARNING, number of entries is hard-coded')
         df.sort(col=colkey, reverse=True)
         DA_data = hp.arr(df[colkey])
-        max_entries = 11
         nremaining = len(DA_data)-max_entries
         plot_data = list(DA_data[:max_entries-1])
         plot_data.append(sum(DA_data[max_entries:]))
@@ -272,13 +267,13 @@ class HealthPackage(object):
         colors = self._getcolors(plot_labels)
         pl.axes([0.18,0.13,0.42,0.77])
         pl.pie(plot_data, labels=data_labels, colors=colors, startangle=90, counterclock=False, radius=0.95, labeldistance=1.03)
-#        pl.gca().axis('equal')
         pl.title("%s spending (total: %s)" % (titlekey, format(int(round(total_averted)), ',')))
         pl.legend(plot_labels, bbox_to_anchor=(1,0.8))
         pl.gca().set_facecolor('none')
         return fig
 
-    def plot_cascade(self, vertical=True):
+
+    def plot_cascade(self, vertical=True, cutoff=200e3):
         if vertical:
             fig_size = (12,12)
             ax_size = [0.45,0.05,0.5,0.9]
@@ -286,7 +281,6 @@ class HealthPackage(object):
             fig_size = (16,8)
             ax_size = [0.05,0.45,0.9,0.5]
         df = sc.dcp(self.data)
-        cutoff = 200e3
         fig = pl.figure(figsize=fig_size)
         df.sort(col='icer', reverse=False)
         DA_data = hp.arr(df['opt_spend'])
