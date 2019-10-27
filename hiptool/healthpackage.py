@@ -352,11 +352,11 @@ class HealthPackage(object):
                 pl.bar(loc,  height=this, bottom=start, width=prop,  color=color)
                 pl.text(x[pt], amount+1, amountstr, horizontalalignment='center', color=colors[pt])
         if vertical:
-            pl.xlabel('Spending for optimized investment cascade')
+            pl.xlabel('Spending for optimized investment cascade (US$ millions)')
             pl.gca().set_yticks(x)
             ticklabels = pl.gca().set_yticklabels(DA_labels)
         else:
-            pl.ylabel('Optimized investment cascade')            
+            pl.ylabel('Optimized investment cascade (US$ millions)')            
             pl.gca().set_xticks(x)
             ticklabels = pl.gca().set_xticklabels(DA_labels, rotation=90)
         for t,tl in enumerate(ticklabels):
