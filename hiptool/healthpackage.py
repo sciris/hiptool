@@ -225,12 +225,12 @@ class HealthPackage(object):
                 if max_spend_coverage > max_spend_dalys:
                     ratio = 1.0
                 else:
-                    ratio = max_spend_coverage/max_spend_dalys
+                    ratio = max_spend_coverage/(hp.eps+max_spend_dalys)
                     averted[r,:] *= ratio
                 
                 max_spend = max_spend_dalys*ratio
                 
-                print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f}')
+                if verbose: print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f}')
                 
                 df['opt_spend',r] = max_spend
                 df['opt_dalys_averted',r] = averted[r,:].sum()

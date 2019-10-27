@@ -85,6 +85,7 @@ def arr(data):
 
 # Core functions
 default_key = -1 # Define what the default key is -- WARNING, move
+eps = 1e-9 # Avoid divide by zero errors
 
 from .utils import getcountryburden, burdenhierarchy, countrylist, burdeninfo
 from .burden import Burden
