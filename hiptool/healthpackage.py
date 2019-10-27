@@ -230,11 +230,11 @@ class HealthPackage(object):
                 
                 max_spend = max_spend_dalys*ratio
                 
-                if verbose: print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f}')
-                
                 df['opt_spend',r] = max_spend
-                df['opt_dalys_averted',r] = averted[r,:].sum()
+                df['opt_dalys_averted',r] = this_max_dalys*ratio
                 remaining_budget -= max_spend
+                
+                if verbose: print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f} {this_max_dalys*ratio}')
                 
         df.sort(col='shortname')
         self.data = df
