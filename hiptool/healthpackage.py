@@ -62,56 +62,63 @@ class HealthPackage(object):
         df['parsedbc'] = sc.dcp(origdata['parsedbc']) # Since not named
         df.filter_out(key=0, col='active', verbose=verbose)
         
+        # Include burdens -- WARNING, contains everything, needs to be refactored
+        bod = sc.objdict()
+        bod.codes = hp.burdeninfo.dict.keys()
+        bod.intervnames = df['shortname'][:].tolist()
+        bod.nburdens = len(bod.codes)
+        bod.nintervs = len(bod.intervnames)
+        bod.codeinds = sc.odict()
+        bod.nameinds = sc.odict()
+        bod.original   = pl.zeros(bod.nburdens)
+        bod.remaining  = pl.zeros(bod.nburdens)
+        bod.prevalence = pl.zeros(bod.nburdens)
+        for i in range(bod.nburdens):
+            code = bod.codes[i]
+            bod.codeinds[code] = i
+            bod.nameinds[hp.burdeninfo.dict[code]] = i
+            thisburden = burdenset.data.findrow(key=code, col=burdenset.colnames['code'], asdict=True, die=True)
+            bod.prevalence[i] = thisburden[burdenset.colnames['prevalence']]
+            bod.original[i]   = thisburden[burdenset.colnames['dalys']]
+            bod.remaining[i]  = bod.original[i]
+        bod.intervinds = sc.odict()
+        for i in range(bod.nintervs):
+            bod.intervinds[bod.intervnames[i]] = i
+        bod.averted = pl.zeros((bod.nburdens, bod.nintervs))
+        bod.max_dalys = sc.dcp(bod.averted)
+        self.bod = bod
+        
         # Calculate people covered (spending/unitcost)
         df['coverage'] = hp.arr(df['spend'])/(self.eps+hp.arr(df['unitcost']))
         
         # Pull out DALYS and prevalence
-        df.addcol('total_prevalence',   value=0)
+        df.addcol('max_prevalence',   value=0)
         df.addcol('total_dalys',        value=0) # Value=0 by default, but just to be explicit
         df.addcol('max_dalys',          value=0)
         df.addcol('dalys_averted',      value=0)
-#        notfound = []
-#        lasterror = None
-#        for r in range(df.nrows):
-#            theseburdencovs = df['parsedbc', r]
-#            for burdencov in theseburdencovs:
-#                key = burdencov[0]
-#                val = burdencov[1] # WARNING, add validation here
-#                try:
-#                    thisburden = burdenset.data.findrow(key=key, col=burdenset.colnames['cause'], asdict=True, die=True)
-#                    df['total_prevalence',r] += thisburden[burdenset.colnames['prevalence']]
-#                    df['total_dalys',r]      += thisburden[burdenset.colnames['dalys']]
-#                    df['max_dalys',r]        += thisburden[burdenset.colnames['dalys']] * val
-#                except Exception as E:
-#                    lasterror = E # Annoying Python 3
-#                    notfound.append(key)
+        notfound = []
+        lasterror = None
+        for r in range(df.nrows):
+            theseburdencovs = df['parsedbc', r]
+            for burdencov in theseburdencovs:
+                key = burdencov[0]
+                val = burdencov[1] # WARNING, add validation here
+                codeind = bod.nameinds[key]
+                dalys = bod.original[codeind]
+                prevalence = bod.prevalence[codeind]
+                df['max_prevalence',r] += prevalence
+                df['total_dalys',r]    += dalys
+                df['max_dalys',r]      += dalys * val
+                bod.max_dalys[codeind,r] = dalys*val
         
         # Validation
         if len(notfound):
             errormsg = 'The following burden(s) were not found: "%s"\nError:\n%s' % (set(notfound), str(lasterror))
             raise hp.HPException(errormsg)
             
-        # Include burdens
-        bod = sc.objdict()
-        bod.codes = hp.burdeninfo.dict.keys()
-        bod.intervs = df['shortname'][:].tolist()
-        nburdens = len(bod.codes)
-        nintervs = len(bod.intervs)
-        bod.averted = pl.zeros((nintervs, nburdens))
-        self.bod = bod
-        
         # WARNING, the previous invalid checks didn't consider that disease burden already included the impact of interventions!
-#        invalid = []
         for r in range(df.nrows):
             df['dalys_averted',r] = df['spend',r]/(self.eps+df['icer',r])
-#            if df['dalys_averted',r]>df['max_dalys',r]:
-#                errormsg = 'Data input error: DALYs averted for "%s" greater than total DALYs (%0.0f vs. %0.0f); please reduce total spending, increase ICER, increase DALYs, or increase max coverage' % (df['shortname',r], df['dalys_averted',r], df['max_dalys',r])
-#                df['dalys_averted',r] = df['max_dalys',r] # WARNING, reset to maximum rather than give error if die=False
-#                invalid.append(errormsg)
-#        if len(invalid):
-#            errors = '\n\n'.join(invalid)
-#            if die: raise Exception(errors)
-#            else:   print(errors)
             
         # To populate with optimization results and fixed spending
         self.budget = hp.arr(df['spend']).sum()
@@ -174,39 +181,61 @@ class HealthPackage(object):
         df['benefit'] = (1.0/(hp.arr(df['icer'])+self.eps)) * hp.arr(df['icerwt'])
         
         # Handle fixed budgets
-        remaining = sc.dcp(self.budget)
+        remaining_budget = sc.dcp(self.budget)
         for r in range(df.nrows):
             if df['fixed',r]:
-                remaining -= df['spend',r]
+                remaining_budget -= df['spend',r]
                 df['opt_spend',r]         = df['spend',r]
                 df['opt_dalys_averted',r] = df['dalys_averted',r]
         
         # Do the "optimization"
-        df.sort(col='benefit', reverse=True) # Sort from most to least cost-effective
-        max_dalys      = hp.arr(df['max_dalys']) # NO NEED TO RECALCUALTE
-        max_coverage   = hp.arr(df['total_prevalence')
+        sortorder = df.sort(col='benefit', reverse=True) # Sort from most to least cost-effective
+        reverseorder = pl.argsort(sortorder)
+        averted = self.bod.averted
+        max_coverage   = hp.arr(df['max_prevalence'])
         icers     = hp.arr(df['icer'])
         unitcosts = hp.arr(df['unitcost'])
         if verbose: print('Optimizing...')
-        for r in range(df.nrows):
-            if not df['fixed',r]:
-                max_spend_dalys    = max_dalys[r] * icers[r]
-                max_spend_coverage = max_coverage[r] * unitcosts[r]
-                max_spend = min(max_spend_dalys, max_spend_coverage)
-                print(f'{r} {max_spend_dalys} {max_spend_coverage}')
-                if verbose: print(f"  row {r} | remaining {remaining} | name {df['shortname',r]} | icer {df['icer',r]} | icerwt {df['icerwt',r]} | benefit {df['benefit',r]} | max_dalys {max_dalys[r]} | max_spend {max_spend}")
-                if remaining >= max_spend:
-                    dalys_averted = max_dalys[r]
-                    remaining -= max_spend
-                    df['opt_spend',r] = max_spend
-                    df['opt_dalys_averted',r] = dalys_averted
-                    df['max_dalys', r] = 0
+        
+        bod = self.bod # Make easier to get
+        for r in range(df.nrows): # Loop over each intervention
+            
+            if remaining_budget > 0:
+            
+                # Calculate burden coverages
+                theseburdencovs = df['parsedbc', r]
+                
+                # Calculate maximum coverage for this intervention based on unit cost and prevalence
+                max_spend_coverage = min(remaining_budget, max_coverage[r] * unitcosts[r])
+                
+                # Calculate maximum DALYs
+                this_max_dalys = 0
+                for burdencov in theseburdencovs: # Loop over each listed burden
+                    name = burdencov[0] # Name of burden, e.g. "Caries of deciduous teeth"
+                    mec  = burdencov[1] # Maximum effective coverage, e.g. 0.2
+                    burdenind = self.bod.nameinds[name]
+                    remainingburden = bod.remaining[burdenind]
+                    available = remainingburden*mec
+                    this_max_dalys += available
+                    averted[burdenind,reverseorder[r]] = available
+                    
+                max_spend_dalys  = this_max_dalys * icers[r]
+                
+                ratio = 1.0
+                if max_spend_coverage > max_spend_dalys:
+                    ratio = 1.0
                 else:
-                    dalys_averted = max_dalys[r]*remaining/max_spend
-                    df['opt_spend',r] = remaining
-                    df['opt_dalys_averted',r] = dalys_averted
-                    df['max_dalys', r] -= dalys_averted # Probably 0 anyway
-                    remaining = 0
+                    ratio = max_spend_coverage/max_spend_dalys
+                    averted[r,:] *= ratio
+                
+                max_spend = max_spend_dalys*ratio
+                
+                print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f}')
+                
+                df['opt_spend',r] = max_spend
+                df['opt_dalys_averted',r] = averted[r,:].sum()
+                remaining_budget -= max_spend
+                
         df.sort(col='shortname')
         self.data = df
         if verbose:
