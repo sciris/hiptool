@@ -210,6 +210,7 @@ class HealthPackage(object):
                 
                 # Calculate maximum DALYs
                 this_max_dalys = 0
+                tmp_data = []
                 for burdencov in theseburdencovs: # Loop over each listed burden
                     name = burdencov[0] # Name of burden, e.g. "Caries of deciduous teeth"
                     mec  = burdencov[1] # Maximum effective coverage, e.g. 0.2
@@ -218,6 +219,7 @@ class HealthPackage(object):
                     available = remainingburden*mec
                     this_max_dalys += available
                     averted[burdenind,reverseorder[r]] = available
+                    tmp_data.append(f'{name:30s}: {available:10.0f}')
                     
                 max_spend_dalys  = this_max_dalys * icers[r]
                 
@@ -234,13 +236,17 @@ class HealthPackage(object):
                 df['opt_dalys_averted',r] = this_max_dalys*ratio
                 remaining_budget -= max_spend
                 
-                if verbose: print(f'{r}: {remaining_budget:10.0f} {max_spend:10.0f} {max_spend_dalys:10.0f} {max_spend_coverage:10.0f} {this_max_dalys*ratio}')
+                if verbose:
+                    print(f'{r}. {df["shortname", r]}')
+                    print(f'Remain: {remaining_budget:10.0f} | Alloc {max_spend:10.0f} | Averted {this_max_dalys*ratio:10.0f} | Max(DALYs) {max_spend_dalys:10.0f} | Max(Cov) {max_spend_coverage:10.0f} | ICER {icers[r]:10.0f}')
+                    print('\n'.join(tmp_data))
+                    print()
                 
         df.sort(col='shortname')
         self.data = df
-        if verbose:
-            print('Optimization output:')
-            print(self.data)
+#        if verbose:
+#            print('Optimization output:')
+#            print(self.data)
         return None
         
     
