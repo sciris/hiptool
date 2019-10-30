@@ -12,7 +12,7 @@ import hiptool as hp
 import pylab as pl
 
 dosave = False # Whether or not to save an example data file
-doplot = True # Whether or not to plot
+doplot = False # Whether or not to plot
 
 
 dp = hp.HPpath('data')
@@ -41,6 +41,8 @@ if doplot:
     fig4 = P.package().plot_dalys(which='optimized')
     fig5 = P.package().plot_cascade()
     pl.show()
+    
+print('Done')
 
 
 # More examples

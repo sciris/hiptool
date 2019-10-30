@@ -85,17 +85,18 @@ def arr(data):
 
 # Core functions
 default_key = -1 # Define what the default key is -- WARNING, move
+eps = 1e-9 # Avoid divide by zero errors
 
-from .utils import getcountryburden, countrylist, causedict, twigcausedict
+from .utils import getcountryburden, burdenhierarchy, countrylist, burdeninfo
 from .burden import Burden
 from .interventions import Interventions
 from .healthpackage import HealthPackage
 from .project import Project, demo
 
 # Import webapp
-from . import webapp
+#from . import webapp
 
 # Print the license
 HPlicense = 'HIPtool %s (%s)' % (version, versiondate)
-print(HPlicense)
+#print(HPlicense)
 
