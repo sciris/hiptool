@@ -6,11 +6,11 @@ Last update: 2018sep25
 
 import sciris as sc
 import scirisweb as sw
-import hiptool as hp
+import hiptool_app as ha
 
 def make_app(**kwargs):
     T = sc.tic()
-    app = sw.ScirisApp(name='HIPtool', filepath=__file__, config=hp.webapp.config, RPC_dict=hp.webapp.rpcs.RPC_dict) # Create the ScirisApp object.  NOTE: app.config will thereafter contain all of the configuration parameters, including for Flask.
+    app = sw.ScirisApp(name='HIPtool', filepath=__file__, config=ha.config, RPC_dict=ha.rpcs.RPC_dict) # Create the ScirisApp object.  NOTE: app.config will thereafter contain all of the configuration parameters, including for Flask.
     sw.make_default_users(app)
     print('>> Webapp initialization complete (elapsed time: %0.2f s)' % sc.toc(T, output=True))
     return app
