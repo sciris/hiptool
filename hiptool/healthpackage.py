@@ -50,7 +50,7 @@ class HealthPackage(object):
         self.equitywt = equitywt
         burdenset = self.projectref().burden(key=self.burdenset)
         intervset = self.projectref().interv(key=self.intervset)
-        intervset.parse() # Ensure it's parsed
+#        intervset.parse() # Ensure it's parsed
         colnames = intervset.colnames
         
         # Create new dataframe
