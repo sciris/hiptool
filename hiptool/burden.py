@@ -63,14 +63,18 @@ class Burden(object):
             ncols = len(self.colnames)
             ncauses = len(countryburden[0])
             rawdata = pl.zeros((ncauses,ncols), dtype=object)
-            rawdata[:,2] = countryburden[0].keys() # Set the causes
+            rawdata[:,2] = countryburden[0].keys() # Set the causes # Iterate over this rather than taking slices
             rawdata[:,3] = countryburden[0][:] # Set DALYs
             rawdata[:,4] = countryburden[1][:] # Set deaths
             rawdata[:,5] = countryburden[2][:] # Set prevalence
             for r in range(len(rawdata)):
                 cause = rawdata[r,2]
                 code = hp.burdeninfo.rdict[cause]
-                assert code == hp.burdeninfo.keys()[r]
+                try:
+                    assert code == hp.burdeninfo.dict.keys()[r]
+                except Exception as E:
+                    errormsg = f'Mismatch: {code} vs. {hp.burdeninfo.dict.keys()[r]}'
+                    raise Exception(errormsg)
                 if onlytwigs: isactive = hp.burdeninfo.istwig[code] # Automatically disable non-twig burdens
                 else:         isactive = True
                 rawdata[r,0] = isactive # Set active
